@@ -1,0 +1,21 @@
+<zk>
+	<window title="${labels.mvvm.title}" viewModel="@id('vm') @init('com.kubehelper.viewmodel.MainViewModel')">
+		Current Time (from Spring Service):
+
+		<hlayout valign="middle">
+			<label value="@load(vm.currentTime)"/>
+			<button iconSclass="z-icon-refresh" onClick="@command('updateTime')"/>
+		</hlayout>
+
+		<separator />
+
+		Simple MVVM-Based Sub Navigation:
+		<div>
+			<button label="sub page 1" onClick="@command('navigate', page='page1')"/>
+			<button label="sub page 2" onClick="@command('navigate', page='page2')"/>
+		</div>
+		<!-- in ZK CE version you can use the include component -->
+		<!--<include pageModel="@load(vm.currentPage)" src="@load(vm.currentPage.uri)"/>-->
+		<apply templateURI="@load(vm.currentPage.uri)" pageModel="@load(vm.currentPage)"/>
+	</window>
+</zk>

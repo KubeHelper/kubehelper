@@ -1,0 +1,6 @@
+<zk>
+	What's your name: <textbox id="demoInput"/>
+	<button id="demoButton" label="Submit" onClick='demoLabel.setValue("Hello " + demoInput.getValue() + "!")'/>
+	<separator/>
+	<label id="demoLabel"/>
+</zk>

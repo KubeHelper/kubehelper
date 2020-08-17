@@ -1,0 +1,5 @@
+<zk>
+	<window title="Page 2" viewModel="@id('subVm') @init(pageModel)">
+		<label value="@load(subVm.data)"/>
+	</window>
+</zk>
