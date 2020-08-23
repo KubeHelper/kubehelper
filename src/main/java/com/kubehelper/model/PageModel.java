@@ -1,5 +1,9 @@
-package com.kubehelper.viewmodel;
+package com.kubehelper.model;
 
+/**
+ * Page Model Example
+ * @param <T>
+ */
 public class PageModel<T> {
 	private String uri;
 	private T data;
