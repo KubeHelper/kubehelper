@@ -1,3 +1,4 @@
+<?page id="indexPage"?>
 <zk>
     <!--    <style>-->
     <!--        .breeze .complex-layout, .breeze .complex-layout .z-south, .breeze .complex-layout .z-west {-->
@@ -16,7 +17,7 @@
     <!--        .inner-border .z-south, .inner-border .z-east { background: #FFFFFF; }-->
     <!--        .dl-link { text-decoration: none; cursor: pointer; }-->
     <!--    </style>-->
-    <div viewModel="@id('indexVM') @init('com.kubehelper.viewmodel.IndexVM')" height="100%">
+    <div id="indexWindow" viewModel="@id('indexVM') @init('com.kubehelper.viewmodel.IndexVM')" height="100%" width="100%">
         <borderlayout sclass="complex-layout">
             <north size="5%" border="0" style="background: #3498DB">
                 <!--                <panel border="normal" height="100%" width="100%">-->
@@ -31,7 +32,6 @@
                 <hbox height="100%" width="100%">
                     <cell hflex="2" align="center" valign="middle">
                         <label value="LOGO TODO "/>
-                        <label value="@load(indexVM.currentTime)"/>
                         <!--                        <image style="width: 100%;height: 100%" src="~./img/kubehelper-logo-256.png"/>-->
                     </cell>
                     <cell hflex="8" align="center" valign="middle">
@@ -65,17 +65,17 @@
                     <panel width="100%">
                         <panelchildren style="padding:5px;">
                             <toolbar>
-                                <toolbarbutton disabled="true" hflex="1" label="Dashboard"/>
-                                <toolbarbutton id="search" hflex="1" label="Search" onClick="indexVM.onButtonClick()"/>
-                                <toolbarbutton hflex="1" label="Security"/>
-                                <toolbarbutton hflex="1" label="Auditing"/>
-                                <toolbarbutton hflex="1" label="Custom Resources"/>
-                                <toolbarbutton hflex="1" label="Deprecated"/>
-                                <toolbarbutton hflex="1" label="Events"/>
-                                <toolbarbutton hflex="1" label="Features"/>
-                                <toolbarbutton hflex="1" label="Feature Gates"/>
-                                <toolbarbutton hflex="1" label="Ips and Ports"/>
-                                <toolbarbutton hflex="1" label="Volumes"/>
+                                <toolbarbutton id="dashboardMenuBtn" hflex="1" disabled="true" label="Dashboard" onClick="@command('switchView', modelName='dashboard')"/>
+                                <toolbarbutton id="searchMenuBtn" hflex="1" label="Search" onClick="@command('switchView', modelName='search')"/>
+                                <toolbarbutton id="securityMenuBtn" hflex="1" label="Security" onClick="@command('switchView', modelName='security')"/>
+                                <toolbarbutton id="auditingMenuBtn" hflex="1" label="Auditing" onClick="@command('switchView', modelName='auditing')"/>
+                                <toolbarbutton id="customResourcesMenuBtn" hflex="1" label="Custom Resources" onClick="@command('switchView', modelName='customResources')"/>
+                                <toolbarbutton id="deprecatedMenuBtn" hflex="1" label="Deprecated" onClick="@command('switchView', modelName='deprecated')"/>
+                                <toolbarbutton id="eventsMenuBtn" hflex="1" label="Events" onClick="@command('switchView', modelName='events')"/>
+                                <toolbarbutton id="featuresMenuBtn" hflex="1" label="Features" onClick="@command('switchView', modelName='features')"/>
+                                <toolbarbutton id="featureGatesMenuBtn" hflex="1" label="Feature Gates" onClick="@command('switchView', modelName='featureGates')"/>
+                                <toolbarbutton id="ipsAndPortsMenuBtn" hflex="1" label="Ips and Ports" onClick="@command('switchView', modelName='ipsAndPorts')"/>
+                                <toolbarbutton id="volumesMenuBtn" hflex="1" label="Volumes" onClick="@command('switchView', modelName='volumes')"/>
                             </toolbar>
                         </panelchildren>
                     </panel>
@@ -121,58 +121,8 @@
             </east>
             <!-- Content -->
             <center style="overflow:auto">
-                <borderlayout sclass="inner-border">
-                    <north splittable="true" collapsible="true" height="3%" margins="2,3,0,0">
-                        <hbox height="100%" width="100%" align="center">
-                            <cell>
-                                <label value="DevTools for content" style="font-size:20px;"/>
-                                <textbox sclass="demo-search-inp" value="@bind(vm.search)"/>
-                                <button label="Search ZK Resource" onClick="@command('search')"/>
-                                <button iconSclass="z-icon-heartbeat" hflex="1" label="Donate" dir="reverse"/>
-                                <button iconSclass="z-icon-heartbeat" hflex="1" label="Operation1" dir="reverse"/>
-                                <button iconSclass="z-icon-heartbeat" hflex="1" label="Operation2" dir="reverse"/>
-                                <button iconSclass="z-icon-heartbeat" hflex="1" label="Operation3" dir="reverse"/>
-                            </cell>
-                        </hbox>
-                    </north>
-                    <center border="0" margins="0,3,3,3">
-                        <div sclass="content">
-                            <!--                            <include id="myInclude1"-->
-                            <!--                                     mode="instant"-->
-                            <!--                                     viewModel="@id('vm') @init('com.kubehelper.viewmodel.IndexVM')"-->
-                            <!--                                     src="@load(vm.template)"/>-->
-                            <!--                            TODO read about difference instant or defer   - https://www.zkoss.org/wiki/ZK Component Reference/Essential Components/Include-->
-                            <include id="myInclude" src="@load(indexVM.template)"/>
-                        </div>
-                    </center>
-                    <east border="0" width="50%" margins="0,0,3,3">
-                        <panel title="Customer Overview" border="normal"
-                               height="100%" hflex="1">
-                            <panelchildren>
-                                Continent Contribution to Total Visitors
-                                <grid height="100%" model="@load(vm.contributions)">
-                                    <columns>
-                                        <column label="category"
-                                                width="80px"/>
-                                        <column label="value"/>
-                                    </columns>
-                                    <template name="model">
-                                        <row>
-                                            <label value="@load(each.area)"/>
-                                            <intbox value="@bind(each.value)" onChange="@command('updatePieModel')"/>
-                                        </row>
-                                    </template>
-                                </grid>
-                            </panelchildren>
-                        </panel>
-                    </east>
-                    <south border="1" size="3%" maxsize="200" splittable="true" collapsible="true" margins="0,0,3,3">
-                        <panel border="normal">
-                            <panelchildren style="overflow:auto;">
-                            </panelchildren>
-                        </panel>
-                    </south>
-                </borderlayout>
+                <!--                            TODO read about difference instant or defer   - https://www.zkoss.org/wiki/ZK Component Reference/Essential Components/Include-->
+                <include id="templateInclude" src="@load(indexVM.pageModel.templateUrl)"/>
             </center>
             <south size="3%" maxsize="200" style="background: none repeat scroll 0 0 ;">
                 <toolbar mold="panel" align="center">

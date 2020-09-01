@@ -1,23 +1,11 @@
 package com.kubehelper.model;
 
 /**
- * Page Model Example
- * @param <T>
+ * @author JDev
  */
-public class PageModel<T> {
-	private String uri;
-	private T data;
+public interface PageModel {
 
-	public PageModel(String uri, T data) {
-		this.uri = uri;
-		this.data = data;
-	}
+    public String getTemplateUrl();
+    public String getName();
 
-	public String getUri() {
-		return uri;
-	}
-
-	public T getData() {
-		return data;
-	}
 }

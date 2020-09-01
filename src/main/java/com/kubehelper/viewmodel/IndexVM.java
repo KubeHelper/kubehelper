@@ -1,17 +1,20 @@
 package com.kubehelper.viewmodel;
 
+import com.kubehelper.model.DashboardModel;
 import com.kubehelper.model.PageModel;
-import com.kubehelper.service.TestService;
+import com.kubehelper.model.SearchModel;
+import com.kubehelper.service.CommonService;
 import org.zkoss.bind.BindUtils;
+import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.Init;
-import org.zkoss.bind.annotation.NotifyChange;
+import org.zkoss.zk.ui.Path;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zkplus.spring.DelegatingVariableResolver;
-import org.zkoss.zul.Include;
+import org.zkoss.zul.Toolbarbutton;
+import org.zkoss.zul.Window;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,71 +24,55 @@ import java.util.Map;
 @VariableResolver(DelegatingVariableResolver.class)
 public class IndexVM {
 
-    private String url;
-    private static final String URL_PREFIX = "~./zul/webpages/templates/";
-    private String template = "~./zul/pages/dashboard.zul";
-    private boolean isInitial = true;
+    private PageModel pageModel;
+    private String currentModelName;
 
     @WireVariable
-    private TestService testService;
+    private CommonService commonService;
 
-//    @Init
-//    public void init(@QueryParam("page") String queryParam) {
-//        url = (String) Executions.getCurrent().getAttribute("page") + ".zul";
-//    }
+    private Window wizard;
+
+    private Map<String, PageModel> models = new HashMap<>() {
+        {
+            put("dashboard", new DashboardModel());
+            put("search", new SearchModel());
+            put("security", new SearchModel());
+            put("auditing", new SearchModel());
+            put("customResources", new SearchModel());
+            put("deprecated", new SearchModel());
+            put("events", new SearchModel());
+            put("features", new SearchModel());
+            put("featureGates", new SearchModel());
+            put("ipsAndPorts", new SearchModel());
+            put("volumes", new SearchModel());
+        }
+    };
+
 
     @Init
     public void init() {
-        
+//        pageModel = new DashboardModel();
+        pageModel = new SearchModel();
+        currentModelName = pageModel.getName();
     }
 
-    @Command
-    @NotifyChange("currentTime")
-    public void updateTime() {
-        //NOOP just for the notify change
+    public PageModel getPageModel() {
+        return pageModel;
     }
 
-    public Date getCurrentTime() {
-        return testService.getTime();
+    @Command()
+    public void switchView(@BindingParam("modelName") String modelName) {
+        pageModel = models.get(modelName);
+        enableDisableMenuItem(modelName);
+
+        BindUtils.postNotifyChange(null, null, this, ".");
     }
 
-    public String getTemplate() {
-        return template;
+    private void enableDisableMenuItem(String modelName) {
+        Toolbarbutton clickedMenuBtn = (Toolbarbutton) Path.getComponent("//indexPage/" + modelName + "MenuBtn");
+        Toolbarbutton currentMenuBtn = (Toolbarbutton) Path.getComponent("//indexPage/" + currentModelName + "MenuBtn");
+        clickedMenuBtn.setDisabled(true);
+        currentMenuBtn.setDisabled(false);
+        currentModelName = modelName;
     }
-
-    public String getUrl() {
-        if (url == null) {
-            return null;
-        }
-        return URL_PREFIX + url;
-
-    }
-
-    public void onButtonClick() {
-        if (isInitial) {
-            template = "~./zul/pages/dashboard.zul";
-            isInitial = false;
-        } else {
-            template = "~./zul/pages/search.zul";
-            isInitial = true;
-        }
-        BindUtils.postNotifyChange(null,null,this,".");
-    }
-
-    //TODO look for page model for all views
-//    Map<String, PageModel<String>> pages = new HashMap<>();
-//    private PageModel<String> currentPage;
-//
-//    @Init
-//    public void init() {
-//        pages.put("page1", new PageModel<>("~./zul/mvvm-page1.zul", "some data for page 1 (could be a more complex object)"));
-//        pages.put("page2", new PageModel<>("~./zul/mvvm-page2.zul", "different data for page 2"));
-//    }
-
-
-//    @Command
-//    @NotifyChange("currentTime")
-//    public void updateTime() {
-//        //NOOP just for the notify change
-//    }
 }

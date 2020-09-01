@@ -1,0 +1,120 @@
+package com.kubehelper.service;
+
+import com.kubehelper.common.Resource;
+import com.kubehelper.model.SearchModel;
+import io.kubernetes.client.openapi.ApiException;
+import io.kubernetes.client.openapi.apis.CoreV1Api;
+import io.kubernetes.client.openapi.models.V1Container;
+import io.kubernetes.client.openapi.models.V1EnvVar;
+import io.kubernetes.client.openapi.models.V1ObjectMeta;
+import io.kubernetes.client.openapi.models.V1Pod;
+import io.kubernetes.client.openapi.models.V1PodList;
+import io.kubernetes.client.openapi.models.V1PodSpec;
+import io.kubernetes.client.openapi.models.V1PodStatus;
+import org.apache.commons.lang3.ObjectUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.zkoss.zul.Messagebox;
+
+import java.lang.reflect.Field;
+import java.util.Objects;
+import java.util.Set;
+
+/**
+ * @author JDev
+ */
+@Service
+public class SearchService {
+
+    @Autowired
+    private CoreV1Api api;
+
+    public void search(String selectedNamespace, String searchString, boolean caseSensitiveSearch, Set<Resource> selectedResources, SearchModel searchModel) {
+
+        for (V1Pod pod : getV1PodList(selectedNamespace).getItems()) {
+            for (V1Container container : Objects.requireNonNull(pod.getSpec()).getContainers()) {
+                if (ObjectUtils.isNotEmpty(container.getEnv())) {
+                    for (V1EnvVar v1EnvVar : container.getEnv()) {
+                        try {
+                            if (ObjectUtils.isEmpty(v1EnvVar.getValueFrom())) {
+                                composeValueFromToSearchResult(null, null, null, v1EnvVar, pod, container, searchModel, searchString);
+                            } else {
+                                if (ObjectUtils.isNotEmpty(v1EnvVar.getValueFrom().getFieldRef())) {
+
+                                    String fieldPath = v1EnvVar.getValueFrom().getFieldRef().getFieldPath();
+                                    String declaredField = fieldPath.substring(fieldPath.lastIndexOf(".") + 1, fieldPath.length());
+                                    if (v1EnvVar.getValueFrom().getFieldRef().getFieldPath().startsWith("metadata")) {
+                                        Field filed = V1ObjectMeta.class.getDeclaredField(declaredField);
+                                        composeValueFromToSearchResult(filed, pod.getMetadata(), fieldPath, v1EnvVar, pod, container, searchModel, searchString);
+                                    }
+                                    if (fieldPath.startsWith("status")) {
+                                        Field filed = V1PodStatus.class.getDeclaredField(declaredField);
+                                        composeValueFromToSearchResult(filed, pod.getStatus(), fieldPath, v1EnvVar, pod, container, searchModel, searchString);
+                                    }
+                                    if (fieldPath.startsWith("spec")) {
+                                        Field filed = V1PodSpec.class.getDeclaredField(declaredField);
+                                        composeValueFromToSearchResult(filed, pod.getSpec(), fieldPath, v1EnvVar, pod, container, searchModel, searchString);
+                                    }
+                                }
+
+//                        if (ObjectUtils.isNotEmpty(v1EnvVar.getValueFrom().getResourceFieldRef())) {
+//                            try {
+//                                String fieldResource = v1EnvVar.getValueFrom().getResourceFieldRef().getResource();
+//                                if (fieldResource.startsWith("requests")) {
+//                                    Field filed = V1ObjectMeta.class.getDeclaredField(fieldResource.substring(fieldResource.lastIndexOf(".") + 1, fieldResource.length()));
+//                                    filed.setAccessible(true);
+//                                    String envName = v1EnvVar.getName().toLowerCase();
+//                                    String envValue = ((String) filed.get(pod.getMetadata())).toLowerCase();
+//                                    if (envName.contains(searchString.toLowerCase()) || envValue.contains(searchString.toLowerCase())) {
+//                                        String resourceName = pod.getMetadata().getName() + "/" + container.getName();
+//                                        String foundString = v1EnvVar.getName() + "=" + envValue;
+////                                        searchModel.addSearchResult(pod.getMetadata().getNamespace(), Resource.ENV_VARIABLE, resourceName, "ValueFrom: " + fieldPath, foundString);
+//                                    }
+//                                }
+//                            } catch (NoSuchFieldException | IllegalAccessException e) {
+//                                e.printStackTrace();
+//                            }
+//                        }
+                            }
+                        } catch (NoSuchFieldException | IllegalAccessException e) {
+                            //TODO set all errors to one block errors collapsable after search result
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void composeValueFromToSearchResult(Field field, Object fieldObject, String fieldPath, V1EnvVar v1EnvVar, V1Pod pod, V1Container container, SearchModel searchModel, String searchString) throws IllegalAccessException {
+        String envValue, envName, additionalInfo = "";
+        envName = v1EnvVar.getName().toLowerCase();
+        if (ObjectUtils.isNotEmpty(field)) {
+            field.setAccessible(true);
+            envValue = ((String) field.get(fieldObject)).toLowerCase();
+            additionalInfo = "ValueFrom: " + fieldPath;
+        } else {
+            envValue = v1EnvVar.getValue().toLowerCase();
+        }
+        if (envName.contains(searchString.toLowerCase()) || envValue.contains(searchString.toLowerCase())) {
+            String resourceName = pod.getMetadata().getName() + "/" + container.getName();
+            String foundString = v1EnvVar.getName() + "=" + envValue;
+            String creationTime = pod.getMetadata().getCreationTimestamp().toString("dd.MM.yyyy HH:mm:ss");
+            searchModel.addSearchResult(pod.getMetadata().getNamespace(), Resource.ENV_VARIABLE, resourceName, additionalInfo, foundString, creationTime);
+        }
+    }
+
+    private V1PodList getV1PodList(String selectedNamespace) {
+        try {
+            if ("all".equals(selectedNamespace)) {
+                return api.listPodForAllNamespaces(null, null, null, null, null, null, null, null, null);
+            } else {
+                return api.listNamespacedPod(selectedNamespace, null, null, null, null, null, null, null, null, null);
+            }
+        } catch (ApiException e) {
+            Messagebox.show(e.getMessage(), "Fetch Pods from Namespace Error", Messagebox.OK, Messagebox.ERROR);
+            e.printStackTrace();
+        }
+        return new V1PodList();
+    }
+}
