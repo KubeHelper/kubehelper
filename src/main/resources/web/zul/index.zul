@@ -1,5 +1,8 @@
 <?page id="indexPage"?>
 <zk>
+    <zscript>
+        
+    </zscript>
     <!--    <style>-->
     <!--        .breeze .complex-layout, .breeze .complex-layout .z-south, .breeze .complex-layout .z-west {-->
     <!--        background: #F7F7F7;-->
@@ -17,7 +20,12 @@
     <!--        .inner-border .z-south, .inner-border .z-east { background: #FFFFFF; }-->
     <!--        .dl-link { text-decoration: none; cursor: pointer; }-->
     <!--    </style>-->
-    <div id="indexWindow" viewModel="@id('indexVM') @init('com.kubehelper.viewmodel.IndexVM')" height="100%" width="100%">
+    <div id="indexWindow" viewModel="@id('indexVM') @init('com.kubehelper.viewmodels.IndexVM')" height="100%" width="100%" onClientInfo="onClientInfo(event)">
+        <zscript>
+            void onClientInfo(ClientInfoEvent evt) {
+                indexVM.onClientInfoEvent(evt);
+            }
+        </zscript>
         <borderlayout sclass="complex-layout">
             <north size="5%" border="0" style="background: #3498DB">
                 <!--                <panel border="normal" height="100%" width="100%">-->
@@ -60,7 +68,7 @@
                 <!--                </div>-->
             </north>
             <!-- Sidebar -->
-            <west title="Navigation" size="7%" maxsize="200" splittable="true" collapsible="true" autoscroll="true" margins="0,5,0,0">
+            <west title="Navigation" size="10%" maxsize="200" splittable="true" collapsible="true" autoscroll="true" margins="0,5,0,0">
                 <vlayout spacing="0">
                     <panel width="100%">
                         <panelchildren style="padding:5px;">
@@ -105,20 +113,6 @@
                     </panel>
                 </vlayout>
             </west>
-            <east title="Quick Links" size="5%" maxsize="200" splittable="true" collapsible="true" autoscroll="true">
-                <vlayout>
-                    <html>
-                        <![CDATA[ <ul> <li>Tutorial</li> <li>Docs</li>
-                        <li>ZK vs GWT</li> <li>ZK vs Ajax JSF</li>
-                        <li>Forum</li> <li>FAQ</li> <li>Contact us</li>
-                        </ul> ]]>
-                    </html>
-                    <vlayout style="text-align:center;">
-                        <toolbarbutton label="Download"
-                                       href="http://www.zkoss.org/download/zk/ce" target="_zkdemo"/>
-                    </vlayout>
-                </vlayout>
-            </east>
             <!-- Content -->
             <center style="overflow:auto">
                 <!--                            TODO read about difference instant or defer   - https://www.zkoss.org/wiki/ZK Component Reference/Essential Components/Include-->
