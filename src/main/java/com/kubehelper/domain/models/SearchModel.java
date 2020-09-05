@@ -1,7 +1,8 @@
-package com.kubehelper.model;
+package com.kubehelper.domain.models;
 
+import com.kubehelper.common.Global;
 import com.kubehelper.common.Resource;
-import org.zkoss.zul.ListModel;
+import com.kubehelper.domain.results.SearchResult;
 import org.zkoss.zul.ListModelList;
 
 import java.util.ArrayList;
@@ -13,8 +14,9 @@ import java.util.List;
 public class SearchModel implements PageModel {
 
     private String templateUrl = "~./zul/pages/search.zul";
-
-    private String name = "name";
+    public static String NAME = Global.SEARCH_MODEL;
+    private int desktopWidth;
+    private int desktopHeight;
     private List<String> namespaces = new ArrayList<>();
     private ListModelList<SearchResult> searchResults = new ListModelList<>();
 
@@ -30,6 +32,17 @@ public class SearchModel implements PageModel {
         searchResults.add(searchResult);
     }
 
+    @Override
+    public void setDesktopWithAndHeight(int width, int height) {
+        this.desktopWidth = width;
+        this.desktopHeight = height;
+    }
+
+    @Override
+    public String getName() {
+        return NAME;
+    }
+
     public SearchModel setNamespaces(List<String> namespaces) {
         this.namespaces = namespaces;
         return this;
@@ -41,8 +54,13 @@ public class SearchModel implements PageModel {
     }
 
     @Override
-    public String getName() {
-        return name;
+    public int getDesktopWidth() {
+        return desktopWidth;
+    }
+
+    @Override
+    public int getDesktopHeight() {
+        return desktopHeight;
     }
 
     public List<String> getNamespaces() {

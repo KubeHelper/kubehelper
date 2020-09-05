@@ -1,6 +1,5 @@
 package com.kubehelper.common;
 
-import java.rmi.dgc.Lease;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -69,7 +68,6 @@ public enum Resource {
     private static final Map<Resource, String> resourcesMap = new HashMap<Resource, String>();
 
     static {
-        // populating the map
         for (Resource resource : values()) {
             resourcesMap.put(resource, resource.getValue());
         }

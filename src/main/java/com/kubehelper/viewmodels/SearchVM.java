@@ -1,9 +1,11 @@
-package com.kubehelper.viewmodel;
+package com.kubehelper.viewmodels;
 
+import com.kubehelper.common.Global;
 import com.kubehelper.common.Resource;
-import com.kubehelper.model.SearchModel;
-import com.kubehelper.service.CommonService;
-import com.kubehelper.service.SearchService;
+import com.kubehelper.domain.models.DashboardModel;
+import com.kubehelper.domain.models.SearchModel;
+import com.kubehelper.services.CommonService;
+import com.kubehelper.services.SearchService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zkoss.bind.BindUtils;
@@ -53,7 +55,7 @@ public class SearchVM implements EventListener {
         add(Resource.ENV_VARIABLE);
     }};
 
-    private SearchModel searchModel = new SearchModel();
+    private SearchModel searchModel;
 
     @WireVariable
     private CommonService commonService;
@@ -62,7 +64,9 @@ public class SearchVM implements EventListener {
     private SearchService searchService;
 
     @Init
+    @NotifyChange("*")
     public void init() {
+        searchModel = (SearchModel) Global.ACTIVE_MODELS.computeIfAbsent(Global.SEARCH_MODEL, (k) -> Global.NEW_MODELS.get(Global.SEARCH_MODEL));
         searchModel.setNamespaces(commonService.getAllNamespaces());
     }
 
@@ -78,15 +82,7 @@ public class SearchVM implements EventListener {
     @Command
     public void search() {
         searchModel.getSearchResults().clear();
-        searchService.search(selectedNamespace, searchString, caseSensitiveSearch, selectedResources, searchModel);
-//        Grid searchGrid = (Grid) Path.getComponent("//indexPage/templateInclude/searchGrid");
-    }
-
-    @Listen("onOK = #searchStringTBox")
-    public void search(KeyEvent e) {
-//        if (e.getKeyCode()==KeyEvent.)
-        searchModel.getSearchResults().clear();
-        searchService.search(selectedNamespace, searchString, caseSensitiveSearch, selectedResources, searchModel);
+        searchService.search(selectedNamespace, searchString, searchModel);
     }
 
     /**

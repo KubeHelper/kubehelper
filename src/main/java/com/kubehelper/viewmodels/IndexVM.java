@@ -1,22 +1,23 @@
-package com.kubehelper.viewmodel;
+package com.kubehelper.viewmodels;
 
-import com.kubehelper.model.DashboardModel;
-import com.kubehelper.model.PageModel;
-import com.kubehelper.model.SearchModel;
-import com.kubehelper.service.CommonService;
+import com.kubehelper.common.Global;
+import com.kubehelper.domain.models.IpsAndPortsModel;
+import com.kubehelper.domain.models.PageModel;
+import com.kubehelper.services.CommonService;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.Init;
+import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.zk.ui.Path;
+import org.zkoss.zk.ui.event.ClientInfoEvent;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Toolbarbutton;
-import org.zkoss.zul.Window;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 /**
  * @author JDev
@@ -30,29 +31,19 @@ public class IndexVM {
     @WireVariable
     private CommonService commonService;
 
-    private Window wizard;
 
-    private Map<String, PageModel> models = new HashMap<>() {
-        {
-            put("dashboard", new DashboardModel());
-            put("search", new SearchModel());
-            put("security", new SearchModel());
-            put("auditing", new SearchModel());
-            put("customResources", new SearchModel());
-            put("deprecated", new SearchModel());
-            put("events", new SearchModel());
-            put("features", new SearchModel());
-            put("featureGates", new SearchModel());
-            put("ipsAndPorts", new SearchModel());
-            put("volumes", new SearchModel());
-        }
-    };
+    @Command
+    public void onClientInfoEvent(ClientInfoEvent evt) {
+        pageModel.setDesktopWithAndHeight(evt.getDesktopWidth(), evt.getDesktopHeight());
+        BindUtils.postGlobalCommand(null, null, "updateHeightsAndRerenderVM", Map.of("eventType", "onClientInfo"));
+    }
 
 
     @Init
     public void init() {
 //        pageModel = new DashboardModel();
-        pageModel = new SearchModel();
+//        pageModel = new SearchModel();
+        pageModel = Global.ACTIVE_MODELS.computeIfAbsent(Global.IPS_AND_PORTS_MODEL, (k) -> Global.NEW_MODELS.get(Global.IPS_AND_PORTS_MODEL));
         currentModelName = pageModel.getName();
     }
 
@@ -62,9 +53,8 @@ public class IndexVM {
 
     @Command()
     public void switchView(@BindingParam("modelName") String modelName) {
-        pageModel = models.get(modelName);
+        pageModel = Global.ACTIVE_MODELS.computeIfAbsent(modelName, (k) -> Global.NEW_MODELS.get(modelName));
         enableDisableMenuItem(modelName);
-
         BindUtils.postNotifyChange(null, null, this, ".");
     }
 

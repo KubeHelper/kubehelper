@@ -1,8 +1,10 @@
-package com.kubehelper.viewmodel;
+package com.kubehelper.viewmodels;
 
-import com.kubehelper.model.DashboardModel;
-import com.kubehelper.service.CommonService;
-import com.kubehelper.service.DashboardService;
+import com.kubehelper.common.Global;
+import com.kubehelper.domain.models.DashboardModel;
+import com.kubehelper.domain.models.IpsAndPortsModel;
+import com.kubehelper.services.CommonService;
+import com.kubehelper.services.DashboardService;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
@@ -25,7 +27,7 @@ public class DashboardVM {
 
     @Init
     public void init() {
-        dashboardModel = new DashboardModel();
+        dashboardModel = (DashboardModel) Global.ACTIVE_MODELS.computeIfAbsent(Global.DASHBOARD_MODEL, (k) -> Global.NEW_MODELS.get(Global.DASHBOARD_MODEL));
     }
 
 }

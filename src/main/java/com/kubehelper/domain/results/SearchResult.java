@@ -1,11 +1,11 @@
-package com.kubehelper.model;
+package com.kubehelper.domain.results;
 
 import com.kubehelper.common.Resource;
 
 /**
  * @author JDev
  */
-public class SearchResult implements Comparable {
+public class SearchResult{
     private String namespace = "";
     private Resource resourceType;
     private String resourceName = "";
@@ -65,15 +65,5 @@ public class SearchResult implements Comparable {
     public SearchResult setFoundString(String foundString) {
         this.foundString = foundString;
         return this;
-    }
-
-    @Override
-    public int compareTo(Object o) {
-//        return this.compareTo(o);
-//        return Comparator.comparing(Person::getFirstName)
-//                .thenComparing(Person::getLastName)
-//                .thenComparingInt(Person::getAge)
-//                .compare(this, o);
-        return 0;
     }
 }
