@@ -1,0 +1,136 @@
+<?page id="indexPage"?>
+<zk>
+    <zscript>
+        
+    </zscript>
+    <!--    <style>-->
+    <!--        .breeze .complex-layout, .breeze .complex-layout .z-south, .breeze .complex-layout .z-west {-->
+    <!--        background: #F7F7F7;-->
+    <!--        }-->
+    <!--        .z-borderlayout { background: #FFFFFF }-->
+    <!--        .complex-layout .z-north { background: #008BB6; }-->
+    <!--        .complex-layout .z-north > div { padding: 5px; }-->
+    <!--        img.complex-layout-header-img { padding: 0 10px; }-->
+    <!--        .complex-layout-header-label {-->
+    <!--        position: relative; top: -30px;-->
+    <!--        padding-left: 40px; font-size: 24px;-->
+    <!--        color: White; font-weight: bold;-->
+    <!--        }-->
+    <!--        .inner-border, .inner-border .z-north, .inner-border .z-west,-->
+    <!--        .inner-border .z-south, .inner-border .z-east { background: #FFFFFF; }-->
+    <!--        .dl-link { text-decoration: none; cursor: pointer; }-->
+    <!--    </style>-->
+    <div id="indexWindow" viewModel="@id('indexVM') @init('com.kubehelper.viewmodels.IndexVM')" height="100%" width="100%" onClientInfo="onClientInfo(event)">
+        <zscript>
+            void onClientInfo(ClientInfoEvent evt) {
+                indexVM.onClientInfoEvent(evt);
+            }
+        </zscript>
+        <borderlayout sclass="complex-layout">
+            <north size="5%" border="0" style="background: #3498DB">
+                <!--                <panel border="normal" height="100%" width="100%">-->
+                <!--                    <panelchildren>-->
+                <!--                        <image src="~./img/kubehelper-logo-256.png"/>-->
+                <!--                        <hbox height="100%" width="100%">-->
+                <!--                            <button label="Test">-->
+                <!--                            </button>-->
+                <!--                        </hbox>-->
+                <!--                    </panelchildren>-->
+                <!--                </panel>-->
+                <hbox height="100%" width="100%">
+                    <cell hflex="2" align="center" valign="middle">
+                        <label value="LOGO TODO "/>
+                        <!--                        <image style="width: 100%;height: 100%" src="~./img/kubehelper-logo-256.png"/>-->
+                    </cell>
+                    <cell hflex="8" align="center" valign="middle">
+                        <label style="color: White; font-weight: bold; font-size: 2.6em;" value="Kube Helper"/>
+                    </cell>
+                    <cell hflex="2" valign="middle" align="right">
+                        <!--                        <textbox sclass="demo-search-inp" value="@bind(vm.search)"/>-->
+                        <!--                        <button label="Search ZK Resource" onClick="@command('search')"/>-->
+                        <button iconSclass="z-icon-heartbeat" hflex="1" label="Donate" dir="reverse"/>
+                    </cell>
+                </hbox>
+
+                <!--                <div>-->
+                <!--                    <div style="float:right">-->
+                <!--                        <textbox sclass="demo-search-inp" value="@bind(vm.search)"/>-->
+                <!--                        <button label="Search ZK Resource"-->
+                <!--                                onClick="@command('search')"/>-->
+                <!--                    </div>-->
+                <!--                    <div style="float:left">-->
+                <!--                        <image style="width: 100%;max-height: 100%" src="~./img/kubehelper-logo-256.png"/>-->
+                <!--                    </div>-->
+                <!--                    <div style="float:left">-->
+                <!--                        <label sclass="complex-layout-header-label" value="Kube Helper"/>-->
+                <!--                    </div>-->
+
+                <!--                </div>-->
+            </north>
+            <!-- Sidebar -->
+            <west title="Navigation" size="10%" maxsize="200" splittable="true" collapsible="true" autoscroll="true" margins="0,5,0,0">
+                <vlayout spacing="0">
+                    <panel width="100%">
+                        <panelchildren style="padding:5px;">
+                            <toolbar>
+                                <toolbarbutton id="dashboardMenuBtn" hflex="1" disabled="true" label="Dashboard" onClick="@command('switchView', modelName='dashboard')"/>
+                                <toolbarbutton id="searchMenuBtn" hflex="1" label="Search" onClick="@command('switchView', modelName='search')"/>
+                                <toolbarbutton id="securityMenuBtn" hflex="1" label="Security" onClick="@command('switchView', modelName='security')"/>
+                                <toolbarbutton id="auditingMenuBtn" hflex="1" label="Auditing" onClick="@command('switchView', modelName='auditing')"/>
+                                <toolbarbutton id="customResourcesMenuBtn" hflex="1" label="Custom Resources" onClick="@command('switchView', modelName='customResources')"/>
+                                <toolbarbutton id="deprecatedMenuBtn" hflex="1" label="Deprecated" onClick="@command('switchView', modelName='deprecated')"/>
+                                <toolbarbutton id="eventsMenuBtn" hflex="1" label="Events" onClick="@command('switchView', modelName='events')"/>
+                                <toolbarbutton id="featuresMenuBtn" hflex="1" label="Features" onClick="@command('switchView', modelName='features')"/>
+                                <toolbarbutton id="featureGatesMenuBtn" hflex="1" label="Feature Gates" onClick="@command('switchView', modelName='featureGates')"/>
+                                <toolbarbutton id="ipsAndPortsMenuBtn" hflex="1" label="Ips and Ports" onClick="@command('switchView', modelName='ipsAndPorts')"/>
+                                <toolbarbutton id="volumesMenuBtn" hflex="1" label="Volumes" onClick="@command('switchView', modelName='volumes')"/>
+                            </toolbar>
+                        </panelchildren>
+                    </panel>
+                    <panel width="100%" border="normal"
+                           title="Why ZK ? ">
+                        <panelchildren>
+                            <html>
+                                <![CDATA[ <ul> <li>Productivity</li>
+                                <li>Security</li> <li>Performance</li>
+                                <li>Totally Control</li> <li>Auto
+                                Testing</li> <li>Scalability</li>
+                                <li>Flexibility</li> </ul> ]]>
+                            </html>
+                        </panelchildren>
+                    </panel>
+                    <panel width="100%" border="normal"
+                           title="Features">
+                        <panelchildren>
+                            <html>
+                                <![CDATA[ <ul> <li>Server+client
+                                Fusion</li> <li>Ajax-as-a-Service</li>
+                                <li>The Event Queue</li> <li>jQuery
+                                Based</li> <li>SEO Friendly</li>
+                                <li>Auto Testing</li> </ul> ]]>
+                            </html>
+                        </panelchildren>
+                    </panel>
+                </vlayout>
+            </west>
+            <!-- Content -->
+            <center style="overflow:auto">
+                <!--                            TODO read about difference instant or defer   - https://www.zkoss.org/wiki/ZK Component Reference/Essential Components/Include-->
+                <include id="templateInclude" src="@load(indexVM.pageModel.templateUrl)"/>
+            </center>
+            <south size="3%" maxsize="200" style="background: none repeat scroll 0 0 ;">
+                <toolbar mold="panel" align="center">
+                    <toolbarbutton label="Sign in"/>
+                    <toolbarbutton label="Home"/>
+                    <toolbarbutton label="Sitemap"/>
+                    <toolbarbutton label="Terms"/>
+                    <toolbarbutton label="Report Abuse"/>
+                    <toolbarbutton label="Print"/>
+                    <separator orient="vertical" bar="true"/>
+                    Powered by ZK ${desktop.webApp.version} ZK
+                    Borderlayout
+                </toolbar>
+            </south>
+        </borderlayout>
+    </div>
+</zk>

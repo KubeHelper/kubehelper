@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.3.3.RELEASE</version>
+        <relativePath/>
+    </parent>
+    <groupId>com.kubehelper</groupId>
+    <artifactId>kube-helper</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <name>Kube Helper</name>
+    <description>Kube HelperProject</description>
+
+    <properties>
+        <java.version>14</java.version>
+        <zkspringboot.version>2.3.1</zkspringboot.version>
+        <zk.version>9.0.0</zk.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.zkoss.zkspringboot</groupId>
+            <artifactId>zkspringboot-starter</artifactId>
+            <type>pom</type>
+            <version>${zkspringboot.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.kubernetes</groupId>
+            <artifactId>client-java</artifactId>
+            <version>9.0.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.11</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.zkoss.zk</groupId>
+            <artifactId>zkplus</artifactId>
+            <version>${zk.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.zkoss.zk</groupId>
+            <artifactId>zkbind</artifactId>
+            <version>${zk.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.zkoss.zk</groupId>
+            <artifactId>zul</artifactId>
+            <version>${zk.version}</version>
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.zkoss.theme</groupId>
+            <artifactId>sapphire</artifactId>
+            <version>${zk.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.zkoss.theme</groupId>
+            <artifactId>breeze</artifactId>
+            <version>${zk.version}</version>
+        </dependency>
+
+        <!--		<dependency>-->
+        <!--			<groupId>org.zkoss.theme</groupId>-->
+        <!--			<artifactId>atlantic</artifactId>-->
+        <!--			<version>${zk.version}</version>-->
+        <!--		</dependency>-->
+        <!--		<dependency>-->
+        <!--			<groupId>org.zkoss.theme</groupId>-->
+        <!--			<artifactId>silvertail</artifactId>-->
+        <!--			<version>${zk.version}</version>-->
+        <!--		</dependency>-->
+
+        <!--		<dependency>-->
+        <!--			<groupId>org.zkoss.theme</groupId>-->
+        <!--			<artifactId>iceblue_c</artifactId>-->
+        <!--			<version>${zk.version}</version>-->
+        <!--		</dependency>-->
+
+
+    </dependencies>
+
+    <repositories>
+        <repository>
+            <id>ZK CE</id>
+            <name>ZK CE Repository</name>
+            <url>http://mavensync.zkoss.org/maven2</url>
+        </repository>
+<!--        <repository>-->
+<!--            <id>Maven Central</id>-->
+<!--            <name>Maven Central Repository</name>-->
+<!--            <url>https://repo1.maven.org/maven2/</url>-->
+<!--        </repository>-->
+    </repositories>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
