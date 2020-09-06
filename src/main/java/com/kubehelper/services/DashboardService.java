@@ -30,4 +30,10 @@ public class DashboardService {
         }
         return namespaces;
     }
+
+    //            V1NodeList v1NodeList = api.listNode(null, null, null, null, null, null, null, null, null);
+//            V1EndpointsList v1EndpointsList = api.listEndpointsForAllNamespaces(null, null, null, null, null, null, null, null, null);
+//            V1SecretList v1SecretList = api.listSecretForAllNamespaces(null, null, null, null, null, null, null, null, null);
+//            Exec exec = new Exec(api.getApiClient());
+////            exec.exec()
 }

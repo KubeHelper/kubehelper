@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zk>
+    <config-name>kube-helper</config-name>
+<!--    <device-config>-->
+<!--        <device-type>ajax</device-type>-->
+<!--        <embed><![CDATA[-->
+<!--        <script type="text/javascript">-->
+<!--            AU_progressbar = function (id, msg)-->
+<!--            {-->
+<!--                Boot_progressbox(id, msg, 0, 0, true, true);-->
+<!--            };-->
+<!--        </script>-->
+<!--    ]]></embed>-->
+<!--    </device-config>-->
+</zk>

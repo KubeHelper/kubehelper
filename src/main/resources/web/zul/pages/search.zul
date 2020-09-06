@@ -4,6 +4,10 @@
             <north title="Search Configuration" splittable="true" collapsible="true" height="20%" style="overflow-y:auto;overflow-x: hidden;">
                 <vbox height="100%" width="100%">
                     <hbox height="100%" width="100%" align="center" style="margin: 5px;">
+                        <cell id="clearAllCell" width="10%" style="padding: 0px 5px 0px 5px;" tooltip="clearAllTooltip">
+                            <button id="clearAll" iconSclass="z-icon-eraser" label="Clear all" onClick="@command('clearAll')"/>
+                        </cell>
+                        <separator width="100%" orient="vertical" bar="true"/>
                         <cell width="20%" style="padding: 0px 5px 0px 5px;">
                             <hlayout valign="middle">
                                 <label value="Namespace: "/>
@@ -15,17 +19,22 @@
                                 </combobox>
                             </hlayout>
                         </cell>
-                        <cell width="60%" style="padding: 0px 5px 0px 5px;">
+                        <cell width="59%" style="padding: 0px 5px 0px 5px;">
                             <hlayout valign="middle">
                                 <label value="Search: "/>
                                 <textbox id="searchStringTBox" hflex="1" value="@bind(searchVM.searchString)" onOK="@command('search')"/>
                             </hlayout>
                         </cell>
-                        <cell width="20%">
-                            <button id="searchBtn" label="Search" hflex="1" onClick="@command('search')" style="padding: 0px 5px 0px 5px;"/>
+<!--                        <cell id="cellGetBtn" width="10%" style="padding: 0px 5px 0px 5px;" align="right">-->
+<!--                            <button id="getIpsBtn" label="Get" iconSclass="z-icon-refresh" onClick="@command('search')" width="100%" tooltip="getResourcesTooltip"/>-->
+<!--                        </cell>-->
+                        <cell id="cellSearchBtn" width="20%" style="padding: 0px 5px 0px 5px;">
+                            <button id="searchBtn" label="Search" iconSclass="z-icon-search" width="100%" onClick="@command('search')" tooltip="searchTooltip"/>
                         </cell>
+<!--                        <cell id="cellSplitterEnd" width="1%" >-->
+<!--                        </cell>-->
                     </hbox>
-                    <separator/>
+<!--                    <separator/>-->
                     <groupbox id="kubeResourcesGBox" width="80%" style="padding: 5px;">
                         <caption>
                             <checkbox id="kubeResourcesGBoxCheckAll" checked="true" onCheck="@command('selectAllResources')"/>Resources
@@ -81,6 +90,9 @@
         </borderlayout>
     </div>
     <popup id="namespacesTooltip">
-        Tooltip about namespaces
+        All visible namespaces.
+    </popup>
+    <popup id="searchTooltip">
+        Search text in selected namespace and resources.
     </popup>
 </zk>

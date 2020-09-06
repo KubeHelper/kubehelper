@@ -46,6 +46,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-text</artifactId>
+            <version>1.9</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.zkoss.zk</groupId>
             <artifactId>zkplus</artifactId>
             <version>${zk.version}</version>
@@ -63,35 +69,34 @@
             <version>${zk.version}</version>
         </dependency>
 
-
-        <dependency>
-            <groupId>org.zkoss.theme</groupId>
-            <artifactId>sapphire</artifactId>
-            <version>${zk.version}</version>
-        </dependency>
-
         <dependency>
             <groupId>org.zkoss.theme</groupId>
             <artifactId>breeze</artifactId>
             <version>${zk.version}</version>
         </dependency>
 
-        <!--		<dependency>-->
-        <!--			<groupId>org.zkoss.theme</groupId>-->
-        <!--			<artifactId>atlantic</artifactId>-->
-        <!--			<version>${zk.version}</version>-->
-        <!--		</dependency>-->
-        <!--		<dependency>-->
-        <!--			<groupId>org.zkoss.theme</groupId>-->
-        <!--			<artifactId>silvertail</artifactId>-->
-        <!--			<version>${zk.version}</version>-->
-        <!--		</dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>org.zkoss.theme</groupId>-->
+<!--            <artifactId>sapphire</artifactId>-->
+<!--            <version>${zk.version}</version>-->
+<!--        </dependency>-->
 
-        <!--		<dependency>-->
-        <!--			<groupId>org.zkoss.theme</groupId>-->
-        <!--			<artifactId>iceblue_c</artifactId>-->
-        <!--			<version>${zk.version}</version>-->
-        <!--		</dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>org.zkoss.theme</groupId>-->
+<!--            <artifactId>atlantic</artifactId>-->
+<!--            <version>${zk.version}</version>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>org.zkoss.theme</groupId>-->
+<!--            <artifactId>silvertail</artifactId>-->
+<!--            <version>${zk.version}</version>-->
+<!--        </dependency>-->
+
+<!--        <dependency>-->
+<!--            <groupId>org.zkoss.theme</groupId>-->
+<!--            <artifactId>iceblue_c</artifactId>-->
+<!--            <version>${zk.version}</version>-->
+<!--        </dependency>-->
 
 
     </dependencies>
@@ -102,11 +107,11 @@
             <name>ZK CE Repository</name>
             <url>http://mavensync.zkoss.org/maven2</url>
         </repository>
-<!--        <repository>-->
-<!--            <id>Maven Central</id>-->
-<!--            <name>Maven Central Repository</name>-->
-<!--            <url>https://repo1.maven.org/maven2/</url>-->
-<!--        </repository>-->
+        <!--        <repository>-->
+        <!--            <id>Maven Central</id>-->
+        <!--            <name>Maven Central Repository</name>-->
+        <!--            <url>https://repo1.maven.org/maven2/</url>-->
+        <!--        </repository>-->
     </repositories>
 
     <build>

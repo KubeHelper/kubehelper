@@ -20,11 +20,13 @@
                                     </combobox>
                                 </hlayout>
                             </cell>
-                            <cell id="cellSplitter" width="50%" style="padding: 0px 5px 0px 5px;">
+                            <cell id="cellSplitterMiddle" width="49%" style="padding: 0px 5px 0px 5px;">
                             </cell>
-                            <cell id="cellGetBtn" width="10%" style="padding: 0px 5px 0px 5px;" align="right">
+                            <cell id="cellGetBtn" width="10%" style="padding: 0px 5px 0px 5px;">
                                 <button id="getIpsBtn" label="Get" iconSclass="z-icon-refresh" onClick="@command('search')" width="100%" tooltip="getResourcesTooltip"/>
                             </cell>
+<!--                            <cell id="cellSplitterEnd" width="1%" >-->
+<!--                            </cell>-->
                         </hbox>
                     </vbox>
                     <separator width="100%" orient="horizontal" bar="false"/>
@@ -103,8 +105,9 @@
             </center>
             <south border="1" size="15%" splittable="true" collapsible="true" margins="0,0,3,3" onOpen="@command('updateGridHeightOnSouthPanelChange')"
                    style="overflow-y:auto;overflow-x: hidden;padding: 7px;">
-                <label id="detailsLabel" value="@bind(ipsAndPortsVM.detailsLabel)" multiline="true"></label>
+                <html id="detailsLabel" content="@load(ipsAndPortsVM.detailsLabel)" style="font-family: Arial,Sans-serif;font-size: 12px;"/>
             </south>
+            
         </borderlayout>
     </div>
     <popup id="clearAllTooltip">

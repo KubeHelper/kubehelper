@@ -1,11 +1,9 @@
 package com.kubehelper.configs;
 
+import io.kubernetes.client.Exec;
 import io.kubernetes.client.openapi.ApiClient;
 import io.kubernetes.client.openapi.apis.AppsV1Api;
-import io.kubernetes.client.openapi.apis.AppsV1beta1Api;
-import io.kubernetes.client.openapi.apis.AppsV1beta2Api;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
-import io.kubernetes.client.openapi.apis.ExtensionsApi;
 import io.kubernetes.client.openapi.apis.ExtensionsV1beta1Api;
 import io.kubernetes.client.util.Config;
 import org.slf4j.Logger;
@@ -28,19 +26,7 @@ public class CustomConfig {
 
     @Bean
     public CoreV1Api getCoreV1Api() throws IOException {
-        ApiClient client = Config.defaultClient();
-//        io.kubernetes.client.openapi.Configuration.setDefaultApiClient(client);
         return new CoreV1Api(Config.defaultClient());
-    }
-
-    @Bean
-    public ExtensionsV1beta1Api getExtensionsV1beta1Api() throws IOException {
-        return new ExtensionsV1beta1Api(Config.defaultClient());
-    }
-
-    @Bean
-    public AppsV1beta1Api getAppsV1beta1Api() throws IOException {
-        return new AppsV1beta1Api(Config.defaultClient());
     }
 
     @Bean
@@ -49,10 +35,24 @@ public class CustomConfig {
     }
 
     @Bean
-    public AppsV1beta2Api getAppsV1beta2Api() throws IOException {
-        return new AppsV1beta2Api(Config.defaultClient());
+    public ExtensionsV1beta1Api getExtensionsV1beta1Api() throws IOException {
+        return new ExtensionsV1beta1Api(Config.defaultClient());
     }
 
+//    @Bean
+//    public AppsV1beta1Api getAppsV1beta1Api() throws IOException {
+//        return new AppsV1beta1Api(Config.defaultClient());
+//    }
+//
+//    @Bean
+//    public AppsV1beta2Api getAppsV1beta2Api() throws IOException {
+//        return new AppsV1beta2Api(Config.defaultClient());
+//    }
+
+    @Bean
+    public Exec getExec() throws IOException {
+        return new Exec(Config.defaultClient());
+    }
 
 
     @PostConstruct
@@ -67,7 +67,12 @@ public class CustomConfig {
         Library.setProperty("org.zkoss.zk.WCS.cache", "false");
         Library.setProperty("org.zkoss.web.classWebResource.cache", "false");
         Library.setProperty("org.zkoss.util.label.cache", "false");
+//        Library.setProperty("org.zkoss.theme.preferred", "iceblue_c");
+//        Library.setProperty("org.zkoss.theme.preferred", "atlantic");
+//        Library.setProperty("org.zkoss.theme.preferred", "silvertail");
+//        Library.setProperty("org.zkoss.theme.preferred", "sapphire");
         Library.setProperty("org.zkoss.theme.preferred", "breeze");
+        Library.setProperty("org.zkoss.zul.progressbox.position", "center");
 
         // enable non minified js
         WebApps.getCurrent().getConfiguration().setDebugJS(true);

@@ -1,24 +1,27 @@
-package com.kubehelper.service;
+package com.kubehelper.services;
 
+import com.kubehelper.common.KubeAPI;
 import com.kubehelper.common.Resource;
-import com.kubehelper.model.SearchModel;
+import com.kubehelper.domain.models.SearchModel;
+import io.kubernetes.client.Exec;
 import io.kubernetes.client.openapi.ApiException;
-import io.kubernetes.client.openapi.apis.CoreV1Api;
 import io.kubernetes.client.openapi.models.V1Container;
 import io.kubernetes.client.openapi.models.V1EnvVar;
 import io.kubernetes.client.openapi.models.V1ObjectMeta;
 import io.kubernetes.client.openapi.models.V1Pod;
-import io.kubernetes.client.openapi.models.V1PodList;
 import io.kubernetes.client.openapi.models.V1PodSpec;
 import io.kubernetes.client.openapi.models.V1PodStatus;
 import org.apache.commons.lang3.ObjectUtils;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.zkoss.zul.Messagebox;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.util.Objects;
-import java.util.Set;
+import java.util.Properties;
 
 /**
  * @author JDev
@@ -27,11 +30,17 @@ import java.util.Set;
 public class SearchService {
 
     @Autowired
-    private CoreV1Api api;
+    private KubeAPI kubeAPI;
 
-    public void search(String selectedNamespace, String searchString, boolean caseSensitiveSearch, Set<Resource> selectedResources, SearchModel searchModel) {
+    @Autowired
+    private Exec exec;
 
-        for (V1Pod pod : getV1PodList(selectedNamespace).getItems()) {
+    public void search(String selectedNamespace, String searchString, SearchModel searchModel) {
+
+        for (V1Pod pod : kubeAPI.getV1PodList(selectedNamespace).getItems()) {
+
+            Properties podEnvironmentVars = getPodEnvironmentVars(pod);
+
             for (V1Container container : Objects.requireNonNull(pod.getSpec()).getContainers()) {
                 if (ObjectUtils.isNotEmpty(container.getEnv())) {
                     for (V1EnvVar v1EnvVar : container.getEnv()) {
@@ -99,22 +108,35 @@ public class SearchService {
         if (envName.contains(searchString.toLowerCase()) || envValue.contains(searchString.toLowerCase())) {
             String resourceName = pod.getMetadata().getName() + "/" + container.getName();
             String foundString = v1EnvVar.getName() + "=" + envValue;
-            String creationTime = pod.getMetadata().getCreationTimestamp().toString("dd.MM.yyyy HH:mm:ss");
-            searchModel.addSearchResult(pod.getMetadata().getNamespace(), Resource.ENV_VARIABLE, resourceName, additionalInfo, foundString, creationTime);
+            searchModel.addSearchResult(pod.getMetadata().getNamespace(), Resource.ENV_VARIABLE, resourceName, additionalInfo, foundString, getParsedCreationTime(pod.getMetadata().getCreationTimestamp()));
         }
     }
 
-    private V1PodList getV1PodList(String selectedNamespace) {
+    private String getParsedCreationTime(DateTime dateTime) {
+        return dateTime.toString("dd.MM.yyyy HH:mm:ss");
+    }
+
+    //    TODO add feature, to mark env variables which comes from container itself
+    private Properties getPodEnvironmentVars(V1Pod pod) {
+        Properties envVars = new Properties();
+        String[] command = new String[]{"env"};
         try {
-            if ("all".equals(selectedNamespace)) {
-                return api.listPodForAllNamespaces(null, null, null, null, null, null, null, null, null);
-            } else {
-                return api.listNamespacedPod(selectedNamespace, null, null, null, null, null, null, null, null, null);
+            Process process = exec.exec(pod, command, false);
+            BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String line;
+            while ((line = br.readLine()) != null) {
+                int idx = line.indexOf('=');
+                System.out.println("Line:" + line);
+                String key = line.substring(0, idx);
+                String value = line.substring(idx + 1);
+                envVars.setProperty(key, value);
+                System.out.println(key + " = " + value);
             }
         } catch (ApiException e) {
-            Messagebox.show(e.getMessage(), "Fetch Pods from Namespace Error", Messagebox.OK, Messagebox.ERROR);
+            e.printStackTrace();
+        } catch (IOException e) {
             e.printStackTrace();
         }
-        return new V1PodList();
+        return envVars;
     }
 }

@@ -8,7 +8,6 @@ import com.kubehelper.services.CommonService;
 import com.kubehelper.services.IpsAndPortsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
@@ -22,7 +21,6 @@ import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.ListModelList;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -51,7 +49,6 @@ public class IpsAndPortsVM {
         ipsAndPortsModel = (IpsAndPortsModel) Global.ACTIVE_MODELS.computeIfAbsent(Global.IPS_AND_PORTS_MODEL, (k) -> Global.NEW_MODELS.get(Global.IPS_AND_PORTS_MODEL));
         onInitPreparations();
     }
-
 
     @Command
     @NotifyChange({"totalItems", "ipsAndPortsResults", "filter"})
