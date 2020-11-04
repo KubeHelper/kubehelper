@@ -1,8 +1,6 @@
 package com.kubehelper.domain.filters;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
  * @author JDev
@@ -84,39 +82,5 @@ public class IpsAndPortsFilter {
 
     public boolean isFilterActive() {
         return !StringUtils.isAllBlank(namespace, resourceType, resourceName, creationTime, ip, hostInfo, ports, additionalInfo);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-
-        if (o == null || getClass() != o.getClass()) return false;
-
-        IpsAndPortsFilter that = (IpsAndPortsFilter) o;
-
-        return new EqualsBuilder()
-                .append(namespace, that.namespace)
-                .append(resourceType, that.resourceType)
-                .append(resourceName, that.resourceName)
-                .append(creationTime, that.creationTime)
-                .append(ip, that.ip)
-                .append(hostInfo, that.hostInfo)
-                .append(ports, that.ports)
-                .append(additionalInfo, that.additionalInfo)
-                .isEquals();
-    }
-
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder(17, 37)
-                .append(namespace)
-                .append(resourceType)
-                .append(resourceName)
-                .append(creationTime)
-                .append(ip)
-                .append(hostInfo)
-                .append(ports)
-                .append(additionalInfo)
-                .toHashCode();
     }
 }

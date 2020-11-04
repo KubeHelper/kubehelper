@@ -68,6 +68,11 @@ public class IpsAndPortsModel implements PageModel {
         return ipsAndPortsResults;
     }
 
+    public IpsAndPortsModel setIpsAndPortsResults(ListModelList<IpsAndPortsResult> ipsAndPortsResults) {
+        this.ipsAndPortsResults = ipsAndPortsResults;
+        return this;
+    }
+
     public IpsAndPortsFilter getFilter() {
         return filter;
     }
@@ -83,11 +88,6 @@ public class IpsAndPortsModel implements PageModel {
 
     public IpsAndPortsModel setSelectedNamespace(String selectedNamespace) {
         this.selectedNamespace = selectedNamespace;
-        return this;
-    }
-
-    public IpsAndPortsModel setIpsAndPortsResults(ListModelList<IpsAndPortsResult> ipsAndPortsResults) {
-        this.ipsAndPortsResults = ipsAndPortsResults;
         return this;
     }
 }

@@ -82,7 +82,7 @@ public class IpsAndPortsService {
             Map<String, String> detailsMap = new HashMap<>(), containersDetailsMap = new HashMap<>();
 
 //          compose pod ips
-            for (V1Container container : Objects.requireNonNull(pod.getSpec()).getContainers()) {
+            for (V1Container container : pod.getSpec().getContainers()) {
                 if (ObjectUtils.isNotEmpty(container.getPorts())) {
                     container.getPorts().forEach(port -> portsJoiner.add(String.valueOf(port.getContainerPort())));
                 }

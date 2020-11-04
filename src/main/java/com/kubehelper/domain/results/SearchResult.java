@@ -5,13 +5,21 @@ import com.kubehelper.common.Resource;
 /**
  * @author JDev
  */
-public class SearchResult{
+public class SearchResult {
+    private int id;
     private String namespace = "";
     private Resource resourceType;
     private String resourceName = "";
     private String creationTime = "";
     private String additionalInfo = "";
     private String foundString = "";
+
+    public SearchResult() {
+    }
+
+    public SearchResult(int id) {
+        this.id = id;
+    }
 
     public String getNamespace() {
         return namespace;
@@ -65,5 +73,9 @@ public class SearchResult{
     public SearchResult setFoundString(String foundString) {
         this.foundString = foundString;
         return this;
+    }
+
+    public int getId() {
+        return id;
     }
 }

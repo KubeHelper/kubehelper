@@ -35,7 +35,7 @@ public class IpsAndPortsVM {
     private String detailsLabel = "";
     private String ipsAndPortsGridHeight = "100px";
 
-    private IpsAndPortsModel ipsAndPortsModel = new IpsAndPortsModel();
+    private IpsAndPortsModel ipsAndPortsModel;
     private ListModelList<IpsAndPortsResult> ipsAndPortsResults = new ListModelList<>();
 
     @WireVariable
@@ -76,13 +76,13 @@ public class IpsAndPortsVM {
     public void filterIps() {
         ipsAndPortsResults.clear();
         for (IpsAndPortsResult ipsAndPortsResult : ipsAndPortsModel.getIpsAndPortsResults()) {
-            if (ipsAndPortsResult.getIp().toLowerCase().contains(getFilter().getIp()) &&
-                    ipsAndPortsResult.getPorts().toLowerCase().contains(getFilter().getPorts()) &&
-                    ipsAndPortsResult.getHostInfo().toLowerCase().contains(getFilter().getHostInfo()) &&
-                    ipsAndPortsResult.getCreationTime().toLowerCase().contains(getFilter().getCreationTime()) &&
-                    ipsAndPortsResult.getResourceName().toLowerCase().contains(getFilter().getResourceName()) &&
-                    ipsAndPortsResult.getResourceType().toLowerCase().contains(getFilter().getResourceType()) &&
-                    ipsAndPortsResult.getNamespace().toLowerCase().contains(getFilter().getNamespace())) {
+            if (ipsAndPortsResult.getIp().toLowerCase().contains(getFilter().getIp().toLowerCase()) &&
+                    ipsAndPortsResult.getPorts().toLowerCase().contains(getFilter().getPorts().toLowerCase()) &&
+                    ipsAndPortsResult.getHostInfo().toLowerCase().contains(getFilter().getHostInfo().toLowerCase()) &&
+                    ipsAndPortsResult.getCreationTime().toLowerCase().contains(getFilter().getCreationTime().toLowerCase()) &&
+                    ipsAndPortsResult.getResourceName().toLowerCase().contains(getFilter().getResourceName().toLowerCase()) &&
+                    ipsAndPortsResult.getResourceType().toLowerCase().contains(getFilter().getResourceType().toLowerCase()) &&
+                    ipsAndPortsResult.getNamespace().toLowerCase().contains(getFilter().getNamespace().toLowerCase())) {
                 ipsAndPortsResults.add(ipsAndPortsResult);
             }
         }
@@ -114,8 +114,7 @@ public class IpsAndPortsVM {
         ipsAndPortsModel.setIpsAndPortsResults(new ListModelList<>())
                 .setFilter(new IpsAndPortsFilter())
                 .setNamespaces(commonService.getAllNamespaces())
-                .setSelectedNamespace("all")
-                .setIpsAndPortsResults(new ListModelList<>());
+                .setSelectedNamespace("all");
         ipsAndPortsResults = new ListModelList<>();
     }
 

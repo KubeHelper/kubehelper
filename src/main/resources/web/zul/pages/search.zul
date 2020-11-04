@@ -11,7 +11,7 @@
                         <cell width="20%" style="padding: 0px 5px 0px 5px;">
                             <hlayout valign="middle">
                                 <label value="Namespace: "/>
-                                <combobox tooltip="namespacesTooltip" id="namespacesCBox" hflex="1" model="@load(searchVM.model.namespaces)" selectedItem="@bind(searchVM.selectedNamespace)"
+                                <combobox tooltip="namespacesTooltip" id="namespacesCBox" hflex="1" model="@load(searchVM.namespaces)" selectedItem="@bind(searchVM.selectedNamespace)"
                                           readonly="true">
                                     <template name="model">
                                         <comboitem label="@load(each)"/>
@@ -25,16 +25,16 @@
                                 <textbox id="searchStringTBox" hflex="1" value="@bind(searchVM.searchString)" onOK="@command('search')"/>
                             </hlayout>
                         </cell>
-<!--                        <cell id="cellGetBtn" width="10%" style="padding: 0px 5px 0px 5px;" align="right">-->
-<!--                            <button id="getIpsBtn" label="Get" iconSclass="z-icon-refresh" onClick="@command('search')" width="100%" tooltip="getResourcesTooltip"/>-->
-<!--                        </cell>-->
+                        <!--                        <cell id="cellGetBtn" width="10%" style="padding: 0px 5px 0px 5px;" align="right">-->
+                        <!--                            <button id="getIpsBtn" label="Get" iconSclass="z-icon-refresh" onClick="@command('search')" width="100%" tooltip="getResourcesTooltip"/>-->
+                        <!--                        </cell>-->
                         <cell id="cellSearchBtn" width="20%" style="padding: 0px 5px 0px 5px;">
-                            <button id="searchBtn" label="Search" iconSclass="z-icon-search" width="100%" onClick="@command('search')" tooltip="searchTooltip"/>
+                            <button id="searchBtn" label="Search" iconSclass="z-icon-search" width="100%" onClick="@command('search')"/>
                         </cell>
-<!--                        <cell id="cellSplitterEnd" width="1%" >-->
-<!--                        </cell>-->
+                        <!--                        <cell id="cellSplitterEnd" width="1%" >-->
+                        <!--                        </cell>-->
                     </hbox>
-<!--                    <separator/>-->
+                    <!--                    <separator/>-->
                     <groupbox id="kubeResourcesGBox" width="80%" style="padding: 5px;">
                         <caption>
                             <checkbox id="kubeResourcesGBoxCheckAll" checked="true" onCheck="@command('selectAllResources')"/>Resources
@@ -51,32 +51,81 @@
                 <!--                <div height="100%" style="overflow-y:auto;overflow-x: hidden;">-->
                 <!--                autopaging="true" mold="paging"-->
                 <div>
-                    <grid id="searchGrid" model="@load(searchVM.model.searchResults)" height="1000px">
+                    <grid id="searchGrid" model="@load(searchVM.searchResults)" height="800px">
                         <auxhead>
-                            <auxheader colspan="6" label="Search Results"/>
+                            <auxheader colspan="7" label="Search Results"/>
                         </auxhead>
-                        <columns menupopup="auto">
+                        <auxhead>
+                            <auxheader>
+                                <span sclass="z-icon-hashtag"/>
+                            </auxheader>
+                            <auxheader colspan="1">
+                                <span sclass="z-icon-filter"/>
+                                <textbox instant="true" width="80%" value="@bind(searchVM.filter.foundString)" onChange="@command('filterSearches')"/>
+                            </auxheader>
+                            <auxheader colspan="1">
+                                <span sclass="z-icon-filter"/>
+                                <textbox instant="true" width="80%" value="@bind(searchVM.filter.additionalInfo)" onChange="@command('filterSearches')"/>
+                            </auxheader>
+                            <auxheader colspan="1">
+                                <span sclass="z-icon-filter"/>
+                                <combobox id="filterResourceNamesCBox" model="@load(searchVM.filter.resourceNamesFilter)" selectedItem="@bind(searchVM.selectedResourceNameFilter)"
+                                          onChange="@command('filterSearches')">
+                                    <template name="model">
+                                        <comboitem label="@load(each)"/>
+                                    </template>
+                                </combobox>
+                                <!--                                <textbox instant="true" width="80%" value="@bind(searchVM.filter.resourceName)" onChange="@command('filterSearches')"/>-->
+                            </auxheader>
+                            <auxheader colspan="1">
+                                <span sclass="z-icon-filter"/>
+                                <combobox id="filterNamespacesCBox" width="80%" mold="rounded" model="@load(searchVM.filter.namespacesFilter)" selectedItem="@bind(searchVM.filter.selectedNamespaceFilter)"
+                                          onChange="@command('filterSearches')">
+                                    <template name="model">
+                                        <comboitem label="@load(each)"/>
+                                    </template>
+                                </combobox>
+                            </auxheader>
+                            <auxheader colspan="1">
+                                <span sclass="z-icon-filter"/>
+                                <!--                                <textbox instant="true" width="80%" value="@bind(searchVM.filter.resourceType)" onChange="@command('filterSearches')"/>-->
+                                <combobox id="filterResourceTypesCBox" width="80%" model="@load(searchVM.filter.resourceTypesFilter)" selectedItem="@bind(searchVM.filter.selectedResourceTypeFilter)"
+                                          onChange="@command('filterSearches')">
+                                    <template name="model">
+                                        <comboitem label="@load(each)"/>
+                                    </template>
+                                </combobox>
+                            </auxheader>
+                            <auxheader colspan="1">
+                                <span sclass="z-icon-filter"/>
+                                <textbox instant="true" width="80%" value="@bind(searchVM.filter.creationTime)" onChange="@command('filterSearches')"/>
+                            </auxheader>
+                        </auxhead>
+                        <columns menupopup="auto" sizable="true">
+                            <column hflex="min" label="Id"/>
                             <column hflex="3" label="Found String"/>
-                            <column hflex="2" label="Additional Info"/>
-                            <column hflex="3" label="Resource Name" sort="auto"/>
-                            <column hflex="1" label="Creation Time" sort="auto"/>
-                            <column hflex="1" label="Namespace" sort="auto"/>
-                            <column hflex="1" label="Resource Type" sort="auto"/>
+                            <column hflex="2" label="Additional Info" sort="auto(additionalInfo)"/>
+                            <column hflex="2" label="Resource Name" tooltiptext="Kubernetes Resource Name: [Pod containers]" sort="auto(additionalInfo)"/>
+                            <column hflex="1" label="Namespace" sort="auto(namespace)"/>
+                            <column hflex="1" label="Resource Type" sort="auto(resourceType)"/>
+                            <column hflex="1" label="Creation Time" sort="auto(creationTime)"/>
                         </columns>
                         <rows>
-                            <template name="model">
+                            <template name="model" var="item">
                                 <row>
-                                    <label value="${each.foundString}"></label>
-                                    <label value="${each.additionalInfo}"></label>
-                                    <label value="${each.resourceName}"></label>
-                                    <label value="${each.creationTime}"></label>
-                                    <label value="${each.namespace}"></label>
-                                    <label value="${each.resourceType}"></label>
+                                    <label value="${item.id}"></label>
+                                    <label value="${item.foundString}" multiline="true"></label>
+                                    <label value="${item.additionalInfo}"></label>
+                                    <label value="${item.resourceName}"></label>
+                                    <label value="${item.namespace}"></label>
+                                    <label value="${item.resourceType}"></label>
+                                    <label value="${item.creationTime}"></label>
                                 </row>
                             </template>
                         </rows>
                         <foot>
-                            <footer id="searchGridFooter" span="6" align="right" label="Founded items"/>
+                            <footer id="searchGridProgressFooter" span="2" align="left" label="@load(searchVM.progressLabel)"/>
+                            <footer id="searchGridTotalItemsFooter" span="5" align="right" label="@load(searchVM.totalItems)"/>
                         </foot>
                     </grid>
                 </div>
@@ -91,8 +140,5 @@
     </div>
     <popup id="namespacesTooltip">
         All visible namespaces.
-    </popup>
-    <popup id="searchTooltip">
-        Search text in selected namespace and resources.
     </popup>
 </zk>

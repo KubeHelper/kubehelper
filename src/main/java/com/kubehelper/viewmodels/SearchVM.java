@@ -2,8 +2,9 @@ package com.kubehelper.viewmodels;
 
 import com.kubehelper.common.Global;
 import com.kubehelper.common.Resource;
-import com.kubehelper.domain.models.DashboardModel;
+import com.kubehelper.domain.filters.SearchFilter;
 import com.kubehelper.domain.models.SearchModel;
+import com.kubehelper.domain.results.SearchResult;
 import com.kubehelper.services.CommonService;
 import com.kubehelper.services.SearchService;
 import org.slf4j.Logger;
@@ -19,16 +20,16 @@ import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Path;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
-import org.zkoss.zk.ui.event.KeyEvent;
-import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Checkbox;
 import org.zkoss.zul.Hlayout;
+import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Vlayout;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
@@ -42,7 +43,6 @@ public class SearchVM implements EventListener {
 
     private static Logger logger = LoggerFactory.getLogger(SearchVM.class);
 
-    private String selectedNamespace = "all";
     private String searchString = "";
     private boolean caseSensitiveSearch = false;
     private Set<Resource> selectedResources = new HashSet<>() {{
@@ -54,6 +54,7 @@ public class SearchVM implements EventListener {
         add(Resource.REPLICA_SET);
         add(Resource.ENV_VARIABLE);
     }};
+    private ListModelList<SearchResult> searchResults = new ListModelList<>();
 
     private SearchModel searchModel;
 
@@ -67,7 +68,7 @@ public class SearchVM implements EventListener {
     @NotifyChange("*")
     public void init() {
         searchModel = (SearchModel) Global.ACTIVE_MODELS.computeIfAbsent(Global.SEARCH_MODEL, (k) -> Global.NEW_MODELS.get(Global.SEARCH_MODEL));
-        searchModel.setNamespaces(commonService.getAllNamespaces());
+        onInitPreparations();
     }
 
     /**
@@ -80,9 +81,13 @@ public class SearchVM implements EventListener {
 
 
     @Command
+    @NotifyChange({"totalItems", "searchResults", "filter"})
     public void search() {
-        searchModel.getSearchResults().clear();
-        searchService.search(selectedNamespace, searchString, searchModel);
+        searchModel.setFilter(new SearchFilter());
+        searchService.search(searchModel.getSelectedNamespace(), searchString, searchModel);
+        searchModel.setNamespaces(commonService.getAllNamespaces());
+        logger.info("Found {} namespaces.", searchModel.getNamespaces());
+        onInitPreparations();
     }
 
     /**
@@ -101,6 +106,50 @@ public class SearchVM implements EventListener {
                 ((Checkbox) cBox).setChecked(isResourcesCheckBoxChecked);
             });
         }
+    }
+
+    private void onInitPreparations() {
+        searchModel.setNamespaces(searchModel.getNamespaces().isEmpty() ? commonService.getAllNamespaces() : searchModel.getNamespaces());
+        if (searchModel.getFilter().isFilterActive() && !searchModel.getSearchResults().isEmpty()) {
+            filterSearches();
+        } else {
+            searchResults = new ListModelList<>(searchModel.getSearchResults());
+        }
+        sortResultsByNamespace();
+//        updateHeightsAndRerenderVM();
+    }
+
+    private void sortResultsByNamespace() {
+        searchResults.sort(Comparator.comparing(SearchResult::getNamespace));
+    }
+
+    @Command
+    @NotifyChange({"totalItems", "searchResults"})
+    public void filterSearches() {
+        searchResults.clear();
+        for (SearchResult searchResult : searchModel.getSearchResults()) {
+            if (searchResult.getFoundString().toLowerCase().contains(getFilter().getFoundString().toLowerCase()) &&
+                    searchResult.getCreationTime().toLowerCase().contains(getFilter().getCreationTime().toLowerCase()) &&
+                    searchResult.getAdditionalInfo().toLowerCase().contains(getFilter().getAdditionalInfo().toLowerCase()) &&
+                    searchResult.getResourceName().toLowerCase().contains(getFilter().getSelectedResourceNameFilter().toLowerCase()) &&
+                    searchResult.getResourceType().toLowerCase().contains(getFilter().getSelectedResourceTypeFilter().toLowerCase()) &&
+                    searchResult.getNamespace().toLowerCase().contains(getFilter().getSelectedNamespaceFilter().toLowerCase())) {
+                searchResults.add(searchResult);
+            }
+        }
+        sortResultsByNamespace();
+    }
+
+    //    TODO Search clear - очистити комбобокси, бо не очищуються. Тут приклад, як має бути. Треба в моделі нульове велью вставити. https://zkfiddle.org/sample/2ptv3d/3-clear-selected-item#source-2
+//    TODO Refactoring, remove unused getters and refactor Search Service
+    @Command
+    @NotifyChange("*")
+    public void clearAll() {
+        searchModel.setSearchResults(new ListModelList<>())
+                .setFilter(new SearchFilter())
+                .setNamespaces(commonService.getAllNamespaces())
+                .setSelectedNamespace("all");
+        searchResults = new ListModelList<>();
     }
 
     /**
@@ -134,7 +183,6 @@ public class SearchVM implements EventListener {
      */
     @Override
     public void onEvent(Event event) {
-
         //Add or remove selected resource to selectedResources model.
         String resourceId = ((Checkbox) event.getTarget()).getId();
         String resourceName = resourceId.substring(0, resourceId.lastIndexOf("_"));
@@ -157,11 +205,11 @@ public class SearchVM implements EventListener {
     }
 
     public String getSelectedNamespace() {
-        return selectedNamespace;
+        return searchModel.getSelectedNamespace();
     }
 
     public SearchVM setSelectedNamespace(String selectedNamespace) {
-        this.selectedNamespace = selectedNamespace;
+        this.searchModel.setSelectedNamespace(selectedNamespace);
         return this;
     }
 
@@ -182,4 +230,30 @@ public class SearchVM implements EventListener {
         this.caseSensitiveSearch = caseSensitiveSearch;
         return this;
     }
+
+    public SearchFilter getFilter() {
+        return searchModel.getFilter();
+    }
+
+    public String getTotalItems() {
+        return String.format("Total Items: %d", searchResults.size());
+    }
+
+    public String getProgressLabel() {
+        return "Progress: ";
+//        return "Progress: " + searchService.getProgressLabel();
+    }
+
+    public ListModelList<SearchResult> getSearchResults() {
+        return searchResults;
+    }
+
+    public List<String> getNamespaces() {
+        return searchModel.getNamespaces();
+    }
+
+    public String getSelectedResourceNameFilter() {
+        return getFilter().getSelectedResourceNameFilter();
+    }
+
 }

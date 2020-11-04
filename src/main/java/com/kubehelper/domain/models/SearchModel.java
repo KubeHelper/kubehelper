@@ -1,7 +1,7 @@
 package com.kubehelper.domain.models;
 
 import com.kubehelper.common.Global;
-import com.kubehelper.common.Resource;
+import com.kubehelper.domain.filters.SearchFilter;
 import com.kubehelper.domain.results.SearchResult;
 import org.zkoss.zul.ListModelList;
 
@@ -17,19 +17,24 @@ public class SearchModel implements PageModel {
     public static String NAME = Global.SEARCH_MODEL;
     private int desktopWidth;
     private int desktopHeight;
+    private String selectedNamespace = "all";
     private List<String> namespaces = new ArrayList<>();
     private ListModelList<SearchResult> searchResults = new ListModelList<>();
+    private SearchFilter filter = new SearchFilter();
 
+    public SearchModel() {
+    }
 
-    public void addSearchResult(String namespace, Resource resourceType, String resourceName, String additionalInfo, String foundString, String creationTime) {
-        SearchResult searchResult = new SearchResult();
-        searchResult.setNamespace(namespace);
-        searchResult.setResourceType(resourceType);
-        searchResult.setResourceName(resourceName);
-        searchResult.setAdditionalInfo(additionalInfo);
-        searchResult.setFoundString(foundString);
-        searchResult.setCreationTime(creationTime);
+    public SearchModel addSearchResult(SearchResult searchResult) {
         searchResults.add(searchResult);
+        filter.addResourceTypesFilter(searchResult.getResourceType());
+        filter.addNamespacesFilter(searchResult.getNamespace());
+        return this;
+    }
+
+    public SearchModel addResourceNameFilter(String resourceName) {
+        filter.addResourceNamesFilter(resourceName);
+        return this;
     }
 
     @Override
@@ -69,5 +74,28 @@ public class SearchModel implements PageModel {
 
     public ListModelList<SearchResult> getSearchResults() {
         return searchResults;
+    }
+
+    public String getSelectedNamespace() {
+        return selectedNamespace;
+    }
+
+    public SearchModel setSelectedNamespace(String selectedNamespace) {
+        this.selectedNamespace = selectedNamespace;
+        return this;
+    }
+
+    public SearchModel setSearchResults(ListModelList<SearchResult> searchResults) {
+        this.searchResults = searchResults;
+        return this;
+    }
+
+    public SearchFilter getFilter() {
+        return filter;
+    }
+
+    public SearchModel setFilter(SearchFilter filter) {
+        this.filter = filter;
+        return this;
     }
 }
