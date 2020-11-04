@@ -67,10 +67,10 @@ public class CustomConfig {
         Library.setProperty("org.zkoss.zk.WCS.cache", "false");
         Library.setProperty("org.zkoss.web.classWebResource.cache", "false");
         Library.setProperty("org.zkoss.util.label.cache", "false");
-//        Library.setProperty("org.zkoss.theme.preferred", "iceblue_c");
 //        Library.setProperty("org.zkoss.theme.preferred", "atlantic");
 //        Library.setProperty("org.zkoss.theme.preferred", "silvertail");
 //        Library.setProperty("org.zkoss.theme.preferred", "sapphire");
+//        Library.setProperty("org.zkoss.theme.preferred", "iceblue_c");
         Library.setProperty("org.zkoss.theme.preferred", "breeze");
         Library.setProperty("org.zkoss.zul.progressbox.position", "center");
 

@@ -17,7 +17,7 @@
     <properties>
         <java.version>14</java.version>
         <zkspringboot.version>2.3.1</zkspringboot.version>
-        <zk.version>9.0.0</zk.version>
+        <zk.version>9.5.0.1</zk.version>
     </properties>
 
     <dependencies>
@@ -92,11 +92,11 @@
 <!--            <version>${zk.version}</version>-->
 <!--        </dependency>-->
 
-<!--        <dependency>-->
-<!--            <groupId>org.zkoss.theme</groupId>-->
-<!--            <artifactId>iceblue_c</artifactId>-->
-<!--            <version>${zk.version}</version>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>org.zkoss.theme</groupId>
+            <artifactId>iceblue_c</artifactId>
+            <version>${zk.version}</version>
+        </dependency>
 
 
     </dependencies>
