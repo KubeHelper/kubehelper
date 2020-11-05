@@ -81,6 +81,6 @@ public class IpsAndPortsFilter {
     }
 
     public boolean isFilterActive() {
-        return !StringUtils.isAllBlank(namespace, resourceType, resourceName, creationTime, ip, hostInfo, ports, additionalInfo);
+        return StringUtils.isNoneBlank(namespace, resourceType, resourceName, creationTime, ip, hostInfo, ports, additionalInfo);
     }
 }

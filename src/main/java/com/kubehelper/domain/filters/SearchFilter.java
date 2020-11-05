@@ -96,7 +96,7 @@ public class SearchFilter {
     }
 
     public boolean isFilterActive() {
-        return !StringUtils.isAllBlank(namespace, resourceType, resourceName, creationTime, foundString, additionalInfo, selectedNamespaceFilter, selectedResourceTypeFilter, selectedResourceNameFilter);
+        return StringUtils.isNoneBlank(namespace, resourceType, resourceName, creationTime, foundString, additionalInfo, selectedNamespaceFilter, selectedResourceTypeFilter, selectedResourceNameFilter);
     }
 
     public ListModelList<String> getNamespacesFilter() {

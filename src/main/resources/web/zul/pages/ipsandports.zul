@@ -31,7 +31,7 @@
                     </vbox>
                     <separator width="100%" orient="horizontal" bar="false"/>
                     <grid id="ipsAndPortsGrid" model="@load(ipsAndPortsVM.ipsAndPortsResults)" height="@bind(ipsAndPortsVM.ipsAndPortsGridHeight)">
-                        <auxhead>
+                        <auxhead  id="ipsAndPortsGridAuxHead">
                             <auxheader>
                                 <span sclass="z-icon-hashtag"/>
                             </auxheader>

@@ -20,10 +20,16 @@ import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Path;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
+import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
+import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
+import org.zkoss.zk.ui.util.Notification;
 import org.zkoss.zkplus.spring.DelegatingVariableResolver;
+import org.zkoss.zul.Auxhead;
 import org.zkoss.zul.Checkbox;
+import org.zkoss.zul.Combobox;
+import org.zkoss.zul.Footer;
 import org.zkoss.zul.Hlayout;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Vlayout;
@@ -42,6 +48,11 @@ import java.util.Set;
 public class SearchVM implements EventListener {
 
     private static Logger logger = LoggerFactory.getLogger(SearchVM.class);
+
+    private boolean isSearchButtonPressed;
+
+    @Wire
+    private Footer searchGridTotalItemsFooter;
 
     private String searchString = "";
     private boolean caseSensitiveSearch = false;
@@ -73,12 +84,15 @@ public class SearchVM implements EventListener {
 
     /**
      * Creates CheckBox components Dynamically after UI render.
+     * <p>
+     * Explanation:
+     * We need Selectors.wireComponents() in order to be able to @Wire GUI components.
      */
     @AfterCompose
-    public void afterCompose() {
+    public void afterCompose(@ContextParam(ContextType.VIEW) Component view) {
         createKubeResourcesCheckboxes();
+        Selectors.wireComponents(view, this, false);
     }
-
 
     @Command
     @NotifyChange({"totalItems", "searchResults", "filter"})
@@ -86,6 +100,7 @@ public class SearchVM implements EventListener {
         searchModel.setFilter(new SearchFilter());
         searchService.search(searchModel.getSelectedNamespace(), searchString, searchModel);
         searchModel.setNamespaces(commonService.getAllNamespaces());
+        isSearchButtonPressed = true;
         logger.info("Found {} namespaces.", searchModel.getNamespaces());
         onInitPreparations();
     }
@@ -140,8 +155,9 @@ public class SearchVM implements EventListener {
         sortResultsByNamespace();
     }
 
-    //    TODO Search clear - очистити комбобокси, бо не очищуються. Тут приклад, як має бути. Треба в моделі нульове велью вставити. https://zkfiddle.org/sample/2ptv3d/3-clear-selected-item#source-2
-//    TODO Refactoring, remove unused getters and refactor Search Service
+    /**
+     * Clears all components, model and pull all namespaces again.
+     */
     @Command
     @NotifyChange("*")
     public void clearAll() {
@@ -150,6 +166,20 @@ public class SearchVM implements EventListener {
                 .setNamespaces(commonService.getAllNamespaces())
                 .setSelectedNamespace("all");
         searchResults = new ListModelList<>();
+        clearAllFilterComboboxes();
+    }
+
+    /**
+     * Removes last selected value from all filter comboboxes.
+     */
+    private void clearAllFilterComboboxes() {
+        Auxhead searchGridAuxHead = (Auxhead) Path.getComponent("//indexPage/templateInclude/searchGridAuxHead");
+        for (Component child : searchGridAuxHead.getFellows()) {
+            if (Arrays.asList("filterResourceNamesCBox", "filterNamespacesCBox", "filterResourceTypesCBox").contains(child.getId())) {
+                Combobox cBox = (Combobox) child;
+                cBox.setValue("");
+            }
+        }
     }
 
     /**
@@ -245,6 +275,10 @@ public class SearchVM implements EventListener {
     }
 
     public ListModelList<SearchResult> getSearchResults() {
+        if (isSearchButtonPressed && searchResults.isEmpty()) {
+            Notification.show("Nothing found.", "info", searchGridTotalItemsFooter, "before_end", 2000);
+        }
+        isSearchButtonPressed = false;
         return searchResults;
     }
 

@@ -8,6 +8,7 @@ import com.kubehelper.services.CommonService;
 import com.kubehelper.services.IpsAndPortsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.zkoss.bind.annotation.AfterCompose;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
@@ -15,12 +16,21 @@ import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
+import org.zkoss.zk.ui.Component;
+import org.zkoss.zk.ui.Path;
 import org.zkoss.zk.ui.event.OpenEvent;
+import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
+import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
+import org.zkoss.zk.ui.util.Notification;
 import org.zkoss.zkplus.spring.DelegatingVariableResolver;
+import org.zkoss.zul.Auxhead;
+import org.zkoss.zul.Combobox;
+import org.zkoss.zul.Footer;
 import org.zkoss.zul.ListModelList;
 
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
@@ -32,11 +42,16 @@ public class IpsAndPortsVM {
 
     private static Logger logger = LoggerFactory.getLogger(IpsAndPortsVM.class);
 
+    private boolean isGetButtonPressed;
+
     private String detailsLabel = "";
-    private String ipsAndPortsGridHeight = "100px";
+    private String ipsAndPortsGridHeight = "800px";
 
     private IpsAndPortsModel ipsAndPortsModel;
     private ListModelList<IpsAndPortsResult> ipsAndPortsResults = new ListModelList<>();
+
+    @Wire
+    private Footer ipsAndPortsGridFooter;
 
     @WireVariable
     private CommonService commonService;
@@ -50,12 +65,21 @@ public class IpsAndPortsVM {
         onInitPreparations();
     }
 
+    /**
+     * We need Selectors.wireComponents() in order to be able to @Wire GUI components.
+     */
+    @AfterCompose
+    public void afterCompose(@ContextParam(ContextType.VIEW) Component view) {
+        Selectors.wireComponents(view, this, false);
+    }
+
     @Command
     @NotifyChange({"totalItems", "ipsAndPortsResults", "filter"})
     public void search() {
         ipsAndPortsModel.setFilter(new IpsAndPortsFilter());
         ipsAndPortsService.get(ipsAndPortsModel.getSelectedNamespace(), ipsAndPortsModel);
         ipsAndPortsModel.setNamespaces(commonService.getAllNamespaces());
+        isGetButtonPressed = true;
         logger.info("Found {} namespaces.", ipsAndPortsModel.getNamespaces());
         onInitPreparations();
     }
@@ -68,7 +92,7 @@ public class IpsAndPortsVM {
             ipsAndPortsResults = new ListModelList<>(ipsAndPortsModel.getIpsAndPortsResults());
         }
         sortResultsByNamespace();
-        updateHeightsAndRerenderVM();
+//        updateHeightsAndRerenderVM();
     }
 
     @Command
@@ -89,6 +113,7 @@ public class IpsAndPortsVM {
         sortResultsByNamespace();
     }
 
+    //TODO Recalculate desktopHeight, change formula. And pass it to SearchVM.
     @GlobalCommand
     @NotifyChange({"*"})
     public void updateHeightsAndRerenderVM() {
@@ -116,6 +141,20 @@ public class IpsAndPortsVM {
                 .setNamespaces(commonService.getAllNamespaces())
                 .setSelectedNamespace("all");
         ipsAndPortsResults = new ListModelList<>();
+        clearAllFilterComboboxes();
+    }
+
+    /**
+     * Removes last selected value from all filter comboboxes.
+     */
+    private void clearAllFilterComboboxes() {
+        Auxhead searchGridAuxHead = (Auxhead) Path.getComponent("//indexPage/templateInclude/ipsAndPortsGridAuxHead");
+        for (Component child : searchGridAuxHead.getFellows()) {
+            if (Arrays.asList("filterResourceNamesCBox", "filterNamespacesCBox", "filterResourceTypesCBox").contains(child.getId())) {
+                Combobox cBox = (Combobox) child;
+                cBox.setValue("");
+            }
+        }
     }
 
     private void sortResultsByNamespace() {
@@ -136,6 +175,10 @@ public class IpsAndPortsVM {
     }
 
     public String getTotalItems() {
+        if (isGetButtonPressed && ipsAndPortsResults.isEmpty()) {
+            Notification.show("Nothing found.", "info", ipsAndPortsGridFooter, "before_end", 2000);
+        }
+        isGetButtonPressed = false;
         return String.format("Total Items: %d", ipsAndPortsResults.size());
     }
 

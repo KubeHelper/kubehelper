@@ -6,7 +6,6 @@ import com.kubehelper.domain.models.SearchModel;
 import com.kubehelper.domain.results.SearchResult;
 import com.kubehelper.viewmodels.SearchVM;
 import io.kubernetes.client.Exec;
-import io.kubernetes.client.openapi.ApiException;
 import io.kubernetes.client.openapi.models.V1Container;
 import io.kubernetes.client.openapi.models.V1EnvVar;
 import io.kubernetes.client.openapi.models.V1ObjectMeta;
@@ -20,14 +19,9 @@ import org.springframework.stereotype.Service;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.util.List;
-import java.util.Objects;
 import java.util.Properties;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author JDev
@@ -45,7 +39,7 @@ public class SearchService {
 
     @Autowired
     private Exec exec;
-
+    //    TODO Refactoring, remove unused getters and refactor Search Service
 
     private PropertyChangeSupport progressUpdateListener = new PropertyChangeSupport(SearchVM.class);
 

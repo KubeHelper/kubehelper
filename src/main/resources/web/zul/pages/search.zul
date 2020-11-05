@@ -55,7 +55,7 @@
                         <auxhead>
                             <auxheader colspan="7" label="Search Results"/>
                         </auxhead>
-                        <auxhead>
+                        <auxhead id="searchGridAuxHead">
                             <auxheader>
                                 <span sclass="z-icon-hashtag"/>
                             </auxheader>
@@ -69,7 +69,7 @@
                             </auxheader>
                             <auxheader colspan="1">
                                 <span sclass="z-icon-filter"/>
-                                <combobox id="filterResourceNamesCBox" model="@load(searchVM.filter.resourceNamesFilter)" selectedItem="@bind(searchVM.selectedResourceNameFilter)"
+                                <combobox id="filterResourceNamesCBox" model="@load(searchVM.filter.resourceNamesFilter)" selectedItem="@bind(searchVM.filter.selectedResourceNameFilter)"
                                           onChange="@command('filterSearches')">
                                     <template name="model">
                                         <comboitem label="@load(each)"/>
@@ -123,9 +123,9 @@
                                 </row>
                             </template>
                         </rows>
-                        <foot>
-                            <footer id="searchGridProgressFooter" span="2" align="left" label="@load(searchVM.progressLabel)"/>
-                            <footer id="searchGridTotalItemsFooter" span="5" align="right" label="@load(searchVM.totalItems)"/>
+                        <foot id="searchFooter">
+                            <footer id="searchGridProgressFooter" span="5" align="left" label="@load(searchVM.progressLabel)"/>
+                            <footer id="searchGridTotalItemsFooter" span="2" align="right" label="@load(searchVM.totalItems)"/>
                         </foot>
                     </grid>
                 </div>
