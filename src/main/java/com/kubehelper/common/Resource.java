@@ -7,9 +7,9 @@ import java.util.Map;
  * @author JDev
  */
 public enum Resource {
-    BINDING("Binding"),
+//    BINDING("Binding"), //Deprecated in 1.7, please use the bindings subresource of pods instead.
     ENV_VARIABLE("EnvironmentVariable"),
-    COMPONENT_STATUS("ComponentStatus"),
+//    COMPONENT_STATUS("ComponentStatus"), //@ComponentStatus (and @ComponentStatusList) holds the cluster validation info.
     CONFIG_MAP("ConfigMap"),
     ENDPOINTS("Endpoints"),
     EVENT("Event"),

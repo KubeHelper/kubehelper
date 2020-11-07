@@ -7,7 +7,9 @@ import com.kubehelper.domain.models.SearchModel;
 import com.kubehelper.domain.results.SearchResult;
 import io.kubernetes.client.Exec;
 import io.kubernetes.client.openapi.ApiException;
+import io.kubernetes.client.openapi.models.V1ConfigMap;
 import io.kubernetes.client.openapi.models.V1ConfigMapKeySelector;
+import io.kubernetes.client.openapi.models.V1ConfigMapList;
 import io.kubernetes.client.openapi.models.V1Container;
 import io.kubernetes.client.openapi.models.V1EnvVar;
 import io.kubernetes.client.openapi.models.V1EnvVarSource;
@@ -33,6 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 /**
  * Search service.
@@ -56,20 +59,62 @@ public class SearchService {
     private Exec exec;
 
     /**
-     * Searches string in pods of selected namespace.
+     * Searches string selected kubernetes resources by selected namespace.
      *
      * @param selectedNamespace - selected namespace. all - all namespaces.
      * @param searchModel       - search model
      */
-    public void search(String selectedNamespace, SearchModel searchModel) {
-
-        List<V1Pod> podList = kubeAPI.getV1PodList(selectedNamespace).getItems();
+    public void search(String selectedNamespace, SearchModel searchModel, Set<Resource> selectedResources) {
 
         searchModel.getSearchResults().clear();
         searchModel.getSearchExceptions().clear();
+        try {
+
+            if (selectedResources.contains(Resource.ENV_VARIABLE)) {
+                searchForEnvironmentVariables(selectedNamespace, searchModel);
+            }
+            if (selectedResources.contains(Resource.CONFIG_MAP)) {
+                searchForConfigMaps(selectedNamespace, searchModel);
+            }
+        } catch (RuntimeException e) {
+            searchModel.addSearchException(new KubeHelperException(e));
+            logger.error(e.getMessage(), e);
+        }
 //        currentItemNumber = 0;
 //        totalItems = podList.size();
+    }
 
+    /**
+     * Searches string in ConfigMaps by selected namespace.
+     *
+     * @param selectedNamespace - selected namespace. all - all namespaces.
+     * @param searchModel       - search model
+     */
+    private void searchForConfigMaps(String selectedNamespace, SearchModel searchModel) {
+        V1ConfigMapList configMapsList = kubeAPI.getV1ConfigMapsList(selectedNamespace);
+        for (V1ConfigMap configMap : configMapsList.getItems()) {
+            if (searchModel.isSkipKubeNamespaces() && configMap.getMetadata().getNamespace().startsWith("kube-")) {
+                continue;
+            }
+            if (ObjectUtils.isNotEmpty(configMap.getData())) {
+                configMap.getData().forEach((configName, configValue) -> {
+                    if (isStringsContainsSearchString(searchModel.getSearchString(), configMap.getMetadata().getName(), configName, configValue)) {
+                        addNewConfigMapSearchResultToModel(configMap, searchModel, configName, configMap.getMetadata().getName(), configValue);
+                    }
+                });
+            }
+        }
+    }
+
+    /**
+     * Searches for environment variable in pods by selected namespace.
+     *
+     * @param selectedNamespace - selected namespace. all - all namespaces.
+     * @param searchModel       - search model
+     */
+    private void searchForEnvironmentVariables(String selectedNamespace, SearchModel searchModel) {
+
+        List<V1Pod> podList = kubeAPI.getV1PodList(selectedNamespace).getItems();
         for (V1Pod pod : podList) {
 
             //skips search in kube- namespace
@@ -132,7 +177,6 @@ public class SearchService {
                                     composeValueFromToSearchResult(v1EnvVar, pod, container, searchModel, "secretKeyRef", "", valueFromValue.toString());
                                 }
                             }
-
                         }
                     }
                 }
@@ -145,7 +189,6 @@ public class SearchService {
                 mergeNativeEnvVarsToSearchResult(pod, searchModel);
             }
         }
-
     }
 
     /**
@@ -168,9 +211,9 @@ public class SearchService {
             additionalInfo = "Simple Environment Variable";
             envValue = v1EnvVar.getValue().toLowerCase();
         }
-        if (envName.contains(searchModel.getSearchString().toLowerCase()) || envValue.contains(searchModel.getSearchString().toLowerCase())) {
+        if (isStringsContainsSearchString(searchModel.getSearchString(), envName, envValue)) {
             String resourceName = pod.getMetadata().getName() + " [" + container.getName() + "]";
-            addNewSearchResultToModel(pod, searchModel, v1EnvVar.getName(), envValue, resourceName, additionalInfo);
+            addNewEnvironmentSearchResultToModel(pod, searchModel, v1EnvVar.getName(), envValue, resourceName, additionalInfo);
         }
     }
 
@@ -197,7 +240,7 @@ public class SearchService {
                 }
             }
         } catch (ApiException | IOException | RuntimeException e) {
-            searchModel.addSearchException(new KubeHelperException(e));
+            searchModel.addSearchException(e);
             logger.error(e.getMessage(), e);
         }
         return envVars;
@@ -225,8 +268,8 @@ public class SearchService {
                 }
             }
             //add new native environment variable
-            if (isEnvVarNotFound && (key.contains(searchModel.getSearchString().toLowerCase()) || envValue.contains(searchModel.getSearchString().toLowerCase()))) {
-                addNewSearchResultToModel(pod, searchModel, key, envValue, pod.getMetadata().getName(), "Native Environment Variable");
+            if (isEnvVarNotFound && isStringsContainsSearchString(searchModel.getSearchString(), key, envValue)) {
+                addNewEnvironmentSearchResultToModel(pod, searchModel, key, envValue, pod.getMetadata().getName(), "Native Environment Variable");
             }
         }
     }
@@ -241,7 +284,7 @@ public class SearchService {
      * @param resourceName   - resource name
      * @param additionalInfo - additional info
      */
-    private void addNewSearchResultToModel(V1Pod pod, SearchModel searchModel, String envKey, String envValue, String resourceName, String additionalInfo) {
+    private void addNewEnvironmentSearchResultToModel(V1Pod pod, SearchModel searchModel, String envKey, String envValue, String resourceName, String additionalInfo) {
         SearchResult newSearchResult = new SearchResult(searchModel.getSearchResults().size() + 1)
                 .setNamespace(pod.getMetadata().getNamespace())
                 .setResourceType(Resource.ENV_VARIABLE)
@@ -251,6 +294,27 @@ public class SearchService {
                 .setCreationTime(getParsedCreationTime(pod.getMetadata().getCreationTimestamp()));
         searchModel.addSearchResult(newSearchResult)
                 .addResourceNameFilter(pod.getMetadata().getName());
+    }
+
+    private void addNewConfigMapSearchResultToModel(V1ConfigMap configMap, SearchModel searchModel, String foundString, String resourceName, String additionalInfo) {
+        SearchResult newSearchResult = new SearchResult(searchModel.getSearchResults().size() + 1)
+                .setNamespace(configMap.getMetadata().getNamespace())
+                .setResourceType(Resource.CONFIG_MAP)
+                .setResourceName(resourceName)
+                .setAdditionalInfo(additionalInfo)
+                .setFoundString(foundString)
+                .setCreationTime(getParsedCreationTime(configMap.getMetadata().getCreationTimestamp()));
+        searchModel.addSearchResult(newSearchResult)
+                .addResourceNameFilter(configMap.getMetadata().getName());
+    }
+
+    private boolean isStringsContainsSearchString(String searchString, String... strings) {
+        for (String s : strings) {
+            if (StringUtils.containsIgnoreCase(s, searchString)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private String getParsedCreationTime(DateTime dateTime) {

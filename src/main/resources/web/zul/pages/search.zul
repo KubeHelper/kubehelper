@@ -89,7 +89,8 @@
                             </auxheader>
                             <auxheader colspan="1">
                                 <span sclass="z-icon-filter"/>
-                                <combobox id="filterNamespacesCBox" width="80%" mold="rounded" model="@load(searchVM.filter.namespacesFilter)" selectedItem="@bind(searchVM.filter.selectedNamespaceFilter)"
+                                <combobox id="filterNamespacesCBox" width="80%" mold="rounded" model="@load(searchVM.filter.namespacesFilter)"
+                                          selectedItem="@bind(searchVM.filter.selectedNamespaceFilter)"
                                           onChange="@command('filterSearches')">
                                     <template name="model">
                                         <comboitem label="@load(each)"/>
@@ -125,7 +126,17 @@
                                 <row style="cursor:pointer">
                                     <label value="${item.id}"></label>
                                     <label value="${item.foundString}" multiline="true"></label>
-                                    <label value="${item.additionalInfo}" multiline="true"></label>
+                                    <!-- Button if config map, label if Environment Variable //-->
+                                    <button label="Show ConfigMap" popup="configMapPopup_${item.id}" hflex="1" if="${item.resourceType=='ConfigMap'}"/>
+<!--                                    TODO do scrollbare and formatted windows dialog -->
+                                    <popup id="configMapPopup_${item.id}" width="700px" if="${item.resourceType=='ConfigMap'}">
+                                        <groupbox sclass="z-demo-config">
+                                            <caption>${item.foundString}</caption>
+                                            <label>${item.additionalInfo}</label>
+                                            <!--                                            <html><![CDATA[ ${item.additionalInfo} ]]></html>-->
+                                        </groupbox>
+                                    </popup>
+                                    <label value="${item.additionalInfo}" if="${item.resourceType=='EnvironmentVariable'}" multiline="true"/>
                                     <label value="${item.resourceName}"></label>
                                     <label value="${item.namespace}"></label>
                                     <label value="${item.resourceType}"></label>
@@ -158,4 +169,5 @@
     <popup id="skipNativeEnvVarsTooltip">
         Don't collect all environment variables from pod. Saves execution time. IMPORTANT! Only environment variables from Kubernetes resources will be shown.
     </popup>
+
 </zk>

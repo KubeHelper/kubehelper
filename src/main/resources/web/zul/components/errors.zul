@@ -1,6 +1,7 @@
 <window id="errorsDialog" title="Errors" width="600px" position="center,top" closable="true" action="show: slideDown;hide: slideUp">
-    Errors occurred while parsing the results.
-    Please send information to the developer and help make the application better.
+    An error has occurred.
+    <separator/>
+    Please send information to the developer and help make the application better. To see the stack trace, click on the error.
     <separator/>
     <separator bar="true"/>
     <listbox id="errorsListbox" mold="paging" pageSize="20">

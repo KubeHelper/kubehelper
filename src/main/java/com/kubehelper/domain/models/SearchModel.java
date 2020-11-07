@@ -25,7 +25,7 @@ public class SearchModel implements PageModel {
     private List<KubeHelperException> searchExceptions = new ArrayList<>();
     private String searchString = "";
     private boolean skipKubeNamespaces = true;
-    private boolean skipNativeEnvVars = false;
+    private boolean skipNativeEnvVars = true;
 //    private boolean caseSensitiveSearch = false;
 
     public SearchModel() {
@@ -43,8 +43,8 @@ public class SearchModel implements PageModel {
         return this;
     }
 
-    public void addSearchException(KubeHelperException exception) {
-        this.searchExceptions.add(exception);
+    public void addSearchException(Exception exception) {
+        this.searchExceptions.add(new KubeHelperException(exception));
     }
 
     @Override

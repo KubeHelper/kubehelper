@@ -7,10 +7,12 @@ import com.kubehelper.domain.models.SearchModel;
 import com.kubehelper.domain.results.SearchResult;
 import com.kubehelper.services.CommonService;
 import com.kubehelper.services.SearchService;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.AfterCompose;
+import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
 import org.zkoss.bind.annotation.ContextType;
@@ -99,10 +101,11 @@ public class SearchVM implements EventListener {
     @Command
     @NotifyChange({"totalItems", "searchResults", "filter"})
     public void search() {
-        clearAll();
         searchModel.setFilter(new SearchFilter());
-        searchService.search(searchModel.getSelectedNamespace(), searchModel);
+        searchService.search(searchModel.getSelectedNamespace(), searchModel, selectedResources);
         searchModel.setNamespaces(commonService.getAllNamespaces());
+        searchModel.setSearchExceptions(new ArrayList<>());
+        clearAllFilterComboboxes();
         isSearchButtonPressed = true;
         logger.info("Found {} namespaces.", searchModel.getNamespaces());
         onInitPreparations();
@@ -152,12 +155,12 @@ public class SearchVM implements EventListener {
     public void filterSearches() {
         searchResults.clear();
         for (SearchResult searchResult : searchModel.getSearchResults()) {
-            if (searchResult.getFoundString().toLowerCase().contains(getFilter().getFoundString().toLowerCase()) &&
-                    searchResult.getCreationTime().toLowerCase().contains(getFilter().getCreationTime().toLowerCase()) &&
-                    searchResult.getAdditionalInfo().toLowerCase().contains(getFilter().getAdditionalInfo().toLowerCase()) &&
-                    searchResult.getResourceName().toLowerCase().contains(getFilter().getSelectedResourceNameFilter().toLowerCase()) &&
-                    searchResult.getResourceType().toLowerCase().contains(getFilter().getSelectedResourceTypeFilter().toLowerCase()) &&
-                    searchResult.getNamespace().toLowerCase().contains(getFilter().getSelectedNamespaceFilter().toLowerCase())) {
+            if (StringUtils.containsIgnoreCase(searchResult.getFoundString(), getFilter().getFoundString()) &&
+                    StringUtils.containsIgnoreCase(searchResult.getCreationTime(), getFilter().getCreationTime()) &&
+                    StringUtils.containsIgnoreCase(searchResult.getAdditionalInfo(), getFilter().getAdditionalInfo()) &&
+                    StringUtils.containsIgnoreCase(searchResult.getResourceName(), getFilter().getSelectedResourceNameFilter()) &&
+                    StringUtils.containsIgnoreCase(searchResult.getResourceType(), getFilter().getSelectedResourceTypeFilter()) &&
+                    StringUtils.containsIgnoreCase(searchResult.getNamespace(), getFilter().getSelectedNamespaceFilter())) {
                 searchResults.add(searchResult);
             }
         }
@@ -239,6 +242,9 @@ public class SearchVM implements EventListener {
             kubeResourcesCheckAll.setChecked(true);
             BindUtils.postNotifyChange(null, null, this, "kubeResourcesGBoxCheckAll");
         }
+    }
+
+    public void showConfigMap(@BindingParam("id") String id) {
     }
 
 
