@@ -1,6 +1,7 @@
 package com.kubehelper.domain.models;
 
 import com.kubehelper.common.Global;
+import com.kubehelper.common.KubeHelperException;
 import com.kubehelper.domain.filters.SearchFilter;
 import com.kubehelper.domain.results.SearchResult;
 import org.zkoss.zul.ListModelList;
@@ -21,6 +22,11 @@ public class SearchModel implements PageModel {
     private List<String> namespaces = new ArrayList<>();
     private ListModelList<SearchResult> searchResults = new ListModelList<>();
     private SearchFilter filter = new SearchFilter();
+    private List<KubeHelperException> searchExceptions = new ArrayList<>();
+    private String searchString = "";
+    private boolean skipKubeNamespaces = true;
+    private boolean skipNativeEnvVars = false;
+//    private boolean caseSensitiveSearch = false;
 
     public SearchModel() {
     }
@@ -35,6 +41,10 @@ public class SearchModel implements PageModel {
     public SearchModel addResourceNameFilter(String resourceName) {
         filter.addResourceNamesFilter(resourceName);
         return this;
+    }
+
+    public void addSearchException(KubeHelperException exception) {
+        this.searchExceptions.add(exception);
     }
 
     @Override
@@ -96,6 +106,46 @@ public class SearchModel implements PageModel {
 
     public SearchModel setFilter(SearchFilter filter) {
         this.filter = filter;
+        return this;
+    }
+
+    public List<KubeHelperException> getSearchExceptions() {
+        return searchExceptions;
+    }
+
+    public SearchModel setSearchExceptions(List<KubeHelperException> searchExceptions) {
+        this.searchExceptions = searchExceptions;
+        return this;
+    }
+
+    public boolean hasSearchErrors(){
+        return !searchExceptions.isEmpty();
+    }
+
+    public String getSearchString() {
+        return searchString;
+    }
+
+    public SearchModel setSearchString(String searchString) {
+        this.searchString = searchString;
+        return this;
+    }
+
+    public boolean isSkipKubeNamespaces() {
+        return skipKubeNamespaces;
+    }
+
+    public SearchModel setSkipKubeNamespaces(boolean skipKubeNamespaces) {
+        this.skipKubeNamespaces = skipKubeNamespaces;
+        return this;
+    }
+
+    public boolean isSkipNativeEnvVars() {
+        return skipNativeEnvVars;
+    }
+
+    public SearchModel setSkipNativeEnvVars(boolean skipNativeEnvVars) {
+        this.skipNativeEnvVars = skipNativeEnvVars;
         return this;
     }
 }

@@ -19,7 +19,17 @@
                                 </combobox>
                             </hlayout>
                         </cell>
-                        <cell width="59%" style="padding: 0px 5px 0px 5px;">
+                        <cell width="5%" style="padding: 0px 5px 0px 5px;">
+                            <hlayout valign="middle">
+                                <checkbox id="skipKubeNamespacesCBox" checked="@bind(searchVM.skipKubeNamespaces)" tooltip="skipKubeNamespacesTooltip"/>Skip kube* namespaces
+                            </hlayout>
+                        </cell>
+                        <cell width="5%" style="padding: 0px 5px 0px 5px;">
+                            <hlayout valign="middle">
+                                <checkbox id="skipNativeEnvVarsCBox" checked="@bind(searchVM.skipNativeEnvVars)" tooltip="skipNativeEnvVarsTooltip"/>Skip native Env variables
+                            </hlayout>
+                        </cell>
+                        <cell width="49%" style="padding: 0px 5px 0px 5px;">
                             <hlayout valign="middle">
                                 <label value="Search: "/>
                                 <textbox id="searchStringTBox" hflex="1" value="@bind(searchVM.searchString)" onOK="@command('search')"/>
@@ -112,10 +122,10 @@
                         </columns>
                         <rows>
                             <template name="model" var="item">
-                                <row>
+                                <row style="cursor:pointer">
                                     <label value="${item.id}"></label>
                                     <label value="${item.foundString}" multiline="true"></label>
-                                    <label value="${item.additionalInfo}"></label>
+                                    <label value="${item.additionalInfo}" multiline="true"></label>
                                     <label value="${item.resourceName}"></label>
                                     <label value="${item.namespace}"></label>
                                     <label value="${item.resourceType}"></label>
@@ -140,5 +150,12 @@
     </div>
     <popup id="namespacesTooltip">
         All visible namespaces.
+    </popup>
+    <popup id="skipKubeNamespacesTooltip">
+        Skips search in pods from kube* namespace. Saves execution time.
+    </popup>
+
+    <popup id="skipNativeEnvVarsTooltip">
+        Don't collect all environment variables from pod. Saves execution time. IMPORTANT! Only environment variables from Kubernetes resources will be shown.
     </popup>
 </zk>

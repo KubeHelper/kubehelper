@@ -17,6 +17,7 @@ import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.zk.ui.Component;
+import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Path;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
@@ -33,12 +34,15 @@ import org.zkoss.zul.Footer;
 import org.zkoss.zul.Hlayout;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Vlayout;
+import org.zkoss.zul.Window;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -54,8 +58,6 @@ public class SearchVM implements EventListener {
     @Wire
     private Footer searchGridTotalItemsFooter;
 
-    private String searchString = "";
-    private boolean caseSensitiveSearch = false;
     private Set<Resource> selectedResources = new HashSet<>() {{
         add(Resource.CONFIG_MAP);
         add(Resource.POD);
@@ -97,8 +99,9 @@ public class SearchVM implements EventListener {
     @Command
     @NotifyChange({"totalItems", "searchResults", "filter"})
     public void search() {
+        clearAll();
         searchModel.setFilter(new SearchFilter());
-        searchService.search(searchModel.getSelectedNamespace(), searchString, searchModel);
+        searchService.search(searchModel.getSelectedNamespace(), searchModel);
         searchModel.setNamespaces(commonService.getAllNamespaces());
         isSearchButtonPressed = true;
         logger.info("Found {} namespaces.", searchModel.getNamespaces());
@@ -123,6 +126,9 @@ public class SearchVM implements EventListener {
         }
     }
 
+    /**
+     * Prepare view for result depends on filters or new searches
+     */
     private void onInitPreparations() {
         searchModel.setNamespaces(searchModel.getNamespaces().isEmpty() ? commonService.getAllNamespaces() : searchModel.getNamespaces());
         if (searchModel.getFilter().isFilterActive() && !searchModel.getSearchResults().isEmpty()) {
@@ -138,6 +144,9 @@ public class SearchVM implements EventListener {
         searchResults.sort(Comparator.comparing(SearchResult::getNamespace));
     }
 
+    /**
+     * Filters searches and refresh total items label and search results view.
+     */
     @Command
     @NotifyChange({"totalItems", "searchResults"})
     public void filterSearches() {
@@ -164,7 +173,9 @@ public class SearchVM implements EventListener {
         searchModel.setSearchResults(new ListModelList<>())
                 .setFilter(new SearchFilter())
                 .setNamespaces(commonService.getAllNamespaces())
-                .setSelectedNamespace("all");
+                .setSelectedNamespace("all")
+                .setSearchString("")
+                .setSearchExceptions(new ArrayList<>());
         searchResults = new ListModelList<>();
         clearAllFilterComboboxes();
     }
@@ -230,8 +241,21 @@ public class SearchVM implements EventListener {
         }
     }
 
-    public SearchModel getModel() {
-        return searchModel;
+
+    public boolean isSkipKubeNamespaces() {
+        return searchModel.isSkipKubeNamespaces();
+    }
+
+    public void setSkipKubeNamespaces(boolean skipKubeNamespaces) {
+        this.searchModel.setSkipKubeNamespaces(skipKubeNamespaces);
+    }
+
+    public boolean isSkipNativeEnvVars() {
+        return searchModel.isSkipNativeEnvVars();
+    }
+
+    public void setSkipNativeEnvVars(boolean skipNativeEnvVars) {
+        this.searchModel.setSkipNativeEnvVars(skipNativeEnvVars);
     }
 
     public String getSelectedNamespace() {
@@ -244,21 +268,11 @@ public class SearchVM implements EventListener {
     }
 
     public String getSearchString() {
-        return searchString;
+        return this.searchModel.getSearchString();
     }
 
-    public SearchVM setSearchString(String searchString) {
-        this.searchString = searchString;
-        return this;
-    }
-
-    public boolean isCaseSensitiveSearch() {
-        return caseSensitiveSearch;
-    }
-
-    public SearchVM setCaseSensitiveSearch(boolean caseSensitiveSearch) {
-        this.caseSensitiveSearch = caseSensitiveSearch;
-        return this;
+    public void setSearchString(String searchString) {
+        this.searchModel.setSearchString(searchString);
     }
 
     public SearchFilter getFilter() {
@@ -274,9 +288,18 @@ public class SearchVM implements EventListener {
 //        return "Progress: " + searchService.getProgressLabel();
     }
 
+    /**
+     * Returns search results for grid and shows Notification if nothing was found or/and error window if some errors has occurred while parsing the results.
+     *
+     * @return - search results
+     */
     public ListModelList<SearchResult> getSearchResults() {
         if (isSearchButtonPressed && searchResults.isEmpty()) {
             Notification.show("Nothing found.", "info", searchGridTotalItemsFooter, "before_end", 2000);
+        }
+        if (isSearchButtonPressed && searchModel.hasSearchErrors()) {
+            Window window = (Window) Executions.createComponents("~./zul/components/errors.zul", null, Map.of("errors", searchModel.getSearchExceptions()));
+            window.doModal();
         }
         isSearchButtonPressed = false;
         return searchResults;

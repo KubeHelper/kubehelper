@@ -5,8 +5,11 @@
                 <div>
                     <vbox height="100%" width="100%">
                         <hbox id="menuHbox" height="100%" width="100%" style="margin: 5px;" align="stretch">
-                            <cell id="clearAllCell" width="10%" style="padding: 0px 5px 0px 5px;" tooltip="clearAllTooltip">
+                            <cell id="clearAllCell" width="5%" style="padding: 0px 5px 0px 5px;" tooltip="clearAllTooltip">
                                 <button id="clearAll" iconSclass="z-icon-eraser" label="Clear all" onClick="@command('clearAll')"/>
+                            </cell>
+                            <cell id="popupDetailsCBox" width="5%" style="padding: 0px 5px 0px 5px;" tooltip="popupIpsAndPortsDetails">
+                                <checkbox id="showDetailsPopupCBox" iconSclass="z-icon-eraser" checked="true" onCheck="@command('showDetailsPopup')"/>Resources
                             </cell>
                             <separator width="100%" orient="vertical" bar="true"/>
                             <cell id="namespacesCell" width="30%" style="padding: 0px 5px 0px 5px;" align="left">
@@ -82,7 +85,7 @@
                         <rows>
                             <template name="model" var="item">
                                 <!--                                TODO make row on click and show info, image id and other <row onClick="@command('filterIps')">-->
-                                <row onClick="@command('getDetails', clickedItem=item)">
+                                <row onClick="@command('getDetails', clickedItem=item)" style="cursor:pointer">
                                     <label value="${item.id}"></label>
                                     <label value="${item.ip}" multiline="true"></label>
                                     <label value="${item.ports}" multiline="true"></label>
@@ -115,6 +118,9 @@
     </popup>
     <popup id="namespacesTooltip">
         All visible namespaces.
+    </popup>
+    <popup id="popupIpsAndPortsDetails">
+        Show detailed information about pod in a pop-up window.
     </popup>
     <!--    <popup id="getResourcesTooltip">-->
     <!--        Searching for resources(pods, services) from the selected namespace.-->
