@@ -5,11 +5,8 @@
                 <div>
                     <vbox height="100%" width="100%">
                         <hbox id="menuHbox" height="100%" width="100%" style="margin: 5px;" align="stretch">
-                            <cell id="clearAllCell" width="5%" style="padding: 0px 5px 0px 5px;" tooltip="clearAllTooltip">
+                            <cell id="clearAllCell" width="10%" style="padding: 0px 5px 0px 5px;" tooltip="clearAllTooltip">
                                 <button id="clearAll" iconSclass="z-icon-eraser" label="Clear all" onClick="@command('clearAll')"/>
-                            </cell>
-                            <cell id="popupDetailsCBox" width="5%" style="padding: 0px 5px 0px 5px;" tooltip="popupIpsAndPortsDetails">
-                                <checkbox id="showDetailsPopupCBox" iconSclass="z-icon-eraser" checked="true" onCheck="@command('showDetailsPopup')"/>Resources
                             </cell>
                             <separator width="100%" orient="vertical" bar="true"/>
                             <cell id="namespacesCell" width="30%" style="padding: 0px 5px 0px 5px;" align="left">
@@ -33,8 +30,9 @@
                         </hbox>
                     </vbox>
                     <separator width="100%" orient="horizontal" bar="false"/>
-                    <grid id="ipsAndPortsGrid" model="@load(ipsAndPortsVM.ipsAndPortsResults)" height="@bind(ipsAndPortsVM.ipsAndPortsGridHeight)">
-                        <auxhead  id="ipsAndPortsGridAuxHead">
+<!--                    <grid id="ipsAndPortsGrid" model="@load(ipsAndPortsVM.ipsAndPortsResults)" height="@bind(ipsAndPortsVM.ipsAndPortsGridHeight)">-->
+                    <grid id="ipsAndPortsGrid" model="@load(ipsAndPortsVM.ipsAndPortsResults)" height="880px">
+                        <auxhead id="ipsAndPortsGridAuxHead">
                             <auxheader>
                                 <span sclass="z-icon-hashtag"/>
                             </auxheader>
@@ -84,19 +82,16 @@
                         </columns>
                         <rows>
                             <template name="model" var="item">
-                                <!--                                TODO make row on click and show info, image id and other <row onClick="@command('filterIps')">-->
                                 <row onClick="@command('getDetails', clickedItem=item)" style="cursor:pointer">
-                                    <label value="${item.id}"></label>
-                                    <label value="${item.ip}" multiline="true"></label>
-                                    <label value="${item.ports}" multiline="true"></label>
-                                    <label value="${item.resourceName}"></label>
-                                    <label value="${item.namespace}"></label>
-                                    <label value="${item.resourceType}"></label>
-                                    <label value="${item.hostInfo}"></label>
-                                    <label value="${item.additionalInfo}" multiline="true"></label>
-                                    <label value="${item.creationTime}"></label>
-                                    <!--                                    TODO Select row, change color-->
-                                    <!--                                    https://zkfiddle.org/sample/2inp2dn/1-Change-selected-row-background-color-when-click-on-row-->
+                                    <label value="${item.id}"/>
+                                    <label value="${item.ip}" multiline="true"/>
+                                    <label value="${item.ports}" multiline="true"/>
+                                    <label value="${item.resourceName}"/>
+                                    <label value="${item.namespace}"/>
+                                    <label value="${item.resourceType}"/>
+                                    <label value="${item.hostInfo}"/>
+                                    <label value="${item.additionalInfo}" multiline="true"/>
+                                    <label value="${item.creationTime}"/>
                                 </row>
                             </template>
                         </rows>
@@ -106,9 +101,9 @@
                     </grid>
                 </div>
             </center>
-            <south size="15%" splittable="true" collapsible="true" margins="0,0,3,3" onOpen="@command('updateGridHeightOnSouthPanelChange')"
-                   style="overflow-y:auto;overflow-x: hidden;padding: 7px;">
-                <html id="detailsLabel" content="@load(ipsAndPortsVM.detailsLabel)" style="font-family: Arial,Sans-serif;font-size: 12px;"/>
+            <!--            <south size="15%" splittable="true" collapsible="true" margins="0,0,3,3" onOpen="@command('updateGridHeightOnSouthPanelChange')" style="overflow-y:auto;overflow-x: hidden;padding: 7px;">-->
+            <south size="20%" splittable="true" collapsible="true" margins="0,0,3,3" style="overflow-y:auto;overflow-x: hidden;padding: 7px;">
+                <html id="detailsLabel" content="@load(ipsAndPortsVM.detailsLabel)" style="font-family: Courier, Monaco, monospace;font-size: 12px;"/>
             </south>
 
         </borderlayout>

@@ -13,6 +13,8 @@ import io.kubernetes.client.openapi.models.V1ServicePort;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +24,6 @@ import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.StringJoiner;
@@ -35,6 +36,8 @@ import java.util.function.Consumer;
 public class IpsAndPortsService {
 
     private final String LS = System.getProperty("line.separator");
+
+    private static Logger logger = LoggerFactory.getLogger(IpsAndPortsService.class);
 
     private final String podDetailsTemplate;
     private final String serviceDetailsTemplate;
@@ -63,9 +66,14 @@ public class IpsAndPortsService {
      * @param ipsAndPortsModel - model for @{@link com.kubehelper.viewmodels.IpsAndPortsVM}
      */
     public void get(String selectedNamespace, IpsAndPortsModel ipsAndPortsModel) {
+        try{
         ipsAndPortsModel.getIpsAndPortsResults().clear();
         fillModelWithPodsInfo(selectedNamespace, ipsAndPortsModel);
         fillModelWithServicesInfo(selectedNamespace, ipsAndPortsModel);
+        } catch (RuntimeException e) {
+            ipsAndPortsModel.addSearchException(e);
+            logger.error(e.getMessage(), e);
+        }
     }
 
     /**

@@ -118,7 +118,7 @@ public class SearchService {
                 searchInServiceAccounts(selectedNamespace, searchModel);
             }
         } catch (RuntimeException e) {
-            searchModel.addSearchException(new KubeHelperException(e));
+            searchModel.addSearchException(e);
             logger.error(e.getMessage(), e);
         }
 //        currentItemNumber = 0;
@@ -333,7 +333,7 @@ public class SearchService {
                     }
                 }
             } catch (NoSuchFieldException | IllegalAccessException e) {
-                searchModel.addSearchException(new KubeHelperException(e));
+                searchModel.addSearchException(e);
                 logger.error(e.getMessage(), e);
             }
             //collect all env vars from pod with exec

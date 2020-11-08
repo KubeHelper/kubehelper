@@ -17,6 +17,7 @@ import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.zk.ui.Component;
+import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Path;
 import org.zkoss.zk.ui.event.OpenEvent;
 import org.zkoss.zk.ui.select.Selectors;
@@ -29,10 +30,13 @@ import org.zkoss.zul.Auxhead;
 import org.zkoss.zul.Combobox;
 import org.zkoss.zul.Footer;
 import org.zkoss.zul.ListModelList;
+import org.zkoss.zul.Window;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author JDev
@@ -79,6 +83,7 @@ public class IpsAndPortsVM {
         ipsAndPortsModel.setFilter(new IpsAndPortsFilter());
         ipsAndPortsService.get(ipsAndPortsModel.getSelectedNamespace(), ipsAndPortsModel);
         ipsAndPortsModel.setNamespaces(commonService.getAllNamespaces());
+        ipsAndPortsModel.setSearchExceptions(new ArrayList<>());
         isGetButtonPressed = true;
         logger.info("Found {} namespaces.", ipsAndPortsModel.getNamespaces());
         onInitPreparations();
@@ -139,7 +144,8 @@ public class IpsAndPortsVM {
         ipsAndPortsModel.setIpsAndPortsResults(new ListModelList<>())
                 .setFilter(new IpsAndPortsFilter())
                 .setNamespaces(commonService.getAllNamespaces())
-                .setSelectedNamespace("all");
+                .setSelectedNamespace("all")
+                .setSearchExceptions(new ArrayList<>());
         ipsAndPortsResults = new ListModelList<>();
         clearAllFilterComboboxes();
     }
@@ -177,6 +183,13 @@ public class IpsAndPortsVM {
     public String getTotalItems() {
         if (isGetButtonPressed && ipsAndPortsResults.isEmpty()) {
             Notification.show("Nothing found.", "info", ipsAndPortsGridFooter, "before_end", 2000);
+        }
+        if (isGetButtonPressed && !ipsAndPortsResults.isEmpty()) {
+            Notification.show("Found: " + ipsAndPortsResults.size() + " items", "info", ipsAndPortsGridFooter, "before_end", 2000);
+        }
+        if (isGetButtonPressed && ipsAndPortsModel.hasSearchErrors()) {
+            Window window = (Window) Executions.createComponents("~./zul/components/errors.zul", null, Map.of("errors", ipsAndPortsModel.getSearchExceptions()));
+            window.doModal();
         }
         isGetButtonPressed = false;
         return String.format("Total Items: %d", ipsAndPortsResults.size());

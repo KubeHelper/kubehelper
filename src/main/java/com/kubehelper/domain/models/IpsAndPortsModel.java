@@ -1,6 +1,7 @@
 package com.kubehelper.domain.models;
 
 import com.kubehelper.common.Global;
+import com.kubehelper.common.KubeHelperException;
 import com.kubehelper.domain.filters.IpsAndPortsFilter;
 import com.kubehelper.domain.results.IpsAndPortsResult;
 import org.zkoss.bind.BindUtils;
@@ -23,6 +24,7 @@ public class IpsAndPortsModel implements PageModel {
     private List<String> namespaces = new ArrayList<>();
     private ListModelList<IpsAndPortsResult> ipsAndPortsResults = new ListModelList<>();
     private IpsAndPortsFilter filter = new IpsAndPortsFilter();
+    private List<KubeHelperException> searchExceptions = new ArrayList<>();
 
 
     public void addIpsAndPortsResult(IpsAndPortsResult ipsAndPortsResult) {
@@ -38,6 +40,10 @@ public class IpsAndPortsModel implements PageModel {
     public void setDesktopWithAndHeight(int width, int height) {
         this.desktopWidth = width;
         this.desktopHeight = height;
+    }
+
+    public void addSearchException(Exception exception) {
+        this.searchExceptions.add(new KubeHelperException(exception));
     }
 
     @Override
@@ -89,5 +95,18 @@ public class IpsAndPortsModel implements PageModel {
     public IpsAndPortsModel setSelectedNamespace(String selectedNamespace) {
         this.selectedNamespace = selectedNamespace;
         return this;
+    }
+
+    public List<KubeHelperException> getSearchExceptions() {
+        return searchExceptions;
+    }
+
+    public IpsAndPortsModel setSearchExceptions(List<KubeHelperException> searchExceptions) {
+        this.searchExceptions = searchExceptions;
+        return this;
+    }
+
+    public boolean hasSearchErrors() {
+        return !searchExceptions.isEmpty();
     }
 }
