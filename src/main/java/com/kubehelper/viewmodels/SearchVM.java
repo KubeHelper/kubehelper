@@ -48,6 +48,15 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import static com.kubehelper.common.Resource.CONFIG_MAP;
+import static com.kubehelper.common.Resource.DEPLOYMENT;
+import static com.kubehelper.common.Resource.ENV_VARIABLE;
+import static com.kubehelper.common.Resource.NAMESPACE;
+import static com.kubehelper.common.Resource.POD;
+import static com.kubehelper.common.Resource.REPLICA_SET;
+import static com.kubehelper.common.Resource.SERVICE;
+import static com.kubehelper.common.Resource.STATEFUL_SET;
+
 /**
  * @author JDev
  */
@@ -62,13 +71,14 @@ public class SearchVM implements EventListener {
     private Footer searchGridTotalItemsFooter;
 
     private Set<Resource> selectedResources = new HashSet<>() {{
-        add(Resource.CONFIG_MAP);
-        add(Resource.POD);
-        add(Resource.SERVICE);
-        add(Resource.DEPLOYMENT);
-        add(Resource.STATEFUL_SET);
-        add(Resource.REPLICA_SET);
-        add(Resource.ENV_VARIABLE);
+        add(CONFIG_MAP);
+        add(POD);
+        add(SERVICE);
+        add(NAMESPACE);
+        add(DEPLOYMENT);
+        add(STATEFUL_SET);
+        add(REPLICA_SET);
+        add(ENV_VARIABLE);
     }};
     private ListModelList<SearchResult> searchResults = new ListModelList<>();
 
@@ -246,18 +256,19 @@ public class SearchVM implements EventListener {
     }
 
     @Command
-    public void showConfig(@BindingParam("id") int id) {
+    public void showAdditionalInfo(@BindingParam("id") int id) {
+        String content = "";
         Optional<SearchResult> first = searchResults.getInnerList().stream().filter(item -> item.getId() == id).findFirst();
-        //escape XML <> symbols for <pre> tag
-        String content = first.get().getAdditionalInfo().replace("<", "&lt;").replace(">", "&gt;");
+        if (CONFIG_MAP.getValue().equals(first.get().getResourceType())) {
+            //escape XML <> symbols for <pre> tag
+            content = first.get().getAdditionalInfo().replace("<", "&lt;").replace(">", "&gt;");
+        } else {
+            content = first.get().getAdditionalInfo();
+        }
         Map<String, String> parameters = Map.of("title", first.get().getFoundString(), "content", content);
         Window window = (Window) Executions.createComponents("~./zul/components/file-display.zul", null, parameters);
         window.doModal();
     }
-
-    public void showConfigMap(@BindingParam("id") String id) {
-    }
-
 
     public boolean isSkipKubeNamespaces() {
         return searchModel.isSkipKubeNamespaces();
@@ -313,6 +324,9 @@ public class SearchVM implements EventListener {
     public ListModelList<SearchResult> getSearchResults() {
         if (isSearchButtonPressed && searchResults.isEmpty()) {
             Notification.show("Nothing found.", "info", searchGridTotalItemsFooter, "before_end", 2000);
+        }
+        if (isSearchButtonPressed && !searchResults.isEmpty()) {
+            Notification.show("Found: " + searchResults.size() + " items", "info", searchGridTotalItemsFooter, "before_end", 2000);
         }
         if (isSearchButtonPressed && searchModel.hasSearchErrors()) {
             Window window = (Window) Executions.createComponents("~./zul/components/errors.zul", null, Map.of("errors", searchModel.getSearchExceptions()));

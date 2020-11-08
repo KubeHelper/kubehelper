@@ -126,9 +126,17 @@
                                 <row style="cursor:pointer">
                                     <label value="${item.id}"></label>
                                     <label value="${item.foundString}" multiline="true"></label>
-                                    <!-- Button if config map, label if Environment Variable //-->
-                                    <toolbarbutton label="Click to see ConfigMap" onClick="@command('showConfig', id=item.id)" hflex="1" if="${item.resourceType=='ConfigMap'}"/>
-                                    <label value="${item.additionalInfo}" if="${item.resourceType=='EnvironmentVariable'}" multiline="true"/>
+                                    <zk switch="${item.resourceType}">
+                                        <zk case="ConfigMap">
+                                            <toolbarbutton label="Click to see ConfigMap" onClick="@command('showAdditionalInfo', id=item.id)" hflex="1"/>
+                                        </zk>
+                                        <zk case="Secret">
+                                            <toolbarbutton label="Click to see Secret" onClick="@command('showAdditionalInfo', id=item.id)" hflex="1"/>
+                                        </zk>
+                                        <zk>
+                                            <label value="${item.additionalInfo}" multiline="true"/>
+                                        </zk>
+                                    </zk>
                                     <label value="${item.resourceName}"></label>
                                     <label value="${item.namespace}"></label>
                                     <label value="${item.resourceType}"></label>

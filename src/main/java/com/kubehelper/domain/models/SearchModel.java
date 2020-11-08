@@ -4,6 +4,7 @@ import com.kubehelper.common.Global;
 import com.kubehelper.common.KubeHelperException;
 import com.kubehelper.domain.filters.SearchFilter;
 import com.kubehelper.domain.results.SearchResult;
+import org.apache.commons.lang3.StringUtils;
 import org.zkoss.zul.ListModelList;
 
 import java.util.ArrayList;
@@ -39,7 +40,9 @@ public class SearchModel implements PageModel {
     }
 
     public SearchModel addResourceNameFilter(String resourceName) {
-        filter.addResourceNamesFilter(resourceName);
+        if (StringUtils.isNotBlank(resourceName)) {
+            filter.addResourceNamesFilter(resourceName);
+        }
         return this;
     }
 
@@ -118,7 +121,7 @@ public class SearchModel implements PageModel {
         return this;
     }
 
-    public boolean hasSearchErrors(){
+    public boolean hasSearchErrors() {
         return !searchExceptions.isEmpty();
     }
 
