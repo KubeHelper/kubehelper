@@ -45,6 +45,7 @@ import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -242,6 +243,16 @@ public class SearchVM implements EventListener {
             kubeResourcesCheckAll.setChecked(true);
             BindUtils.postNotifyChange(null, null, this, "kubeResourcesGBoxCheckAll");
         }
+    }
+
+    @Command
+    public void showConfig(@BindingParam("id") int id) {
+        Optional<SearchResult> first = searchResults.getInnerList().stream().filter(item -> item.getId() == id).findFirst();
+        //escape XML <> symbols for <pre> tag
+        String content = first.get().getAdditionalInfo().replace("<", "&lt;").replace(">", "&gt;");
+        Map<String, String> parameters = Map.of("title", first.get().getFoundString(), "content", content);
+        Window window = (Window) Executions.createComponents("~./zul/components/file-display.zul", null, parameters);
+        window.doModal();
     }
 
     public void showConfigMap(@BindingParam("id") String id) {

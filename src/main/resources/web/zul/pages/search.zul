@@ -57,7 +57,7 @@
                 </vbox>
             </north>
             <!--            TODO Paging-->
-            <center border="0" margins="0,3,3,3">
+            <center margins="0,3,3,3">
                 <!--                <div height="100%" style="overflow-y:auto;overflow-x: hidden;">-->
                 <!--                autopaging="true" mold="paging"-->
                 <div>
@@ -127,15 +127,7 @@
                                     <label value="${item.id}"></label>
                                     <label value="${item.foundString}" multiline="true"></label>
                                     <!-- Button if config map, label if Environment Variable //-->
-                                    <button label="Show ConfigMap" popup="configMapPopup_${item.id}" hflex="1" if="${item.resourceType=='ConfigMap'}"/>
-<!--                                    TODO do scrollbare and formatted windows dialog -->
-                                    <popup id="configMapPopup_${item.id}" width="700px" if="${item.resourceType=='ConfigMap'}">
-                                        <groupbox sclass="z-demo-config">
-                                            <caption>${item.foundString}</caption>
-                                            <label>${item.additionalInfo}</label>
-                                            <!--                                            <html><![CDATA[ ${item.additionalInfo} ]]></html>-->
-                                        </groupbox>
-                                    </popup>
+                                    <toolbarbutton label="Click to see ConfigMap" onClick="@command('showConfig', id=item.id)" hflex="1" if="${item.resourceType=='ConfigMap'}"/>
                                     <label value="${item.additionalInfo}" if="${item.resourceType=='EnvironmentVariable'}" multiline="true"/>
                                     <label value="${item.resourceName}"></label>
                                     <label value="${item.namespace}"></label>
@@ -151,7 +143,7 @@
                     </grid>
                 </div>
             </center>
-            <south border="1" size="3%" maxsize="200" splittable="true" collapsible="true" margins="0,0,3,3">
+            <south size="3%" maxsize="200" splittable="true" collapsible="true" margins="0,0,3,3">
                 <panel border="normal">
                     <panelchildren style="overflow:auto;">
                     </panelchildren>
