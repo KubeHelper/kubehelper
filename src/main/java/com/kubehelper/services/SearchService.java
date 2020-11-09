@@ -74,6 +74,11 @@ public class SearchService {
 //    private int currentItemNumber;
 //    private int totalItems;
 
+    //    DAEMON_SET("DaemonSet"),
+//    DEPLOYMENT("Deployment"),
+//    REPLICA_SET("ReplicaSet"),
+//    STATEFUL_SET("StatefulSet"),
+
     @Autowired
     private KubeAPI kubeAPI;
 

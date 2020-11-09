@@ -15,7 +15,8 @@ import java.util.List;
  */
 public class IpsAndPortsModel implements PageModel {
 
-    private String templateUrl = "~./zul/pages/ipsandports.zul";
+//    TODO - change name
+    private String templateUrl = "~./zul/pages/feature-gates.zul";
 
     public static String NAME = Global.IPS_AND_PORTS_MODEL;
     private int desktopWidth;

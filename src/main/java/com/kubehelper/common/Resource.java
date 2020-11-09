@@ -36,31 +36,31 @@ public enum Resource {
     REPLICA_SET("ReplicaSet"),
     STATEFUL_SET("StatefulSet"),
     TOKEN_REVIEW("TokenReview"),
-    LOCAL_SUBJECT_ACCESS_REVIEW("LocalSubjectAccessReview"),
-    SELF_SUBJECT_ACCESS_REVIEW("SelfSubjectAccessReview"),
-    SELF_SUBJECT_RULES_REVIEW("SelfSubjectRulesReview"),
-    SUBJECT_ACCESS_REVIEW("SubjectAccessReview"),
-    HORIZONTAL_POD_AUTOSCALER("HorizontalPodAutoscaler"),
+//    LOCAL_SUBJECT_ACCESS_REVIEW("LocalSubjectAccessReview"), //just skipped
+//    SELF_SUBJECT_ACCESS_REVIEW("SelfSubjectAccessReview"), //just skipped
+//    SELF_SUBJECT_RULES_REVIEW("SelfSubjectRulesReview"), //just skipped
+//    SUBJECT_ACCESS_REVIEW("SubjectAccessReview"), //just skipped
+//    HORIZONTAL_POD_AUTOSCALER("HorizontalPodAutoscaler"), //just skipped
     CRON_JOB("CronJob"),
     JOB("Job"),
-    CERTIFICATE_SIGNING_REQUEST("CertificateSigningRequest"),
-    LEASE("Lease"),
-    ENDPOINT_SLICE("EndpointSlice"),
-    INGRESS("Ingress"),
-    NODE_METRICS("NodeMetrics"),
-    POD_METRICS("PodMetrics"),
-    INGRESS_CLASS("IngressClass"),
+//    CERTIFICATE_SIGNING_REQUEST("CertificateSigningRequest"), //just skipped
+//    LEASE("Lease"), //just skipped
+//    ENDPOINT_SLICE("EndpointSlice"), //just skipped
+//    INGRESS("Ingress"), //just skipped
+//    NODE_METRICS("NodeMetrics"), //just skipped
+//    POD_METRICS("PodMetrics"),  //just skipped
+//    INGRESS_CLASS("IngressClass"),  //just skipped
     NETWORK_POLICY("NetworkPolicy"),
-    RUNTIME_CLASS("RuntimeClass"),
+//    RUNTIME_CLASS("RuntimeClass"), //just skipped
     POD_DISRUPTION_BUDGET("PodDisruptionBudget"),
     POD_SECURITY_POLICY("PodSecurityPolicy"),
     CLUSTER_ROLE_BINDING("ClusterRoleBinding"),
     CLUSTER_ROLE("ClusterRole"),
     ROLE_BINDING("RoleBinding"),
     ROLE("Role"),
-    PRIORITY_CLASS("PriorityClass"),
-    CSI_DRIVER("CSIDriver"),
-    CSI_NODE("CSINode"),
+//    PRIORITY_CLASS("PriorityClass"), //just skipped
+//    CSI_DRIVER("CSIDriver"), //just skipped
+//    CSI_NODE("CSINode"), //just skipped
     STORAGE_CLASS("StorageClass"),
     VOLUME_ATTACHMENT("VolumeAttachment");
 

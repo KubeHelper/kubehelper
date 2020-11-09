@@ -2,18 +2,27 @@ package com.kubehelper.common;
 
 import io.kubernetes.client.openapi.ApiException;
 import io.kubernetes.client.openapi.apis.AppsV1Api;
+import io.kubernetes.client.openapi.apis.BatchV1Api;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
+import io.kubernetes.client.openapi.apis.ExtensionsV1beta1Api;
+import io.kubernetes.client.openapi.apis.PolicyV1beta1Api;
+import io.kubernetes.client.openapi.apis.SchedulingApi;
+import io.kubernetes.client.openapi.apis.SchedulingV1Api;
 import io.kubernetes.client.openapi.models.V1ConfigMapList;
 import io.kubernetes.client.openapi.models.V1ControllerRevisionList;
+import io.kubernetes.client.openapi.models.V1DaemonSetList;
+import io.kubernetes.client.openapi.models.V1DeploymentList;
 import io.kubernetes.client.openapi.models.V1EventList;
 import io.kubernetes.client.openapi.models.V1NamespaceList;
 import io.kubernetes.client.openapi.models.V1NodeList;
 import io.kubernetes.client.openapi.models.V1PersistentVolumeClaimList;
 import io.kubernetes.client.openapi.models.V1PersistentVolumeList;
 import io.kubernetes.client.openapi.models.V1PodList;
+import io.kubernetes.client.openapi.models.V1ReplicaSetList;
 import io.kubernetes.client.openapi.models.V1SecretList;
 import io.kubernetes.client.openapi.models.V1ServiceAccountList;
 import io.kubernetes.client.openapi.models.V1ServiceList;
+import io.kubernetes.client.openapi.models.V1StatefulSetList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +46,65 @@ public class KubeAPI {
 
     @Autowired
     private AppsV1Api appsV1Api;
+
+//    BatchV1Api
+//            NetworkingV1Api
+//    PolicyV1beta1Api
+//            RbacAuthorizationV1beta1Api
+//            ExtensionsV1beta1Api
+
+    public V1DeploymentList getV1DeploymentList(String selectedNamespace) {
+        try {
+            if ("all".equals(selectedNamespace)) {
+                return appsV1Api.listDeploymentForAllNamespaces(null, null, null, null, null, null, null, null, null);
+            } else {
+                return appsV1Api.listNamespacedDeployment(selectedNamespace, null, null, null, null, null, null, null, null, null);
+            }
+        } catch (ApiException e) {
+            showErrorDialog(e);
+        }
+        return new V1DeploymentList();
+    }
+
+    public V1DaemonSetList getV1DaemonSetList(String selectedNamespace) {
+        try {
+            if ("all".equals(selectedNamespace)) {
+                return appsV1Api.listDaemonSetForAllNamespaces(null, null, null, null, null, null, null, null, null);
+            } else {
+                return appsV1Api.listNamespacedDaemonSet(selectedNamespace, null, null, null, null, null, null, null, null, null);
+            }
+        } catch (ApiException e) {
+            showErrorDialog(e);
+        }
+        return new V1DaemonSetList();
+    }
+
+    public V1ReplicaSetList getV1ReplicaSetList(String selectedNamespace) {
+        try {
+            if ("all".equals(selectedNamespace)) {
+                return appsV1Api.listReplicaSetForAllNamespaces(null, null, null, null, null, null, null, null, null);
+            } else {
+                return appsV1Api.listNamespacedReplicaSet(selectedNamespace, null, null, null, null, null, null, null, null, null);
+            }
+        } catch (ApiException e) {
+            showErrorDialog(e);
+        }
+        return new V1ReplicaSetList();
+    }
+
+    public V1StatefulSetList getV1StatefulSetList(String selectedNamespace) {
+        try {
+            if ("all".equals(selectedNamespace)) {
+                return appsV1Api.listStatefulSetForAllNamespaces(null, null, null, null, null, null, null, null, null);
+            } else {
+                return appsV1Api.listNamespacedStatefulSet(selectedNamespace, null, null, null, null, null, null, null, null, null);
+            }
+        } catch (ApiException e) {
+            showErrorDialog(e);
+        }
+        return new V1StatefulSetList();
+    }
+
 
     /**
      * Get pods list depends on namespace.
