@@ -113,7 +113,7 @@ public class SearchVM implements EventListener {
     @NotifyChange({"totalItems", "searchResults", "filter"})
     public void search() {
         searchModel.setFilter(new SearchFilter());
-        searchService.search(searchModel.getSelectedNamespace(), searchModel, selectedResources);
+        searchService.search(searchModel, selectedResources);
         searchModel.setNamespaces(commonService.getAllNamespaces());
         searchModel.setSearchExceptions(new ArrayList<>());
         clearAllFilterComboboxes();
@@ -338,10 +338,6 @@ public class SearchVM implements EventListener {
 
     public List<String> getNamespaces() {
         return searchModel.getNamespaces();
-    }
-
-    public String getSelectedResourceNameFilter() {
-        return getFilter().getSelectedResourceNameFilter();
     }
 
 }

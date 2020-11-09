@@ -1,7 +1,6 @@
 package com.kubehelper.services;
 
 import com.kubehelper.common.KubeAPI;
-import com.kubehelper.common.KubeHelperException;
 import com.kubehelper.common.Resource;
 import com.kubehelper.domain.models.SearchModel;
 import com.kubehelper.domain.results.SearchResult;
@@ -84,38 +83,37 @@ public class SearchService {
     /**
      * Searches string selected kubernetes resources by selected namespace.
      *
-     * @param selectedNamespace - selected namespace. all - all namespaces.
      * @param searchModel       - search model
      */
-    public void search(String selectedNamespace, SearchModel searchModel, Set<Resource> selectedResources) {
+    public void search(SearchModel searchModel, Set<Resource> selectedResources) {
 
         searchModel.getSearchResults().clear();
         searchModel.getSearchExceptions().clear();
         try {
 
             if (selectedResources.contains(ENV_VARIABLE)) {
-                searchInEnvironmentVariables(selectedNamespace, searchModel);
+                searchInEnvironmentVariables(searchModel);
             }
             if (selectedResources.contains(CONFIG_MAP)) {
-                searchInConfigMaps(selectedNamespace, searchModel);
+                searchInConfigMaps(searchModel);
             }
             if (selectedResources.contains(SERVICE)) {
-                searchInServices(selectedNamespace, searchModel);
+                searchInServices(searchModel);
             }
             if (selectedResources.contains(POD)) {
-                searchInPods(selectedNamespace, searchModel);
+                searchInPods(searchModel);
             }
             if (selectedResources.contains(PERSISTENT_VOLUME) && "all".equals(searchModel.getSelectedNamespace())) {
                 searchInPersistentVolumes(searchModel);
             }
             if (selectedResources.contains(PERSISTENT_VOLUME_CLAIM)) {
-                searchInPersistentVolumeClaims(selectedNamespace, searchModel);
+                searchInPersistentVolumeClaims(searchModel);
             }
             if (selectedResources.contains(SECRET)) {
-                searchInSecrets(selectedNamespace, searchModel);
+                searchInSecrets(searchModel);
             }
             if (selectedResources.contains(SERVICE_ACCOUNT)) {
-                searchInServiceAccounts(selectedNamespace, searchModel);
+                searchInServiceAccounts(searchModel);
             }
         } catch (RuntimeException e) {
             searchModel.addSearchException(e);
@@ -129,11 +127,10 @@ public class SearchService {
     /**
      * Searches string in Pods by selected namespace.
      *
-     * @param selectedNamespace - selected namespace. all - all namespaces
      * @param searchModel       - search model
      */
-    private void searchInPods(String selectedNamespace, SearchModel searchModel) {
-        V1PodList podsList = kubeAPI.getV1PodsList(selectedNamespace);
+    private void searchInPods(SearchModel searchModel) {
+        V1PodList podsList = kubeAPI.getV1PodsList(searchModel.getSelectedNamespace());
         for (V1Pod pod : podsList.getItems()) {
             if (isStringsContainsSearchString(searchModel.getSearchString(), pod.getMetadata().getName())) {
                 addSearchResultToModel(pod.getMetadata(), searchModel, NAMESPACE, pod.getMetadata().getName(), pod.getMetadata().getName(), "");
@@ -158,11 +155,10 @@ public class SearchService {
     /**
      * Searches string in PersistentVolumeClaims by selected namespace.
      *
-     * @param selectedNamespace - selected namespace. all - all namespaces
      * @param searchModel       - search model
      */
-    private void searchInPersistentVolumeClaims(String selectedNamespace, SearchModel searchModel) {
-        V1PersistentVolumeClaimList persistentVolumeClaimsList = kubeAPI.getV1PersistentVolumeClaimsList(selectedNamespace);
+    private void searchInPersistentVolumeClaims(SearchModel searchModel) {
+        V1PersistentVolumeClaimList persistentVolumeClaimsList = kubeAPI.getV1PersistentVolumeClaimsList(searchModel.getSelectedNamespace());
         for (V1PersistentVolumeClaim persistentVolumeClaim : persistentVolumeClaimsList.getItems()) {
             if (isStringsContainsSearchString(searchModel.getSearchString(), persistentVolumeClaim.getMetadata().getName())) {
                 addSearchResultToModel(persistentVolumeClaim.getMetadata(), searchModel, PERSISTENT_VOLUME_CLAIM, persistentVolumeClaim.getMetadata().getName(), persistentVolumeClaim.getMetadata().getName(), "");
@@ -173,11 +169,10 @@ public class SearchService {
     /**
      * Searches string in Services by selected namespace.
      *
-     * @param selectedNamespace - selected namespace. all - all namespaces
      * @param searchModel       - search model
      */
-    private void searchInServices(String selectedNamespace, SearchModel searchModel) {
-        V1ServiceList servicesList = kubeAPI.getV1ServicesList(selectedNamespace);
+    private void searchInServices(SearchModel searchModel) {
+        V1ServiceList servicesList = kubeAPI.getV1ServicesList(searchModel.getSelectedNamespace());
         for (V1Service service : servicesList.getItems()) {
             if (skipKubeNamespace(searchModel, service.getMetadata())) {
                 continue;
@@ -191,11 +186,10 @@ public class SearchService {
     /**
      * Searches string in ServiceAccounts by selected namespace.
      *
-     * @param selectedNamespace - selected namespace. all - all namespaces
      * @param searchModel       - search model
      */
-    private void searchInServiceAccounts(String selectedNamespace, SearchModel searchModel) {
-        V1ServiceAccountList serviceAccountsList = kubeAPI.getV1ServiceAccountsList(selectedNamespace);
+    private void searchInServiceAccounts(SearchModel searchModel) {
+        V1ServiceAccountList serviceAccountsList = kubeAPI.getV1ServiceAccountsList(searchModel.getSelectedNamespace());
         for (V1ServiceAccount serviceAccount : serviceAccountsList.getItems()) {
             if (skipKubeNamespace(searchModel, serviceAccount.getMetadata())) {
                 continue;
@@ -215,11 +209,10 @@ public class SearchService {
     /**
      * Searches string in Secrets by selected namespace.
      *
-     * @param selectedNamespace - selected namespace. all - all namespaces
      * @param searchModel       - search model
      */
-    private void searchInSecrets(String selectedNamespace, SearchModel searchModel) {
-        V1SecretList secretsList = kubeAPI.getV1SecretsList(selectedNamespace);
+    private void searchInSecrets(SearchModel searchModel) {
+        V1SecretList secretsList = kubeAPI.getV1SecretsList(searchModel.getSelectedNamespace());
         for (V1Secret secret : secretsList.getItems()) {
             if (skipKubeNamespace(searchModel, secret.getMetadata())) {
                 continue;
@@ -239,11 +232,10 @@ public class SearchService {
     /**
      * Searches string in ConfigMaps by selected namespace.
      *
-     * @param selectedNamespace - selected namespace. all - all namespaces.
      * @param searchModel       - search model
      */
-    private void searchInConfigMaps(String selectedNamespace, SearchModel searchModel) {
-        V1ConfigMapList configMapsList = kubeAPI.getV1ConfigMapsList(selectedNamespace);
+    private void searchInConfigMaps(SearchModel searchModel) {
+        V1ConfigMapList configMapsList = kubeAPI.getV1ConfigMapsList(searchModel.getSelectedNamespace());
         for (V1ConfigMap configMap : configMapsList.getItems()) {
             if (skipKubeNamespace(searchModel, configMap.getMetadata())) {
                 continue;
@@ -261,12 +253,11 @@ public class SearchService {
     /**
      * Searches for environment variable in pods by selected namespace.
      *
-     * @param selectedNamespace - selected namespace. all - all namespaces.
      * @param searchModel       - search model
      */
-    private void searchInEnvironmentVariables(String selectedNamespace, SearchModel searchModel) {
+    private void searchInEnvironmentVariables(SearchModel searchModel) {
 
-        List<V1Pod> podList = kubeAPI.getV1PodList(selectedNamespace).getItems();
+        List<V1Pod> podList = kubeAPI.getV1PodList(searchModel.getSelectedNamespace()).getItems();
         for (V1Pod pod : podList) {
 
             //skips search in kube- namespace

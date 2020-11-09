@@ -3,8 +3,8 @@ package com.kubehelper.domain.models;
 import com.kubehelper.common.Global;
 import com.kubehelper.common.KubeHelperException;
 import com.kubehelper.domain.filters.EventsFilter;
-import com.kubehelper.domain.filters.IpsAndPortsFilter;
 import com.kubehelper.domain.results.EventResult;
+import org.apache.commons.lang3.StringUtils;
 import org.zkoss.zul.ListModelList;
 
 import java.util.ArrayList;
@@ -22,13 +22,16 @@ public class EventsModel implements PageModel {
     private int desktopHeight;
     private String selectedNamespace = "all";
     private List<String> namespaces = new ArrayList<>();
-    private ListModelList<EventResult> eventsResult = new ListModelList<>();
+    private ListModelList<EventResult> searchResults = new ListModelList<>();
     private EventsFilter filter = new EventsFilter();
     private List<KubeHelperException> searchExceptions = new ArrayList<>();
 
 
-    public void addEventResult(EventResult eventResult) {
-        eventsResult.add(eventResult);
+    public EventsModel addSearchResult(EventResult eventResult) {
+        searchResults.add(eventResult);
+        filter.addResourceTypesFilter(eventResult.getResourceType());
+        filter.addNamespacesFilter(eventResult.getNamespace());
+        return this;
     }
 
     public EventsModel setNamespaces(List<String> namespaces) {
@@ -40,6 +43,14 @@ public class EventsModel implements PageModel {
     public void setDesktopWithAndHeight(int width, int height) {
         this.desktopWidth = width;
         this.desktopHeight = height;
+    }
+
+
+    public EventsModel addResourceNameFilter(String resourceName) {
+        if (StringUtils.isNotBlank(resourceName)) {
+            filter.addResourceNamesFilter(resourceName);
+        }
+        return this;
     }
 
     public void addSearchException(Exception exception) {
@@ -70,12 +81,12 @@ public class EventsModel implements PageModel {
         return desktopHeight;
     }
 
-    public ListModelList<EventResult> getEventsResult() {
-        return eventsResult;
+    public ListModelList<EventResult> getSearchResults() {
+        return searchResults;
     }
 
-    public EventsModel setEventsResult(ListModelList<EventResult> eventsResult) {
-        this.eventsResult = eventsResult;
+    public EventsModel setSearchResults(ListModelList<EventResult> searchResults) {
+        this.searchResults = searchResults;
         return this;
     }
 

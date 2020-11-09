@@ -68,8 +68,8 @@ public class IpsAndPortsService {
     public void get(String selectedNamespace, IpsAndPortsModel ipsAndPortsModel) {
         try{
         ipsAndPortsModel.getIpsAndPortsResults().clear();
-        fillModelWithPodsInfo(selectedNamespace, ipsAndPortsModel);
-        fillModelWithServicesInfo(selectedNamespace, ipsAndPortsModel);
+        fillModelWithPodsInfo(ipsAndPortsModel);
+        fillModelWithServicesInfo(ipsAndPortsModel);
         } catch (RuntimeException e) {
             ipsAndPortsModel.addSearchException(e);
             logger.error(e.getMessage(), e);
@@ -79,11 +79,10 @@ public class IpsAndPortsService {
     /**
      * Fill {@link IpsAndPortsModel} with new data from pods depends on namespace.
      *
-     * @param selectedNamespace - selected namespace. all - all namespaces.
      * @param ipsAndPortsModel - model for @{@link com.kubehelper.viewmodels.IpsAndPortsVM} view.
      */
-    private void fillModelWithPodsInfo(String selectedNamespace, IpsAndPortsModel ipsAndPortsModel) {
-        for (V1Pod pod : kubeAPI.getV1PodList(selectedNamespace).getItems()) {
+    private void fillModelWithPodsInfo(IpsAndPortsModel ipsAndPortsModel) {
+        for (V1Pod pod : kubeAPI.getV1PodList(ipsAndPortsModel.getSelectedNamespace()).getItems()) {
             IpsAndPortsResult ipsAndPortsResult = new IpsAndPortsResult(ipsAndPortsModel.getIpsAndPortsResults().size() + 1);
             StringJoiner portsJoiner = getStringsJoiner(), containerNamesJoiner = getStringsJoiner();
             String resourceName = pod.getMetadata().getName() + ": ";
@@ -140,12 +139,11 @@ public class IpsAndPortsService {
     /**
      * Fill {@link IpsAndPortsModel} with new data from services depends on namespace.
      *
-     * @param selectedNamespace - selected namespace. all - all namespaces.
      * @param ipsAndPortsModel - model for @{@link com.kubehelper.viewmodels.IpsAndPortsVM} view.
      */
-    private void fillModelWithServicesInfo(String selectedNamespace, IpsAndPortsModel ipsAndPortsModel) {
+    private void fillModelWithServicesInfo(IpsAndPortsModel ipsAndPortsModel) {
 
-        for (V1Service service : kubeAPI.getV1ServicesList(selectedNamespace).getItems()) {
+        for (V1Service service : kubeAPI.getV1ServicesList(ipsAndPortsModel.getSelectedNamespace()).getItems()) {
             Map<String, String> detailsMap = new HashMap<>();
             IpsAndPortsResult ipsAndPortsResult = new IpsAndPortsResult(ipsAndPortsModel.getIpsAndPortsResults().size() + 1);
             StringBuilder servicePortsBuilder = new StringBuilder();

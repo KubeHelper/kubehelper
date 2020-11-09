@@ -12,7 +12,7 @@ public enum Resource {
 //    COMPONENT_STATUS("ComponentStatus"), //@ComponentStatus (and @ComponentStatusList) holds the cluster validation info.
     CONFIG_MAP("ConfigMap"),
 //    ENDPOINTS("Endpoints"),
-//    EVENT("Event"),
+    EVENT("Event"),
 //    LIMIT_RANGE("LimitRange"),
     NAMESPACE("Namespace"),
 //    NODE("Node"),
