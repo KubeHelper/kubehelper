@@ -1,8 +1,17 @@
 package com.kubehelper.common;
 
 import io.kubernetes.client.openapi.ApiException;
+import io.kubernetes.client.openapi.apis.ApisApi;
 import io.kubernetes.client.openapi.apis.AppsV1Api;
+import io.kubernetes.client.openapi.apis.AuditregistrationV1alpha1Api;
+import io.kubernetes.client.openapi.apis.AuthenticationV1Api;
+import io.kubernetes.client.openapi.apis.AuthorizationV1Api;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
+import io.kubernetes.client.openapi.apis.DiscoveryV1beta1Api;
+import io.kubernetes.client.openapi.apis.LogsApi;
+import io.kubernetes.client.openapi.apis.NetworkingV1Api;
+import io.kubernetes.client.openapi.apis.PolicyV1beta1Api;
+import io.kubernetes.client.openapi.apis.SettingsV1alpha1Api;
 import io.kubernetes.client.openapi.models.V1ConfigMapList;
 import io.kubernetes.client.openapi.models.V1ControllerRevisionList;
 import io.kubernetes.client.openapi.models.V1EventList;
@@ -14,6 +23,7 @@ import io.kubernetes.client.openapi.models.V1PodList;
 import io.kubernetes.client.openapi.models.V1SecretList;
 import io.kubernetes.client.openapi.models.V1ServiceAccountList;
 import io.kubernetes.client.openapi.models.V1ServiceList;
+import io.kubernetes.client.util.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +31,7 @@ import org.springframework.stereotype.Service;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zul.Window;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -37,6 +48,19 @@ public class KubeAPI {
 
     @Autowired
     private AppsV1Api appsV1Api;
+
+    public void testApis() throws IOException {
+
+        AuthenticationV1Api authenticationApi = new AuthenticationV1Api(Config.defaultClient());
+        SettingsV1alpha1Api settingsApi = new SettingsV1alpha1Api(Config.defaultClient());
+        AuthorizationV1Api authorizationApi = new AuthorizationV1Api(Config.defaultClient());
+        DiscoveryV1beta1Api discoveryApi = new DiscoveryV1beta1Api(Config.defaultClient());
+        AuditregistrationV1alpha1Api auditregistrationApi = new AuditregistrationV1alpha1Api(Config.defaultClient());
+        PolicyV1beta1Api policyApi = new PolicyV1beta1Api(Config.defaultClient());
+        LogsApi logsApi = new LogsApi(Config.defaultClient());
+        NetworkingV1Api networkingApi = new NetworkingV1Api(Config.defaultClient());
+        ApisApi apisApi = new ApisApi(Config.defaultClient());
+    }
 
     /**
      * Get pods list depends on namespace.

@@ -3,6 +3,7 @@ package com.kubehelper.common;
 import com.kubehelper.domain.models.DashboardModel;
 import com.kubehelper.domain.models.EventsModel;
 import com.kubehelper.domain.models.IpsAndPortsModel;
+import com.kubehelper.domain.models.LabelsModel;
 import com.kubehelper.domain.models.PageModel;
 import com.kubehelper.domain.models.SearchModel;
 
@@ -18,6 +19,7 @@ public class Global {
     public static String SEARCH_MODEL = "search";
     public static String SECURITY_MODEL = "security";
     public static String AUDITING_MODEL = "auditing";
+    public static String LABELS_MODEL = "labels";
     public static String CUSTOM_RESOURCES_MODEL = "customResources";
     public static String DEPRECATED_MODEL = "deprecated";
     public static String EVENTS_MODEL = "events";
@@ -34,6 +36,7 @@ public class Global {
             put(DASHBOARD_MODEL, new DashboardModel());
             put(SEARCH_MODEL, new SearchModel());
             put(SECURITY_MODEL, new SearchModel());
+            put(LABELS_MODEL, new LabelsModel());
             put(AUDITING_MODEL, new SearchModel());
             put(CUSTOM_RESOURCES_MODEL, new SearchModel());
             put(DEPRECATED_MODEL, new SearchModel());

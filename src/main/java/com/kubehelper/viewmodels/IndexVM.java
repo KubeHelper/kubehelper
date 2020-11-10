@@ -40,9 +40,11 @@ public class IndexVM {
     public void init() {
 //        pageModel = new DashboardModel();
 //        pageModel = new SearchModel();
-        pageModel = Global.ACTIVE_MODELS.computeIfAbsent(Global.EVENTS_MODEL, (k) -> Global.NEW_MODELS.get(Global.EVENTS_MODEL));
+//        pageModel = Global.ACTIVE_MODELS.computeIfAbsent(Global.LABELS_MODEL, (k) -> Global.NEW_MODELS.get(Global.LABELS_MODEL));
+//        pageModel = Global.ACTIVE_MODELS.computeIfAbsent(Global.EVENTS_MODEL, (k) -> Global.NEW_MODELS.get(Global.EVENTS_MODEL));
 //        pageModel = Global.ACTIVE_MODELS.computeIfAbsent(Global.IPS_AND_PORTS_MODEL, (k) -> Global.NEW_MODELS.get(Global.IPS_AND_PORTS_MODEL));
 //        pageModel = Global.ACTIVE_MODELS.computeIfAbsent(Global.SEARCH_MODEL, (k) -> Global.NEW_MODELS.get(Global.SEARCH_MODEL));
+        pageModel = Global.ACTIVE_MODELS.computeIfAbsent(Global.LABELS_MODEL, (k) -> Global.NEW_MODELS.get(Global.LABELS_MODEL));
         currentModelName = pageModel.getName();
     }
 

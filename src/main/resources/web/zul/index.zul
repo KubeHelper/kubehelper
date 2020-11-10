@@ -75,15 +75,16 @@
                             <toolbarbutton id="dashboardMenuBtn" hflex="1" iconSclass="z-icon-dashboard" disabled="true" label="&#160;Dashboard"
                                            onClick="@command('switchView', modelName='dashboard')"/>
                             <toolbarbutton id="searchMenuBtn" hflex="1" iconSclass="z-icon-search" label="&#160;Search" onClick="@command('switchView', modelName='search')"/>
+                            <toolbarbutton id="ipsAndPortsMenuBtn" hflex="1" iconSclass="z-icon-cubes" label="&#160;Ips and Ports" onClick="@command('switchView', modelName='ipsAndPorts')"/>
                             <toolbarbutton id="securityMenuBtn" hflex="1" iconSclass="z-icon-shield" label="&#160;Security" onClick="@command('switchView', modelName='security')"/>
+                            <toolbarbutton id="labelsMenuBtn" hflex="1" iconSclass="z-icon-tags" label="&#160;Labels, Selectors, Annotations" onClick="@command('switchView', modelName='labels')"/>
                             <toolbarbutton id="auditingMenuBtn" hflex="1" iconSclass="z-icon-gears" label="&#160;Auditing" onClick="@command('switchView', modelName='auditing')"/>
-                            <toolbarbutton id="customResourcesMenuBtn" hflex="1" iconSclass="z-icon-home" label="&#160;Custom Resources" onClick="@command('switchView', modelName='customResources')"/>
-                            <toolbarbutton id="deprecatedMenuBtn" hflex="1" iconSclass="z-icon-home" label="&#160;Deprecated" onClick="@command('switchView', modelName='deprecated')"/>
-                            <toolbarbutton id="eventsMenuBtn" hflex="1" iconSclass="z-icon-flash" label="&#160;Events" onClick="@command('switchView', modelName='events')"/>
                             <toolbarbutton id="featuresMenuBtn" hflex="1" iconSclass="z-icon-th" label="&#160;Features" onClick="@command('switchView', modelName='features')"/>
                             <toolbarbutton id="featureGatesMenuBtn" hflex="1" iconSclass="z-icon-home" label="&#160;Feature Gates" onClick="@command('switchView', modelName='featureGates')"/>
-                            <toolbarbutton id="ipsAndPortsMenuBtn" hflex="1" iconSclass="z-icon-cubes" label="&#160;Ips and Ports" onClick="@command('switchView', modelName='ipsAndPorts')"/>
-                            <toolbarbutton id="volumesMenuBtn" hflex="1" iconSclass="z-icon-server" label="&#160;Volumes" onClick="@command('switchView', modelName='volumes')"/>
+                            <!--                            <toolbarbutton id="customResourcesMenuBtn" hflex="1" iconSclass="z-icon-home" label="&#160;Custom Resources" onClick="@command('switchView', modelName='customResources')"/>-->
+                            <!--                            <toolbarbutton id="deprecatedMenuBtn" hflex="1" iconSclass="z-icon-home" label="&#160;Deprecated" onClick="@command('switchView', modelName='deprecated')"/>-->
+                            <!--                            <toolbarbutton id="eventsMenuBtn" hflex="1" iconSclass="z-icon-flash" label="&#160;Events" onClick="@command('switchView', modelName='events')"/>-->
+<!--                            <toolbarbutton id="volumesMenuBtn" hflex="1" iconSclass="z-icon-server" label="&#160;Volumes" onClick="@command('switchView', modelName='volumes')"/>-->
                         </panelchildren>
                     </panel>
                     <panel width="100%" title="Kube Helper" collapsible="true">
