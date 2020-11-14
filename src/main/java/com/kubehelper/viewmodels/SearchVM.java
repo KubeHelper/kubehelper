@@ -1,5 +1,6 @@
 package com.kubehelper.viewmodels;
 
+import com.google.common.collect.Iterables;
 import com.kubehelper.common.Global;
 import com.kubehelper.common.Resource;
 import com.kubehelper.domain.filters.SearchFilter;
@@ -33,9 +34,9 @@ import org.zkoss.zul.Auxhead;
 import org.zkoss.zul.Checkbox;
 import org.zkoss.zul.Combobox;
 import org.zkoss.zul.Footer;
-import org.zkoss.zul.Hlayout;
+import org.zkoss.zul.Hbox;
 import org.zkoss.zul.ListModelList;
-import org.zkoss.zul.Vlayout;
+import org.zkoss.zul.Vbox;
 import org.zkoss.zul.Window;
 
 import java.util.ArrayList;
@@ -47,6 +48,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.StreamSupport;
 
 import static com.kubehelper.common.Resource.CONFIG_MAP;
 import static com.kubehelper.common.Resource.DEPLOYMENT;
@@ -128,11 +130,11 @@ public class SearchVM implements EventListener {
      * @param component - kubeResourcesGBoxCheckAll Checkbox itself.
      */
     @Command
-    @NotifyChange("kubeResources")
+    @NotifyChange("kubeResourcesVBox")
     public void selectAllResources(@ContextParam(ContextType.COMPONENT) Component component) {
         boolean isResourcesCheckBoxChecked = ((Checkbox) component).isChecked();
         selectedResources = isResourcesCheckBoxChecked ? EnumSet.allOf(Resource.class) : new HashSet<>();
-        Vlayout checkboxesVLayout = (Vlayout) Path.getComponent("//indexPage/templateInclude/kubeResources");
+        Vbox checkboxesVLayout = (Vbox) Path.getComponent("//indexPage/templateInclude/kubeResourcesVBox");
         for (int i = 0; i < checkboxesVLayout.getChildren().size(); i++) {
             checkboxesVLayout.getChildren().get(i).getChildren().forEach(cBox -> {
                 ((Checkbox) cBox).setChecked(isResourcesCheckBoxChecked);
@@ -211,24 +213,26 @@ public class SearchVM implements EventListener {
      * Create dynamically CheckBoxes for all kubernetes resources. 10 per Hlayout.
      */
     private void createKubeResourcesCheckboxes() {
-        List<Resource> resources = Arrays.asList(Resource.values());
-        Hlayout hlayout = null;
-        Vlayout checkboxesVLayout = (Vlayout) Path.getComponent("//indexPage/templateInclude/kubeResources");
-        for (int i = 0; i < resources.size(); i++) {
-            Resource resource = resources.get(i);
-
-            if (i % 10 == 0) {
-                hlayout = new Hlayout();
-                hlayout.setValign("middle");
+        Vbox checkboxesVLayout = (Vbox) Path.getComponent("//indexPage/templateInclude/kubeResourcesVBox");
+        StreamSupport.stream(Iterables.partition(Arrays.asList(Resource.values()), 10).spliterator(), false).forEach(list -> {
+            Hbox hbox = createNewHbox();
+            for (Resource resource : list) {
+                Checkbox resourceCheckbox = new Checkbox(Resource.getValueByKey(resource.name()));
+                resourceCheckbox.setId(resource.name() + "_Checkbox");
+                resourceCheckbox.setStyle("padding: 5px;");
+                resourceCheckbox.addEventListener("onCheck", this);
+                resourceCheckbox.setChecked(selectedResources.contains(resource));
+                hbox.appendChild(resourceCheckbox);
             }
-            Checkbox resourceCheckbox = new Checkbox(Resource.getValueByKey(resource.name()));
-            resourceCheckbox.setId(resource.name() + "_Checkbox");
-            resourceCheckbox.setStyle("padding: 5px;");
-            resourceCheckbox.addEventListener("onCheck", this);
-            resourceCheckbox.setChecked(selectedResources.contains(resource));
-            hlayout.appendChild(resourceCheckbox);
-            checkboxesVLayout.appendChild(hlayout);
-        }
+            checkboxesVLayout.appendChild(hbox);
+        });
+    }
+
+    private Hbox createNewHbox() {
+        Hbox hbox = new Hbox();
+        hbox.setHflex("1");
+        hbox.setStyle("flex-wrap: flex");
+        return hbox;
     }
 
     /**

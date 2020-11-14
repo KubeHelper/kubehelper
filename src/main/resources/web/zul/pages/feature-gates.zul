@@ -1,6 +1,7 @@
 <zk>
     <div id="featureGatesTemplate" viewModel="@id('ipsAndPortsVM') @init('com.kubehelper.viewmodels.IpsAndPortsVM')" width="100%" height="100%">
         <borderlayout>
+            <!--            TODO Paging and vflex="min" for center and remove height-->
             <center margins="0,3,3,3" title="Feature Gates">
                 <tabbox width="100%" sclass="nav_tabs">
                     <tabs id="tabs">
@@ -38,8 +39,9 @@
                                     <!--                            </cell>-->
                                 </hbox>
                             </vbox>
-                            <separator width="100%" orient="horizontal" bar="false"/>
-                            <grid id="ipsAndPortsGrid" model="@load(ipsAndPortsVM.ipsAndPortsResults)" height="880px">
+                            <separator width="100%" orient="horizontal" />
+                            <!--            TODO Paging and vflex="min" for center and remove height-->
+                            <grid id="ipsAndPortsGrid" model="@load(ipsAndPortsVM.ipsAndPortsResults)" height="800px">
                                 <auxhead id="ipsAndPortsGridAuxHead">
                                     <auxheader>
                                         <span sclass="z-icon-hashtag"/>

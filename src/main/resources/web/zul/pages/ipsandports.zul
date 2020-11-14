@@ -5,11 +5,13 @@
                 <div>
                     <vbox height="100%" width="100%">
                         <hbox id="menuHbox" height="100%" width="100%" style="margin: 5px;" align="stretch">
-                            <cell id="clearAllCell" width="10%" style="padding: 0px 5px 0px 5px;" tooltip="clearAllTooltip">
-                                <button id="clearAll" iconSclass="z-icon-eraser" label="Clear all" onClick="@command('clearAll')"/>
+                            <cell id="clearAllCell" width="10%" tooltip="clearAllTooltip">
+                                <button id="clearAll" iconSclass="z-icon-eraser" width="100%" label="Clear all" onClick="@command('clearAll')"/>
                             </cell>
-                            <separator width="100%" orient="vertical" bar="true"/>
-                            <cell id="namespacesCell" width="30%" style="padding: 0px 5px 0px 5px;" align="left">
+                            <cell width="3%">
+                                <separator hflex="1" orient="horizontal"/>
+                            </cell>
+                            <cell id="namespacesCell" width="62.6%">
                                 <hlayout id="menuHlayout" valign="middle">
                                     <label value="Namespace: "/>
                                     <combobox tooltip="namespacesTooltip" id="namespacesCBox" hflex="1" model="@load(ipsAndPortsVM.namespaces)"
@@ -20,18 +22,21 @@
                                     </combobox>
                                 </hlayout>
                             </cell>
-                            <cell id="cellSplitterMiddle" width="49%" style="padding: 0px 5px 0px 5px;">
+                            <cell width="4%">
+                                <separator hflex="1" orient="horizontal"/>
                             </cell>
-                            <cell id="cellGetBtn" width="10%" style="padding: 0px 5px 0px 5px;">
+                            <cell id="cellGetBtn" width="20%">
                                 <button id="getIpsBtn" label="Get" iconSclass="z-icon-refresh" onClick="@command('search')" width="100%"/>
                             </cell>
-                            <!--                            <cell id="cellSplitterEnd" width="1%" >-->
-                            <!--                            </cell>-->
+                            <cell width="0.4%">
+                                <separator hflex="1" orient="horizontal"/>
+                            </cell>
                         </hbox>
                     </vbox>
                     <separator width="100%" orient="horizontal" bar="false"/>
-<!--                    <grid id="ipsAndPortsGrid" model="@load(ipsAndPortsVM.ipsAndPortsResults)" height="@bind(ipsAndPortsVM.ipsAndPortsGridHeight)">-->
-                    <grid id="ipsAndPortsGrid" model="@load(ipsAndPortsVM.ipsAndPortsResults)" height="880px">
+                    <!--                    <grid id="ipsAndPortsGrid" model="@load(ipsAndPortsVM.ipsAndPortsResults)" height="@bind(ipsAndPortsVM.ipsAndPortsGridHeight)">-->
+                    <!--            TODO Paging and vflex="min" for center and remove height-->
+                    <grid id="ipsAndPortsGrid" model="@load(ipsAndPortsVM.ipsAndPortsResults)" height="700px">
                         <auxhead id="ipsAndPortsGridAuxHead">
                             <auxheader>
                                 <span sclass="z-icon-hashtag"/>

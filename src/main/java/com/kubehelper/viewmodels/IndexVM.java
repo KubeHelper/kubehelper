@@ -4,19 +4,20 @@ import com.kubehelper.common.Global;
 import com.kubehelper.domain.models.PageModel;
 import com.kubehelper.services.CommonService;
 import org.zkoss.bind.BindUtils;
+import org.zkoss.bind.annotation.AfterCompose;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
+import org.zkoss.bind.annotation.ContextParam;
+import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.Init;
+import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Path;
-import org.zkoss.zk.ui.event.ClientInfoEvent;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Toolbarbutton;
 import org.zkoss.zul.Window;
-
-import java.util.Map;
 
 /**
  * @author JDev
@@ -30,10 +31,15 @@ public class IndexVM {
     @WireVariable
     private CommonService commonService;
 
+//    @Command
+//    public void onClientInfoEvent(ClientInfoEvent evt) {
+//        pageModel.setDesktopWithAndHeight(evt.getDesktopWidth(), evt.getDesktopHeight());
+//        BindUtils.postGlobalCommand(null, null, "updateHeightsAndRerenderVM", Map.of("eventType", "onClientInfo"));
+//    }
+
     @Command
-    public void onClientInfoEvent(ClientInfoEvent evt) {
-        pageModel.setDesktopWithAndHeight(evt.getDesktopWidth(), evt.getDesktopHeight());
-        BindUtils.postGlobalCommand(null, null, "updateHeightsAndRerenderVM", Map.of("eventType", "onClientInfo"));
+    public void refreshMainGridSize() {
+        BindUtils.postNotifyChange(null, null, this, "mainGridId");
     }
 
     @Init
@@ -46,6 +52,12 @@ public class IndexVM {
 //        pageModel = Global.ACTIVE_MODELS.computeIfAbsent(Global.SEARCH_MODEL, (k) -> Global.NEW_MODELS.get(Global.SEARCH_MODEL));
         pageModel = Global.ACTIVE_MODELS.computeIfAbsent(Global.LABELS_MODEL, (k) -> Global.NEW_MODELS.get(Global.LABELS_MODEL));
         currentModelName = pageModel.getName();
+    }
+
+    @AfterCompose
+    public void afterCompose(@ContextParam(ContextType.VIEW) Component view) {
+//        BindUtils.postNotifyChange(null, null, this, "mainGridId");
+        enableDisableMenuItem(pageModel.getName());
     }
 
     public PageModel getPageModel() {
@@ -68,8 +80,8 @@ public class IndexVM {
     private void enableDisableMenuItem(String modelName) {
         Toolbarbutton clickedMenuBtn = (Toolbarbutton) Path.getComponent("//indexPage/" + modelName + "MenuBtn");
         Toolbarbutton currentMenuBtn = (Toolbarbutton) Path.getComponent("//indexPage/" + currentModelName + "MenuBtn");
-        clickedMenuBtn.setDisabled(true);
         currentMenuBtn.setDisabled(false);
+        clickedMenuBtn.setDisabled(true);
         currentModelName = modelName;
     }
 }

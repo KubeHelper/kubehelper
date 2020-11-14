@@ -1,31 +1,27 @@
 <?page id="indexPage" title="Kube Helper"?>
 <zk>
-    <zscript>
+    <script type="text/javascript">
+        function init() {
+            $('body').on('DOMSubtreeModified', '.mainGridDivId', function(){
+                $(".mainGridId").height($(".mainGridDivId").height()-50)
+                console.log('changed'+' '+$(".mainGridId").height() + ' '+$(".centerContentId").height());
 
-    </zscript>
-    <!--    <style>-->
-    <!--        .breeze .complex-layout, .breeze .complex-layout .z-south, .breeze .complex-layout .z-west {-->
-    <!--        background: #F7F7F7;-->
-    <!--        }-->
-    <!--        .z-borderlayout { background: #FFFFFF }-->
-    <!--        .complex-layout .z-north { background: #008BB6; }-->
-    <!--        .complex-layout .z-north > div { padding: 5px; }-->
-    <!--        img.complex-layout-header-img { padding: 0 10px; }-->
-    <!--        .complex-layout-header-label {-->
-    <!--        position: relative; top: -30px;-->
-    <!--        padding-left: 40px; font-size: 24px;-->
-    <!--        color: White; font-weight: bold;-->
-    <!--        }-->
-    <!--        .inner-border, .inner-border .z-north, .inner-border .z-west,-->
-    <!--        .inner-border .z-south, .inner-border .z-east { background: #FFFFFF; }-->
-    <!--        .dl-link { text-decoration: none; cursor: pointer; }-->
-    <!--    </style>-->
-    <div id="indexWindow" viewModel="@id('indexVM') @init('com.kubehelper.viewmodels.IndexVM')" height="100%" width="100%" onClientInfo="onClientInfo(event)">
-        <zscript>
-            void onClientInfo(ClientInfoEvent evt) {
-            indexVM.onClientInfoEvent(evt);
-            }
-        </zscript>
+<!--                if($(".mainGridId").height()==null || $(".mainGridId").height()=='undefined'){-->
+<!--                    $(".mainGridId").height(600)-->
+<!--                }-->
+<!--        pageNorthClass.position - mainSouthFooterClass.position-->
+            });
+        }
+        init()
+    </script>
+
+    <div id="indexWindow" viewModel="@id('indexVM') @init('com.kubehelper.viewmodels.IndexVM')" height="100%" width="100%">
+<!--    <div id="indexWindow" viewModel="@id('indexVM') @init('com.kubehelper.viewmodels.IndexVM')" height="100%" width="100%" onClientInfo="onClientInfo(event)">-->
+<!--        <zscript>-->
+<!--            void onClientInfo(ClientInfoEvent evt) {-->
+<!--            indexVM.onClientInfoEvent(evt);-->
+<!--            }-->
+<!--        </zscript>-->
         <borderlayout sclass="complex-layout">
             <north size="5%" border="0" style="background: #3498DB">
                 <!--                <panel border="normal" height="100%" width="100%">-->
@@ -72,7 +68,7 @@
                 <vlayout spacing="0">
                     <panel width="100%" title="Menu" collapsible="true">
                         <panelchildren style="padding:5px;">
-                            <toolbarbutton id="dashboardMenuBtn" hflex="1" iconSclass="z-icon-dashboard" disabled="true" label="&#160;Dashboard"
+                            <toolbarbutton id="dashboardMenuBtn" hflex="1" iconSclass="z-icon-dashboard" label="&#160;Dashboard"
                                            onClick="@command('switchView', modelName='dashboard')"/>
                             <toolbarbutton id="searchMenuBtn" hflex="1" iconSclass="z-icon-search" label="&#160;Search" onClick="@command('switchView', modelName='search')"/>
                             <toolbarbutton id="ipsAndPortsMenuBtn" hflex="1" iconSclass="z-icon-cubes" label="&#160;Ips and Ports" onClick="@command('switchView', modelName='ipsAndPorts')"/>
@@ -84,7 +80,7 @@
                             <!--                            <toolbarbutton id="customResourcesMenuBtn" hflex="1" iconSclass="z-icon-home" label="&#160;Custom Resources" onClick="@command('switchView', modelName='customResources')"/>-->
                             <!--                            <toolbarbutton id="deprecatedMenuBtn" hflex="1" iconSclass="z-icon-home" label="&#160;Deprecated" onClick="@command('switchView', modelName='deprecated')"/>-->
                             <!--                            <toolbarbutton id="eventsMenuBtn" hflex="1" iconSclass="z-icon-flash" label="&#160;Events" onClick="@command('switchView', modelName='events')"/>-->
-<!--                            <toolbarbutton id="volumesMenuBtn" hflex="1" iconSclass="z-icon-server" label="&#160;Volumes" onClick="@command('switchView', modelName='volumes')"/>-->
+                            <!--                            <toolbarbutton id="volumesMenuBtn" hflex="1" iconSclass="z-icon-server" label="&#160;Volumes" onClick="@command('switchView', modelName='volumes')"/>-->
                         </panelchildren>
                     </panel>
                     <panel width="100%" title="Kube Helper" collapsible="true">
@@ -122,7 +118,7 @@
                 <!--                            TODO read about difference instant or defer   - https://www.zkoss.org/wiki/ZK Component Reference/Essential Components/Include-->
                 <include id="templateInclude" src="@load(indexVM.pageModel.templateUrl)"/>
             </center>
-            <south size="3%" maxsize="200" style="background: none repeat scroll 0 0 ;">
+            <south class="mainSouthFooterClass" size="3%" maxsize="200" style="background: none repeat scroll 0 0 ;">
                 <toolbar mold="panel" align="center">
                     <toolbarbutton label="Sign in"/>
                     <toolbarbutton label="Home"/>

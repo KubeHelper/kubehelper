@@ -4,7 +4,6 @@ import com.kubehelper.common.Global;
 import com.kubehelper.common.KubeHelperException;
 import com.kubehelper.domain.filters.IpsAndPortsFilter;
 import com.kubehelper.domain.results.IpsAndPortsResult;
-import org.zkoss.bind.BindUtils;
 import org.zkoss.zul.ListModelList;
 
 import java.util.ArrayList;
@@ -16,7 +15,8 @@ import java.util.List;
 public class IpsAndPortsModel implements PageModel {
 
 //    TODO - change name
-    private String templateUrl = "~./zul/pages/feature-gates.zul";
+//    private String templateUrl = "~./zul/pages/feature-gates.zul";
+    private String templateUrl = "~./zul/pages/ipsandports.zul";
 
     public static String NAME = Global.IPS_AND_PORTS_MODEL;
     private int desktopWidth;
