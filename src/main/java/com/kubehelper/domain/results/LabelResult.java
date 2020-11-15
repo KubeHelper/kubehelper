@@ -1,17 +1,19 @@
 package com.kubehelper.domain.results;
 
 import com.kubehelper.common.Resource;
+import com.kubehelper.common.ResourceProperty;
 
 /**
  * @author JDev
  */
 public class LabelResult {
     private int id;
-    private String namespace = "";
+    private String name = "";
+    private ResourceProperty resourceProperty;
     private Resource resourceType;
     private String resourceName = "";
+    private String namespace = "";
     private String additionalInfo = "";
-    private String foundString = "";
 
     public LabelResult() {
     }
@@ -56,12 +58,21 @@ public class LabelResult {
         return this;
     }
 
-    public String getFoundString() {
-        return foundString;
+    public String getName() {
+        return name;
     }
 
-    public LabelResult setFoundString(String foundString) {
-        this.foundString = foundString;
+    public LabelResult setName(String name) {
+        this.name = name;
+        return this;
+    }
+
+    public String getResourceProperty() {
+        return ResourceProperty.getValueByKey(resourceProperty.name());
+    }
+
+    public LabelResult setResourceProperty(ResourceProperty resourceProperty) {
+        this.resourceProperty = resourceProperty;
         return this;
     }
 

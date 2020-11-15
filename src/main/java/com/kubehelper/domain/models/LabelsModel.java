@@ -16,7 +16,7 @@ import java.util.List;
 public class LabelsModel implements PageModel {
 
     private String templateUrl = "~./zul/pages/labels.zul";
-    public static String NAME = Global.SEARCH_MODEL;
+    public static String NAME = Global.LABELS_MODEL;
     private int desktopWidth;
     private int desktopHeight;
     private String selectedNamespace = "all";
@@ -24,8 +24,8 @@ public class LabelsModel implements PageModel {
     private ListModelList<LabelResult> searchResults = new ListModelList<>();
     private LabelsFilter filter = new LabelsFilter();
     private List<KubeHelperException> searchExceptions = new ArrayList<>();
-    private String searchString = "";
     private boolean skipKubeNamespaces = true;
+    private boolean skipHashLabels = true;
 
     public LabelsModel() {
     }
@@ -33,6 +33,7 @@ public class LabelsModel implements PageModel {
     public LabelsModel addSearchResult(LabelResult searchResult) {
         searchResults.add(searchResult);
         filter.addResourceTypesFilter(searchResult.getResourceType());
+        filter.addResourcePropertiesFilter(searchResult.getResourceProperty());
         filter.addNamespacesFilter(searchResult.getNamespace());
         return this;
     }
@@ -123,21 +124,21 @@ public class LabelsModel implements PageModel {
         return !searchExceptions.isEmpty();
     }
 
-    public String getSearchString() {
-        return searchString;
-    }
-
-    public LabelsModel setSearchString(String searchString) {
-        this.searchString = searchString;
-        return this;
-    }
-
     public boolean isSkipKubeNamespaces() {
         return skipKubeNamespaces;
     }
 
     public LabelsModel setSkipKubeNamespaces(boolean skipKubeNamespaces) {
         this.skipKubeNamespaces = skipKubeNamespaces;
+        return this;
+    }
+
+    public boolean isSkipHashLabels() {
+        return skipHashLabels;
+    }
+
+    public LabelsModel setSkipHashLabels(boolean skipHashLabels) {
+        this.skipHashLabels = skipHashLabels;
         return this;
     }
 }

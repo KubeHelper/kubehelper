@@ -110,10 +110,10 @@
                         </auxheader>
                     </auxhead>
                     <columns menupopup="auto" sizable="true">
-                        <column hflex="min" label="Id"/>
+                        <column hflex="min" label="Id" sort="auto(id)"/>
                         <column hflex="3" label="Found String"/>
                         <column hflex="2" label="Additional Info" sort="auto(additionalInfo)"/>
-                        <column hflex="2" label="Resource Name" tooltiptext="Kubernetes Resource Name: [Pod containers]" sort="auto(additionalInfo)"/>
+                        <column hflex="2" label="Resource Name" tooltiptext="Kubernetes Resource Name: [Pod containers]" sort="auto(resourceName)"/>
                         <column hflex="1" label="Namespace" sort="auto(namespace)"/>
                         <column hflex="1" label="Resource Type" sort="auto(resourceType)"/>
                         <column hflex="1" label="Creation Time" sort="auto(creationTime)"/>

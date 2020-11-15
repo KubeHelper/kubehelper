@@ -71,9 +71,9 @@
                             <toolbarbutton id="dashboardMenuBtn" hflex="1" iconSclass="z-icon-dashboard" label="&#160;Dashboard"
                                            onClick="@command('switchView', modelName='dashboard')"/>
                             <toolbarbutton id="searchMenuBtn" hflex="1" iconSclass="z-icon-search" label="&#160;Search" onClick="@command('switchView', modelName='search')"/>
-                            <toolbarbutton id="ipsAndPortsMenuBtn" hflex="1" iconSclass="z-icon-cubes" label="&#160;Ips and Ports" onClick="@command('switchView', modelName='ipsAndPorts')"/>
+                            <toolbarbutton id="ipsAndPortsMenuBtn" hflex="1" iconSclass="z-icon-cubes" label="&#160;Ips Ports" onClick="@command('switchView', modelName='ipsAndPorts')"/>
                             <toolbarbutton id="securityMenuBtn" hflex="1" iconSclass="z-icon-shield" label="&#160;Security" onClick="@command('switchView', modelName='security')"/>
-                            <toolbarbutton id="labelsMenuBtn" hflex="1" iconSclass="z-icon-tags" label="&#160;Labels, Selectors, Annotations" onClick="@command('switchView', modelName='labels')"/>
+                            <toolbarbutton id="labelsMenuBtn" hflex="1" iconSclass="z-icon-tags" label="&#160;Labels Annotations Selectors" onClick="@command('switchView', modelName='labels')"/>
                             <toolbarbutton id="auditingMenuBtn" hflex="1" iconSclass="z-icon-gears" label="&#160;Auditing" onClick="@command('switchView', modelName='auditing')"/>
                             <toolbarbutton id="featuresMenuBtn" hflex="1" iconSclass="z-icon-th" label="&#160;Features" onClick="@command('switchView', modelName='features')"/>
                             <toolbarbutton id="featureGatesMenuBtn" hflex="1" iconSclass="z-icon-home" label="&#160;Feature Gates" onClick="@command('switchView', modelName='featureGates')"/>

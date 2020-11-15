@@ -1,23 +1,26 @@
 package com.kubehelper.common;
 
 import io.kubernetes.client.openapi.ApiException;
-import io.kubernetes.client.openapi.apis.ApisApi;
 import io.kubernetes.client.openapi.apis.AppsV1Api;
 import io.kubernetes.client.openapi.apis.AuditregistrationV1alpha1Api;
 import io.kubernetes.client.openapi.apis.AuthenticationV1Api;
 import io.kubernetes.client.openapi.apis.AuthorizationV1Api;
+import io.kubernetes.client.openapi.apis.BatchV1Api;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
 import io.kubernetes.client.openapi.apis.DiscoveryV1beta1Api;
-import io.kubernetes.client.openapi.apis.LogsApi;
 import io.kubernetes.client.openapi.apis.NetworkingV1Api;
 import io.kubernetes.client.openapi.apis.PolicyV1beta1Api;
+import io.kubernetes.client.openapi.apis.RbacAuthorizationV1beta1Api;
 import io.kubernetes.client.openapi.apis.SettingsV1alpha1Api;
+import io.kubernetes.client.openapi.models.PolicyV1beta1PodSecurityPolicyList;
 import io.kubernetes.client.openapi.models.V1ConfigMapList;
 import io.kubernetes.client.openapi.models.V1ControllerRevisionList;
 import io.kubernetes.client.openapi.models.V1DaemonSetList;
 import io.kubernetes.client.openapi.models.V1DeploymentList;
 import io.kubernetes.client.openapi.models.V1EventList;
+import io.kubernetes.client.openapi.models.V1JobList;
 import io.kubernetes.client.openapi.models.V1NamespaceList;
+import io.kubernetes.client.openapi.models.V1NetworkPolicyList;
 import io.kubernetes.client.openapi.models.V1NodeList;
 import io.kubernetes.client.openapi.models.V1PersistentVolumeClaimList;
 import io.kubernetes.client.openapi.models.V1PersistentVolumeList;
@@ -27,6 +30,11 @@ import io.kubernetes.client.openapi.models.V1SecretList;
 import io.kubernetes.client.openapi.models.V1ServiceAccountList;
 import io.kubernetes.client.openapi.models.V1ServiceList;
 import io.kubernetes.client.openapi.models.V1StatefulSetList;
+import io.kubernetes.client.openapi.models.V1beta1ClusterRoleBindingList;
+import io.kubernetes.client.openapi.models.V1beta1ClusterRoleList;
+import io.kubernetes.client.openapi.models.V1beta1PodDisruptionBudgetList;
+import io.kubernetes.client.openapi.models.V1beta1RoleBindingList;
+import io.kubernetes.client.openapi.models.V1beta1RoleList;
 import io.kubernetes.client.util.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,24 +61,26 @@ public class KubeAPI {
     @Autowired
     private AppsV1Api appsV1Api;
 
-    public void testApis() throws IOException {
+    @Autowired
+    private BatchV1Api batchV1Api;
 
+    @Autowired
+    private RbacAuthorizationV1beta1Api rbacAuthorizationV1beta1Api;
+
+    @Autowired
+    private NetworkingV1Api networkingApi;
+
+    @Autowired
+    private PolicyV1beta1Api policyV1beta1Api;
+
+    public void testApis() throws IOException {
         AuthenticationV1Api authenticationApi = new AuthenticationV1Api(Config.defaultClient());
         SettingsV1alpha1Api settingsApi = new SettingsV1alpha1Api(Config.defaultClient());
-        AuthorizationV1Api authorizationApi = new AuthorizationV1Api(Config.defaultClient());
+        AuthorizationV1Api authorizationApi = new AuthorizationV1Api(Config.defaultClient()); //TOKEn REVIEW
         DiscoveryV1beta1Api discoveryApi = new DiscoveryV1beta1Api(Config.defaultClient());
         AuditregistrationV1alpha1Api auditregistrationApi = new AuditregistrationV1alpha1Api(Config.defaultClient());
-        PolicyV1beta1Api policyApi = new PolicyV1beta1Api(Config.defaultClient());
-        LogsApi logsApi = new LogsApi(Config.defaultClient());
-        NetworkingV1Api networkingApi = new NetworkingV1Api(Config.defaultClient());
-        ApisApi apisApi = new ApisApi(Config.defaultClient());
     }
 
-//    BatchV1Api
-//            NetworkingV1Api
-//    PolicyV1beta1Api
-//            RbacAuthorizationV1beta1Api
-//            ExtensionsV1beta1Api
 
     public V1DeploymentList getV1DeploymentList(String selectedNamespace) {
         try {
@@ -110,6 +120,102 @@ public class KubeAPI {
         }
         return new V1ReplicaSetList();
     }
+
+    public V1JobList getV1JobList(String selectedNamespace) {
+        try {
+            if ("all".equals(selectedNamespace)) {
+                return batchV1Api.listJobForAllNamespaces(null, null, null, null, null, null, null, null, null);
+            } else {
+                return batchV1Api.listNamespacedJob(selectedNamespace, null, null, null, null, null, null, null, null, null);
+            }
+        } catch (ApiException e) {
+            showErrorDialog(e);
+        }
+        return new V1JobList();
+    }
+
+    public V1beta1RoleList getV1RolesList(String selectedNamespace) {
+        try {
+            if ("all".equals(selectedNamespace)) {
+                return rbacAuthorizationV1beta1Api.listRoleForAllNamespaces(null, null, null, null, null, null, null, null, null);
+            } else {
+                return rbacAuthorizationV1beta1Api.listNamespacedRole(selectedNamespace, null, null, null, null, null, null, null, null, null);
+            }
+        } catch (ApiException e) {
+            showErrorDialog(e);
+        }
+        return new V1beta1RoleList();
+    }
+
+    public V1beta1ClusterRoleList getV1ClusterRolesList() {
+        try {
+            return rbacAuthorizationV1beta1Api.listClusterRole(null, null, null, null, null, null, null, null, null);
+        } catch (ApiException e) {
+            showErrorDialog(e);
+        }
+        return new V1beta1ClusterRoleList();
+    }
+
+    public V1beta1ClusterRoleBindingList getV1ClusterRolesBindingsList() {
+        try {
+            return rbacAuthorizationV1beta1Api.listClusterRoleBinding(null, null, null, null, null, null, null, null, null);
+        } catch (ApiException e) {
+            showErrorDialog(e);
+        }
+        return new V1beta1ClusterRoleBindingList();
+    }
+
+    public V1beta1RoleBindingList getV1RolesBindingList(String selectedNamespace) {
+        try {
+            if ("all".equals(selectedNamespace)) {
+                return rbacAuthorizationV1beta1Api.listRoleBindingForAllNamespaces(null, null, null, null, null, null, null, null, null);
+            } else {
+                return rbacAuthorizationV1beta1Api.listNamespacedRoleBinding(selectedNamespace, null, null, null, null, null, null, null, null, null);
+            }
+        } catch (ApiException e) {
+            showErrorDialog(e);
+        }
+        return new V1beta1RoleBindingList();
+    }
+
+
+    public V1NetworkPolicyList getV1NetworkPolicyList(String selectedNamespace) {
+        try {
+            if ("all".equals(selectedNamespace)) {
+                return networkingApi.listNetworkPolicyForAllNamespaces(null, null, null, null, null, null, null, null, null);
+            } else {
+                return networkingApi.listNamespacedNetworkPolicy(selectedNamespace, null, null, null, null, null, null, null, null, null);
+            }
+        } catch (ApiException e) {
+            showErrorDialog(e);
+        }
+        return new V1NetworkPolicyList();
+    }
+
+
+    public V1beta1PodDisruptionBudgetList getV1beta1PodDisruptionBudgetsList(String selectedNamespace) {
+        try {
+            if ("all".equals(selectedNamespace)) {
+                return policyV1beta1Api.listPodDisruptionBudgetForAllNamespaces(null, null, null, null, null, null, null, null, null);
+            } else {
+                return policyV1beta1Api.listNamespacedPodDisruptionBudget(selectedNamespace, null, null, null, null, null, null, null, null, null);
+            }
+        } catch (ApiException e) {
+            showErrorDialog(e);
+        }
+        return new V1beta1PodDisruptionBudgetList();
+    }
+
+
+    public PolicyV1beta1PodSecurityPolicyList getPolicyV1beta1PodSecurityPolicyList() {
+        try {
+            return policyV1beta1Api.listPodSecurityPolicy(null, null, null, null, null, null, null, null, null);
+        } catch (ApiException e) {
+            showErrorDialog(e);
+        }
+        return new PolicyV1beta1PodSecurityPolicyList();
+    }
+
 
     public V1StatefulSetList getV1StatefulSetList(String selectedNamespace) {
         try {

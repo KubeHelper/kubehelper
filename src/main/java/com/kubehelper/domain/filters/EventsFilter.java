@@ -7,7 +7,7 @@ import org.zkoss.zul.ListModelList;
  * @author JDev
  */
 public class EventsFilter {
-    private String namespace = "", resourceType = "", resourceName = "", creationTime = "", additionalInfo = "";
+    private String creationTime = "", additionalInfo = "";
 
     private String selectedNamespaceFilter = "";
     private String selectedResourceTypeFilter = "";
@@ -41,32 +41,6 @@ public class EventsFilter {
         }
     }
 
-    public String getNamespace() {
-        return namespace;
-    }
-
-    public EventsFilter setNamespace(String namespace) {
-        this.namespace = namespace == null ? "" : namespace.trim();
-        return this;
-    }
-
-    public String getResourceType() {
-        return resourceType;
-    }
-
-    public EventsFilter setResourceType(String resourceType) {
-        this.resourceType = resourceType == null ? "" : resourceType.trim();
-        return this;
-    }
-
-    public String getResourceName() {
-        return resourceName;
-    }
-
-    public EventsFilter setResourceName(String resourceName) {
-        this.resourceName = resourceName == null ? "" : resourceName.trim();
-        return this;
-    }
 
     public String getCreationTime() {
         return creationTime;
@@ -87,7 +61,7 @@ public class EventsFilter {
     }
 
     public boolean isFilterActive() {
-        return StringUtils.isNoneBlank(namespace, resourceType, resourceName, creationTime, additionalInfo, selectedNamespaceFilter, selectedResourceTypeFilter, selectedResourceNameFilter);
+        return StringUtils.isNoneBlank(creationTime, additionalInfo, selectedNamespaceFilter, selectedResourceTypeFilter, selectedResourceNameFilter);
     }
 
     public ListModelList<String> getNamespacesFilter() {

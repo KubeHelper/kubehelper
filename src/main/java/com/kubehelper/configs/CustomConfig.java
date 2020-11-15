@@ -1,10 +1,13 @@
 package com.kubehelper.configs;
 
 import io.kubernetes.client.Exec;
-import io.kubernetes.client.openapi.ApiClient;
 import io.kubernetes.client.openapi.apis.AppsV1Api;
+import io.kubernetes.client.openapi.apis.BatchV1Api;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
 import io.kubernetes.client.openapi.apis.ExtensionsV1beta1Api;
+import io.kubernetes.client.openapi.apis.NetworkingV1Api;
+import io.kubernetes.client.openapi.apis.PolicyV1beta1Api;
+import io.kubernetes.client.openapi.apis.RbacAuthorizationV1beta1Api;
 import io.kubernetes.client.util.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,19 +38,30 @@ public class CustomConfig {
     }
 
     @Bean
+    public BatchV1Api getBatchV1Api() throws IOException {
+        return new BatchV1Api(Config.defaultClient());
+    }
+
+    @Bean
     public ExtensionsV1beta1Api getExtensionsV1beta1Api() throws IOException {
         return new ExtensionsV1beta1Api(Config.defaultClient());
     }
 
-//    @Bean
-//    public AppsV1beta1Api getAppsV1beta1Api() throws IOException {
-//        return new AppsV1beta1Api(Config.defaultClient());
-//    }
-//
-//    @Bean
-//    public AppsV1beta2Api getAppsV1beta2Api() throws IOException {
-//        return new AppsV1beta2Api(Config.defaultClient());
-//    }
+    @Bean
+    public RbacAuthorizationV1beta1Api getRbacAuthorizationV1beta1Api() throws IOException {
+        return new RbacAuthorizationV1beta1Api(Config.defaultClient());
+    }
+
+    @Bean
+    public NetworkingV1Api getNetworkingV1Api() throws IOException {
+        return new NetworkingV1Api(Config.defaultClient());
+    }
+
+    @Bean
+    public PolicyV1beta1Api getPolicyV1beta1Api() throws IOException {
+        return new PolicyV1beta1Api(Config.defaultClient());
+    }
+
 
     @Bean
     public Exec getExec() throws IOException {

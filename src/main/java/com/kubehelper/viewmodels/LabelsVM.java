@@ -31,7 +31,6 @@ import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Notification;
 import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Auxhead;
-import org.zkoss.zul.Center;
 import org.zkoss.zul.Checkbox;
 import org.zkoss.zul.Combobox;
 import org.zkoss.zul.Footer;
@@ -51,13 +50,25 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.StreamSupport;
 
+import static com.kubehelper.common.Resource.CLUSTER_ROLE;
+import static com.kubehelper.common.Resource.CLUSTER_ROLE_BINDING;
 import static com.kubehelper.common.Resource.CONFIG_MAP;
+import static com.kubehelper.common.Resource.DAEMON_SET;
 import static com.kubehelper.common.Resource.DEPLOYMENT;
-import static com.kubehelper.common.Resource.ENV_VARIABLE;
+import static com.kubehelper.common.Resource.JOB;
 import static com.kubehelper.common.Resource.NAMESPACE;
+import static com.kubehelper.common.Resource.NETWORK_POLICY;
+import static com.kubehelper.common.Resource.PERSISTENT_VOLUME;
+import static com.kubehelper.common.Resource.PERSISTENT_VOLUME_CLAIM;
 import static com.kubehelper.common.Resource.POD;
+import static com.kubehelper.common.Resource.POD_DISRUPTION_BUDGET;
+import static com.kubehelper.common.Resource.POD_SECURITY_POLICY;
 import static com.kubehelper.common.Resource.REPLICA_SET;
+import static com.kubehelper.common.Resource.ROLE;
+import static com.kubehelper.common.Resource.ROLE_BINDING;
+import static com.kubehelper.common.Resource.SECRET;
 import static com.kubehelper.common.Resource.SERVICE;
+import static com.kubehelper.common.Resource.SERVICE_ACCOUNT;
 import static com.kubehelper.common.Resource.STATEFUL_SET;
 
 /**
@@ -77,12 +88,14 @@ public class LabelsVM implements EventListener {
         add(CONFIG_MAP);
         add(POD);
         add(SERVICE);
-        add(NAMESPACE);
+        add(DAEMON_SET);
         add(DEPLOYMENT);
         add(STATEFUL_SET);
         add(REPLICA_SET);
-        add(ENV_VARIABLE);
     }};
+
+    private List<Resource> labelResources = Arrays.asList(POD, CONFIG_MAP, SECRET, SERVICE_ACCOUNT, SERVICE, DAEMON_SET, DEPLOYMENT, REPLICA_SET, STATEFUL_SET, JOB, NAMESPACE,
+            PERSISTENT_VOLUME_CLAIM, PERSISTENT_VOLUME, CLUSTER_ROLE_BINDING, CLUSTER_ROLE, ROLE_BINDING, ROLE, NETWORK_POLICY, POD_DISRUPTION_BUDGET, POD_SECURITY_POLICY);
     private ListModelList<LabelResult> searchResults = new ListModelList<>();
 
     private LabelsModel labelsModel;
@@ -115,12 +128,10 @@ public class LabelsVM implements EventListener {
     @Command
     @NotifyChange({"totalItems", "searchResults", "filter"})
     public void search() {
-        Center center = (Center) Path.getComponent("//indexPage/templateInclude/centerContent");
-
         labelsModel.setFilter(new LabelsFilter());
+        labelsModel.setSearchExceptions(new ArrayList<>());
         labelsService.search(labelsModel, selectedResources);
         labelsModel.setNamespaces(commonService.getAllNamespaces());
-        labelsModel.setSearchExceptions(new ArrayList<>());
         clearAllFilterComboboxes();
         isSearchButtonPressed = true;
         logger.info("Found {} namespaces.", labelsModel.getNamespaces());
@@ -171,10 +182,11 @@ public class LabelsVM implements EventListener {
     public void filterSearches() {
         searchResults.clear();
         for (LabelResult searchResult : labelsModel.getSearchResults()) {
-            if (StringUtils.containsIgnoreCase(searchResult.getFoundString(), getFilter().getFoundString()) &&
-                    StringUtils.containsIgnoreCase(searchResult.getAdditionalInfo(), getFilter().getAdditionalInfo()) &&
-                    StringUtils.containsIgnoreCase(searchResult.getResourceName(), getFilter().getSelectedResourceNameFilter()) &&
+            if (StringUtils.containsIgnoreCase(searchResult.getName(), getFilter().getName()) &&
+                    StringUtils.containsIgnoreCase(searchResult.getResourceProperty(), getFilter().getSelectedResourcePropertyFilter()) &&
                     StringUtils.containsIgnoreCase(searchResult.getResourceType(), getFilter().getSelectedResourceTypeFilter()) &&
+                    StringUtils.containsIgnoreCase(searchResult.getResourceName(), getFilter().getSelectedResourceNameFilter()) &&
+                    StringUtils.containsIgnoreCase(searchResult.getAdditionalInfo(), getFilter().getAdditionalInfo()) &&
                     StringUtils.containsIgnoreCase(searchResult.getNamespace(), getFilter().getSelectedNamespaceFilter())) {
                 searchResults.add(searchResult);
             }
@@ -192,7 +204,6 @@ public class LabelsVM implements EventListener {
                 .setFilter(new LabelsFilter())
                 .setNamespaces(commonService.getAllNamespaces())
                 .setSelectedNamespace("all")
-                .setSearchString("")
                 .setSearchExceptions(new ArrayList<>());
         searchResults = new ListModelList<>();
         clearAllFilterComboboxes();
@@ -204,7 +215,7 @@ public class LabelsVM implements EventListener {
     private void clearAllFilterComboboxes() {
         Auxhead searchGridAuxHead = (Auxhead) Path.getComponent("//indexPage/templateInclude/searchGridAuxHead");
         for (Component child : searchGridAuxHead.getFellows()) {
-            if (Arrays.asList("filterResourceNamesCBox", "filterNamespacesCBox", "filterResourceTypesCBox").contains(child.getId())) {
+            if (Arrays.asList("filterResourceNamesCBox", "filterNamespacesCBox", "filterResourceTypesCBox", "filterResourcePropertyCBox").contains(child.getId())) {
                 Combobox cBox = (Combobox) child;
                 cBox.setValue("");
             }
@@ -216,7 +227,7 @@ public class LabelsVM implements EventListener {
      */
     private void createKubeResourcesCheckboxes() {
         Vbox checkboxesVLayout = (Vbox) Path.getComponent("//indexPage/templateInclude/kubeResourcesVBox");
-        StreamSupport.stream(Iterables.partition(Arrays.asList(Resource.values()), 10).spliterator(), false).forEach(list -> {
+        StreamSupport.stream(Iterables.partition(labelResources, 10).spliterator(), false).forEach(list -> {
             Hbox hbox = createNewHbox();
             for (Resource resource : list) {
                 Checkbox resourceCheckbox = new Checkbox(Resource.getValueByKey(resource.name()));
@@ -262,18 +273,26 @@ public class LabelsVM implements EventListener {
     }
 
     @Command
-    public void showAdditionalInfo(@BindingParam("id") int id) {
-        String content = "";
+    public void showFullLabelValue(@BindingParam("id") int id) {
         Optional<LabelResult> first = searchResults.getInnerList().stream().filter(item -> item.getId() == id).findFirst();
-        if (CONFIG_MAP.getValue().equals(first.get().getResourceType())) {
-            //escape XML <> symbols for <pre> tag
-            content = first.get().getAdditionalInfo().replace("<", "&lt;").replace(">", "&gt;");
-        } else {
-            content = first.get().getAdditionalInfo();
+        if (first.isPresent()) {
+            String name = first.get().getName();
+            Map<String, String> parameters = Map.of("title", name.substring(0, name.indexOf("=")), "content", name.substring(name.indexOf("=")+1));
+            Window window = (Window) Executions.createComponents("~./zul/components/file-display.zul", null, parameters);
+            window.doModal();
         }
-        Map<String, String> parameters = Map.of("title", first.get().getFoundString(), "content", content);
-        Window window = (Window) Executions.createComponents("~./zul/components/file-display.zul", null, parameters);
-        window.doModal();
+    }
+
+    public boolean isLabelLengthNormal(String label) {
+
+        int length = label.substring(label.indexOf("=")).length();
+        return true;
+    }
+
+    public boolean isLabelLengthTooBig(String label) {
+
+        int length = label.substring(label.indexOf("=")).length();
+        return true;
     }
 
     public boolean isSkipKubeNamespaces() {
@@ -284,6 +303,15 @@ public class LabelsVM implements EventListener {
         this.labelsModel.setSkipKubeNamespaces(skipKubeNamespaces);
     }
 
+    public boolean isSkipHashLabels() {
+        return labelsModel.isSkipHashLabels();
+    }
+
+    public void setSkipHashLabels(boolean skipHashLabels) {
+        this.labelsModel.setSkipHashLabels(skipHashLabels);
+    }
+
+
     public String getSelectedNamespace() {
         return labelsModel.getSelectedNamespace();
     }
@@ -291,14 +319,6 @@ public class LabelsVM implements EventListener {
     public LabelsVM setSelectedNamespace(String selectedNamespace) {
         this.labelsModel.setSelectedNamespace(selectedNamespace);
         return this;
-    }
-
-    public String getSearchString() {
-        return this.labelsModel.getSearchString();
-    }
-
-    public void setSearchString(String searchString) {
-        this.labelsModel.setSearchString(searchString);
     }
 
     public LabelsFilter getFilter() {

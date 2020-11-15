@@ -50,13 +50,26 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.StreamSupport;
 
+import static com.kubehelper.common.Resource.CLUSTER_ROLE;
+import static com.kubehelper.common.Resource.CLUSTER_ROLE_BINDING;
 import static com.kubehelper.common.Resource.CONFIG_MAP;
+import static com.kubehelper.common.Resource.DAEMON_SET;
 import static com.kubehelper.common.Resource.DEPLOYMENT;
 import static com.kubehelper.common.Resource.ENV_VARIABLE;
+import static com.kubehelper.common.Resource.JOB;
 import static com.kubehelper.common.Resource.NAMESPACE;
+import static com.kubehelper.common.Resource.NETWORK_POLICY;
+import static com.kubehelper.common.Resource.PERSISTENT_VOLUME;
+import static com.kubehelper.common.Resource.PERSISTENT_VOLUME_CLAIM;
 import static com.kubehelper.common.Resource.POD;
+import static com.kubehelper.common.Resource.POD_DISRUPTION_BUDGET;
+import static com.kubehelper.common.Resource.POD_SECURITY_POLICY;
 import static com.kubehelper.common.Resource.REPLICA_SET;
+import static com.kubehelper.common.Resource.ROLE;
+import static com.kubehelper.common.Resource.ROLE_BINDING;
+import static com.kubehelper.common.Resource.SECRET;
 import static com.kubehelper.common.Resource.SERVICE;
+import static com.kubehelper.common.Resource.SERVICE_ACCOUNT;
 import static com.kubehelper.common.Resource.STATEFUL_SET;
 
 /**
@@ -81,7 +94,12 @@ public class SearchVM implements EventListener {
         add(STATEFUL_SET);
         add(REPLICA_SET);
         add(ENV_VARIABLE);
+        add(DAEMON_SET);
+        add(SERVICE_ACCOUNT);
+        add(SERVICE);
     }};
+    private List<Resource> searchResources = Arrays.asList(ENV_VARIABLE, POD, CONFIG_MAP, SECRET, SERVICE_ACCOUNT, SERVICE, DAEMON_SET, DEPLOYMENT, REPLICA_SET, STATEFUL_SET, JOB, NAMESPACE,
+            PERSISTENT_VOLUME_CLAIM, PERSISTENT_VOLUME, CLUSTER_ROLE_BINDING, CLUSTER_ROLE, ROLE_BINDING, ROLE, NETWORK_POLICY, POD_DISRUPTION_BUDGET, POD_SECURITY_POLICY);
     private ListModelList<SearchResult> searchResults = new ListModelList<>();
 
     private SearchModel searchModel;
@@ -115,9 +133,9 @@ public class SearchVM implements EventListener {
     @NotifyChange({"totalItems", "searchResults", "filter"})
     public void search() {
         searchModel.setFilter(new SearchFilter());
+        searchModel.setSearchExceptions(new ArrayList<>());
         searchService.search(searchModel, selectedResources);
         searchModel.setNamespaces(commonService.getAllNamespaces());
-        searchModel.setSearchExceptions(new ArrayList<>());
         clearAllFilterComboboxes();
         isSearchButtonPressed = true;
         logger.info("Found {} namespaces.", searchModel.getNamespaces());
@@ -214,7 +232,7 @@ public class SearchVM implements EventListener {
      */
     private void createKubeResourcesCheckboxes() {
         Vbox checkboxesVLayout = (Vbox) Path.getComponent("//indexPage/templateInclude/kubeResourcesVBox");
-        StreamSupport.stream(Iterables.partition(Arrays.asList(Resource.values()), 10).spliterator(), false).forEach(list -> {
+        StreamSupport.stream(Iterables.partition(searchResources, 10).spliterator(), false).forEach(list -> {
             Hbox hbox = createNewHbox();
             for (Resource resource : list) {
                 Checkbox resourceCheckbox = new Checkbox(Resource.getValueByKey(resource.name()));

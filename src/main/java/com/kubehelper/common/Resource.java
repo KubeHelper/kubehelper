@@ -30,18 +30,17 @@ public enum Resource {
     CUSTOM_RESOURCE_DEFINITION("CustomResourceDefinition"),
 //    API_SERVICE("APIService"),
 //    CONTROLLER_REVISION("ControllerRevision"),
-//    TODO Move forward later for search gui
     DAEMON_SET("DaemonSet"),
     DEPLOYMENT("Deployment"),
     REPLICA_SET("ReplicaSet"),
     STATEFUL_SET("StatefulSet"),
-    TOKEN_REVIEW("TokenReview"),
+//    TOKEN_REVIEW("TokenReview"), //just skipped
 //    LOCAL_SUBJECT_ACCESS_REVIEW("LocalSubjectAccessReview"), //just skipped
 //    SELF_SUBJECT_ACCESS_REVIEW("SelfSubjectAccessReview"), //just skipped
 //    SELF_SUBJECT_RULES_REVIEW("SelfSubjectRulesReview"), //just skipped
 //    SUBJECT_ACCESS_REVIEW("SubjectAccessReview"), //just skipped
 //    HORIZONTAL_POD_AUTOSCALER("HorizontalPodAutoscaler"), //just skipped
-    CRON_JOB("CronJob"),
+//    CRON_JOB("CronJob"),  //just skipped
     JOB("Job"),
 //    CERTIFICATE_SIGNING_REQUEST("CertificateSigningRequest"), //just skipped
 //    LEASE("Lease"), //just skipped

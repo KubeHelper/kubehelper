@@ -7,7 +7,7 @@ import org.zkoss.zul.ListModelList;
  * @author JDev
  */
 public class SearchFilter {
-    private String namespace = "", resourceType = "", resourceName = "", creationTime = "", foundString = "", additionalInfo = "";
+    private String namespace = "", creationTime = "", foundString = "", additionalInfo = "";
 
     private String selectedNamespaceFilter = "";
     private String selectedResourceTypeFilter = "";
@@ -50,24 +50,6 @@ public class SearchFilter {
         return this;
     }
 
-    public String getResourceType() {
-        return resourceType;
-    }
-
-    public SearchFilter setResourceType(String resourceType) {
-        this.resourceType = resourceType == null ? "" : resourceType.trim();
-        return this;
-    }
-
-    public String getResourceName() {
-        return resourceName;
-    }
-
-    public SearchFilter setResourceName(String resourceName) {
-        this.resourceName = resourceName == null ? "" : resourceName.trim();
-        return this;
-    }
-
     public String getCreationTime() {
         return creationTime;
     }
@@ -96,7 +78,7 @@ public class SearchFilter {
     }
 
     public boolean isFilterActive() {
-        return StringUtils.isNoneBlank(namespace, resourceType, resourceName, creationTime, foundString, additionalInfo, selectedNamespaceFilter, selectedResourceTypeFilter, selectedResourceNameFilter);
+        return StringUtils.isNoneBlank(namespace, creationTime, foundString, additionalInfo, selectedNamespaceFilter, selectedResourceTypeFilter, selectedResourceNameFilter);
     }
 
     public ListModelList<String> getNamespacesFilter() {

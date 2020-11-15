@@ -7,19 +7,22 @@ import org.zkoss.zul.ListModelList;
  * @author JDev
  */
 public class LabelsFilter {
-    private String namespace = "", resourceType = "", resourceName = "", foundString = "", additionalInfo = "";
+    private String name = "", additionalInfo = "";
 
     private String selectedNamespaceFilter = "";
     private String selectedResourceTypeFilter = "";
+    private String selectedResourcePropertyFilter = "";
     private String selectedResourceNameFilter = "";
 
     private ListModelList<String> namespacesFilter = new ListModelList<>();
     private ListModelList<String> resourceTypesFilter = new ListModelList<>();
+    private ListModelList<String> resourcePropertiesFilter = new ListModelList<>();
     private ListModelList<String> resourceNamesFilter = new ListModelList<>();
 
     public LabelsFilter() {
         namespacesFilter.clear();
         resourceTypesFilter.clear();
+        resourcePropertiesFilter.clear();
         resourceNamesFilter.clear();
     }
 
@@ -41,39 +44,36 @@ public class LabelsFilter {
         }
     }
 
-    public String getNamespace() {
-        return namespace;
+    public void addResourcePropertiesFilter(String resourcePropertyFilter) {
+        if (!resourcePropertiesFilter.contains(resourcePropertyFilter)) {
+            resourcePropertiesFilter.add(resourcePropertyFilter);
+        }
     }
 
-    public LabelsFilter setNamespace(String namespace) {
-        this.namespace = namespace == null ? "" : namespace.trim();
+    public String getName() {
+        return name;
+    }
+
+    public LabelsFilter setName(String name) {
+        this.name = name;
         return this;
     }
 
-    public String getResourceType() {
-        return resourceType;
+    public String getSelectedResourcePropertyFilter() {
+        return selectedResourcePropertyFilter;
     }
 
-    public LabelsFilter setResourceType(String resourceType) {
-        this.resourceType = resourceType == null ? "" : resourceType.trim();
+    public LabelsFilter setSelectedResourcePropertyFilter(String selectedResourcePropertyFilter) {
+        this.selectedResourcePropertyFilter = selectedResourcePropertyFilter == null ? "" : selectedResourcePropertyFilter;
         return this;
     }
 
-    public String getResourceName() {
-        return resourceName;
+    public ListModelList<String> getResourcePropertiesFilter() {
+        return resourcePropertiesFilter;
     }
 
-    public LabelsFilter setResourceName(String resourceName) {
-        this.resourceName = resourceName == null ? "" : resourceName.trim();
-        return this;
-    }
-
-    public String getFoundString() {
-        return foundString;
-    }
-
-    public LabelsFilter setFoundString(String foundString) {
-        this.foundString = foundString;
+    public LabelsFilter setResourcePropertiesFilter(ListModelList<String> resourcePropertiesFilter) {
+        this.resourcePropertiesFilter = resourcePropertiesFilter;
         return this;
     }
 
@@ -87,7 +87,7 @@ public class LabelsFilter {
     }
 
     public boolean isFilterActive() {
-        return StringUtils.isNoneBlank(namespace, resourceType, resourceName, foundString, additionalInfo, selectedNamespaceFilter, selectedResourceTypeFilter, selectedResourceNameFilter);
+        return StringUtils.isNoneBlank(name, additionalInfo, selectedNamespaceFilter, selectedResourceTypeFilter, selectedResourcePropertyFilter, selectedResourceNameFilter);
     }
 
     public ListModelList<String> getNamespacesFilter() {
