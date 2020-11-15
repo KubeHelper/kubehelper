@@ -2,59 +2,62 @@
     <div id="searchTemplate" viewModel="@id('searchVM') @init('com.kubehelper.viewmodels.SearchVM')" width="100%" height="100%">
         <borderlayout>
             <north title="Search" collapsible="true" vflex="min" style="overflow-y:auto;overflow-x: hidden;">
-                <vbox height="100%" width="100%">
-                    <hbox height="100%" width="100%" align="center" style="margin: 5px;">
-                        <cell id="clearAllCell" width="10%" tooltip="clearAllTooltip">
-                            <button id="clearAll" iconSclass="z-icon-eraser" label="Clear all" width="100%" onClick="@command('clearAll')"/>
-                        </cell>
-                        <cell width="3%">
-                            <separator hflex="1" orient="horizontal"/>
-                        </cell>
-                        <cell width="38.6%">
-                            <hlayout valign="middle">
-                                <label value="Namespace: "/>
-                                <combobox tooltip="namespacesTooltip" id="namespacesCBox" hflex="1" model="@load(searchVM.namespaces)" selectedItem="@bind(searchVM.selectedNamespace)"
-                                          readonly="true">
-                                    <template name="model">
-                                        <comboitem label="@load(each)"/>
-                                    </template>
-                                </combobox>
-                            </hlayout>
-                        </cell>
-                        <cell width="2%">
-                            <separator hflex="1" orient="horizontal"/>
-                        </cell>
-                        <cell width="10%">
-                            <hlayout valign="middle">
-                                <checkbox id="skipKubeNamespacesCBox" checked="@bind(searchVM.skipKubeNamespaces)" tooltip="skipKubeNamespacesTooltip"/>Skip kube* namespaces
-                            </hlayout>
-                        </cell>
-                        <cell width="2%">
-                            <separator hflex="1" orient="horizontal"/>
-                        </cell>
-                        <cell width="10%">
-                            <hlayout valign="middle">
-                                <checkbox id="skipNativeEnvVarsCBox" checked="@bind(searchVM.skipNativeEnvVars)" tooltip="skipNativeEnvVarsTooltip"/>Skip native Env variables
-                            </hlayout>
-                        </cell>
-                        <cell width="4%">
-                            <separator hflex="1" orient="horizontal"/>
-                        </cell>
-                        <cell id="cellSearchBtn" width="20%">
-                            <button id="searchBtn" label="Search" iconSclass="z-icon-search" width="100%" onClick="@command('search')"/>
-                        </cell>
-                        <cell width="0.4%">
-                            <separator hflex="1" orient="horizontal"/>
-                        </cell>
-                    </hbox>
-                    <groupbox id="kubeResourcesGBox" width="100%" style="padding: 5px;">
-                        <caption>
-                            <checkbox id="kubeResourcesGBoxCheckAll" checked="true" onCheck="@command('selectAllResources')"/>Resources
-                        </caption>
-                        <vbox id="kubeResourcesVBox" spacing="1" align="center" width="100%">
-                        </vbox>
-                    </groupbox>
-                </vbox>
+                <groupbox id="labelsConfigGroupBox" width="100%" style="margin: 0px 5px 5px 5px;">
+                    <caption iconSclass="z-icon-sliders" label="Search Configuration"/>
+                    <vbox height="100%" width="100%">
+                        <hbox height="100%" width="100%" align="center" style="margin: 5px;">
+                            <cell id="clearAllCell" width="10%" tooltip="clearAllTooltip">
+                                <button id="clearAll" iconSclass="z-icon-eraser" label="Clear all" width="100%" onClick="@command('clearAll')"/>
+                            </cell>
+                            <cell width="3%">
+                                <separator hflex="1" orient="horizontal"/>
+                            </cell>
+                            <cell width="38.6%">
+                                <hlayout valign="middle">
+                                    <label value="Namespace: "/>
+                                    <combobox tooltip="namespacesTooltip" id="namespacesCBox" hflex="1" model="@load(searchVM.namespaces)" selectedItem="@bind(searchVM.selectedNamespace)"
+                                              readonly="true">
+                                        <template name="model">
+                                            <comboitem label="@load(each)"/>
+                                        </template>
+                                    </combobox>
+                                </hlayout>
+                            </cell>
+                            <cell width="2%">
+                                <separator hflex="1" orient="horizontal"/>
+                            </cell>
+                            <cell width="10%">
+                                <hlayout valign="middle">
+                                    <checkbox id="skipKubeNamespacesCBox" checked="@bind(searchVM.skipKubeNamespaces)" tooltip="skipKubeNamespacesTooltip"/>Skip kube* namespaces
+                                </hlayout>
+                            </cell>
+                            <cell width="2%">
+                                <separator hflex="1" orient="horizontal"/>
+                            </cell>
+                            <cell width="10%">
+                                <hlayout valign="middle">
+                                    <checkbox id="skipNativeEnvVarsCBox" checked="@bind(searchVM.skipNativeEnvVars)" tooltip="skipNativeEnvVarsTooltip"/>Skip native Env variables
+                                </hlayout>
+                            </cell>
+                            <cell width="4%">
+                                <separator hflex="1" orient="horizontal"/>
+                            </cell>
+                            <cell id="cellSearchBtn" width="20%">
+                                <button id="searchBtn" label="Search" iconSclass="z-icon-search" width="100%" onClick="@command('search')"/>
+                            </cell>
+                            <cell width="0.4%">
+                                <separator hflex="1" orient="horizontal"/>
+                            </cell>
+                        </hbox>
+                        <groupbox id="kubeResourcesGBox" width="100%" style="padding: 5px;">
+                            <caption>
+                                <checkbox id="kubeResourcesGBoxCheckAll" checked="true" onCheck="@command('selectAllResources')"/>Resources
+                            </caption>
+                            <vbox id="kubeResourcesVBox" spacing="1" align="center" width="100%">
+                            </vbox>
+                        </groupbox>
+                    </vbox>
+                </groupbox>
             </north>
             <center margins="0,3,3,3" vflex="max">
                 <!--                <div height="100%" style="overflow-y:auto;overflow-x: hidden;">-->

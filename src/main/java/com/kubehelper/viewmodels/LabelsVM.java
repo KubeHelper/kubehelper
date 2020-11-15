@@ -126,11 +126,12 @@ public class LabelsVM implements EventListener {
     }
 
     @Command
-    @NotifyChange({"totalItems", "searchResults", "filter"})
+    @NotifyChange({"totalItems", "searchResults", "filter", "groupedLabels", "groupedLabelsDetails"})
     public void search() {
         labelsModel.setFilter(new LabelsFilter());
         labelsModel.setSearchExceptions(new ArrayList<>());
         labelsService.search(labelsModel, selectedResources);
+        labelsModel.groupSearchResults();
         labelsModel.setNamespaces(commonService.getAllNamespaces());
         clearAllFilterComboboxes();
         isSearchButtonPressed = true;
@@ -277,7 +278,7 @@ public class LabelsVM implements EventListener {
         Optional<LabelResult> first = searchResults.getInnerList().stream().filter(item -> item.getId() == id).findFirst();
         if (first.isPresent()) {
             String name = first.get().getName();
-            Map<String, String> parameters = Map.of("title", name.substring(0, name.indexOf("=")), "content", name.substring(name.indexOf("=")+1));
+            Map<String, String> parameters = Map.of("title", name.substring(0, name.indexOf("=")), "content", name.substring(name.indexOf("=") + 1));
             Window window = (Window) Executions.createComponents("~./zul/components/file-display.zul", null, parameters);
             window.doModal();
         }
@@ -352,6 +353,14 @@ public class LabelsVM implements EventListener {
         }
         isSearchButtonPressed = false;
         return searchResults;
+    }
+
+    public List<LabelsModel.GroupedLabel> getGroupedLabels() {
+        return labelsModel.getGroupedLabels();
+    }
+
+    public List<LabelResult> getGroupedLabelDetail(String name) {
+        return labelsModel.getGroupedLabelDetail(name);
     }
 
     public List<String> getNamespaces() {

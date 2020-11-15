@@ -1,8 +1,9 @@
 <zk>
     <div id="ipsAndPortsTemplate" viewModel="@id('ipsAndPortsVM') @init('com.kubehelper.viewmodels.IpsAndPortsVM')" width="100%" height="100%">
         <borderlayout>
-            <center margins="0,3,3,3" title="Ips And Ports">
-                <div>
+            <north title="Ips Ports" collapsible="true" vflex="min" style="overflow-y:auto;overflow-x: hidden;">
+                <groupbox id="ipsAndPortsConfigGroupBox" width="100%" style="margin: 0px 5px 5px 5px;">
+                    <caption iconSclass="z-icon-sliders" label="Search Configuration"/>
                     <vbox height="100%" width="100%">
                         <hbox id="menuHbox" height="100%" width="100%" style="margin: 5px;" align="stretch">
                             <cell id="clearAllCell" width="10%" tooltip="clearAllTooltip">
@@ -34,77 +35,78 @@
                         </hbox>
                     </vbox>
                     <separator width="100%" orient="horizontal" bar="false"/>
-                    <!--                    <grid id="ipsAndPortsGrid" model="@load(ipsAndPortsVM.ipsAndPortsResults)" height="@bind(ipsAndPortsVM.ipsAndPortsGridHeight)">-->
-                    <!--            TODO Paging and vflex="min" for center and remove height-->
-                    <grid id="ipsAndPortsGrid" model="@load(ipsAndPortsVM.ipsAndPortsResults)" height="700px">
-                        <auxhead id="ipsAndPortsGridAuxHead">
-                            <auxheader>
-                                <span sclass="z-icon-hashtag"/>
-                            </auxheader>
-                            <auxheader colspan="1">
-                                <span sclass="z-icon-filter"/>
-                                <textbox instant="true" width="80%" value="@bind(ipsAndPortsVM.filter.ip)" onChange="@command('filterIps')"/>
-                            </auxheader>
-                            <auxheader colspan="1">
-                                <span sclass="z-icon-filter"/>
-                                <textbox instant="true" width="80%" value="@bind(ipsAndPortsVM.filter.ports)" onChange="@command('filterIps')"/>
-                            </auxheader>
-                            <auxheader colspan="1">
-                                <span sclass="z-icon-filter"/>
-                                <textbox instant="true" width="80%" value="@bind(ipsAndPortsVM.filter.resourceName)" onChange="@command('filterIps')"/>
-                            </auxheader>
-                            <auxheader colspan="1">
-                                <span sclass="z-icon-filter"/>
-                                <textbox instant="true" width="80%" value="@bind(ipsAndPortsVM.filter.namespace)" onChange="@command('filterIps')"/>
-                            </auxheader>
-                            <auxheader colspan="1">
-                                <span sclass="z-icon-filter"/>
-                                <textbox instant="true" width="80%" value="@bind(ipsAndPortsVM.filter.resourceType)" onChange="@command('filterIps')"/>
-                            </auxheader>
-                            <auxheader colspan="1">
-                                <span sclass="z-icon-filter"/>
-                                <textbox instant="true" width="80%" value="@bind(ipsAndPortsVM.filter.hostInfo)" onChange="@command('filterIps')"/>
-                            </auxheader>
-                            <auxheader colspan="1">
-                                <span sclass="z-icon-filter"/>
-                                <textbox instant="true" width="80%" value="@bind(ipsAndPortsVM.filter.additionalInfo)" onChange="@command('filterIps')"/>
-                            </auxheader>
-                            <auxheader colspan="1">
-                                <span sclass="z-icon-filter"/>
-                                <textbox instant="true" width="80%" value="@bind(ipsAndPortsVM.filter.creationTime)" onChange="@command('filterIps')"/>
-                            </auxheader>
-                        </auxhead>
-                        <columns menupopup="auto" sizable="true">
-                            <column hflex="min" label="Id" sort="auto(id)"/>
-                            <column hflex="1" label="IP" sort="auto(ip)"/>
-                            <column hflex="1" label="Container Ports" sort="auto(ports)"/>
-                            <column hflex="1" label="Resource Name" tooltiptext="Kubernetes Resource Name: [Pod containers]" sort="auto(resourceName)"/>
-                            <column hflex="min" label="Namespace" sort="auto(namespace)"/>
-                            <column hflex="min" label="Resource Type" sort="auto(resourceType)"/>
-                            <column hflex="min" label="Host Info" tooltiptext="Node/Host Name: [Node IP]" sort="auto(hostInfo)"/>
-                            <column hflex="1" label="Additional Info" sort="auto(additionalInfo)"/>
-                            <column hflex="min" label="Creation Time" sort="auto(creationTime)"/>
-                        </columns>
-                        <rows>
-                            <template name="model" var="item">
-                                <row onClick="@command('getDetails', clickedItem=item)" style="cursor:pointer">
-                                    <label value="${item.id}" sort="auto(id)"/>
-                                    <label value="${item.ip}" multiline="true" sort="auto(ip)"/>
-                                    <label value="${item.ports}" multiline="true"/>
-                                    <label value="${item.resourceName}" sort="auto(resourceName)"/>
-                                    <label value="${item.namespace}" sort="auto(namespace)"/>
-                                    <label value="${item.resourceType}" sort="auto(resourceType)"/>
-                                    <label value="${item.hostInfo}"/>
-                                    <label value="${item.additionalInfo}" multiline="true"/>
-                                    <label value="${item.creationTime}" sort="auto(creationTime)"/>
-                                </row>
-                            </template>
-                        </rows>
-                        <foot>
-                            <footer id="ipsAndPortsGridFooter" span="9" align="right" label="@load(ipsAndPortsVM.totalItems)"/>
-                        </foot>
-                    </grid>
-                </div>
+                </groupbox>
+            </north>
+            <center margins="0,3,3,3">
+                <!--            TODO Paging and vflex="min" for center and remove height-->
+                <grid id="ipsAndPortsGrid" model="@load(ipsAndPortsVM.ipsAndPortsResults)" height="700px">
+                    <auxhead id="ipsAndPortsGridAuxHead">
+                        <auxheader>
+                            <span sclass="z-icon-hashtag"/>
+                        </auxheader>
+                        <auxheader colspan="1">
+                            <span sclass="z-icon-filter"/>
+                            <textbox instant="true" width="80%" value="@bind(ipsAndPortsVM.filter.ip)" onChange="@command('filterIps')"/>
+                        </auxheader>
+                        <auxheader colspan="1">
+                            <span sclass="z-icon-filter"/>
+                            <textbox instant="true" width="80%" value="@bind(ipsAndPortsVM.filter.ports)" onChange="@command('filterIps')"/>
+                        </auxheader>
+                        <auxheader colspan="1">
+                            <span sclass="z-icon-filter"/>
+                            <textbox instant="true" width="80%" value="@bind(ipsAndPortsVM.filter.resourceName)" onChange="@command('filterIps')"/>
+                        </auxheader>
+                        <auxheader colspan="1">
+                            <span sclass="z-icon-filter"/>
+                            <textbox instant="true" width="80%" value="@bind(ipsAndPortsVM.filter.namespace)" onChange="@command('filterIps')"/>
+                        </auxheader>
+                        <auxheader colspan="1">
+                            <span sclass="z-icon-filter"/>
+                            <textbox instant="true" width="80%" value="@bind(ipsAndPortsVM.filter.resourceType)" onChange="@command('filterIps')"/>
+                        </auxheader>
+                        <auxheader colspan="1">
+                            <span sclass="z-icon-filter"/>
+                            <textbox instant="true" width="80%" value="@bind(ipsAndPortsVM.filter.hostInfo)" onChange="@command('filterIps')"/>
+                        </auxheader>
+                        <auxheader colspan="1">
+                            <span sclass="z-icon-filter"/>
+                            <textbox instant="true" width="80%" value="@bind(ipsAndPortsVM.filter.additionalInfo)" onChange="@command('filterIps')"/>
+                        </auxheader>
+                        <auxheader colspan="1">
+                            <span sclass="z-icon-filter"/>
+                            <textbox instant="true" width="80%" value="@bind(ipsAndPortsVM.filter.creationTime)" onChange="@command('filterIps')"/>
+                        </auxheader>
+                    </auxhead>
+                    <columns menupopup="auto" sizable="true">
+                        <column hflex="min" label="Id" sort="auto(id)"/>
+                        <column hflex="1" label="IP" sort="auto(ip)"/>
+                        <column hflex="1" label="Container Ports" sort="auto(ports)"/>
+                        <column hflex="1" label="Resource Name" tooltiptext="Kubernetes Resource Name: [Pod containers]" sort="auto(resourceName)"/>
+                        <column hflex="min" label="Namespace" sort="auto(namespace)"/>
+                        <column hflex="min" label="Resource Type" sort="auto(resourceType)"/>
+                        <column hflex="min" label="Host Info" tooltiptext="Node/Host Name: [Node IP]" sort="auto(hostInfo)"/>
+                        <column hflex="1" label="Additional Info" sort="auto(additionalInfo)"/>
+                        <column hflex="min" label="Creation Time" sort="auto(creationTime)"/>
+                    </columns>
+                    <rows>
+                        <template name="model" var="item">
+                            <row onClick="@command('getDetails', clickedItem=item)" style="cursor:pointer">
+                                <label value="${item.id}" sort="auto(id)"/>
+                                <label value="${item.ip}" multiline="true" sort="auto(ip)"/>
+                                <label value="${item.ports}" multiline="true"/>
+                                <label value="${item.resourceName}" sort="auto(resourceName)"/>
+                                <label value="${item.namespace}" sort="auto(namespace)"/>
+                                <label value="${item.resourceType}" sort="auto(resourceType)"/>
+                                <label value="${item.hostInfo}"/>
+                                <label value="${item.additionalInfo}" multiline="true"/>
+                                <label value="${item.creationTime}" sort="auto(creationTime)"/>
+                            </row>
+                        </template>
+                    </rows>
+                    <foot>
+                        <footer id="ipsAndPortsGridFooter" span="9" align="right" label="@load(ipsAndPortsVM.totalItems)"/>
+                    </foot>
+                </grid>
             </center>
             <!--            <south size="15%" splittable="true" collapsible="true" margins="0,0,3,3" onOpen="@command('updateGridHeightOnSouthPanelChange')" style="overflow-y:auto;overflow-x: hidden;padding: 7px;">-->
             <south size="20%" splittable="true" collapsible="true" margins="0,0,3,3" style="overflow-y:auto;overflow-x: hidden;padding: 7px;">

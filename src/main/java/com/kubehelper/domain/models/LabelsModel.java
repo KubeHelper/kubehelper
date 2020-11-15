@@ -8,7 +8,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.zkoss.zul.ListModelList;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author JDev
@@ -26,6 +30,8 @@ public class LabelsModel implements PageModel {
     private List<KubeHelperException> searchExceptions = new ArrayList<>();
     private boolean skipKubeNamespaces = true;
     private boolean skipHashLabels = true;
+    private Map<String, List<LabelResult>> groupedSearchResults = new HashMap<>();
+    private List<GroupedLabel> groupedLabels = new ArrayList<>();
 
     public LabelsModel() {
     }
@@ -43,6 +49,29 @@ public class LabelsModel implements PageModel {
             filter.addResourceNamesFilter(resourceName);
         }
         return this;
+    }
+
+    public void groupSearchResults() {
+        groupedSearchResults.clear();
+        groupedLabels.clear();
+        for (LabelResult searchResult : searchResults) {
+            if (groupedSearchResults.containsKey(searchResult.getName())) {
+                groupedSearchResults.get(searchResult.getName()).add(searchResult);
+                incrementFoundSearchResult(searchResult.getName());
+            } else {
+                groupedSearchResults.put(searchResult.getName(), new ArrayList<>(Arrays.asList(searchResult)));
+                groupedLabels.add(new GroupedLabel(groupedLabels.size() + 1).setName(searchResult.getName()).setAmount(1));
+            }
+        }
+    }
+
+    private void incrementFoundSearchResult(String name) {
+        for (GroupedLabel groupedLabel : groupedLabels) {
+            if (groupedLabel.getName().equals(name)) {
+                groupedLabel.setAmount(groupedLabel.getAmount() + 1);
+                break;
+            }
+        }
     }
 
     public void addSearchException(Exception exception) {
@@ -141,4 +170,51 @@ public class LabelsModel implements PageModel {
         this.skipHashLabels = skipHashLabels;
         return this;
     }
+
+    public List<GroupedLabel> getGroupedLabels() {
+        return groupedLabels;
+    }
+
+    public List<LabelResult> getGroupedLabelDetail(String name) {
+        return groupedSearchResults.get(name);
+    }
+
+    public class GroupedLabel {
+        private int id;
+        private String name = "";
+        private int amount;
+
+        public GroupedLabel(int id) {
+            this.id = id;
+        }
+
+        public int getId() {
+            return id;
+        }
+
+        public GroupedLabel setId(int id) {
+            this.id = id;
+            return this;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public GroupedLabel setName(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public int getAmount() {
+            return amount;
+        }
+
+        public GroupedLabel setAmount(int amount) {
+            this.amount = amount;
+            return this;
+        }
+    }
 }
+
+
