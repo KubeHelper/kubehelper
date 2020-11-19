@@ -30,6 +30,7 @@ import io.kubernetes.client.openapi.models.V1SecretList;
 import io.kubernetes.client.openapi.models.V1ServiceAccountList;
 import io.kubernetes.client.openapi.models.V1ServiceList;
 import io.kubernetes.client.openapi.models.V1StatefulSetList;
+import io.kubernetes.client.openapi.models.V1alpha1PodPresetList;
 import io.kubernetes.client.openapi.models.V1beta1ClusterRoleBindingList;
 import io.kubernetes.client.openapi.models.V1beta1ClusterRoleList;
 import io.kubernetes.client.openapi.models.V1beta1PodDisruptionBudgetList;
@@ -73,12 +74,19 @@ public class KubeAPI {
     @Autowired
     private PolicyV1beta1Api policyV1beta1Api;
 
-    public void testApis() throws IOException {
-        AuthenticationV1Api authenticationApi = new AuthenticationV1Api(Config.defaultClient());
-        SettingsV1alpha1Api settingsApi = new SettingsV1alpha1Api(Config.defaultClient());
-        AuthorizationV1Api authorizationApi = new AuthorizationV1Api(Config.defaultClient()); //TOKEn REVIEW
-        DiscoveryV1beta1Api discoveryApi = new DiscoveryV1beta1Api(Config.defaultClient());
-        AuditregistrationV1alpha1Api auditregistrationApi = new AuditregistrationV1alpha1Api(Config.defaultClient());
+    public void testApis() {
+        try {
+            AuthenticationV1Api authenticationApi = new AuthenticationV1Api(Config.defaultClient());
+            SettingsV1alpha1Api settingsApi = new SettingsV1alpha1Api(Config.defaultClient());
+            V1alpha1PodPresetList v1alpha1PodPresetList = settingsApi.listPodPresetForAllNamespaces(null, null, null, null, null, null, null, null, null);
+            AuthorizationV1Api authorizationApi = new AuthorizationV1Api(Config.defaultClient()); //TOKEn REVIEW
+            DiscoveryV1beta1Api discoveryApi = new DiscoveryV1beta1Api(Config.defaultClient());
+            AuditregistrationV1alpha1Api auditregistrationApi = new AuditregistrationV1alpha1Api(Config.defaultClient());
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ApiException e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -230,25 +238,6 @@ public class KubeAPI {
         return new V1StatefulSetList();
     }
 
-
-    /**
-     * Get pods list depends on namespace.
-     *
-     * @param selectedNamespace - selected namespace. all - all namespaces.
-     * @return - list with found pods.
-     */
-    public V1PodList getV1PodList(String selectedNamespace) {
-        try {
-            if ("all".equals(selectedNamespace)) {
-                return apiV1.listPodForAllNamespaces(null, null, null, null, null, null, null, null, null);
-            } else {
-                return apiV1.listNamespacedPod(selectedNamespace, null, null, null, null, null, null, null, null, null);
-            }
-        } catch (ApiException e) {
-            showErrorDialog(e);
-        }
-        return new V1PodList();
-    }
 
     /**
      * Get services list depends on namespace.

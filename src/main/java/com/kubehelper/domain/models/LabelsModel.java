@@ -2,7 +2,11 @@ package com.kubehelper.domain.models;
 
 import com.kubehelper.common.Global;
 import com.kubehelper.common.KubeHelperException;
+import com.kubehelper.common.Resource;
+import com.kubehelper.common.ResourceProperty;
 import com.kubehelper.domain.filters.LabelsFilter;
+import com.kubehelper.domain.filters.LabelsGroupedColumnsFilter;
+import com.kubehelper.domain.filters.LabelsGroupedFilter;
 import com.kubehelper.domain.results.LabelResult;
 import org.apache.commons.lang3.StringUtils;
 import org.zkoss.zul.ListModelList;
@@ -12,7 +16,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * @author JDev
@@ -27,11 +30,14 @@ public class LabelsModel implements PageModel {
     private List<String> namespaces = new ArrayList<>();
     private ListModelList<LabelResult> searchResults = new ListModelList<>();
     private LabelsFilter filter = new LabelsFilter();
+    private LabelsGroupedColumnsFilter groupedColumnsFilter = new LabelsGroupedColumnsFilter();
+    private LabelsGroupedFilter groupedFilter = new LabelsGroupedFilter();
     private List<KubeHelperException> searchExceptions = new ArrayList<>();
     private boolean skipKubeNamespaces = true;
     private boolean skipHashLabels = true;
     private Map<String, List<LabelResult>> groupedSearchResults = new HashMap<>();
     private List<GroupedLabel> groupedLabels = new ArrayList<>();
+    private List<GroupedLabelColumn> groupedLabelsColumns = new ArrayList<>();
 
     public LabelsModel() {
     }
@@ -63,6 +69,21 @@ public class LabelsModel implements PageModel {
                 groupedLabels.add(new GroupedLabel(groupedLabels.size() + 1).setName(searchResult.getName()).setAmount(1));
             }
         }
+    }
+
+    public LabelsModel setGroupedLabels(List<GroupedLabel> groupedLabels) {
+        this.groupedLabels = groupedLabels;
+        return this;
+    }
+
+    public List<GroupedLabelColumn> getGroupedLabelsColumns() {
+        return groupedLabelsColumns;
+    }
+
+    public LabelsModel setGroupedLabelsColumns(GroupedLabel item) {
+//        groupedSearchResults.get(item.getName());
+        this.groupedLabelsColumns = groupedLabelsColumns;
+        return this;
     }
 
     private void incrementFoundSearchResult(String name) {
@@ -140,6 +161,32 @@ public class LabelsModel implements PageModel {
         return this;
     }
 
+    public LabelsGroupedColumnsFilter getGroupedColumnsFilter() {
+        return groupedColumnsFilter;
+    }
+
+    public LabelsModel setGroupedColumnsFilter(LabelsGroupedColumnsFilter groupedColumnsFilter) {
+        this.groupedColumnsFilter = groupedColumnsFilter;
+        return this;
+    }
+
+    public LabelsGroupedFilter getGroupedFilter() {
+        return groupedFilter;
+    }
+
+    public LabelsModel setGroupedFilter(LabelsGroupedFilter groupedFilter) {
+        this.groupedFilter = groupedFilter;
+        return this;
+    }
+
+    public Map<String, List<LabelResult>> getGroupedSearchResults() {
+        return groupedSearchResults;
+    }
+
+    public void setGroupedSearchResults(Map<String, List<LabelResult>> groupedSearchResults) {
+        this.groupedSearchResults = groupedSearchResults;
+    }
+
     public List<KubeHelperException> getSearchExceptions() {
         return searchExceptions;
     }
@@ -212,6 +259,64 @@ public class LabelsModel implements PageModel {
 
         public GroupedLabel setAmount(int amount) {
             this.amount = amount;
+            return this;
+        }
+    }
+
+    public class GroupedLabelColumn {
+        private int id;
+        private ResourceProperty resourceProperty;
+        private Resource resourceType;
+        private String resourceName = "";
+        private String namespace = "";
+        private String additionalInfo = "";
+
+        public GroupedLabelColumn(int id) {
+            this.id = id;
+        }
+
+        public ResourceProperty getResourceProperty() {
+            return resourceProperty;
+        }
+
+        public GroupedLabelColumn setResourceProperty(ResourceProperty resourceProperty) {
+            this.resourceProperty = resourceProperty;
+            return this;
+        }
+
+        public Resource getResourceType() {
+            return resourceType;
+        }
+
+        public GroupedLabelColumn setResourceType(Resource resourceType) {
+            this.resourceType = resourceType;
+            return this;
+        }
+
+        public String getResourceName() {
+            return resourceName;
+        }
+
+        public GroupedLabelColumn setResourceName(String resourceName) {
+            this.resourceName = resourceName;
+            return this;
+        }
+
+        public String getNamespace() {
+            return namespace;
+        }
+
+        public GroupedLabelColumn setNamespace(String namespace) {
+            this.namespace = namespace;
+            return this;
+        }
+
+        public String getAdditionalInfo() {
+            return additionalInfo;
+        }
+
+        public GroupedLabelColumn setAdditionalInfo(String additionalInfo) {
+            this.additionalInfo = additionalInfo;
             return this;
         }
     }

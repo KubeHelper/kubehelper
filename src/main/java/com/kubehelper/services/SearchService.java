@@ -383,7 +383,7 @@ public class SearchService {
      */
     private void searchInEnvironmentVariables(SearchModel searchModel) {
 
-        List<V1Pod> podList = kubeAPI.getV1PodList(searchModel.getSelectedNamespace()).getItems();
+        List<V1Pod> podList = kubeAPI.getV1PodsList(searchModel.getSelectedNamespace()).getItems();
         for (V1Pod pod : podList) {
 
             //skips search in kube- namespace

@@ -6,6 +6,7 @@ import com.kubehelper.domain.models.IpsAndPortsModel;
 import com.kubehelper.domain.models.LabelsModel;
 import com.kubehelper.domain.models.PageModel;
 import com.kubehelper.domain.models.SearchModel;
+import com.kubehelper.domain.models.SecurityModel;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,7 +36,7 @@ public class Global {
         {
             put(DASHBOARD_MODEL, new DashboardModel());
             put(SEARCH_MODEL, new SearchModel());
-            put(SECURITY_MODEL, new SearchModel());
+            put(SECURITY_MODEL, new SecurityModel());
             put(LABELS_MODEL, new LabelsModel());
             put(AUDITING_MODEL, new SearchModel());
             put(CUSTOM_RESOURCES_MODEL, new SearchModel());

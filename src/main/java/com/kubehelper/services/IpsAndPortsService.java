@@ -82,7 +82,7 @@ public class IpsAndPortsService {
      * @param ipsAndPortsModel - model for @{@link com.kubehelper.viewmodels.IpsAndPortsVM} view.
      */
     private void fillModelWithPodsInfo(IpsAndPortsModel ipsAndPortsModel) {
-        for (V1Pod pod : kubeAPI.getV1PodList(ipsAndPortsModel.getSelectedNamespace()).getItems()) {
+        for (V1Pod pod : kubeAPI.getV1PodsList(ipsAndPortsModel.getSelectedNamespace()).getItems()) {
             IpsAndPortsResult ipsAndPortsResult = new IpsAndPortsResult(ipsAndPortsModel.getIpsAndPortsResults().size() + 1);
             StringJoiner portsJoiner = getStringsJoiner(), containerNamesJoiner = getStringsJoiner();
             String resourceName = pod.getMetadata().getName() + ": ";

@@ -4,6 +4,8 @@ import com.google.common.collect.Iterables;
 import com.kubehelper.common.Global;
 import com.kubehelper.common.Resource;
 import com.kubehelper.domain.filters.LabelsFilter;
+import com.kubehelper.domain.filters.LabelsGroupedColumnsFilter;
+import com.kubehelper.domain.filters.LabelsGroupedFilter;
 import com.kubehelper.domain.models.LabelsModel;
 import com.kubehelper.domain.results.LabelResult;
 import com.kubehelper.services.CommonService;
@@ -195,6 +197,37 @@ public class LabelsVM implements EventListener {
         sortResultsByNamespace();
     }
 
+    //    TODO
+    @Command
+    @NotifyChange({"totalGroupedItems", "groupedLabels"})
+    public void filterGroupedLabels() {
+        searchResults.clear();
+        for (LabelsModel.GroupedLabel groupedLabel : labelsModel.getGroupedLabels()) {
+            if (StringUtils.containsIgnoreCase(groupedLabel.getName(), getGroupedLabelsFilter().getName()) && groupedLabel.getAmount() == getGroupedLabelsFilter().getAmount()) {
+//                searchResults.add(searchResult);
+            }
+        }
+        sortResultsByNamespace();
+    }
+
+    //        TODO
+    @Command
+    @NotifyChange({"totalItems", "searchResults"})
+    public void filterGroupedLabelsColumns() {
+        searchResults.clear();
+        for (LabelResult searchResult : labelsModel.getSearchResults()) {
+            if (StringUtils.containsIgnoreCase(searchResult.getName(), getFilter().getName()) &&
+                    StringUtils.containsIgnoreCase(searchResult.getResourceProperty(), getFilter().getSelectedResourcePropertyFilter()) &&
+                    StringUtils.containsIgnoreCase(searchResult.getResourceType(), getFilter().getSelectedResourceTypeFilter()) &&
+                    StringUtils.containsIgnoreCase(searchResult.getResourceName(), getFilter().getSelectedResourceNameFilter()) &&
+                    StringUtils.containsIgnoreCase(searchResult.getAdditionalInfo(), getFilter().getAdditionalInfo()) &&
+                    StringUtils.containsIgnoreCase(searchResult.getNamespace(), getFilter().getSelectedNamespaceFilter())) {
+                searchResults.add(searchResult);
+            }
+        }
+        sortResultsByNamespace();
+    }
+
     /**
      * Clears all components, model and pull all namespaces again.
      */
@@ -284,6 +317,13 @@ public class LabelsVM implements EventListener {
         }
     }
 
+    @Command
+    @NotifyChange("groupedLabelsColumnGrid")
+    public void showGroupedLabelItems(@BindingParam("clickedItem") LabelsModel.GroupedLabel item) {
+        labelsModel.setGroupedLabelsColumns(item);
+//        detailsLabel = detailsLabel.equals(item.getDetails()) ? "" : item.getDetails();
+    }
+
     public boolean isLabelLengthNormal(String label) {
 
         int length = label.substring(label.indexOf("=")).length();
@@ -326,7 +366,18 @@ public class LabelsVM implements EventListener {
         return labelsModel.getFilter();
     }
 
+    public LabelsGroupedFilter getGroupedLabelsFilter() {
+        return labelsModel.getGroupedFilter();
+    }
+
+    public LabelsGroupedColumnsFilter getGroupedLabelColumnsFilter() {
+        return labelsModel.getGroupedColumnsFilter();
+    }
+
     public String getTotalItems() {
+        return String.format("Total Items: %d", searchResults.size());
+    }
+    public String getTotalGroupedItems() {
         return String.format("Total Items: %d", searchResults.size());
     }
 
@@ -357,6 +408,10 @@ public class LabelsVM implements EventListener {
 
     public List<LabelsModel.GroupedLabel> getGroupedLabels() {
         return labelsModel.getGroupedLabels();
+    }
+
+    public List<LabelsModel.GroupedLabelColumn> getGroupedLabelColumns() {
+        return labelsModel.getGroupedLabelsColumns();
     }
 
     public List<LabelResult> getGroupedLabelDetail(String name) {
