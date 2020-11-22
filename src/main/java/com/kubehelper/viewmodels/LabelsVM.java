@@ -116,6 +116,8 @@ public class LabelsVM implements EventListener {
     private List<Resource> labelResources = Arrays.asList(POD, CONFIG_MAP, SECRET, SERVICE_ACCOUNT, SERVICE, DAEMON_SET, DEPLOYMENT, REPLICA_SET, STATEFUL_SET, JOB, NAMESPACE,
             PERSISTENT_VOLUME_CLAIM, PERSISTENT_VOLUME, CLUSTER_ROLE_BINDING, CLUSTER_ROLE, ROLE_BINDING, ROLE, NETWORK_POLICY, POD_DISRUPTION_BUDGET, POD_SECURITY_POLICY);
     private ListModelList<LabelResult> searchResults = new ListModelList<>();
+    private ListModelList<LabelsModel.GroupedLabel> groupedLabels = new ListModelList<>();
+    private ListModelList<LabelsModel.GroupedLabelColumn> groupedLabelColumns = new ListModelList<>();
 
     private LabelsModel labelsModel;
 
@@ -145,7 +147,7 @@ public class LabelsVM implements EventListener {
     }
 
     @Command
-    @NotifyChange({"totalItems", "searchResults", "filter", "groupedLabels", "groupedLabelsDetails"})
+    @NotifyChange({"totalItems", "searchResults", "filter", "groupedLabels", "groupedLabelsDetails", "totalGroupedItems"})
     public void search() {
         labelsModel.setFilter(new LabelsFilter());
         labelsModel.setSearchExceptions(new ArrayList<>());
@@ -185,6 +187,8 @@ public class LabelsVM implements EventListener {
             filterSearches();
         } else {
             searchResults = new ListModelList<>(labelsModel.getSearchResults());
+            groupedLabels = new ListModelList<>(labelsModel.getGroupedLabels());
+            groupedLabelColumns = new ListModelList<>();
         }
         sortResultsByNamespace();
 //        updateHeightsAndRerenderVM();
@@ -198,7 +202,7 @@ public class LabelsVM implements EventListener {
      * Filters searches and refresh total items label and search results view.
      */
     @Command
-    @NotifyChange({"totalItems", "searchResults"})
+    @NotifyChange({"totalItems", "searchResults", "totalGroupedItems", "groupedLabels", "groupedLabelsFilter", "groupedLabelColumnsFilter"})
     public void filterSearches() {
         searchResults.clear();
         for (LabelResult searchResult : labelsModel.getSearchResults()) {
@@ -211,35 +215,46 @@ public class LabelsVM implements EventListener {
                 searchResults.add(searchResult);
             }
         }
+        labelsModel.reGroupSearchResultsAfterFilter(searchResults);
+        groupedLabels = new ListModelList<>(labelsModel.getGroupedLabels());
+        groupedLabelColumns = new ListModelList<>();
+        labelsModel.setGroupedFilter(new LabelsGroupedFilter())
+                .setGroupedColumnsFilter(new LabelsGroupedColumnsFilter());
         sortResultsByNamespace();
     }
 
-    //    TODO
+    /**
+     * Filters searches and refresh total items group label and group labels results view.
+     */
     @Command
     @NotifyChange({"totalGroupedItems", "groupedLabels"})
     public void filterGroupedLabels() {
-        searchResults.clear();
+        groupedLabels.clear();
+        groupedLabelColumns.clear();
+        labelsModel.getGroupedLabelsColumns().clear();
         for (LabelsModel.GroupedLabel groupedLabel : labelsModel.getGroupedLabels()) {
-            if (StringUtils.containsIgnoreCase(groupedLabel.getName(), getGroupedLabelsFilter().getName()) && groupedLabel.getAmount() == getGroupedLabelsFilter().getAmount()) {
-//                searchResults.add(searchResult);
+            if (StringUtils.containsIgnoreCase(groupedLabel.getName(), getGroupedLabelsFilter().getName()) &&
+                    StringUtils.containsIgnoreCase(groupedLabel.getAmount(), getGroupedLabelsFilter().getAmount())) {
+                groupedLabels.add(groupedLabel);
             }
         }
         sortResultsByNamespace();
     }
 
-    //        TODO
+    /**
+     * Filters searches and refresh total items group label items and group labels items results view.
+     */
     @Command
-    @NotifyChange({"totalItems", "searchResults"})
+    @NotifyChange({"totalGroupedLabelsColumnsItems", "groupedLabelColumns"})
     public void filterGroupedLabelsColumns() {
-        searchResults.clear();
-        for (LabelResult searchResult : labelsModel.getSearchResults()) {
-            if (StringUtils.containsIgnoreCase(searchResult.getName(), getFilter().getName()) &&
-                    StringUtils.containsIgnoreCase(searchResult.getResourceProperty(), getFilter().getSelectedResourcePropertyFilter()) &&
-                    StringUtils.containsIgnoreCase(searchResult.getResourceType(), getFilter().getSelectedResourceTypeFilter()) &&
-                    StringUtils.containsIgnoreCase(searchResult.getResourceName(), getFilter().getSelectedResourceNameFilter()) &&
-                    StringUtils.containsIgnoreCase(searchResult.getAdditionalInfo(), getFilter().getAdditionalInfo()) &&
-                    StringUtils.containsIgnoreCase(searchResult.getNamespace(), getFilter().getSelectedNamespaceFilter())) {
-                searchResults.add(searchResult);
+        groupedLabelColumns.clear();
+        for (LabelsModel.GroupedLabelColumn glc : labelsModel.getGroupedLabelsColumns()) {
+            if (StringUtils.containsIgnoreCase(glc.getResourceProperty(), getGroupedLabelColumnsFilter().getSelectedResourcePropertyFilter()) &&
+                    StringUtils.containsIgnoreCase(glc.getResourceType(), getGroupedLabelColumnsFilter().getSelectedResourceTypeFilter()) &&
+                    StringUtils.containsIgnoreCase(glc.getResourceName(), getGroupedLabelColumnsFilter().getSelectedResourceNameFilter()) &&
+                    StringUtils.containsIgnoreCase(glc.getAdditionalInfo(), getFilter().getAdditionalInfo()) &&
+                    StringUtils.containsIgnoreCase(glc.getNamespace(), getGroupedLabelColumnsFilter().getSelectedNamespaceFilter())) {
+                groupedLabelColumns.add(glc);
             }
         }
         sortResultsByNamespace();
@@ -251,19 +266,27 @@ public class LabelsVM implements EventListener {
     @Command
     @NotifyChange("*")
     public void clearAll() {
-        labelsModel.setSearchResults(new ListModelList<>())
+        labelsModel.setSearchResults(new ArrayList<>())
                 .setFilter(new LabelsFilter())
+                .setGroupedFilter(new LabelsGroupedFilter())
+                .setGroupedColumnsFilter(new LabelsGroupedColumnsFilter())
                 .setNamespaces(commonService.getAllNamespaces())
                 .setSelectedNamespace("all")
-                .setSearchExceptions(new ArrayList<>());
+                .setSearchExceptions(new ArrayList<>())
+                .setGroupedLabels(new ArrayList<>())
+                .setGroupedLabelsColumns(new ArrayList<>())
+                .setClickedLabelsGroup("");
         searchResults = new ListModelList<>();
+        groupedLabels = new ListModelList<>();
+        groupedLabelColumns = new ListModelList<>();
         clearAllFilterComboboxes();
     }
 
     /**
-     * Removes last selected value from all filter comboboxes.
+     * Removes selected value from all filter comboboxes in all grids.
      */
     private void clearAllFilterComboboxes() {
+
         Auxhead searchGridAuxHead = (Auxhead) Path.getComponent("//indexPage/templateInclude/searchGridAuxHead");
         for (Component child : searchGridAuxHead.getFellows()) {
             if (Arrays.asList("filterResourceNamesCBox", "filterNamespacesCBox", "filterResourceTypesCBox", "filterResourcePropertyCBox").contains(child.getId())) {
@@ -271,7 +294,22 @@ public class LabelsVM implements EventListener {
                 cBox.setValue("");
             }
         }
+        clearAllGroupedItemsFilterComboboxes();
     }
+
+    /**
+     * Removes selected value from grouped items filter comboboxes.
+     */
+    private void clearAllGroupedItemsFilterComboboxes() {
+        Auxhead groupedLabelsColumnGridAuxHead = (Auxhead) Path.getComponent("//indexPage/templateInclude/groupedLabelsColumnGridAuxHead");
+        for (Component child : groupedLabelsColumnGridAuxHead.getFellows()) {
+            if (Arrays.asList("filterGLCResourcePropertyCBox", "filterGLCResourceTypesCBox", "filterGLCResourceNamesCBox", "filterGLCNamespacesCBox").contains(child.getId())) {
+                Combobox cBox = (Combobox) child;
+                cBox.setValue("");
+            }
+        }
+    }
+
 
     /**
      * Create dynamically CheckBoxes for all kubernetes resources. 10 per Hlayout.
@@ -323,23 +361,55 @@ public class LabelsVM implements EventListener {
         }
     }
 
+    /**
+     * Shows popup window with full label value on main search grid.
+     *
+     * @param id - clicked searched item id.
+     */
     @Command
     public void showFullLabelValue(@BindingParam("id") int id) {
         Optional<LabelResult> first = searchResults.getInnerList().stream().filter(item -> item.getId() == id).findFirst();
-        if (first.isPresent()) {
-            String name = first.get().getName();
+        showDetailWindow(first.isPresent(), first.get().getName());
+    }
+
+    /**
+     * Shows popup window with full label value on grouped grid.
+     *
+     * @param id - clicked grouped item id.
+     */
+    @Command
+    public void showFullGroupedLabelValue(@BindingParam("id") int id) {
+        Optional<LabelsModel.GroupedLabel> first = groupedLabels.getInnerList().stream().filter(item -> item.getId() == id).findFirst();
+        showDetailWindow(first.isPresent(), first.get().getName());
+    }
+
+    /**
+     * Compose title and content into popup window.
+     *
+     * @param present - is value present.
+     * @param name - key=value string for title and content.
+     */
+    private void showDetailWindow(boolean present, String name) {
+        if (present) {
             Map<String, String> parameters = Map.of("title", name.substring(0, name.indexOf("=")), "content", name.substring(name.indexOf("=") + 1));
             Window window = (Window) Executions.createComponents("~./zul/components/file-display.zul", null, parameters);
             window.doModal();
         }
     }
 
+    /**
+     * Shows grouped label items at click on labels group.
+     *
+     * @param item - clicked @{@link com.kubehelper.domain.models.LabelsModel.GroupedLabel}
+     */
     @Command
-    @NotifyChange("groupedLabelsColumnGrid")
+    @NotifyChange({"groupedLabelColumns", "totalGroupedLabelsColumnsItems", "clickedLabelsGroup", "groupedLabelColumnsFilter"})
     public void showGroupedLabelItems(@BindingParam("clickedItem") LabelsModel.GroupedLabel item) {
-        labelsModel.setGroupedLabelsColumns(item);
-//        detailsLabel = detailsLabel.equals(item.getDetails()) ? "" : item.getDetails();
+        labelsModel.fillGroupedLabelsColumnsForGroup(item);
+        clearAllGroupedItemsFilterComboboxes();
+        groupedLabelColumns = new ListModelList<>(labelsModel.getGroupedLabelsColumns());
     }
+
 
     public boolean isLabelLengthNormal(String label) {
 
@@ -348,7 +418,6 @@ public class LabelsVM implements EventListener {
     }
 
     public boolean isLabelLengthTooBig(String label) {
-
         int length = label.substring(label.indexOf("=")).length();
         return true;
     }
@@ -368,7 +437,6 @@ public class LabelsVM implements EventListener {
     public void setSkipHashLabels(boolean skipHashLabels) {
         this.labelsModel.setSkipHashLabels(skipHashLabels);
     }
-
 
     public String getSelectedNamespace() {
         return labelsModel.getSelectedNamespace();
@@ -394,13 +462,23 @@ public class LabelsVM implements EventListener {
     public String getTotalItems() {
         return String.format("Total Items: %d", searchResults.size());
     }
+
     public String getTotalGroupedItems() {
-        return String.format("Total Items: %d", searchResults.size());
+        return String.format("Total Items: %d", groupedLabels.size());
     }
+
+    public String getTotalGroupedLabelsColumnsItems() {
+        return String.format("Total Items: %d", groupedLabelColumns.size());
+    }
+
 
     public String getProgressLabel() {
         return "Progress: ";
 //        return "Progress: " + searchService.getProgressLabel();
+    }
+
+    public String getClickedLabelsGroup() {
+        return "Group Items for: " + labelsModel.getClickedLabelsGroup();
     }
 
     /**
@@ -424,11 +502,11 @@ public class LabelsVM implements EventListener {
     }
 
     public List<LabelsModel.GroupedLabel> getGroupedLabels() {
-        return labelsModel.getGroupedLabels();
+        return groupedLabels;
     }
 
     public List<LabelsModel.GroupedLabelColumn> getGroupedLabelColumns() {
-        return labelsModel.getGroupedLabelsColumns();
+        return groupedLabelColumns;
     }
 
     public List<LabelResult> getGroupedLabelDetail(String name) {

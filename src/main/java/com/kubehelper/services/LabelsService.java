@@ -122,14 +122,14 @@ public class LabelsService {
         searchModel.getSearchResults().clear();
         searchModel.getSearchExceptions().clear();
 
-        PolicyV1beta1PodSecurityPolicyList policyV1beta1PodSecurityPolicyList = kubeAPI.getPolicyV1beta1PodSecurityPolicyList();
-        V1PodList v1PodsList = kubeAPI.getV1PodsList(searchModel.getSelectedNamespace());
-        V1beta1PodDisruptionBudgetList v1beta1PodDisruptionBudgetsList = kubeAPI.getV1beta1PodDisruptionBudgetsList(searchModel.getSelectedNamespace());
-        V1NetworkPolicyList v1NetworkPolicyList = kubeAPI.getV1NetworkPolicyList(searchModel.getSelectedNamespace());
-        V1beta1PodDisruptionBudgetList podDisruptionBudgetsList = kubeAPI.getV1beta1PodDisruptionBudgetsList(searchModel.getSelectedNamespace());
-
-
-        kubeAPI.testApis();
+//        PolicyV1beta1PodSecurityPolicyList policyV1beta1PodSecurityPolicyList = kubeAPI.getPolicyV1beta1PodSecurityPolicyList();
+//        V1PodList v1PodsList = kubeAPI.getV1PodsList(searchModel.getSelectedNamespace());
+//        V1beta1PodDisruptionBudgetList v1beta1PodDisruptionBudgetsList = kubeAPI.getV1beta1PodDisruptionBudgetsList(searchModel.getSelectedNamespace());
+//        V1NetworkPolicyList v1NetworkPolicyList = kubeAPI.getV1NetworkPolicyList(searchModel.getSelectedNamespace());
+//        V1beta1PodDisruptionBudgetList podDisruptionBudgetsList = kubeAPI.getV1beta1PodDisruptionBudgetsList(searchModel.getSelectedNamespace());
+//
+//
+//        kubeAPI.testApis();
 //        V1PodSecurityContext
 
         try {
@@ -663,8 +663,7 @@ public class LabelsService {
                     .setResourceName(metadata.getName())
                     .setResourceProperty(resourceProperty)
                     .setAdditionalInfo(additionalInfo);
-            searchModel.addSearchResult(newSearchResult)
-                    .addResourceNameFilter(metadata.getName());
+            searchModel.addSearchResult(newSearchResult);
         }
     }
 

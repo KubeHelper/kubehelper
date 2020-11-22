@@ -37,10 +37,6 @@ public class LabelsFilter {
     private ListModelList<String> resourceNamesFilter = new ListModelList<>();
 
     public LabelsFilter() {
-        namespacesFilter.clear();
-        resourceTypesFilter.clear();
-        resourcePropertiesFilter.clear();
-        resourceNamesFilter.clear();
     }
 
     public void addNamespacesFilter(String namespaceFilter) {
@@ -56,7 +52,7 @@ public class LabelsFilter {
     }
 
     public void addResourceNamesFilter(String resourceNameFilter) {
-        if (!resourceNamesFilter.contains(resourceNameFilter)) {
+        if (StringUtils.isNotBlank(resourceNameFilter) && !resourceNamesFilter.contains(resourceNameFilter)) {
             resourceNamesFilter.add(resourceNameFilter);
         }
     }

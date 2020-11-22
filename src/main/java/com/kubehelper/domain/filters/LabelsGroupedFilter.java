@@ -22,7 +22,7 @@ package com.kubehelper.domain.filters;
  */
 public class LabelsGroupedFilter {
     private String name = "";
-    private int amount;
+    private String amount = "";
 
     public LabelsGroupedFilter() {
     }
@@ -36,11 +36,11 @@ public class LabelsGroupedFilter {
         return this;
     }
 
-    public int getAmount() {
+    public String getAmount() {
         return amount;
     }
 
-    public void setAmount(int amount) {
+    public void setAmount(String amount) {
         this.amount = amount;
     }
 }

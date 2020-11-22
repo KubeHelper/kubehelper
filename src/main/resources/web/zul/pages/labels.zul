@@ -184,7 +184,7 @@
                                                         <label value="${item.name}" multiline="true" if="${c:length(item.name) lt 150}"></label>
                                                         <hlayout if="${c:length(item.name) ge 150}">
                                                             <label value="${c:substring(item.name, 0, c:indexOf(item.name,'='))}  =" multiline="true"></label>
-                                                            <toolbarbutton label="Value ist too long. Click to see full Value" onClick="@command('showFullLabelValue', id=item.id)"/>
+                                                            <toolbarbutton label="Value ist too long. Click to see full Value" onClick="@command('showFullGroupedLabelValue', id=item.id)"/>
                                                         </hlayout>
                                                         <label value="${item.amount}"></label>
                                                     </row>
@@ -200,7 +200,7 @@
                                 <separator hflex="1" orient="vertical"/>
                                 <cell width="60%">
                                     <groupbox id="labelsGroupedColumnsGroupBox">
-                                        <caption iconSclass="z-icon-columns" label="Group Items"/>
+                                        <caption iconSclass="z-icon-columns" label="@load(labelsVM.clickedLabelsGroup)"/>
                                         <grid id="groupedLabelsColumnGrid" class="mainGridId" model="@load(labelsVM.groupedLabelColumns)" height="800px">
                                             <auxhead id="groupedLabelsColumnGridAuxHead">
                                                 <auxheader>
@@ -269,7 +269,7 @@
                                             </rows>
                                             <foot id="groupedLabelsColumnsFooter">
 <!--                                                <footer id="groupedLabelsColumnProgressFooter" span="5" align="left" label="@load(labelsVM.progressLabel)"/>-->
-                                                <footer id="groupedLabelsColumnTotalItemsFooter" span="2" align="right" label="@load(labelsVM.totalItems)"/>
+                                                <footer id="groupedLabelsColumnTotalItemsFooter" span="2" align="right" label="@load(labelsVM.totalGroupedLabelsColumnsItems)"/>
                                             </foot>
                                         </grid>
                                     </groupbox>

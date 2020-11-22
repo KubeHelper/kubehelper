@@ -52,6 +52,14 @@ public class LabelResult {
         return Resource.getValueByKey(resourceType.name());
     }
 
+    public Resource getEnumResourceType() {
+        return resourceType;
+    }
+
+    public ResourceProperty getEnumResourceProperty() {
+        return resourceProperty;
+    }
+
     public LabelResult setResourceType(Resource resourceType) {
         this.resourceType = resourceType;
         return this;

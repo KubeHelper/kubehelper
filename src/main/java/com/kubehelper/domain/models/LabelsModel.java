@@ -45,7 +45,7 @@ public class LabelsModel implements PageModel {
     private int desktopHeight;
     private String selectedNamespace = "all";
     private List<String> namespaces = new ArrayList<>();
-    private ListModelList<LabelResult> searchResults = new ListModelList<>();
+    private List<LabelResult> searchResults = new ArrayList<>();
     private LabelsFilter filter = new LabelsFilter();
     private LabelsGroupedColumnsFilter groupedColumnsFilter = new LabelsGroupedColumnsFilter();
     private LabelsGroupedFilter groupedFilter = new LabelsGroupedFilter();
@@ -55,6 +55,7 @@ public class LabelsModel implements PageModel {
     private Map<String, List<LabelResult>> groupedSearchResults = new HashMap<>();
     private List<GroupedLabel> groupedLabels = new ArrayList<>();
     private List<GroupedLabelColumn> groupedLabelsColumns = new ArrayList<>();
+    private String clickedLabelsGroup = "";
 
     public LabelsModel() {
     }
@@ -64,13 +65,7 @@ public class LabelsModel implements PageModel {
         filter.addResourceTypesFilter(searchResult.getResourceType());
         filter.addResourcePropertiesFilter(searchResult.getResourceProperty());
         filter.addNamespacesFilter(searchResult.getNamespace());
-        return this;
-    }
-
-    public LabelsModel addResourceNameFilter(String resourceName) {
-        if (StringUtils.isNotBlank(resourceName)) {
-            filter.addResourceNamesFilter(resourceName);
-        }
+        filter.addResourceNamesFilter(searchResult.getResourceName());
         return this;
     }
 
@@ -83,7 +78,21 @@ public class LabelsModel implements PageModel {
                 incrementFoundSearchResult(searchResult.getName());
             } else {
                 groupedSearchResults.put(searchResult.getName(), new ArrayList<>(Arrays.asList(searchResult)));
-                groupedLabels.add(new GroupedLabel(groupedLabels.size() + 1).setName(searchResult.getName()).setAmount(1));
+                groupedLabels.add(new GroupedLabel(groupedLabels.size() + 1).setName(searchResult.getName()).setAmount("1"));
+            }
+        }
+    }
+
+    public void reGroupSearchResultsAfterFilter(List<LabelResult> filteredSearchResults) {
+        groupedSearchResults.clear();
+        groupedLabels.clear();
+        for (LabelResult searchResult : filteredSearchResults) {
+            if (groupedSearchResults.containsKey(searchResult.getName())) {
+                groupedSearchResults.get(searchResult.getName()).add(searchResult);
+                incrementFoundSearchResult(searchResult.getName());
+            } else {
+                groupedSearchResults.put(searchResult.getName(), new ArrayList<>(Arrays.asList(searchResult)));
+                groupedLabels.add(new GroupedLabel(groupedLabels.size() + 1).setName(searchResult.getName()).setAmount("1"));
             }
         }
     }
@@ -97,16 +106,34 @@ public class LabelsModel implements PageModel {
         return groupedLabelsColumns;
     }
 
-    public LabelsModel setGroupedLabelsColumns(GroupedLabel item) {
-//        groupedSearchResults.get(item.getName());
+    public LabelsModel setGroupedLabelsColumns(List<GroupedLabelColumn> groupedLabelsColumns) {
         this.groupedLabelsColumns = groupedLabelsColumns;
         return this;
+    }
+
+    public void fillGroupedLabelsColumnsForGroup(LabelsModel.GroupedLabel item) {
+        clickedLabelsGroup = item.getName().length() > 100 ? item.getName().substring(0, 100) + "..." : item.getName();
+        this.groupedLabelsColumns.clear();
+        this.groupedColumnsFilter = new LabelsGroupedColumnsFilter();
+        for (LabelResult labelResult : groupedSearchResults.get(item.getName())) {
+            this.groupedLabelsColumns.add(new GroupedLabelColumn(groupedLabelsColumns.size() + 1)
+                    .setNamespace(labelResult.getNamespace())
+                    .setResourceName(labelResult.getResourceName())
+                    .setResourceType(labelResult.getEnumResourceType())
+                    .setAdditionalInfo(labelResult.getAdditionalInfo())
+                    .setResourceProperty(labelResult.getEnumResourceProperty()));
+
+            this.groupedColumnsFilter.addNamespacesFilter(labelResult.getNamespace())
+                    .addResourceNamesFilter(labelResult.getResourceName())
+                    .addResourcePropertiesFilter(labelResult.getResourceProperty())
+                    .addResourceTypesFilter(labelResult.getResourceType());
+        }
     }
 
     private void incrementFoundSearchResult(String name) {
         for (GroupedLabel groupedLabel : groupedLabels) {
             if (groupedLabel.getName().equals(name)) {
-                groupedLabel.setAmount(groupedLabel.getAmount() + 1);
+                groupedLabel.setAmount(String.valueOf(Integer.valueOf(groupedLabel.getAmount()) + 1));
                 break;
             }
         }
@@ -151,7 +178,7 @@ public class LabelsModel implements PageModel {
         return namespaces;
     }
 
-    public ListModelList<LabelResult> getSearchResults() {
+    public List<LabelResult> getSearchResults() {
         return searchResults;
     }
 
@@ -164,7 +191,7 @@ public class LabelsModel implements PageModel {
         return this;
     }
 
-    public LabelsModel setSearchResults(ListModelList<LabelResult> searchResults) {
+    public LabelsModel setSearchResults(List<LabelResult> searchResults) {
         this.searchResults = searchResults;
         return this;
     }
@@ -243,10 +270,19 @@ public class LabelsModel implements PageModel {
         return groupedSearchResults.get(name);
     }
 
+    public String getClickedLabelsGroup() {
+        return clickedLabelsGroup;
+    }
+
+    public LabelsModel setClickedLabelsGroup(String clickedLabelsGroup) {
+        this.clickedLabelsGroup = clickedLabelsGroup;
+        return this;
+    }
+
     public class GroupedLabel {
         private int id;
         private String name = "";
-        private int amount;
+        private String amount;
 
         public GroupedLabel(int id) {
             this.id = id;
@@ -270,11 +306,11 @@ public class LabelsModel implements PageModel {
             return this;
         }
 
-        public int getAmount() {
+        public String getAmount() {
             return amount;
         }
 
-        public GroupedLabel setAmount(int amount) {
+        public GroupedLabel setAmount(String amount) {
             this.amount = amount;
             return this;
         }
@@ -292,8 +328,17 @@ public class LabelsModel implements PageModel {
             this.id = id;
         }
 
-        public ResourceProperty getResourceProperty() {
-            return resourceProperty;
+        public int getId() {
+            return id;
+        }
+
+        public GroupedLabelColumn setId(int id) {
+            this.id = id;
+            return this;
+        }
+
+        public String getResourceProperty() {
+            return ResourceProperty.getValueByKey(resourceProperty.name());
         }
 
         public GroupedLabelColumn setResourceProperty(ResourceProperty resourceProperty) {
@@ -301,8 +346,8 @@ public class LabelsModel implements PageModel {
             return this;
         }
 
-        public Resource getResourceType() {
-            return resourceType;
+        public String getResourceType() {
+            return Resource.getValueByKey(resourceType.name());
         }
 
         public GroupedLabelColumn setResourceType(Resource resourceType) {

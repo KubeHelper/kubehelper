@@ -37,34 +37,34 @@ public class LabelsGroupedColumnsFilter {
     private ListModelList<String> resourceNamesFilter = new ListModelList<>();
 
     public LabelsGroupedColumnsFilter() {
-        namespacesFilter.clear();
-        resourceTypesFilter.clear();
-        resourcePropertiesFilter.clear();
-        resourceNamesFilter.clear();
     }
 
-    public void addNamespacesFilter(String namespaceFilter) {
+    public LabelsGroupedColumnsFilter addNamespacesFilter(String namespaceFilter) {
         if (!namespacesFilter.contains(namespaceFilter)) {
             namespacesFilter.add(namespaceFilter);
         }
+        return this;
     }
 
-    public void addResourceTypesFilter(String resourceTypeFilter) {
+    public LabelsGroupedColumnsFilter addResourceTypesFilter(String resourceTypeFilter) {
         if (!resourceTypesFilter.contains(resourceTypeFilter)) {
             resourceTypesFilter.add(resourceTypeFilter);
         }
+        return this;
     }
 
-    public void addResourceNamesFilter(String resourceNameFilter) {
-        if (!resourceNamesFilter.contains(resourceNameFilter)) {
+    public LabelsGroupedColumnsFilter addResourceNamesFilter(String resourceNameFilter) {
+        if (StringUtils.isNotBlank(resourceNameFilter) && !resourceNamesFilter.contains(resourceNameFilter)) {
             resourceNamesFilter.add(resourceNameFilter);
         }
+        return this;
     }
 
-    public void addResourcePropertiesFilter(String resourcePropertyFilter) {
+    public LabelsGroupedColumnsFilter addResourcePropertiesFilter(String resourcePropertyFilter) {
         if (!resourcePropertiesFilter.contains(resourcePropertyFilter)) {
             resourcePropertiesFilter.add(resourcePropertyFilter);
         }
+        return this;
     }
 
     public String getName() {

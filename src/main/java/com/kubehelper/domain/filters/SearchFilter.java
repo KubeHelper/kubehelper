@@ -35,9 +35,6 @@ public class SearchFilter {
     private ListModelList<String> resourceNamesFilter = new ListModelList<>();
 
     public SearchFilter() {
-        namespacesFilter.clear();
-        resourceTypesFilter.clear();
-        resourceNamesFilter.clear();
     }
 
     public void addNamespacesFilter(String namespaceFilter) {
