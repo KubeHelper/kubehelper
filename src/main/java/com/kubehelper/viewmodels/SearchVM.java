@@ -304,9 +304,22 @@ public class SearchVM implements EventListener {
         } else {
             content = first.get().getAdditionalInfo();
         }
-        Map<String, String> parameters = Map.of("title", first.get().getFoundString(), "content", content);
-        Window window = (Window) Executions.createComponents("~./zul/components/file-display.zul", null, parameters);
-        window.doModal();
+        if (first.isPresent()) {
+            Map<String, String> parameters = Map.of("title", first.get().getFoundString(), "content", content);
+            Window window = (Window) Executions.createComponents("~./zul/components/file-display.zul", null, parameters);
+            window.doModal();
+        }
+    }
+
+    @Command
+    public void showFullDefinition(@BindingParam("id") int id) {
+        String content = "";
+        Optional<SearchResult> first = searchResults.getInnerList().stream().filter(item -> item.getId() == id).findFirst();
+        if (first.isPresent()) {
+            Map<String, String> parameters = Map.of("title", first.get().getResourceName(), "content", first.get().getFullDefinition());
+            Window window = (Window) Executions.createComponents("~./zul/components/file-display.zul", null, parameters);
+            window.doModal();
+        }
     }
 
     public boolean isSkipKubeNamespaces() {

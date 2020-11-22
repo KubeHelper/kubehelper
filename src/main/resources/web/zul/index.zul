@@ -2,26 +2,26 @@
 <zk>
     <script type="text/javascript">
         function init() {
-            $('body').on('DOMSubtreeModified', '.mainGridDivId', function(){
-                $(".mainGridId").height($(".mainGridDivId").height()-50)
-                console.log('changed'+' '+$(".mainGridId").height() + ' '+$(".centerContentId").height());
+        $('body').on('DOMSubtreeModified', '.mainGridDivId', function(){
+        $(".mainGridId").height($(".mainGridDivId").height()-50)
+        console.log('changed'+' '+$(".mainGridId").height() + ' '+$(".centerContentId").height());
 
-<!--                if($(".mainGridId").height()==null || $(".mainGridId").height()=='undefined'){-->
-<!--                    $(".mainGridId").height(600)-->
-<!--                }-->
-<!--        pageNorthClass.position - mainSouthFooterClass.position-->
-            });
+        <!--                if($(".mainGridId").height()==null || $(".mainGridId").height()=='undefined'){-->
+        <!--                    $(".mainGridId").height(600)-->
+        <!--                }-->
+        <!--        pageNorthClass.position - mainSouthFooterClass.position-->
+        });
         }
         init()
     </script>
 
     <div id="indexWindow" viewModel="@id('indexVM') @init('com.kubehelper.viewmodels.IndexVM')" height="100%" width="100%">
-<!--    <div id="indexWindow" viewModel="@id('indexVM') @init('com.kubehelper.viewmodels.IndexVM')" height="100%" width="100%" onClientInfo="onClientInfo(event)">-->
-<!--        <zscript>-->
-<!--            void onClientInfo(ClientInfoEvent evt) {-->
-<!--            indexVM.onClientInfoEvent(evt);-->
-<!--            }-->
-<!--        </zscript>-->
+        <!--    <div id="indexWindow" viewModel="@id('indexVM') @init('com.kubehelper.viewmodels.IndexVM')" height="100%" width="100%" onClientInfo="onClientInfo(event)">-->
+        <!--        <zscript>-->
+        <!--            void onClientInfo(ClientInfoEvent evt) {-->
+        <!--            indexVM.onClientInfoEvent(evt);-->
+        <!--            }-->
+        <!--        </zscript>-->
         <borderlayout sclass="complex-layout">
             <north size="5%" border="0" style="background: #3498DB">
                 <!--                <panel border="normal" height="100%" width="100%">-->
@@ -113,22 +113,17 @@
                     </panel>
                 </vlayout>
             </west>
-            <!-- Content -->
             <center style="overflow:auto">
-                <!--                            TODO read about difference instant or defer   - https://www.zkoss.org/wiki/ZK Component Reference/Essential Components/Include-->
                 <include id="templateInclude" src="@load(indexVM.pageModel.templateUrl)"/>
             </center>
-            <south class="mainSouthFooterClass" size="3%" maxsize="200" style="background: none repeat scroll 0 0 ;">
-                <toolbar mold="panel" align="center">
-                    <toolbarbutton label="Sign in"/>
-                    <toolbarbutton label="Home"/>
-                    <toolbarbutton label="Sitemap"/>
-                    <toolbarbutton label="Terms"/>
-                    <toolbarbutton label="Report Abuse"/>
-                    <toolbarbutton label="Print"/>
-                    <separator orient="vertical" bar="true"/>
-                    Powered by ZK ${desktop.webApp.version} ZK
-                    Borderlayout
+            <south class="mainSouthFooterClass" size="3%">
+                <toolbar align="center">
+                    <toolbarbutton id="copyrightBtn" label="@load(indexVM.footerCopyrightText)" tooltiptext="https://github.com/JWebDev/kubehelper" href="https://github.com/JWebDev/kubehelper"
+                                   target="_blank"
+                                   style="font-family: Courier, Monaco, monospace;font-size: 14px;font-weight: bold;"/>
+                    <toolbarbutton id="copyrightSeparator" label="|" disabled="true" style="font-family: Courier, Monaco, monospace;font-size: 14px;font-weight: bold;"/>
+                    <toolbarbutton id="autorBtn" label="JDev" tooltiptext="https://github.com/JWebDev" href="https://github.com/JWebDev" target="_blank"
+                                   style="font-family: Courier, Monaco, monospace;font-size: 14px;font-weight: bold;"/>
                 </toolbar>
             </south>
         </borderlayout>

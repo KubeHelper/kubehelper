@@ -22,9 +22,8 @@ import com.kubehelper.common.Resource;
 import com.kubehelper.domain.models.SearchModel;
 import com.kubehelper.domain.results.SearchResult;
 import io.kubernetes.client.Exec;
+import io.kubernetes.client.extended.kubectl.Kubectl;
 import io.kubernetes.client.openapi.ApiException;
-import io.kubernetes.client.openapi.models.PolicyV1beta1PodSecurityPolicy;
-import io.kubernetes.client.openapi.models.PolicyV1beta1PodSecurityPolicyList;
 import io.kubernetes.client.openapi.models.V1ConfigMap;
 import io.kubernetes.client.openapi.models.V1ConfigMapKeySelector;
 import io.kubernetes.client.openapi.models.V1ConfigMapList;
@@ -66,10 +65,13 @@ import io.kubernetes.client.openapi.models.V1beta1ClusterRoleBindingList;
 import io.kubernetes.client.openapi.models.V1beta1ClusterRoleList;
 import io.kubernetes.client.openapi.models.V1beta1PodDisruptionBudget;
 import io.kubernetes.client.openapi.models.V1beta1PodDisruptionBudgetList;
+import io.kubernetes.client.openapi.models.V1beta1PodSecurityPolicy;
+import io.kubernetes.client.openapi.models.V1beta1PodSecurityPolicyList;
 import io.kubernetes.client.openapi.models.V1beta1Role;
 import io.kubernetes.client.openapi.models.V1beta1RoleBinding;
 import io.kubernetes.client.openapi.models.V1beta1RoleBindingList;
 import io.kubernetes.client.openapi.models.V1beta1RoleList;
+import io.kubernetes.client.util.Yaml;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
@@ -138,6 +140,9 @@ public class SearchService {
      * @param searchModel - search model
      */
     public void search(SearchModel searchModel, Set<Resource> selectedResources) {
+
+        //TODO exp with kubectl
+//        Kubectl kubectl = Kubectl.apiResources().execute().;
 
         searchModel.getSearchResults().clear();
         searchModel.getSearchExceptions().clear();
@@ -221,7 +226,7 @@ public class SearchService {
         for (V1Pod pod : podsList.getItems()) {
             try {
                 if (isStringsContainsSearchString(searchModel.getSearchString(), pod.getMetadata().getName())) {
-                    addSearchResultToModel(pod.getMetadata(), searchModel, POD, pod.getMetadata().getName(), pod.getMetadata().getName(), "");
+                    addSearchResultToModel(pod.getMetadata(), searchModel, POD, pod.getMetadata().getName(), pod.getMetadata().getName(), "", pod.toString());
                 }
             } catch (RuntimeException e) {
                 searchModel.addSearchException(e);
@@ -240,7 +245,7 @@ public class SearchService {
         for (V1PersistentVolume persistentVolume : persistentVolumesList.getItems()) {
             try {
                 if (isStringsContainsSearchString(searchModel.getSearchString(), persistentVolume.getMetadata().getName())) {
-                    addSearchResultToModel(persistentVolume.getMetadata(), searchModel, PERSISTENT_VOLUME, persistentVolume.getMetadata().getName(), persistentVolume.getMetadata().getName(), "");
+                    addSearchResultToModel(persistentVolume.getMetadata(), searchModel, PERSISTENT_VOLUME, persistentVolume.getMetadata().getName(), persistentVolume.getMetadata().getName(), "", persistentVolume.toString());
                 }
             } catch (RuntimeException e) {
                 searchModel.addSearchException(e);
@@ -259,7 +264,7 @@ public class SearchService {
         for (V1PersistentVolumeClaim persistentVolumeClaim : persistentVolumeClaimsList.getItems()) {
             try {
                 if (isStringsContainsSearchString(searchModel.getSearchString(), persistentVolumeClaim.getMetadata().getName())) {
-                    addSearchResultToModel(persistentVolumeClaim.getMetadata(), searchModel, PERSISTENT_VOLUME_CLAIM, persistentVolumeClaim.getMetadata().getName(), persistentVolumeClaim.getMetadata().getName(), "");
+                    addSearchResultToModel(persistentVolumeClaim.getMetadata(), searchModel, PERSISTENT_VOLUME_CLAIM, persistentVolumeClaim.getMetadata().getName(), persistentVolumeClaim.getMetadata().getName(), "", persistentVolumeClaim.toString());
                 }
             } catch (RuntimeException e) {
                 searchModel.addSearchException(e);
@@ -281,7 +286,7 @@ public class SearchService {
                     continue;
                 }
                 if (isStringsContainsSearchString(searchModel.getSearchString(), service.getMetadata().getName())) {
-                    addSearchResultToModel(service.getMetadata(), searchModel, SERVICE, service.getMetadata().getName(), service.getMetadata().getName(), "");
+                    addSearchResultToModel(service.getMetadata(), searchModel, SERVICE, service.getMetadata().getName(), service.getMetadata().getName(), "", service.toString());
                 }
             } catch (RuntimeException e) {
                 searchModel.addSearchException(e);
@@ -308,7 +313,7 @@ public class SearchService {
                         serviceAccount.getSecrets().forEach(secretObject -> additionalInfo.add(secretObject.getName()));
                     }
                     addSearchResultToModel(serviceAccount.getMetadata(), searchModel, SERVICE_ACCOUNT, serviceAccount.getMetadata().getName(), serviceAccount.getMetadata().getName(),
-                            "secrets " + additionalInfo.toString());
+                            "secrets " + additionalInfo.toString(), serviceAccount.toString());
                 }
             } catch (RuntimeException e) {
                 searchModel.addSearchException(e);
@@ -334,7 +339,7 @@ public class SearchService {
                         if (isStringsContainsSearchString(searchModel.getSearchString(), secret.getMetadata().getName(), secretName)) {
                             String secretType = secret.getType() == null ? "null" : secret.getType();
                             String foundString = secret.getMetadata().getName() + " [" + secretType + "] : " + secretName;
-                            addSearchResultToModel(secret.getMetadata(), searchModel, SECRET, secret.getMetadata().getName(), foundString, new String(secretValue, UTF_8));
+                            addSearchResultToModel(secret.getMetadata(), searchModel, SECRET, secret.getMetadata().getName(), foundString, new String(secretValue, UTF_8), secret.toString());
                         }
                     });
                 }
@@ -360,7 +365,7 @@ public class SearchService {
                 if (ObjectUtils.isNotEmpty(configMap.getData())) {
                     configMap.getData().forEach((configName, configValue) -> {
                         if (isStringsContainsSearchString(searchModel.getSearchString(), configMap.getMetadata().getName(), configName, configValue)) {
-                            addSearchResultToModel(configMap.getMetadata(), searchModel, CONFIG_MAP, configMap.getMetadata().getName(), configName, configValue);
+                            addSearchResultToModel(configMap.getMetadata(), searchModel, CONFIG_MAP, configMap.getMetadata().getName(), configName, configValue, configMap.toString());
                         }
                     });
                 }
@@ -380,7 +385,7 @@ public class SearchService {
                     continue;
                 }
                 if (isStringsContainsSearchString(searchModel.getSearchString(), daemonSet.getMetadata().getName())) {
-                    addSearchResultToModel(daemonSet.getMetadata(), searchModel, DAEMON_SET, daemonSet.getMetadata().getName(), daemonSet.getMetadata().getName(), "");
+                    addSearchResultToModel(daemonSet.getMetadata(), searchModel, DAEMON_SET, daemonSet.getMetadata().getName(), daemonSet.getMetadata().getName(), "", daemonSet.toString());
                 }
             } catch (RuntimeException e) {
                 searchModel.addSearchException(e);
@@ -397,7 +402,7 @@ public class SearchService {
                     continue;
                 }
                 if (isStringsContainsSearchString(searchModel.getSearchString(), deployment.getMetadata().getName())) {
-                    addSearchResultToModel(deployment.getMetadata(), searchModel, DEPLOYMENT, deployment.getMetadata().getName(), deployment.getMetadata().getName(), "");
+                    addSearchResultToModel(deployment.getMetadata(), searchModel, DEPLOYMENT, deployment.getMetadata().getName(), deployment.getMetadata().getName(), "", deployment.toString());
                 }
             } catch (RuntimeException e) {
                 searchModel.addSearchException(e);
@@ -414,7 +419,7 @@ public class SearchService {
                     continue;
                 }
                 if (isStringsContainsSearchString(searchModel.getSearchString(), replicaSet.getMetadata().getName())) {
-                    addSearchResultToModel(replicaSet.getMetadata(), searchModel, REPLICA_SET, replicaSet.getMetadata().getName(), replicaSet.getMetadata().getName(), "");
+                    addSearchResultToModel(replicaSet.getMetadata(), searchModel, REPLICA_SET, replicaSet.getMetadata().getName(), replicaSet.getMetadata().getName(), "", replicaSet.toString());
                 }
             } catch (RuntimeException e) {
                 searchModel.addSearchException(e);
@@ -431,7 +436,7 @@ public class SearchService {
                     continue;
                 }
                 if (isStringsContainsSearchString(searchModel.getSearchString(), statefulSet.getMetadata().getName())) {
-                    addSearchResultToModel(statefulSet.getMetadata(), searchModel, STATEFUL_SET, statefulSet.getMetadata().getName(), statefulSet.getMetadata().getName(), "");
+                    addSearchResultToModel(statefulSet.getMetadata(), searchModel, STATEFUL_SET, statefulSet.getMetadata().getName(), statefulSet.getMetadata().getName(), "", statefulSet.toString());
                 }
             } catch (RuntimeException e) {
                 searchModel.addSearchException(e);
@@ -448,7 +453,7 @@ public class SearchService {
                     continue;
                 }
                 if (isStringsContainsSearchString(searchModel.getSearchString(), job.getMetadata().getName())) {
-                    addSearchResultToModel(job.getMetadata(), searchModel, JOB, job.getMetadata().getName(), job.getMetadata().getName(), "");
+                    addSearchResultToModel(job.getMetadata(), searchModel, JOB, job.getMetadata().getName(), job.getMetadata().getName(), "", job.toString());
                 }
             } catch (RuntimeException e) {
                 searchModel.addSearchException(e);
@@ -465,7 +470,7 @@ public class SearchService {
                     continue;
                 }
                 if (isStringsContainsSearchString(searchModel.getSearchString(), binding.getMetadata().getName())) {
-                    addSearchResultToModel(binding.getMetadata(), searchModel, ROLE_BINDING, binding.getMetadata().getName(), binding.getMetadata().getName(), "");
+                    addSearchResultToModel(binding.getMetadata(), searchModel, ROLE_BINDING, binding.getMetadata().getName(), binding.getMetadata().getName(), "", binding.toString());
                 }
             } catch (RuntimeException e) {
                 searchModel.addSearchException(e);
@@ -482,7 +487,7 @@ public class SearchService {
                     continue;
                 }
                 if (isStringsContainsSearchString(searchModel.getSearchString(), clusterRole.getMetadata().getName())) {
-                    addSearchResultToModel(clusterRole.getMetadata(), searchModel, CLUSTER_ROLE, clusterRole.getMetadata().getName(), clusterRole.getMetadata().getName(), "");
+                    addSearchResultToModel(clusterRole.getMetadata(), searchModel, CLUSTER_ROLE, clusterRole.getMetadata().getName(), clusterRole.getMetadata().getName(), "", clusterRole.toString());
                 }
             } catch (RuntimeException e) {
                 searchModel.addSearchException(e);
@@ -499,7 +504,7 @@ public class SearchService {
                     continue;
                 }
                 if (isStringsContainsSearchString(searchModel.getSearchString(), roleBinding.getMetadata().getName())) {
-                    addSearchResultToModel(roleBinding.getMetadata(), searchModel, ROLE_BINDING, roleBinding.getMetadata().getName(), roleBinding.getMetadata().getName(), "");
+                    addSearchResultToModel(roleBinding.getMetadata(), searchModel, ROLE_BINDING, roleBinding.getMetadata().getName(), roleBinding.getMetadata().getName(), "", roleBinding.toString());
                 }
             } catch (RuntimeException e) {
                 searchModel.addSearchException(e);
@@ -516,7 +521,7 @@ public class SearchService {
                     continue;
                 }
                 if (isStringsContainsSearchString(searchModel.getSearchString(), role.getMetadata().getName())) {
-                    addSearchResultToModel(role.getMetadata(), searchModel, ROLE, role.getMetadata().getName(), role.getMetadata().getName(), "");
+                    addSearchResultToModel(role.getMetadata(), searchModel, ROLE, role.getMetadata().getName(), role.getMetadata().getName(), "", role.toString());
                 }
             } catch (RuntimeException e) {
                 searchModel.addSearchException(e);
@@ -533,7 +538,7 @@ public class SearchService {
                     continue;
                 }
                 if (isStringsContainsSearchString(searchModel.getSearchString(), policy.getMetadata().getName())) {
-                    addSearchResultToModel(policy.getMetadata(), searchModel, NETWORK_POLICY, policy.getMetadata().getName(), policy.getMetadata().getName(), "");
+                    addSearchResultToModel(policy.getMetadata(), searchModel, NETWORK_POLICY, policy.getMetadata().getName(), policy.getMetadata().getName(), "", policy.toString());
                 }
             } catch (RuntimeException e) {
                 searchModel.addSearchException(e);
@@ -550,7 +555,7 @@ public class SearchService {
                     continue;
                 }
                 if (isStringsContainsSearchString(searchModel.getSearchString(), budget.getMetadata().getName())) {
-                    addSearchResultToModel(budget.getMetadata(), searchModel, POD_DISRUPTION_BUDGET, budget.getMetadata().getName(), budget.getMetadata().getName(), "");
+                    addSearchResultToModel(budget.getMetadata(), searchModel, POD_DISRUPTION_BUDGET, budget.getMetadata().getName(), budget.getMetadata().getName(), "", budget.toString());
                 }
             } catch (RuntimeException e) {
                 searchModel.addSearchException(e);
@@ -560,14 +565,14 @@ public class SearchService {
     }
 
     private void searchInPodSecurityPolicies(SearchModel searchModel) {
-        PolicyV1beta1PodSecurityPolicyList policiesList = kubeAPI.getPolicyV1beta1PodSecurityPolicyList();
-        for (PolicyV1beta1PodSecurityPolicy policy : policiesList.getItems()) {
+        V1beta1PodSecurityPolicyList policiesList = kubeAPI.getPolicyV1beta1PodSecurityPolicyList();
+        for (V1beta1PodSecurityPolicy policy : policiesList.getItems()) {
             try {
                 if (skipKubeNamespace(searchModel, policy.getMetadata())) {
                     continue;
                 }
                 if (isStringsContainsSearchString(searchModel.getSearchString(), policy.getMetadata().getName())) {
-                    addSearchResultToModel(policy.getMetadata(), searchModel, POD_SECURITY_POLICY, policy.getMetadata().getName(), policy.getMetadata().getName(), "");
+                    addSearchResultToModel(policy.getMetadata(), searchModel, POD_SECURITY_POLICY, policy.getMetadata().getName(), policy.getMetadata().getName(), "", policy.toString());
                 }
             } catch (RuntimeException e) {
                 searchModel.addSearchException(e);
@@ -684,7 +689,7 @@ public class SearchService {
         if (isStringsContainsSearchString(searchModel.getSearchString(), envName, envValue)) {
             String resourceName = pod.getMetadata().getName() + " [" + container.getName() + "]";
             String composedFoundString = v1EnvVar.getName() + "=" + envValue;
-            addSearchResultToModel(pod.getMetadata(), searchModel, ENV_VARIABLE, resourceName, composedFoundString, additionalInfo);
+            addSearchResultToModel(pod.getMetadata(), searchModel, ENV_VARIABLE, resourceName, composedFoundString, additionalInfo, pod.toString());
         }
     }
 
@@ -741,7 +746,7 @@ public class SearchService {
             //add new native environment variable
             if (isEnvVarNotFound && isStringsContainsSearchString(searchModel.getSearchString(), key, envValue)) {
                 String composedFoundString = key + "=" + envValue;
-                addSearchResultToModel(pod.getMetadata(), searchModel, ENV_VARIABLE, pod.getMetadata().getName(), composedFoundString, "Native Environment Variable");
+                addSearchResultToModel(pod.getMetadata(), searchModel, ENV_VARIABLE, pod.getMetadata().getName(), composedFoundString, "Native Environment Variable", pod.toString());
             }
         }
     }
@@ -757,14 +762,15 @@ public class SearchService {
      * @param foundString    - found string
      * @param additionalInfo - additional info
      */
-    private void addSearchResultToModel(V1ObjectMeta metadata, SearchModel searchModel, Resource resource, String resourceName, String foundString, String additionalInfo) {
+    private void addSearchResultToModel(V1ObjectMeta metadata, SearchModel searchModel, Resource resource, String resourceName, String foundString, String additionalInfo, String fullDefinition) {
         SearchResult newSearchResult = new SearchResult(searchModel.getSearchResults().size() + 1)
                 .setNamespace(metadata.getNamespace() == null ? "N/A" : metadata.getNamespace())
                 .setResourceType(resource)
                 .setResourceName(resourceName)
                 .setFoundString(foundString)
                 .setAdditionalInfo(additionalInfo)
-                .setCreationTime(getParsedCreationTime(metadata.getCreationTimestamp()));
+                .setCreationTime(getParsedCreationTime(metadata.getCreationTimestamp()))
+                .setFullDefinition(fullDefinition);
         searchModel.addSearchResult(newSearchResult)
                 .addResourceNameFilter(metadata.getName());
     }

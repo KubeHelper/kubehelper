@@ -30,6 +30,7 @@ public class SearchResult {
     private String creationTime = "";
     private String additionalInfo = "";
     private String foundString = "";
+    private String fullDefinition = "";
 
     public SearchResult() {
     }
@@ -94,5 +95,14 @@ public class SearchResult {
 
     public int getId() {
         return id;
+    }
+
+    public String getFullDefinition() {
+        return fullDefinition;
+    }
+
+    public SearchResult setFullDefinition(String fullDefinition) {
+        this.fullDefinition = fullDefinition;
+        return this;
     }
 }

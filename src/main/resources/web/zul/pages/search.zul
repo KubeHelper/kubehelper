@@ -111,6 +111,9 @@
                             <span sclass="z-icon-filter"/>
                             <textbox instant="true" width="80%" value="@bind(searchVM.filter.creationTime)" onChange="@command('filterSearches')"/>
                         </auxheader>
+                        <auxheader class="fullDefinitionIdHeader">
+                            <span sclass="z-icon-file-text"/>
+                        </auxheader>
                     </auxhead>
                     <columns menupopup="auto" sizable="true">
                         <column hflex="min" label="Id" sort="auto(id)"/>
@@ -120,6 +123,7 @@
                         <column hflex="1" label="Namespace" sort="auto(namespace)"/>
                         <column hflex="1" label="Resource Type" sort="auto(resourceType)"/>
                         <column hflex="1" label="Creation Time" sort="auto(creationTime)"/>
+                        <column hflex="min" label="Full Definition"/>
                     </columns>
                     <rows>
                         <template name="model" var="item">
@@ -141,6 +145,7 @@
                                 <label value="${item.namespace}"></label>
                                 <label value="${item.resourceType}"></label>
                                 <label value="${item.creationTime}"></label>
+                                <toolbarbutton label="Full definition" onClick="@command('showFullDefinition', id=item.id)" hflex="1"/>
                             </row>
                         </template>
                     </rows>

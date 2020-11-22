@@ -22,8 +22,6 @@ import com.kubehelper.common.Resource;
 import com.kubehelper.common.ResourceProperty;
 import com.kubehelper.domain.models.LabelsModel;
 import com.kubehelper.domain.results.LabelResult;
-import io.kubernetes.client.openapi.models.PolicyV1beta1PodSecurityPolicy;
-import io.kubernetes.client.openapi.models.PolicyV1beta1PodSecurityPolicyList;
 import io.kubernetes.client.openapi.models.V1ConfigMap;
 import io.kubernetes.client.openapi.models.V1ConfigMapList;
 import io.kubernetes.client.openapi.models.V1DaemonSet;
@@ -60,6 +58,8 @@ import io.kubernetes.client.openapi.models.V1beta1ClusterRoleBindingList;
 import io.kubernetes.client.openapi.models.V1beta1ClusterRoleList;
 import io.kubernetes.client.openapi.models.V1beta1PodDisruptionBudget;
 import io.kubernetes.client.openapi.models.V1beta1PodDisruptionBudgetList;
+import io.kubernetes.client.openapi.models.V1beta1PodSecurityPolicy;
+import io.kubernetes.client.openapi.models.V1beta1PodSecurityPolicyList;
 import io.kubernetes.client.openapi.models.V1beta1Role;
 import io.kubernetes.client.openapi.models.V1beta1RoleBinding;
 import io.kubernetes.client.openapi.models.V1beta1RoleBindingList;
@@ -625,8 +625,8 @@ public class LabelsService {
      * @param searchModel - search model
      */
     private void searchInPodSecurityPolicies(LabelsModel searchModel) {
-        PolicyV1beta1PodSecurityPolicyList podSecurityPolicyList = kubeAPI.getPolicyV1beta1PodSecurityPolicyList();
-        for (PolicyV1beta1PodSecurityPolicy policy : podSecurityPolicyList.getItems()) {
+        V1beta1PodSecurityPolicyList podSecurityPolicyList = kubeAPI.getPolicyV1beta1PodSecurityPolicyList();
+        for (V1beta1PodSecurityPolicy policy : podSecurityPolicyList.getItems()) {
             try {
                 V1ObjectMeta meta = policy.getMetadata();
                 if (!skipKubeNamespace(searchModel, meta)) {

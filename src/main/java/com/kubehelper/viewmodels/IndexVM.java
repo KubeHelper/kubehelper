@@ -36,6 +36,8 @@ import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Toolbarbutton;
 import org.zkoss.zul.Window;
 
+import java.time.LocalDate;
+
 /**
  * @author JDev
  */
@@ -92,6 +94,12 @@ public class IndexVM {
     public void contactDeveloper() {
         Window window = (Window) Executions.createComponents("~./zul/components/contact.zul", null, null);
         window.doModal();
+    }
+
+    public String getFooterCopyrightText() {
+        int year = LocalDate.now().getYear();
+        String currentYear = year > 2020 ? "2020-" + String.valueOf(year) : String.valueOf(year);
+        return "Copyright © " + currentYear + ", Kube Helper";
     }
 
     private void enableDisableMenuItem(String modelName) {

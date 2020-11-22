@@ -29,7 +29,6 @@ import io.kubernetes.client.openapi.apis.NetworkingV1Api;
 import io.kubernetes.client.openapi.apis.PolicyV1beta1Api;
 import io.kubernetes.client.openapi.apis.RbacAuthorizationV1beta1Api;
 import io.kubernetes.client.openapi.apis.SettingsV1alpha1Api;
-import io.kubernetes.client.openapi.models.PolicyV1beta1PodSecurityPolicyList;
 import io.kubernetes.client.openapi.models.V1ConfigMapList;
 import io.kubernetes.client.openapi.models.V1ControllerRevisionList;
 import io.kubernetes.client.openapi.models.V1DaemonSetList;
@@ -51,6 +50,7 @@ import io.kubernetes.client.openapi.models.V1alpha1PodPresetList;
 import io.kubernetes.client.openapi.models.V1beta1ClusterRoleBindingList;
 import io.kubernetes.client.openapi.models.V1beta1ClusterRoleList;
 import io.kubernetes.client.openapi.models.V1beta1PodDisruptionBudgetList;
+import io.kubernetes.client.openapi.models.V1beta1PodSecurityPolicyList;
 import io.kubernetes.client.openapi.models.V1beta1RoleBindingList;
 import io.kubernetes.client.openapi.models.V1beta1RoleList;
 import io.kubernetes.client.util.Config;
@@ -232,13 +232,13 @@ public class KubeAPI {
     }
 
 
-    public PolicyV1beta1PodSecurityPolicyList getPolicyV1beta1PodSecurityPolicyList() {
+    public V1beta1PodSecurityPolicyList getPolicyV1beta1PodSecurityPolicyList() {
         try {
             return policyV1beta1Api.listPodSecurityPolicy(null, null, null, null, null, null, null, null, null);
         } catch (ApiException e) {
             showErrorDialog(e);
         }
-        return new PolicyV1beta1PodSecurityPolicyList();
+        return new V1beta1PodSecurityPolicyList();
     }
 
 
