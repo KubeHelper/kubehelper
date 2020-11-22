@@ -23,12 +23,22 @@ import com.kubehelper.domain.models.SearchModel;
 import com.kubehelper.domain.results.SearchResult;
 import io.kubernetes.client.Exec;
 import io.kubernetes.client.openapi.ApiException;
+import io.kubernetes.client.openapi.models.PolicyV1beta1PodSecurityPolicy;
+import io.kubernetes.client.openapi.models.PolicyV1beta1PodSecurityPolicyList;
 import io.kubernetes.client.openapi.models.V1ConfigMap;
 import io.kubernetes.client.openapi.models.V1ConfigMapKeySelector;
 import io.kubernetes.client.openapi.models.V1ConfigMapList;
 import io.kubernetes.client.openapi.models.V1Container;
+import io.kubernetes.client.openapi.models.V1DaemonSet;
+import io.kubernetes.client.openapi.models.V1DaemonSetList;
+import io.kubernetes.client.openapi.models.V1Deployment;
+import io.kubernetes.client.openapi.models.V1DeploymentList;
 import io.kubernetes.client.openapi.models.V1EnvVar;
 import io.kubernetes.client.openapi.models.V1EnvVarSource;
+import io.kubernetes.client.openapi.models.V1Job;
+import io.kubernetes.client.openapi.models.V1JobList;
+import io.kubernetes.client.openapi.models.V1NetworkPolicy;
+import io.kubernetes.client.openapi.models.V1NetworkPolicyList;
 import io.kubernetes.client.openapi.models.V1ObjectMeta;
 import io.kubernetes.client.openapi.models.V1PersistentVolume;
 import io.kubernetes.client.openapi.models.V1PersistentVolumeClaim;
@@ -38,6 +48,8 @@ import io.kubernetes.client.openapi.models.V1Pod;
 import io.kubernetes.client.openapi.models.V1PodList;
 import io.kubernetes.client.openapi.models.V1PodSpec;
 import io.kubernetes.client.openapi.models.V1PodStatus;
+import io.kubernetes.client.openapi.models.V1ReplicaSet;
+import io.kubernetes.client.openapi.models.V1ReplicaSetList;
 import io.kubernetes.client.openapi.models.V1ResourceFieldSelector;
 import io.kubernetes.client.openapi.models.V1Secret;
 import io.kubernetes.client.openapi.models.V1SecretKeySelector;
@@ -46,6 +58,18 @@ import io.kubernetes.client.openapi.models.V1Service;
 import io.kubernetes.client.openapi.models.V1ServiceAccount;
 import io.kubernetes.client.openapi.models.V1ServiceAccountList;
 import io.kubernetes.client.openapi.models.V1ServiceList;
+import io.kubernetes.client.openapi.models.V1StatefulSet;
+import io.kubernetes.client.openapi.models.V1StatefulSetList;
+import io.kubernetes.client.openapi.models.V1beta1ClusterRole;
+import io.kubernetes.client.openapi.models.V1beta1ClusterRoleBinding;
+import io.kubernetes.client.openapi.models.V1beta1ClusterRoleBindingList;
+import io.kubernetes.client.openapi.models.V1beta1ClusterRoleList;
+import io.kubernetes.client.openapi.models.V1beta1PodDisruptionBudget;
+import io.kubernetes.client.openapi.models.V1beta1PodDisruptionBudgetList;
+import io.kubernetes.client.openapi.models.V1beta1Role;
+import io.kubernetes.client.openapi.models.V1beta1RoleBinding;
+import io.kubernetes.client.openapi.models.V1beta1RoleBindingList;
+import io.kubernetes.client.openapi.models.V1beta1RoleList;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
@@ -102,11 +126,6 @@ public class SearchService {
 //    private int currentItemNumber;
 //    private int totalItems;
 
-    //    DAEMON_SET("DaemonSet"),
-//    DEPLOYMENT("Deployment"),
-//    REPLICA_SET("ReplicaSet"),
-//    STATEFUL_SET("StatefulSet"),
-
     @Autowired
     private KubeAPI kubeAPI;
 
@@ -148,7 +167,6 @@ public class SearchService {
             if (selectedResources.contains(SERVICE_ACCOUNT)) {
                 searchInServiceAccounts(searchModel);
             }
-//            TODO
             if (selectedResources.contains(DAEMON_SET)) {
                 searchInDaemonSets(searchModel);
             }
@@ -355,41 +373,207 @@ public class SearchService {
 
 
     private void searchInDaemonSets(SearchModel searchModel) {
+        V1DaemonSetList daemonSetsList = kubeAPI.getV1DaemonSetList(searchModel.getSelectedNamespace());
+        for (V1DaemonSet daemonSet : daemonSetsList.getItems()) {
+            try {
+                if (skipKubeNamespace(searchModel, daemonSet.getMetadata())) {
+                    continue;
+                }
+                if (isStringsContainsSearchString(searchModel.getSearchString(), daemonSet.getMetadata().getName())) {
+                    addSearchResultToModel(daemonSet.getMetadata(), searchModel, DAEMON_SET, daemonSet.getMetadata().getName(), daemonSet.getMetadata().getName(), "");
+                }
+            } catch (RuntimeException e) {
+                searchModel.addSearchException(e);
+                logger.error(e.getMessage(), e);
+            }
+        }
     }
 
     private void searchInDeployments(SearchModel searchModel) {
+        V1DeploymentList deploymentsList = kubeAPI.getV1DeploymentList(searchModel.getSelectedNamespace());
+        for (V1Deployment deployment : deploymentsList.getItems()) {
+            try {
+                if (skipKubeNamespace(searchModel, deployment.getMetadata())) {
+                    continue;
+                }
+                if (isStringsContainsSearchString(searchModel.getSearchString(), deployment.getMetadata().getName())) {
+                    addSearchResultToModel(deployment.getMetadata(), searchModel, DEPLOYMENT, deployment.getMetadata().getName(), deployment.getMetadata().getName(), "");
+                }
+            } catch (RuntimeException e) {
+                searchModel.addSearchException(e);
+                logger.error(e.getMessage(), e);
+            }
+        }
     }
 
     private void searchInReplicaSets(SearchModel searchModel) {
+        V1ReplicaSetList replicaSetsList = kubeAPI.getV1ReplicaSetList(searchModel.getSelectedNamespace());
+        for (V1ReplicaSet replicaSet : replicaSetsList.getItems()) {
+            try {
+                if (skipKubeNamespace(searchModel, replicaSet.getMetadata())) {
+                    continue;
+                }
+                if (isStringsContainsSearchString(searchModel.getSearchString(), replicaSet.getMetadata().getName())) {
+                    addSearchResultToModel(replicaSet.getMetadata(), searchModel, REPLICA_SET, replicaSet.getMetadata().getName(), replicaSet.getMetadata().getName(), "");
+                }
+            } catch (RuntimeException e) {
+                searchModel.addSearchException(e);
+                logger.error(e.getMessage(), e);
+            }
+        }
     }
 
     private void searchInStatefulSets(SearchModel searchModel) {
+        V1StatefulSetList statefulSetsList = kubeAPI.getV1StatefulSetList(searchModel.getSelectedNamespace());
+        for (V1StatefulSet statefulSet : statefulSetsList.getItems()) {
+            try {
+                if (skipKubeNamespace(searchModel, statefulSet.getMetadata())) {
+                    continue;
+                }
+                if (isStringsContainsSearchString(searchModel.getSearchString(), statefulSet.getMetadata().getName())) {
+                    addSearchResultToModel(statefulSet.getMetadata(), searchModel, STATEFUL_SET, statefulSet.getMetadata().getName(), statefulSet.getMetadata().getName(), "");
+                }
+            } catch (RuntimeException e) {
+                searchModel.addSearchException(e);
+                logger.error(e.getMessage(), e);
+            }
+        }
     }
 
     private void searchInJobs(SearchModel searchModel) {
-
+        V1JobList jobsList = kubeAPI.getV1JobList(searchModel.getSelectedNamespace());
+        for (V1Job job : jobsList.getItems()) {
+            try {
+                if (skipKubeNamespace(searchModel, job.getMetadata())) {
+                    continue;
+                }
+                if (isStringsContainsSearchString(searchModel.getSearchString(), job.getMetadata().getName())) {
+                    addSearchResultToModel(job.getMetadata(), searchModel, JOB, job.getMetadata().getName(), job.getMetadata().getName(), "");
+                }
+            } catch (RuntimeException e) {
+                searchModel.addSearchException(e);
+                logger.error(e.getMessage(), e);
+            }
+        }
     }
 
     private void searchInClusterRoleBindings(SearchModel searchModel) {
-
+        V1beta1ClusterRoleBindingList clusterRoleBindingsList = kubeAPI.getV1ClusterRolesBindingsList();
+        for (V1beta1ClusterRoleBinding binding : clusterRoleBindingsList.getItems()) {
+            try {
+                if (skipKubeNamespace(searchModel, binding.getMetadata())) {
+                    continue;
+                }
+                if (isStringsContainsSearchString(searchModel.getSearchString(), binding.getMetadata().getName())) {
+                    addSearchResultToModel(binding.getMetadata(), searchModel, ROLE_BINDING, binding.getMetadata().getName(), binding.getMetadata().getName(), "");
+                }
+            } catch (RuntimeException e) {
+                searchModel.addSearchException(e);
+                logger.error(e.getMessage(), e);
+            }
+        }
     }
 
     private void searchInClusterRoles(SearchModel searchModel) {
+        V1beta1ClusterRoleList clusterRolesList = kubeAPI.getV1ClusterRolesList();
+        for (V1beta1ClusterRole clusterRole : clusterRolesList.getItems()) {
+            try {
+                if (skipKubeNamespace(searchModel, clusterRole.getMetadata())) {
+                    continue;
+                }
+                if (isStringsContainsSearchString(searchModel.getSearchString(), clusterRole.getMetadata().getName())) {
+                    addSearchResultToModel(clusterRole.getMetadata(), searchModel, CLUSTER_ROLE, clusterRole.getMetadata().getName(), clusterRole.getMetadata().getName(), "");
+                }
+            } catch (RuntimeException e) {
+                searchModel.addSearchException(e);
+                logger.error(e.getMessage(), e);
+            }
+        }
     }
 
     private void searchInRoleBindings(SearchModel searchModel) {
+        V1beta1RoleBindingList rolesBindingsList = kubeAPI.getV1RolesBindingList(searchModel.getSelectedNamespace());
+        for (V1beta1RoleBinding roleBinding : rolesBindingsList.getItems()) {
+            try {
+                if (skipKubeNamespace(searchModel, roleBinding.getMetadata())) {
+                    continue;
+                }
+                if (isStringsContainsSearchString(searchModel.getSearchString(), roleBinding.getMetadata().getName())) {
+                    addSearchResultToModel(roleBinding.getMetadata(), searchModel, ROLE_BINDING, roleBinding.getMetadata().getName(), roleBinding.getMetadata().getName(), "");
+                }
+            } catch (RuntimeException e) {
+                searchModel.addSearchException(e);
+                logger.error(e.getMessage(), e);
+            }
+        }
     }
 
     private void searchInRoles(SearchModel searchModel) {
+        V1beta1RoleList rolesList = kubeAPI.getV1RolesList(searchModel.getSelectedNamespace());
+        for (V1beta1Role role : rolesList.getItems()) {
+            try {
+                if (skipKubeNamespace(searchModel, role.getMetadata())) {
+                    continue;
+                }
+                if (isStringsContainsSearchString(searchModel.getSearchString(), role.getMetadata().getName())) {
+                    addSearchResultToModel(role.getMetadata(), searchModel, ROLE, role.getMetadata().getName(), role.getMetadata().getName(), "");
+                }
+            } catch (RuntimeException e) {
+                searchModel.addSearchException(e);
+                logger.error(e.getMessage(), e);
+            }
+        }
     }
 
     private void searchInNetworkPolicies(SearchModel searchModel) {
+        V1NetworkPolicyList networkPoliciesList = kubeAPI.getV1NetworkPolicyList(searchModel.getSelectedNamespace());
+        for (V1NetworkPolicy policy : networkPoliciesList.getItems()) {
+            try {
+                if (skipKubeNamespace(searchModel, policy.getMetadata())) {
+                    continue;
+                }
+                if (isStringsContainsSearchString(searchModel.getSearchString(), policy.getMetadata().getName())) {
+                    addSearchResultToModel(policy.getMetadata(), searchModel, NETWORK_POLICY, policy.getMetadata().getName(), policy.getMetadata().getName(), "");
+                }
+            } catch (RuntimeException e) {
+                searchModel.addSearchException(e);
+                logger.error(e.getMessage(), e);
+            }
+        }
     }
 
     private void searchInPodDistributionBudgets(SearchModel searchModel) {
+        V1beta1PodDisruptionBudgetList budgetsList = kubeAPI.getV1beta1PodDisruptionBudgetsList(searchModel.getSelectedNamespace());
+        for (V1beta1PodDisruptionBudget budget : budgetsList.getItems()) {
+            try {
+                if (skipKubeNamespace(searchModel, budget.getMetadata())) {
+                    continue;
+                }
+                if (isStringsContainsSearchString(searchModel.getSearchString(), budget.getMetadata().getName())) {
+                    addSearchResultToModel(budget.getMetadata(), searchModel, POD_DISRUPTION_BUDGET, budget.getMetadata().getName(), budget.getMetadata().getName(), "");
+                }
+            } catch (RuntimeException e) {
+                searchModel.addSearchException(e);
+                logger.error(e.getMessage(), e);
+            }
+        }
     }
 
     private void searchInPodSecurityPolicies(SearchModel searchModel) {
+        PolicyV1beta1PodSecurityPolicyList policiesList = kubeAPI.getPolicyV1beta1PodSecurityPolicyList();
+        for (PolicyV1beta1PodSecurityPolicy policy : policiesList.getItems()) {
+            try {
+                if (skipKubeNamespace(searchModel, policy.getMetadata())) {
+                    continue;
+                }
+                if (isStringsContainsSearchString(searchModel.getSearchString(), policy.getMetadata().getName())) {
+                    addSearchResultToModel(policy.getMetadata(), searchModel, POD_SECURITY_POLICY, policy.getMetadata().getName(), policy.getMetadata().getName(), "");
+                }
+            } catch (RuntimeException e) {
+                searchModel.addSearchException(e);
+                logger.error(e.getMessage(), e);
+            }
+        }
     }
 
 
