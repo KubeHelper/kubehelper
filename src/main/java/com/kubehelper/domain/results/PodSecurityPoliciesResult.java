@@ -17,40 +17,47 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package com.kubehelper.domain.results;
 
-import io.kubernetes.client.openapi.models.V1Capabilities;
+import com.google.gson.annotations.SerializedName;
 import io.kubernetes.client.openapi.models.V1SELinuxOptions;
+import io.kubernetes.client.openapi.models.V1Sysctl;
 import io.kubernetes.client.openapi.models.V1WindowsSecurityContextOptions;
+import io.kubernetes.client.openapi.models.V1beta1AllowedCSIDriver;
+import io.kubernetes.client.openapi.models.V1beta1AllowedFlexVolume;
+import io.kubernetes.client.openapi.models.V1beta1AllowedHostPath;
+import io.kubernetes.client.openapi.models.V1beta1FSGroupStrategyOptions;
+import io.kubernetes.client.openapi.models.V1beta1HostPortRange;
+import io.kubernetes.client.openapi.models.V1beta1RunAsGroupStrategyOptions;
+import io.kubernetes.client.openapi.models.V1beta1RunAsUserStrategyOptions;
+import io.kubernetes.client.openapi.models.V1beta1RuntimeClassStrategyOptions;
+import io.kubernetes.client.openapi.models.V1beta1SELinuxStrategyOptions;
+import io.kubernetes.client.openapi.models.V1beta1SupplementalGroupsStrategyOptions;
+
+import java.util.List;
 
 /**
  * @author JDev
  */
-public class ContainerSecurityResult {
+public class PodSecurityPoliciesResult {
+
     private int id;
     private String resourceName = "";
-    private String podName = "";
 
     private Boolean allowPrivilegeEscalation;
-
-    //    TODO replace object with string joiners, look toString Method
-    private V1Capabilities capabilities;
+    private Boolean defaultAllowPrivilegeEscalation;
+    private Boolean hostIPC;
+    private Boolean hostNetwork;
+    private Boolean hostPID;
     private Boolean privileged;
-    private String procMount;
     private Boolean readOnlyRootFilesystem;
-    private Long runAsGroup;
-    private Boolean runAsNonRoot;
-    private Long runAsUser;
-    private V1SELinuxOptions seLinuxOptions;
-    private V1WindowsSecurityContextOptions windowsOptions;
-
 
     private String namespace = "";
     private String creationTime = "";
     private String fullDefinition = "";
 
-    public ContainerSecurityResult() {
+    public PodSecurityPoliciesResult() {
     }
 
-    public ContainerSecurityResult(int id) {
+    public PodSecurityPoliciesResult(int id) {
         this.id = id;
     }
 

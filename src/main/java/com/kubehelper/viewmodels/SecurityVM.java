@@ -139,14 +139,16 @@ public class SecurityVM {
     @GlobalCommand
     @NotifyChange({"*"})
     public void updateHeightsAndRerenderVM() {
-        ipsAndPortsGridHeight = ((float) ipsAndPortsModel.getDesktopHeight() / 100) * 68 + "px";
+//        ipsAndPortsGridHeight = ((float) ipsAndPortsModel.getDesktopHeight() / 100) * 68 + "px";
+        ipsAndPortsGridHeight = "900px";
     }
 
     @Command
     @NotifyChange({"*"})
     public void updateGridHeightOnSouthPanelChange(@ContextParam(ContextType.TRIGGER_EVENT) OpenEvent event) {
-        int heightPercentage = event.isOpen() ? 68 : 78;
-        ipsAndPortsGridHeight = ((float) ipsAndPortsModel.getDesktopHeight() / 100) * heightPercentage + "px";
+//        int heightPercentage = event.isOpen() ? 68 : 78;
+//        ipsAndPortsGridHeight = ((float) ipsAndPortsModel.getDesktopHeight() / 100) * heightPercentage + "px";
+        ipsAndPortsGridHeight = "900px";
     }
 
     @Command

@@ -41,8 +41,6 @@ public class LabelsModel implements PageModel {
 
     private String templateUrl = "~./zul/pages/labels.zul";
     public static String NAME = Global.LABELS_MODEL;
-    private int desktopWidth;
-    private int desktopHeight;
     private String selectedNamespace = "all";
     private List<String> namespaces = new ArrayList<>();
     private List<LabelResult> searchResults = new ArrayList<>();
@@ -144,12 +142,6 @@ public class LabelsModel implements PageModel {
     }
 
     @Override
-    public void setDesktopWithAndHeight(int width, int height) {
-        this.desktopWidth = width;
-        this.desktopHeight = height;
-    }
-
-    @Override
     public String getName() {
         return NAME;
     }
@@ -162,16 +154,6 @@ public class LabelsModel implements PageModel {
     @Override
     public String getTemplateUrl() {
         return templateUrl;
-    }
-
-    @Override
-    public int getDesktopWidth() {
-        return desktopWidth;
-    }
-
-    @Override
-    public int getDesktopHeight() {
-        return desktopHeight;
     }
 
     public List<String> getNamespaces() {

@@ -17,39 +17,33 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package com.kubehelper.domain.results;
 
-import io.kubernetes.client.openapi.models.V1SELinuxOptions;
-import io.kubernetes.client.openapi.models.V1Sysctl;
-import io.kubernetes.client.openapi.models.V1WindowsSecurityContextOptions;
+import com.kubehelper.common.Resource;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author JDev
  */
-public class PodSecurityResult {
-
+public class RoleRuleResult {
     private int id;
-    private String resourceName = "";
-
-    private Long fsGroup;
-    private Long runAsGroup;
-    private Boolean runAsNonRoot;
-    private Long runAsUser;
-//    TODO replace object with string joiners, look toString Method
-    private V1SELinuxOptions seLinuxOptions;
-    private List<Long> supplementalGroups = null;
-    private List<V1Sysctl> sysctls = null;
-    private V1WindowsSecurityContextOptions windowsOptions;
-
-
-    private String namespace = "";
-    private String creationTime = "";
+    private List<String> apiGroups = new ArrayList<>();
+    private List<String> nonResourceURLs = new ArrayList<>();
+    private List<String> resourceNames = new ArrayList<>();
+    private List<String> resources = new ArrayList<>();
+    private List<String> verbs = new ArrayList<>();
     private String fullDefinition = "";
 
-    public PodSecurityResult() {
+    //Generate a simple panel with 4 columns and 2 rows in one row create, read, update and delete and below ist verbs which belongs to this CRUD will be shown if rule is selected
+    private boolean create;
+    private boolean read;
+    private boolean update;
+    private boolean delete;
+
+    public RoleRuleResult() {
     }
 
-    public PodSecurityResult(int id) {
+    public RoleRuleResult(int id) {
         this.id = id;
     }
 

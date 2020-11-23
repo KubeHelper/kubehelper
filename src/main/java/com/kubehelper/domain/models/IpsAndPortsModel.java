@@ -34,8 +34,6 @@ public class IpsAndPortsModel implements PageModel {
     private String templateUrl = "~./zul/pages/ipsandports.zul";
 
     public static String NAME = Global.IPS_AND_PORTS_MODEL;
-    private int desktopWidth;
-    private int desktopHeight;
     private String selectedNamespace = "all";
     private List<String> namespaces = new ArrayList<>();
     private ListModelList<IpsAndPortsResult> ipsAndPortsResults = new ListModelList<>();
@@ -50,12 +48,6 @@ public class IpsAndPortsModel implements PageModel {
     public IpsAndPortsModel setNamespaces(List<String> namespaces) {
         this.namespaces = namespaces;
         return this;
-    }
-
-    @Override
-    public void setDesktopWithAndHeight(int width, int height) {
-        this.desktopWidth = width;
-        this.desktopHeight = height;
     }
 
     public void addSearchException(Exception exception) {
@@ -74,16 +66,6 @@ public class IpsAndPortsModel implements PageModel {
     @Override
     public String getTemplateUrl() {
         return templateUrl;
-    }
-
-    @Override
-    public int getDesktopWidth() {
-        return desktopWidth;
-    }
-
-    @Override
-    public int getDesktopHeight() {
-        return desktopHeight;
     }
 
     public ListModelList<IpsAndPortsResult> getIpsAndPortsResults() {

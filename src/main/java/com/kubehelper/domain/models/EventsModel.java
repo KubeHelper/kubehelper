@@ -35,8 +35,6 @@ public class EventsModel implements PageModel {
     private String templateUrl = "~./zul/pages/events.zul";
 
     public static String NAME = Global.EVENTS_MODEL;
-    private int desktopWidth;
-    private int desktopHeight;
     private String selectedNamespace = "all";
     private List<String> namespaces = new ArrayList<>();
     private ListModelList<EventResult> searchResults = new ListModelList<>();
@@ -55,13 +53,6 @@ public class EventsModel implements PageModel {
         this.namespaces = namespaces;
         return this;
     }
-
-    @Override
-    public void setDesktopWithAndHeight(int width, int height) {
-        this.desktopWidth = width;
-        this.desktopHeight = height;
-    }
-
 
     public EventsModel addResourceNameFilter(String resourceName) {
         if (StringUtils.isNotBlank(resourceName)) {
@@ -86,16 +77,6 @@ public class EventsModel implements PageModel {
     @Override
     public String getTemplateUrl() {
         return templateUrl;
-    }
-
-    @Override
-    public int getDesktopWidth() {
-        return desktopWidth;
-    }
-
-    @Override
-    public int getDesktopHeight() {
-        return desktopHeight;
     }
 
     public ListModelList<EventResult> getSearchResults() {

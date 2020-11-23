@@ -34,8 +34,6 @@ public class SearchModel implements PageModel {
 
     private String templateUrl = "~./zul/pages/search.zul";
     public static String NAME = Global.SEARCH_MODEL;
-    private int desktopWidth;
-    private int desktopHeight;
     private String selectedNamespace = "all";
     private List<String> namespaces = new ArrayList<>();
     private ListModelList<SearchResult> searchResults = new ListModelList<>();
@@ -68,12 +66,6 @@ public class SearchModel implements PageModel {
     }
 
     @Override
-    public void setDesktopWithAndHeight(int width, int height) {
-        this.desktopWidth = width;
-        this.desktopHeight = height;
-    }
-
-    @Override
     public String getName() {
         return NAME;
     }
@@ -86,16 +78,6 @@ public class SearchModel implements PageModel {
     @Override
     public String getTemplateUrl() {
         return templateUrl;
-    }
-
-    @Override
-    public int getDesktopWidth() {
-        return desktopWidth;
-    }
-
-    @Override
-    public int getDesktopHeight() {
-        return desktopHeight;
     }
 
     public List<String> getNamespaces() {

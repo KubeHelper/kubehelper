@@ -5,10 +5,11 @@
             <center margins="0,3,3,3" title="Security">
                 <tabbox width="100%" sclass="nav_tabs">
                     <tabs id="tabs">
-                        <tab label="Pods"/>
-                        <tab label="Policies"/>
-                        <tab label="Service Accounts"/>
                         <tab label="Roles"/>
+                        <tab label="Pods"/>
+                        <tab label="Containers"/>
+                        <tab label="Service Accounts"/>
+                        <tab label="Pod Security Policies"/>
                     </tabs>
                     <tabpanels>
                         <tabpanel>

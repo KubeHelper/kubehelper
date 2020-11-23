@@ -91,15 +91,15 @@
                     <rows>
                         <template name="model" var="item">
                             <row onClick="@command('getDetails', clickedItem=item)" style="cursor:pointer">
-                                <label value="${item.id}" sort="auto(id)"/>
-                                <label value="${item.ip}" multiline="true" sort="auto(ip)"/>
+                                <label value="${item.id}"/>
+                                <label value="${item.ip}" multiline="true"/>
                                 <label value="${item.ports}" multiline="true"/>
-                                <label value="${item.resourceName}" sort="auto(resourceName)"/>
-                                <label value="${item.namespace}" sort="auto(namespace)"/>
-                                <label value="${item.resourceType}" sort="auto(resourceType)"/>
+                                <label value="${item.resourceName}"/>
+                                <label value="${item.namespace}"/>
+                                <label value="${item.resourceType}"/>
                                 <label value="${item.hostInfo}"/>
                                 <label value="${item.additionalInfo}" multiline="true"/>
-                                <label value="${item.creationTime}" sort="auto(creationTime)"/>
+                                <label value="${item.creationTime}"/>
                             </row>
                         </template>
                     </rows>
