@@ -42,6 +42,11 @@ public class ContainerSecurityResult {
     private V1SELinuxOptions seLinuxOptions;
     private V1WindowsSecurityContextOptions windowsOptions;
 
+    //TODO get active user from container
+    private String userAtContainer = "";
+    private String userAtContainerPermissions = "";
+    private String runCommand = "";
+
 
     private String namespace = "";
     private String creationTime = "";
