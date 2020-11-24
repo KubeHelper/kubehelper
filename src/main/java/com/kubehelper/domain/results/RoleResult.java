@@ -17,9 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package com.kubehelper.domain.results;
 
-import com.google.common.collect.Table;
 import com.kubehelper.common.Resource;
-import org.zkoss.zul.Rows;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -74,6 +72,15 @@ public class RoleResult {
         return this;
     }
 
+    public List<RoleRuleResult> getRoleRules(int roleId) {
+//        return roleRules.get(roleId);
+        return new ArrayList<>();
+    }
+
+    public RoleResult setRoleRules(Map<Integer, RoleRuleResult> roleRules) {
+        this.roleRules = roleRules;
+        return this;
+    }
 
     public class RoleBindingSubject{
         private String kind;

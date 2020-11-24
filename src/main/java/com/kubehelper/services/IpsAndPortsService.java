@@ -79,10 +79,9 @@ public class IpsAndPortsService {
     /**
      * Clears active @{@link IpsAndPortsModel} model and fill it with new data from pods and services.
      *
-     * @param selectedNamespace - selected namespace. All - all namespaces.
      * @param ipsAndPortsModel - model for @{@link com.kubehelper.viewmodels.IpsAndPortsVM}
      */
-    public void get(String selectedNamespace, IpsAndPortsModel ipsAndPortsModel) {
+    public void get(IpsAndPortsModel ipsAndPortsModel) {
         try{
         ipsAndPortsModel.getIpsAndPortsResults().clear();
         fillModelWithPodsInfo(ipsAndPortsModel);

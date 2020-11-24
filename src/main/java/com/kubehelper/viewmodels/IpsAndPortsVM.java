@@ -98,7 +98,7 @@ public class IpsAndPortsVM {
     @NotifyChange({"totalItems", "ipsAndPortsResults", "filter"})
     public void search() {
         ipsAndPortsModel.setFilter(new IpsAndPortsFilter());
-        ipsAndPortsService.get(ipsAndPortsModel.getSelectedNamespace(), ipsAndPortsModel);
+        ipsAndPortsService.get(ipsAndPortsModel);
         ipsAndPortsModel.setNamespaces(commonService.getAllNamespaces());
         ipsAndPortsModel.setSearchExceptions(new ArrayList<>());
         isGetButtonPressed = true;
@@ -200,6 +200,14 @@ public class IpsAndPortsVM {
     }
 
     public String getTotalItems() {
+        return String.format("Total Items: %d", ipsAndPortsResults.size());
+    }
+
+    public List<String> getNamespaces() {
+        return ipsAndPortsModel.getNamespaces();
+    }
+
+    public ListModelList<IpsAndPortsResult> getIpsAndPortsResults() {
         if (isGetButtonPressed && ipsAndPortsResults.isEmpty()) {
             Notification.show("Nothing found.", "info", ipsAndPortsGridFooter, "before_end", 2000);
         }
@@ -211,14 +219,6 @@ public class IpsAndPortsVM {
             window.doModal();
         }
         isGetButtonPressed = false;
-        return String.format("Total Items: %d", ipsAndPortsResults.size());
-    }
-
-    public List<String> getNamespaces() {
-        return ipsAndPortsModel.getNamespaces();
-    }
-
-    public ListModelList<IpsAndPortsResult> getIpsAndPortsResults() {
         return ipsAndPortsResults;
     }
 

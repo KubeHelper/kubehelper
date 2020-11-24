@@ -18,25 +18,31 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package com.kubehelper.viewmodels;
 
 import com.kubehelper.common.Global;
-import com.kubehelper.domain.filters.IpsAndPortsFilter;
-import com.kubehelper.domain.models.IpsAndPortsModel;
-import com.kubehelper.domain.results.IpsAndPortsResult;
+import com.kubehelper.domain.filters.ContainersSecurityFilter;
+import com.kubehelper.domain.filters.PodsSecurityFilter;
+import com.kubehelper.domain.filters.PodsSecurityPoliciesSecurityFilter;
+import com.kubehelper.domain.filters.RoleRulesSecurityFilter;
+import com.kubehelper.domain.filters.RolesSecurityFilter;
+import com.kubehelper.domain.filters.ServiceAccountsSecurityFilter;
+import com.kubehelper.domain.models.SecurityModel;
+import com.kubehelper.domain.results.ContainerSecurityResult;
+import com.kubehelper.domain.results.PodSecurityPoliciesResult;
+import com.kubehelper.domain.results.PodSecurityResult;
+import com.kubehelper.domain.results.RoleResult;
+import com.kubehelper.domain.results.ServiceAccountResult;
 import com.kubehelper.services.CommonService;
-import com.kubehelper.services.IpsAndPortsService;
+import com.kubehelper.services.SecurityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zkoss.bind.annotation.AfterCompose;
-import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
 import org.zkoss.bind.annotation.ContextType;
-import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Path;
-import org.zkoss.zk.ui.event.OpenEvent;
 import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
@@ -51,8 +57,6 @@ import org.zkoss.zul.Window;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -63,27 +67,50 @@ public class SecurityVM {
 
     private static Logger logger = LoggerFactory.getLogger(SecurityVM.class);
 
-    private boolean isGetButtonPressed;
+    private boolean isGetRolesButtonPressed;
+    private boolean isGetPodsButtonPressed;
+    private boolean isGetContainersButtonPressed;
+    private boolean isGetServiceAccountsButtonPressed;
+    private boolean isGetPodSecurityPoliciesButtonPressed;
 
-    private String detailsLabel = "";
-    private String ipsAndPortsGridHeight = "800px";
+    private SecurityModel securityModel;
 
-    private IpsAndPortsModel ipsAndPortsModel;
-    private ListModelList<IpsAndPortsResult> ipsAndPortsResults = new ListModelList<>();
+    private ListModelList<RoleResult> rolesResults = new ListModelList<>();
+    private ListModelList<RoleResult> roleRulesResults = new ListModelList<>();
+    private ListModelList<PodSecurityResult> podsResults = new ListModelList<>();
+    private ListModelList<ContainerSecurityResult> containersResults = new ListModelList<>();
+    private ListModelList<ServiceAccountResult> serviceAccountsResults = new ListModelList<>();
+    private ListModelList<PodSecurityPoliciesResult> podSecurityPoliciesResults = new ListModelList<>();
 
     @Wire
-    private Footer ipsAndPortsGridFooter;
+    private Footer rolesGridFooter;
+
+    @Wire
+    private Footer roleRulesGridFooter;
+
+    @Wire
+    private Footer podsGridFooter;
+
+    @Wire
+    private Footer containersGridFooter;
+
+    @Wire
+    private Footer serviceAccountsGridFooter;
+
+    @Wire
+    private Footer podSecurityPoliciesGridFooter;
 
     @WireVariable
     private CommonService commonService;
 
     @WireVariable
-    private IpsAndPortsService ipsAndPortsService;
+    private SecurityService securityService;
 
     @Init
     public void init() {
-        ipsAndPortsModel = (IpsAndPortsModel) Global.ACTIVE_MODELS.computeIfAbsent(Global.IPS_AND_PORTS_MODEL, (k) -> Global.NEW_MODELS.get(Global.IPS_AND_PORTS_MODEL));
-        onInitPreparations();
+        securityModel = (SecurityModel) Global.ACTIVE_MODELS.computeIfAbsent(Global.SECURITY_MODEL, (k) -> Global.NEW_MODELS.get(Global.SECURITY_MODEL));
+//        TODO
+//        onInitPreparations();
     }
 
     /**
@@ -95,77 +122,146 @@ public class SecurityVM {
     }
 
     @Command
-    @NotifyChange({"totalItems", "ipsAndPortsResults", "filter"})
-    public void search() {
-        ipsAndPortsModel.setFilter(new IpsAndPortsFilter());
-        ipsAndPortsService.get(ipsAndPortsModel.getSelectedNamespace(), ipsAndPortsModel);
-        ipsAndPortsModel.setNamespaces(commonService.getAllNamespaces());
-        ipsAndPortsModel.setSearchExceptions(new ArrayList<>());
-        isGetButtonPressed = true;
-        logger.info("Found {} namespaces.", ipsAndPortsModel.getNamespaces());
-        onInitPreparations();
+    @NotifyChange({"rolesTotalItems", "rolesResults", "rolesFilter"})
+    public void getRoles() {
+        securityModel.setRolesFilter(new RolesSecurityFilter());
+//        securityService.getRoles(securityModel);
+        securityModel.setSearchExceptions(new ArrayList<>());
+        isGetRolesButtonPressed = true;
+//        onInitPreparations();
     }
 
+    @Command
+    @NotifyChange({"podsTotalItems", "podsResults", "podsFilter"})
+    public void getPods() {
+        securityModel.setPodsFilter(new PodsSecurityFilter());
+//        securityService.getPods(securityModel);
+        securityModel.setSearchExceptions(new ArrayList<>());
+        isGetPodsButtonPressed = true;
+//        onInitPreparations();
+    }
+
+    @Command
+    @NotifyChange({"containersTotalItems", "containersResults", "containersFilter"})
+    public void getContainers() {
+        securityModel.setContainersFilter(new ContainersSecurityFilter());
+//        securityService.getContainers(securityModel);
+        securityModel.setSearchExceptions(new ArrayList<>());
+        isGetContainersButtonPressed = true;
+//        onInitPreparations();
+    }
+
+    @Command
+    @NotifyChange({"serviceAccountsTotalItems", "serviceAccountsResults", "serviceAccountsFilter"})
+    public void getServiceAccounts() {
+        securityModel.setServiceAccountsFilter(new ServiceAccountsSecurityFilter());
+//        securityService.getServiceAccounts(securityModel);
+        securityModel.setSearchExceptions(new ArrayList<>());
+        isGetServiceAccountsButtonPressed = true;
+//        onInitPreparations();
+    }
+
+    @Command
+    @NotifyChange({"podSecurityPoliciesTotalItems", "podSecurityPoliciesResults", "podSecurityPoliciesFilter"})
+    public void getPodSecurityPolicies() {
+        securityModel.setPodSecurityPoliciesFilter(new PodsSecurityPoliciesSecurityFilter());
+//        securityService.getPodSecurityPolicies(securityModel);
+        securityModel.setSearchExceptions(new ArrayList<>());
+        isGetPodSecurityPoliciesButtonPressed = true;
+//        onInitPreparations();
+    }
+
+    //    TODO onInitPreparations for each tab
     private void onInitPreparations() {
-        ipsAndPortsModel.setNamespaces(ipsAndPortsModel.getNamespaces().isEmpty() ? commonService.getAllNamespaces() : ipsAndPortsModel.getNamespaces());
-        if (ipsAndPortsModel.getFilter().isFilterActive() && !ipsAndPortsModel.getIpsAndPortsResults().isEmpty()) {
-            filterIps();
-        } else {
-            ipsAndPortsResults = new ListModelList<>(ipsAndPortsModel.getIpsAndPortsResults());
-        }
-        sortResultsByNamespace();
-//        updateHeightsAndRerenderVM();
+        securityModel.setNamespaces(securityModel.getNamespaces().isEmpty() ? commonService.getAllNamespaces() : securityModel.getNamespaces());
+        //        TODO remove call commonService.getAllNamespaces() and from other models and put logger in onInitPreparations
+        logger.info("Found {} namespaces.", securityModel.getNamespaces());
+//        if (securityModel.getFilter().isFilterActive() && !ipsAndPortsModel.getIpsAndPortsResults().isEmpty()) {
+//            filterIps();
+//        } else {
+//            ipsAndPortsResults = new ListModelList<>(securityModel.getRolesResults());
+//        }
+//        sortResultsByNamespace();
+    }
+
+//    TODO Filters for all tabs
+
+//    @Command
+//    @NotifyChange({"totalItems", "ipsAndPortsResults"})
+//    public void filterIps() {
+//        ipsAndPortsResults.clear();
+//        for (IpsAndPortsResult ipsAndPortsResult : ipsAndPortsModel.getIpsAndPortsResults()) {
+//            if (ipsAndPortsResult.getIp().toLowerCase().contains(getFilter().getIp().toLowerCase()) &&
+//                    ipsAndPortsResult.getPorts().toLowerCase().contains(getFilter().getPorts().toLowerCase()) &&
+//                    ipsAndPortsResult.getHostInfo().toLowerCase().contains(getFilter().getHostInfo().toLowerCase()) &&
+//                    ipsAndPortsResult.getCreationTime().toLowerCase().contains(getFilter().getCreationTime().toLowerCase()) &&
+//                    ipsAndPortsResult.getResourceName().toLowerCase().contains(getFilter().getResourceName().toLowerCase()) &&
+//                    ipsAndPortsResult.getResourceType().toLowerCase().contains(getFilter().getResourceType().toLowerCase()) &&
+//                    ipsAndPortsResult.getNamespace().toLowerCase().contains(getFilter().getNamespace().toLowerCase())) {
+//                ipsAndPortsResults.add(ipsAndPortsResult);
+//            }
+//        }
+//        sortResultsByNamespace();
+//    }
+
+
+    @Command
+    @NotifyChange({"rolesTotalItems", "rolesResults", "rolesFilter", "selectedRolesNamespace"})
+    public void clearAllRoles() {
+//        securityModel.setRolesResults(new ListModelList<>())
+//                .setFilter(new IpsAndPortsFilter())
+//                .setNamespaces(commonService.getAllNamespaces())
+//                .setSelectedNamespace("all")
+//                .setSearchExceptions(new ArrayList<>());
+        rolesResults = new ListModelList<>();
+        clearAllFilterComboboxes();
     }
 
     @Command
-    @NotifyChange({"totalItems", "ipsAndPortsResults"})
-    public void filterIps() {
-        ipsAndPortsResults.clear();
-        for (IpsAndPortsResult ipsAndPortsResult : ipsAndPortsModel.getIpsAndPortsResults()) {
-            if (ipsAndPortsResult.getIp().toLowerCase().contains(getFilter().getIp().toLowerCase()) &&
-                    ipsAndPortsResult.getPorts().toLowerCase().contains(getFilter().getPorts().toLowerCase()) &&
-                    ipsAndPortsResult.getHostInfo().toLowerCase().contains(getFilter().getHostInfo().toLowerCase()) &&
-                    ipsAndPortsResult.getCreationTime().toLowerCase().contains(getFilter().getCreationTime().toLowerCase()) &&
-                    ipsAndPortsResult.getResourceName().toLowerCase().contains(getFilter().getResourceName().toLowerCase()) &&
-                    ipsAndPortsResult.getResourceType().toLowerCase().contains(getFilter().getResourceType().toLowerCase()) &&
-                    ipsAndPortsResult.getNamespace().toLowerCase().contains(getFilter().getNamespace().toLowerCase())) {
-                ipsAndPortsResults.add(ipsAndPortsResult);
-            }
-        }
-        sortResultsByNamespace();
-    }
-
-    //TODO Recalculate desktopHeight, change formula. And pass it to SearchVM.
-    @GlobalCommand
-    @NotifyChange({"*"})
-    public void updateHeightsAndRerenderVM() {
-//        ipsAndPortsGridHeight = ((float) ipsAndPortsModel.getDesktopHeight() / 100) * 68 + "px";
-        ipsAndPortsGridHeight = "900px";
+    @NotifyChange({"podsTotalItems", "podsResults", "podsFilter", "selectedPodsNamespace"})
+    public void clearAllPods() {
+//        securityModel.setRolesResults(new ListModelList<>())
+//                .setFilter(new IpsAndPortsFilter())
+//                .setNamespaces(commonService.getAllNamespaces())
+//                .setSelectedNamespace("all")
+//                .setSearchExceptions(new ArrayList<>());
+        containersResults = new ListModelList<>();
+        clearAllFilterComboboxes();
     }
 
     @Command
-    @NotifyChange({"*"})
-    public void updateGridHeightOnSouthPanelChange(@ContextParam(ContextType.TRIGGER_EVENT) OpenEvent event) {
-//        int heightPercentage = event.isOpen() ? 68 : 78;
-//        ipsAndPortsGridHeight = ((float) ipsAndPortsModel.getDesktopHeight() / 100) * heightPercentage + "px";
-        ipsAndPortsGridHeight = "900px";
+    @NotifyChange({"containersTotalItems", "containersResults", "containersFilter", "selectedContainersNamespace"})
+    public void clearAllContainers() {
+//        securityModel.setRolesResults(new ListModelList<>())
+//                .setFilter(new IpsAndPortsFilter())
+//                .setNamespaces(commonService.getAllNamespaces())
+//                .setSelectedNamespace("all")
+//                .setSearchExceptions(new ArrayList<>());
+        containersResults = new ListModelList<>();
+        clearAllFilterComboboxes();
     }
 
     @Command
-    @NotifyChange("detailsLabel")
-    public void getDetails(@BindingParam("clickedItem") IpsAndPortsResult item) {
-        detailsLabel = detailsLabel.equals(item.getDetails()) ? "" : item.getDetails();
+    @NotifyChange({"serviceAccountsTotalItems", "serviceAccountsResults", "serviceAccountsFilter", "selectedServiceAccountsNamespace"})
+    public void clearAllServiceAccounts() {
+//        securityModel.setRolesResults(new ListModelList<>())
+//                .setFilter(new IpsAndPortsFilter())
+//                .setNamespaces(commonService.getAllNamespaces())
+//                .setSelectedNamespace("all")
+//                .setSearchExceptions(new ArrayList<>());
+        serviceAccountsResults = new ListModelList<>();
+        clearAllFilterComboboxes();
     }
 
     @Command
-    @NotifyChange({"totalItems", "ipsAndPortsResults", "filter", "selectedNamespace"})
-    public void clearAll() {
-        ipsAndPortsModel.setIpsAndPortsResults(new ListModelList<>())
-                .setFilter(new IpsAndPortsFilter())
-                .setNamespaces(commonService.getAllNamespaces())
-                .setSelectedNamespace("all")
-                .setSearchExceptions(new ArrayList<>());
-        ipsAndPortsResults = new ListModelList<>();
+    @NotifyChange({"podSecurityPoliciesTotalItems", "podSecurityPoliciesResults", "podSecurityPoliciesFilter", "selectedPodSecurityPoliciesNamespace"})
+    public void clearAllPodSecurityPolicies() {
+//        securityModel.setRolesResults(new ListModelList<>())
+//                .setFilter(new IpsAndPortsFilter())
+//                .setNamespaces(commonService.getAllNamespaces())
+//                .setSelectedNamespace("all")
+//                .setSearchExceptions(new ArrayList<>());
+        podSecurityPoliciesResults = new ListModelList<>();
         clearAllFilterComboboxes();
     }
 
@@ -182,57 +278,150 @@ public class SecurityVM {
         }
     }
 
-    private void sortResultsByNamespace() {
-        ipsAndPortsResults.sort(Comparator.comparing(IpsAndPortsResult::getNamespace));
+    //TODO get sort by namespace for each grid
+//    private void sortResultsByNamespace() {
+//        ipsAndPortsResults.sort(Comparator.comparing(IpsAndPortsResult::getNamespace));
+//    }
+
+    public SecurityModel getModel() {
+        return securityModel;
     }
 
-    public IpsAndPortsModel getModel() {
-        return ipsAndPortsModel;
+
+    public ListModelList<RoleResult> getRolesResults() {
+        showNotificationAndExceptions(isGetRolesButtonPressed, rolesResults, rolesGridFooter);
+        isGetRolesButtonPressed = false;
+        return rolesResults;
     }
 
-    public String getSelectedNamespace() {
-        return this.ipsAndPortsModel.getSelectedNamespace();
+    public ListModelList<RoleResult> getRoleRulesResults() {
+//TODO add Method for get RoleRules by ID
+        return roleRulesResults;
     }
 
-    public SecurityVM setSelectedNamespace(String selectedNamespace) {
-        this.ipsAndPortsModel.setSelectedNamespace(selectedNamespace);
-        return this;
+    public ListModelList<PodSecurityResult> getPodsResults() {
+        showNotificationAndExceptions(isGetPodsButtonPressed, podsResults, podsGridFooter);
+        isGetPodsButtonPressed = false;
+        return podsResults;
     }
 
-    public String getTotalItems() {
-        if (isGetButtonPressed && ipsAndPortsResults.isEmpty()) {
-            Notification.show("Nothing found.", "info", ipsAndPortsGridFooter, "before_end", 2000);
+    public ListModelList<ContainerSecurityResult> getContainersResults() {
+        showNotificationAndExceptions(isGetContainersButtonPressed, containersResults, containersGridFooter);
+        isGetContainersButtonPressed = false;
+        return containersResults;
+    }
+
+    public ListModelList<ServiceAccountResult> getServiceAccountsResults() {
+        showNotificationAndExceptions(isGetServiceAccountsButtonPressed, serviceAccountsResults, serviceAccountsGridFooter);
+        isGetServiceAccountsButtonPressed = false;
+        return serviceAccountsResults;
+    }
+
+    public ListModelList<PodSecurityPoliciesResult> getPodSecurityPoliciesResults() {
+        showNotificationAndExceptions(isGetPodSecurityPoliciesButtonPressed, podSecurityPoliciesResults, podSecurityPoliciesGridFooter);
+        isGetPodSecurityPoliciesButtonPressed = false;
+        return podSecurityPoliciesResults;
+    }
+
+    public void showNotificationAndExceptions(boolean pressedButton, ListModelList results, Footer footer) {
+        if (pressedButton && results.isEmpty()) {
+            Notification.show("Nothing found.", "info", footer, "before_end", 2000);
         }
-        if (isGetButtonPressed && !ipsAndPortsResults.isEmpty()) {
-            Notification.show("Found: " + ipsAndPortsResults.size() + " items", "info", ipsAndPortsGridFooter, "before_end", 2000);
+        if (pressedButton && !results.isEmpty()) {
+            Notification.show("Found: " + results.size() + " items", "info", footer, "before_end", 2000);
         }
-        if (isGetButtonPressed && ipsAndPortsModel.hasSearchErrors()) {
-            Window window = (Window) Executions.createComponents("~./zul/components/errors.zul", null, Map.of("errors", ipsAndPortsModel.getSearchExceptions()));
+        if (pressedButton && securityModel.hasSearchErrors()) {
+            Window window = (Window) Executions.createComponents("~./zul/components/errors.zul", null, Map.of("errors", securityModel.getSearchExceptions()));
             window.doModal();
         }
-        isGetButtonPressed = false;
-        return String.format("Total Items: %d", ipsAndPortsResults.size());
     }
 
-    public List<String> getNamespaces() {
-        return ipsAndPortsModel.getNamespaces();
+    public String getSelectedRolesNamespace() {
+        return securityModel.getSelectedRolesNamespace();
     }
 
-    public ListModelList<IpsAndPortsResult> getIpsAndPortsResults() {
-        return ipsAndPortsResults;
+    public void setSelectedRolesNamespace(String selectedRolesNamespace) {
+        this.securityModel.setSelectedRolesNamespace(selectedRolesNamespace);
     }
 
-    public IpsAndPortsFilter getFilter() {
-        return ipsAndPortsModel.getFilter();
+    public String getSelectedPodsNamespace() {
+        return securityModel.getSelectedPodsNamespace();
     }
 
-    public String getDetailsLabel() {
-        return detailsLabel;
+    public void setSelectedPodsNamespace(String selectedPodsNamespace) {
+        this.securityModel.setSelectedPodsNamespace(selectedPodsNamespace);
     }
 
-    //    The approximate heights of the components on the page as a percentage. Header: 15%, Grid: 68, Footer: 17%
-    public String getIpsAndPortsGridHeight() {
-        return ipsAndPortsGridHeight;
+    public String getSelectedContainersNamespace() {
+        return securityModel.getSelectedContainersNamespace();
+    }
+
+    public void setSelectedContainersNamespace(String selectedContainersNamespace) {
+        this.securityModel.setSelectedContainersNamespace(selectedContainersNamespace);
+    }
+
+    public String getSelectedServiceAccountsNamespace() {
+        return securityModel.getSelectedServiceAccountsNamespace();
+    }
+
+    public void setSelectedServiceAccountsNamespace(String selectedServiceAccountsNamespace) {
+        this.securityModel.setSelectedServiceAccountsNamespace(selectedServiceAccountsNamespace);
+    }
+
+    public String getSelectedPodSecurityPoliciesNamespace() {
+        return securityModel.getSelectedPodSecurityPoliciesNamespace();
+    }
+
+    public void setSelectedPodSecurityPoliciesNamespace(String selectedPodSecurityPoliciesNamespace) {
+        this.securityModel.setSelectedPodSecurityPoliciesNamespace(selectedPodSecurityPoliciesNamespace);
+    }
+
+    public String getRolesTotalItems() {
+        return String.format("Total Items: %d", rolesResults.size());
+    }
+
+    public String getRoleRulesTotalItems() {
+        return String.format("Total Items: %d", roleRulesResults.size());
+    }
+
+    public String getPodsTotalItems() {
+        return String.format("Total Items: %d", podsResults.size());
+    }
+
+    public String getContainersTotalItems() {
+        return String.format("Total Items: %d", containersResults.size());
+    }
+
+    public String getServiceAccountsTotalItems() {
+        return String.format("Total Items: %d", serviceAccountsResults.size());
+    }
+
+    public String getPodSecurityPoliciesTotalItems() {
+        return String.format("Total Items: %d", podSecurityPoliciesResults.size());
+    }
+
+    public RolesSecurityFilter getRolesFilter() {
+        return securityModel.getRolesFilter();
+    }
+
+    public RoleRulesSecurityFilter getRoleRulesFilter() {
+        return securityModel.getRoleRulesFilter();
+    }
+
+    public PodsSecurityFilter getPodsFilter() {
+        return securityModel.getPodsFilter();
+    }
+
+    public ContainersSecurityFilter getContainersFilter() {
+        return securityModel.getContainersFilter();
+    }
+
+    public ServiceAccountsSecurityFilter getServiceAccountsFilter() {
+        return securityModel.getServiceAccountsFilter();
+    }
+
+    public PodsSecurityPoliciesSecurityFilter getPodSecurityPoliciesFilter() {
+        return securityModel.getPodSecurityPoliciesFilter();
     }
 
 }

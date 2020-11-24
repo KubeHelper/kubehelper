@@ -19,15 +19,18 @@ package com.kubehelper.domain.models;
 
 import com.kubehelper.common.Global;
 import com.kubehelper.common.KubeHelperException;
-import com.kubehelper.domain.filters.SearchFilter;
+import com.kubehelper.domain.filters.ContainersSecurityFilter;
+import com.kubehelper.domain.filters.PodsSecurityFilter;
+import com.kubehelper.domain.filters.PodsSecurityPoliciesSecurityFilter;
+import com.kubehelper.domain.filters.RoleRulesSecurityFilter;
+import com.kubehelper.domain.filters.RolesSecurityFilter;
+import com.kubehelper.domain.filters.ServiceAccountsSecurityFilter;
 import com.kubehelper.domain.results.ContainerSecurityResult;
 import com.kubehelper.domain.results.PodSecurityPoliciesResult;
 import com.kubehelper.domain.results.PodSecurityResult;
 import com.kubehelper.domain.results.RoleResult;
-import com.kubehelper.domain.results.SearchResult;
+import com.kubehelper.domain.results.RoleRuleResult;
 import com.kubehelper.domain.results.ServiceAccountResult;
-import org.apache.commons.lang3.StringUtils;
-import org.zkoss.zul.ListModelList;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,15 +44,26 @@ public class SecurityModel implements PageModel {
 
     private String templateUrl = "~./zul/pages/security.zul";
     public static String NAME = Global.SECURITY_MODEL;
-    private String selectedNamespace = "all";
+
+    private String selectedRolesNamespace = "all";
+    private String selectedPodsNamespace = "all";
+    private String selectedContainersNamespace = "all";
+    private String selectedServiceAccountsNamespace = "all";
+    private String selectedPodSecurityPoliciesNamespace = "all";
+
     private List<String> namespaces = new ArrayList<>();
-    private List<PodSecurityResult> podsSearchResults = new ArrayList<>();
-    private List<ContainerSecurityResult> containersSearchResults = new ArrayList<>();
-    private List<ServiceAccountResult> serviceAccountsSearchResults = new ArrayList<>();
-    private List<PodSecurityPoliciesResult> podSecurityPoliciesSearchResults = new ArrayList<>();
-    //key is RoleResult id
     private Map<Integer, RoleResult> rolesResults = new HashMap<>();
-    private SearchFilter filter = new SearchFilter();
+    private List<PodSecurityResult> podsResults = new ArrayList<>();
+    private List<ContainerSecurityResult> containersResults = new ArrayList<>();
+    private List<ServiceAccountResult> serviceAccountsResults = new ArrayList<>();
+    private List<PodSecurityPoliciesResult> podSecurityPoliciesResults = new ArrayList<>();
+    //key is RoleResult id
+    private RolesSecurityFilter rolesFilter = new RolesSecurityFilter();
+    private RoleRulesSecurityFilter roleRulesFilter = new RoleRulesSecurityFilter();
+    private PodsSecurityFilter podsFilter = new PodsSecurityFilter();
+    private ContainersSecurityFilter containersFilter = new ContainersSecurityFilter();
+    private ServiceAccountsSecurityFilter serviceAccountsFilter = new ServiceAccountsSecurityFilter();
+    private PodsSecurityPoliciesSecurityFilter podSecurityPoliciesFilter = new PodsSecurityPoliciesSecurityFilter();
     private List<KubeHelperException> searchExceptions = new ArrayList<>();
     private int selectedRoleId;
     private int selectedRoleRuleId;
@@ -70,6 +84,16 @@ public class SecurityModel implements PageModel {
         this.searchExceptions.add(new KubeHelperException(exception));
     }
 
+    public SecurityModel setSearchExceptions(List<KubeHelperException> searchExceptions) {
+        this.searchExceptions = searchExceptions;
+        return this;
+    }
+
+
+    public List<KubeHelperException> getSearchExceptions() {
+        return searchExceptions;
+    }
+
     @Override
     public String getTemplateUrl() {
         return templateUrl;
@@ -78,5 +102,167 @@ public class SecurityModel implements PageModel {
     @Override
     public String getName() {
         return NAME;
+    }
+
+
+    public boolean hasSearchErrors() {
+        return !searchExceptions.isEmpty();
+    }
+
+    public String getSelectedRolesNamespace() {
+        return selectedRolesNamespace;
+    }
+
+    public SecurityModel setSelectedRolesNamespace(String selectedRolesNamespace) {
+        this.selectedRolesNamespace = selectedRolesNamespace;
+        return this;
+    }
+
+    public String getSelectedPodsNamespace() {
+        return selectedPodsNamespace;
+    }
+
+    public SecurityModel setSelectedPodsNamespace(String selectedPodsNamespace) {
+        this.selectedPodsNamespace = selectedPodsNamespace;
+        return this;
+    }
+
+    public String getSelectedContainersNamespace() {
+        return selectedContainersNamespace;
+    }
+
+    public SecurityModel setSelectedContainersNamespace(String selectedContainersNamespace) {
+        this.selectedContainersNamespace = selectedContainersNamespace;
+        return this;
+    }
+
+    public String getSelectedServiceAccountsNamespace() {
+        return selectedServiceAccountsNamespace;
+    }
+
+    public SecurityModel setSelectedServiceAccountsNamespace(String selectedServiceAccountsNamespace) {
+        this.selectedServiceAccountsNamespace = selectedServiceAccountsNamespace;
+        return this;
+    }
+
+    public String getSelectedPodSecurityPoliciesNamespace() {
+        return selectedPodSecurityPoliciesNamespace;
+    }
+
+    public SecurityModel setSelectedPodSecurityPoliciesNamespace(String selectedPodSecurityPoliciesNamespace) {
+        this.selectedPodSecurityPoliciesNamespace = selectedPodSecurityPoliciesNamespace;
+        return this;
+    }
+
+    public RolesSecurityFilter getRolesFilter() {
+        return rolesFilter;
+    }
+
+    public RoleRulesSecurityFilter getRoleRulesFilter() {
+        return roleRulesFilter;
+    }
+
+    public PodsSecurityFilter getPodsFilter() {
+        return podsFilter;
+    }
+
+    public ContainersSecurityFilter getContainersFilter() {
+        return containersFilter;
+    }
+
+    public ServiceAccountsSecurityFilter getServiceAccountsFilter() {
+        return serviceAccountsFilter;
+    }
+
+    public PodsSecurityPoliciesSecurityFilter getPodSecurityPoliciesFilter() {
+        return podSecurityPoliciesFilter;
+    }
+
+    public SecurityModel setRolesFilter(RolesSecurityFilter rolesFilter) {
+        this.rolesFilter = rolesFilter;
+        return this;
+    }
+
+    public SecurityModel setRoleRulesFilter(RoleRulesSecurityFilter roleRulesFilter) {
+        this.roleRulesFilter = roleRulesFilter;
+        return this;
+    }
+
+    public SecurityModel setPodsFilter(PodsSecurityFilter podsFilter) {
+        this.podsFilter = podsFilter;
+        return this;
+    }
+
+    public SecurityModel setContainersFilter(ContainersSecurityFilter containersFilter) {
+        this.containersFilter = containersFilter;
+        return this;
+    }
+
+    public SecurityModel setServiceAccountsFilter(ServiceAccountsSecurityFilter serviceAccountsFilter) {
+        this.serviceAccountsFilter = serviceAccountsFilter;
+        return this;
+    }
+
+    public SecurityModel setPodSecurityPoliciesFilter(PodsSecurityPoliciesSecurityFilter podSecurityPoliciesFilter) {
+        this.podSecurityPoliciesFilter = podSecurityPoliciesFilter;
+        return this;
+    }
+
+    public Map<Integer, RoleResult> getRolesResults() {
+        return rolesResults;
+    }
+
+    public SecurityModel setRolesResults(Map<Integer, RoleResult> rolesResults) {
+        this.rolesResults = rolesResults;
+        return this;
+    }
+
+    public List<PodSecurityResult> getPodsResults() {
+        return podsResults;
+    }
+
+    public SecurityModel setPodsResults(List<PodSecurityResult> podsResults) {
+        this.podsResults = podsResults;
+        return this;
+    }
+
+    public List<RoleRuleResult> getRoleRulesResults(int roleId) {
+        return rolesResults.get(roleId).getRoleRules(roleId);
+    }
+
+    public List<ContainerSecurityResult> getContainersResults() {
+        return containersResults;
+    }
+
+    public SecurityModel setContainersResults(List<ContainerSecurityResult> containersResults) {
+        this.containersResults = containersResults;
+        return this;
+    }
+
+    public List<ServiceAccountResult> getServiceAccountsResults() {
+        return serviceAccountsResults;
+    }
+
+    public SecurityModel setServiceAccountsResults(List<ServiceAccountResult> serviceAccountsResults) {
+        this.serviceAccountsResults = serviceAccountsResults;
+        return this;
+    }
+
+    public List<PodSecurityPoliciesResult> getPodSecurityPoliciesResults() {
+        return podSecurityPoliciesResults;
+    }
+
+    public SecurityModel setPodSecurityPoliciesResults(List<PodSecurityPoliciesResult> podSecurityPoliciesResults) {
+        this.podSecurityPoliciesResults = podSecurityPoliciesResults;
+        return this;
+    }
+
+    public List<String> getNamespaces() {
+        return namespaces;
+    }
+
+    public SecurityModel setNamespaces(List<String> namespaces) {
+        this.namespaces = namespaces;
+        return this;
     }
 }
