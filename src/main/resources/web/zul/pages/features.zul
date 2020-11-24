@@ -1,0 +1,118 @@
+<zk>
+    <div id="securityTemplate" viewModel="@id('featuresVM') @init('com.kubehelper.viewmodels.FeaturesVM')" width="100%" height="100%">
+        <borderlayout>
+            <!--            TODO Paging and vflex="min" for center and remove height-->
+            <center margins="0,3,3,3" title="Security">
+                <tabbox width="100%" sclass="nav_tabs">
+                    <tabs id="tabs">
+                        <tab label="Features"/>
+                        <tab label="Features Constructor"/>
+                    </tabs>
+                    <tabpanels>
+
+                        <tabpanel>
+                            <separator width="100%" orient="horizontal"/>
+                            <vbox height="100%" width="100%">
+                                <!--                                TODO Hbox and cell has align, to test!!-->
+                                <hbox height="100%" width="100%" style="margin: 5px;" align="stretch">
+                                    <cell width="30%" style="padding: 0px 5px 0px 5px;" align="left">
+                                        <hlayout valign="middle">
+                                            <label value="Namespace: "/>
+                                            <combobox id="namespacesCBox" tooltip="namespacesTooltip" hflex="1" model="@load(featuresVM.namespaces)"
+                                                      selectedItem="@bind(featuresVM.selectedNamespace)" readonly="true">
+                                                <template name="model">
+                                                    <comboitem label="@load(each)"/>
+                                                </template>
+                                            </combobox>
+                                        </hlayout>
+                                    </cell>
+                                    <cell width="30%" style="padding: 0px 5px 0px 5px;" align="center">
+<!--                                        <radiogroup id="sv1" onCheck="choice1.value = self.selectedItem.label" />-->
+                                        <radio id="ra1" label="Run predefined command" radiogroup="sv1" />
+                                        <hlayout valign="middle">
+                                            <label value="Predefined Commands: "/>
+                                            <combobox id="predefinedCommandsCBox" hflex="1" model="@load(featuresVM.predefinedCommands)" readonly="true">
+                                                <template name="model">
+                                                    <comboitem label="@load(each)"/>
+                                                </template>
+                                            </combobox>
+                                        </hlayout>
+                                    </cell>
+                                    <cell width="30%" style="padding: 0px 5px 0px 5px;" align="center">
+                                        <radio id="ra1" label="Run custom command" radiogroup="sv1" />
+                                        <hlayout valign="middle">
+                                            <label value="Custom Commands: "/>
+                                            <combobox id="customCommandsCBox" hflex="1" model="@load(featuresVM.customCommands)" readonly="true">
+                                                <template name="model">
+                                                    <comboitem label="@load(each)"/>
+                                                </template>
+                                            </combobox>
+                                        </hlayout>
+                                    </cell>
+                                    <cell width="10%" style="padding: 0px 5px 0px 5px;">
+                                        <button id="runCommandBtn" label="Run" iconSclass="z-icon-refresh" onClick="@command('run')" width="100%"/>
+                                    </cell>
+                                </hbox>
+                                <hbox height="100%" width="100%" style="margin: 5px;" align="stretch">
+                                    <label value="Full Command: "/>
+                                </hbox>
+                            </vbox>
+                            <separator width="100%" orient="horizontal"/>
+                            <grid id="runCommandGrid" model="@load(featuresVM.featureResults)" height="800px">
+                                <auxhead id="runCommandAuxHead">
+                                </auxhead>
+                                <columns menupopup="auto" sizable="true">
+                                    <column hflex="min" label="Id"/>
+                                    <column hflex="1" label="IP"/>
+                                </columns>
+                                <rows>
+                                    <template name="model" var="item">
+                                        <row style="cursor:pointer">
+                                            <label value="${item.id}"/>
+                                            <label value="${item.ip}" multiline="true"/>
+                                        </row>
+                                    </template>
+                                </rows>
+                                <foot>
+                                    <footer id="runCommandGridFooter" span="9" align="right" label="@load(featuresVM.runCommandTotalItems)"/>
+                                </foot>
+                            </grid>
+                        </tabpanel>
+
+                        <tabpanel>
+                            <listbox>
+                                <!--                                <attribute name="onSelect"><![CDATA[-->
+                                <!--            txt.setValue("Mail Received on "+-->
+                                <!--                    self.getSelectedItem().getLastChild().getLabel());  -->
+                                <!--        ]]></attribute>-->
+                                <listhead sizable="true">
+                                    <listheader label="Subject" width="50%" sort="auto"/>
+                                    <listheader label="Received" width="50%" sort="auto"/>
+                                </listhead>
+                                <template name="model" var="item">
+                                    <listitem>
+                                        <listcell image="/widgets/listbox/keystroke_command/img/ArrowUpOrange-16x16.png"/>
+                                        <listcell label="2010/06/29 17:41:29"/>
+                                    </listitem>
+                                </template>
+                            </listbox>
+                        </tabpanel>
+
+                    </tabpanels>
+                </tabbox>
+            </center>
+        </borderlayout>
+    </div>
+    <popup id="clearAllTooltip">
+        Clears the entire model and sets the view to its original state.
+    </popup>
+    <popup id="namespacesTooltip">
+        All visible namespaces.
+    </popup>
+    <popup id="popupIpsAndPortsDetails">
+        Show detailed information about pod in a pop-up window.
+    </popup>
+    <!--    <popup id="getResourcesTooltip">-->
+    <!--        Searching for resources(pods, services) from the selected namespace.-->
+    <!--    </popup>-->
+</zk>
