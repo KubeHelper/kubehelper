@@ -17,9 +17,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package com.kubehelper.services;
 
+import com.google.common.io.Files;
 import com.kubehelper.common.KubeAPI;
 import com.kubehelper.common.Resource;
 import com.kubehelper.domain.models.SearchModel;
+import com.kubehelper.domain.results.FeatureResult;
 import com.kubehelper.domain.results.SearchResult;
 import io.kubernetes.client.Exec;
 import io.kubernetes.client.openapi.ApiException;
@@ -79,11 +81,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
+import java.net.URISyntaxException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -131,6 +138,46 @@ public class FeaturesService {
 
     @Autowired
     private Exec exec;
+
+    public void parsePredefinedCommands() {
+        try {
+            List<String> lines = Files.readLines(new File(this.getClass().getResource("/templates/features/commands.kh").toURI()), Charset.forName("UTF-8"));
+            List<FeatureResult> featureResults = new ArrayList<>();
+            while (lines.listIterator().hasNext()) {
+                FeatureResult featureResult = new FeatureResult(featureResults.size() + 1);
+                String line = lines.listIterator().next();
+                if (line.startsWith("Group:")) {
+                    featureResult.setGroup(getLineContent(line));
+                }
+                if (line.startsWith("Description:")) {
+                    featureResult.setDescription(getLineContent(line));
+                }
+
+                if (line.startsWith("Rows:")) {
+                    String[] split = getLineContent(line).split("|");
+                    featureResult.setRows(Arrays.asList(split));
+                }
+
+                if (StringUtils.startsWithAny("Group:", "Description:", "Rows:") && StringUtils.isNotBlank(line)) {
+//                    StringBuilder builder = new StringBuilder();
+//                    if (line.endsWith("\\")){
+//
+//                    }
+                    String[] split = line.substring(line.indexOf("Rows:")).trim().split("|");
+                    featureResult.setRows(Arrays.asList(split));
+                }
+            }
+            ListIterator<String> stringListIterator = lines.listIterator();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private String getLineContent(String line) {
+        return line.substring(line.indexOf(":") + 1).trim();
+    }
 
     /**
      * Searches string selected kubernetes resources by selected namespace.

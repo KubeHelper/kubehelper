@@ -23,7 +23,7 @@ import com.kubehelper.domain.filters.FeaturesFilter;
 import com.kubehelper.domain.models.FeaturesModel;
 import com.kubehelper.domain.results.FeatureResult;
 import com.kubehelper.services.CommonService;
-import com.kubehelper.services.SearchService;
+import com.kubehelper.services.FeaturesService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -123,7 +123,7 @@ public class FeaturesVM implements EventListener {
     private CommonService commonService;
 
     @WireVariable
-    private SearchService searchService;
+    private FeaturesService featuresService;
 
     @Init
     @NotifyChange("*")
@@ -163,6 +163,7 @@ public class FeaturesVM implements EventListener {
     private void onInitPreparations() {
 
         featuresModel.setNamespaces(featuresModel.getNamespaces().isEmpty() ? commonService.getAllNamespaces() : featuresModel.getNamespaces());
+        featuresService.parsePredefinedCommands();
 //        if (featuresModel.getFilter().isFilterActive() && !featuresModel.getSearchResults().isEmpty()) {
 //            filterSearches();
 //        } else {
@@ -189,7 +190,7 @@ public class FeaturesVM implements EventListener {
         listHead.appendChild(listHeader3);
         listBox.appendChild(listHead);
 
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 10; i++) {
             Listitem listItem1 = new Listitem();
             Listitem listItem2 = new Listitem();
             Listitem listItem3 = new Listitem();
@@ -203,7 +204,6 @@ public class FeaturesVM implements EventListener {
             listItem1.appendChild(listCell2);
             listItem1.appendChild(listCell3);
             listBox.appendChild(listItem1);
-            listBox.setVisible(false);
         }
     }
 
