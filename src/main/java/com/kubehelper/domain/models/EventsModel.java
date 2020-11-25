@@ -22,7 +22,6 @@ import com.kubehelper.common.KubeHelperException;
 import com.kubehelper.domain.filters.EventsFilter;
 import com.kubehelper.domain.results.EventResult;
 import org.apache.commons.lang3.StringUtils;
-import org.zkoss.zul.ListModelList;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +36,7 @@ public class EventsModel implements PageModel {
     public static String NAME = Global.EVENTS_MODEL;
     private String selectedNamespace = "all";
     private List<String> namespaces = new ArrayList<>();
-    private ListModelList<EventResult> searchResults = new ListModelList<>();
+    private List<EventResult> searchResults = new ArrayList<>();
     private EventsFilter filter = new EventsFilter();
     private List<KubeHelperException> searchExceptions = new ArrayList<>();
 
@@ -79,11 +78,11 @@ public class EventsModel implements PageModel {
         return templateUrl;
     }
 
-    public ListModelList<EventResult> getSearchResults() {
+    public List<EventResult> getSearchResults() {
         return searchResults;
     }
 
-    public EventsModel setSearchResults(ListModelList<EventResult> searchResults) {
+    public EventsModel setSearchResults(List<EventResult> searchResults) {
         this.searchResults = searchResults;
         return this;
     }

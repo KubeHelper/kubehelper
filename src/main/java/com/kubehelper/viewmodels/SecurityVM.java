@@ -57,6 +57,7 @@ import org.zkoss.zul.Window;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -422,6 +423,10 @@ public class SecurityVM {
 
     public PodsSecurityPoliciesSecurityFilter getPodSecurityPoliciesFilter() {
         return securityModel.getPodSecurityPoliciesFilter();
+    }
+
+    public List<String> getNamespaces() {
+        return securityModel.getNamespaces();
     }
 
 }

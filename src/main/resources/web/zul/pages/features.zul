@@ -9,74 +9,100 @@
                         <tab label="Features Constructor"/>
                     </tabs>
                     <tabpanels>
-
                         <tabpanel>
                             <separator width="100%" orient="horizontal"/>
-                            <vbox height="100%" width="100%">
-                                <!--                                TODO Hbox and cell has align, to test!!-->
-                                <hbox height="100%" width="100%" style="margin: 5px;" align="stretch">
-                                    <cell width="30%" style="padding: 0px 5px 0px 5px;" align="left">
-                                        <hlayout valign="middle">
-                                            <label value="Namespace: "/>
-                                            <combobox id="namespacesCBox" tooltip="namespacesTooltip" hflex="1" model="@load(featuresVM.namespaces)"
-                                                      selectedItem="@bind(featuresVM.selectedNamespace)" readonly="true">
-                                                <template name="model">
-                                                    <comboitem label="@load(each)"/>
-                                                </template>
-                                            </combobox>
+                            <vbox height="50%" width="100%">
+                                <vbox height="100%" width="100%">
+                                    <hbox height="100%" width="100%" style="margin: 5px;" align="stretch">
+
+                                        <hlayout>
+                                            <listbox rows="1" mold="select">
+                                                <listitem selected="true" label="Inbox"/>
+                                                <listitem label="Received"/>
+                                                <listitem label="Draft"/>
+                                            </listbox>
+                                            <separator spacing="5px"/>
+                                            <textbox id="txt" width="220px" style="color:#008FD2;"/>
                                         </hlayout>
-                                    </cell>
-                                    <cell width="30%" style="padding: 0px 5px 0px 5px;" align="center">
-<!--                                        <radiogroup id="sv1" onCheck="choice1.value = self.selectedItem.label" />-->
-                                        <radio id="ra1" label="Run predefined command" radiogroup="sv1" />
-                                        <hlayout valign="middle">
-                                            <label value="Predefined Commands: "/>
-                                            <combobox id="predefinedCommandsCBox" hflex="1" model="@load(featuresVM.predefinedCommands)" readonly="true">
-                                                <template name="model">
-                                                    <comboitem label="@load(each)"/>
-                                                </template>
-                                            </combobox>
-                                        </hlayout>
-                                    </cell>
-                                    <cell width="30%" style="padding: 0px 5px 0px 5px;" align="center">
-                                        <radio id="ra1" label="Run custom command" radiogroup="sv1" />
-                                        <hlayout valign="middle">
-                                            <label value="Custom Commands: "/>
-                                            <combobox id="customCommandsCBox" hflex="1" model="@load(featuresVM.customCommands)" readonly="true">
-                                                <template name="model">
-                                                    <comboitem label="@load(each)"/>
-                                                </template>
-                                            </combobox>
-                                        </hlayout>
-                                    </cell>
-                                    <cell width="10%" style="padding: 0px 5px 0px 5px;">
-                                        <button id="runCommandBtn" label="Run" iconSclass="z-icon-refresh" onClick="@command('run')" width="100%"/>
-                                    </cell>
-                                </hbox>
-                                <hbox height="100%" width="100%" style="margin: 5px;" align="stretch">
-                                    <label value="Full Command: "/>
-                                </hbox>
+                                        <separator bar="true"/>
+                                        <listbox id="featuresListBoxId">
+                                            <!--                                            <attribute name="onSelect"><![CDATA[-->
+                                            <!--            txt.setValue("Mail Received on "+-->
+                                            <!--                    self.getSelectedItem().getLastChild().getLabel());-->
+                                            <!--        ]]></attribute>-->
+                                            <!--                                            <listhead sizable="true">-->
+                                            <!--                                                <listheader align="center" width="40px"-->
+                                            <!--                                                            image="./img/kubehelper-logo-256.png"/>-->
+                                            <!--                                                <listheader align="center" width="40px"-->
+                                            <!--                                                            image="./img/kubehelper-logo-256.png"/>-->
+                                            <!--                                                <listheader align="center" width="40px"-->
+                                            <!--                                                            image="./img/kubehelper-logo-256.png"/>-->
+                                            <!--                                                <listheader label="Subject" sort="auto"/>-->
+                                            <!--                                                <listheader label="Received" sort="auto"/>-->
+                                            <!--                                            </listhead>-->
+                                            <!--                                            <listitem height="28px">-->
+                                            <!--                                                <listcell image="./img/kubehelper-logo-256.png"/>-->
+                                            <!--                                                <listcell image="./img/kubehelper-logo-256.png"/>-->
+                                            <!--                                                <listcell image="./img/kubehelper-logo-256.png"/>-->
+                                            <!--                                                <listcell label="ZK 5.0.3 Released!"/>-->
+                                            <!--                                                <listcell label="2010/06/29 17:41:29"/>-->
+                                            <!--                                            </listitem>-->
+                                            <!--                                            <listitem height="28px">-->
+                                            <!--                                                <listcell image="./img/kubehelper-logo-256.png"/>-->
+                                            <!--                                                <listcell image="./img/kubehelper-logo-256.png"/>-->
+                                            <!--                                                <listcell image="./img/kubehelper-logo-256.png"/>-->
+                                            <!--                                                <listcell label="ZK 5.0.2 Released!"/>-->
+                                            <!--                                                <listcell label="2010/05/12 15:56:37"/>-->
+                                            <!--                                            </listitem>-->
+                                            <!--                                            <listitem height="28px">-->
+                                            <!--                                                <listcell image="./img/kubehelper-logo-256.png"/>-->
+                                            <!--                                                <listcell image="./img/kubehelper-logo-256.png"/>-->
+                                            <!--                                                <listcell label="&#160;"/>-->
+                                            <!--                                                <listcell label="ZK 5 Released!"/>-->
+                                            <!--                                                <listcell label="2010/01/26 13:23:07"/>-->
+                                            <!--                                            </listitem>-->
+                                            <!--                                            <listitem height="28px">-->
+                                            <!--                                                <listcell image="./img/kubehelper-logo-256.png"/>-->
+                                            <!--                                                <listcell image="./img/kubehelper-logo-256.png"/>-->
+                                            <!--                                                <listcell label="&#160;"/>-->
+                                            <!--                                                <listcell label="ZK 3.6.3 Released!"/>-->
+                                            <!--                                                <listcell label="2009/11/03 10:26:37"/>-->
+                                            <!--                                            </listitem>-->
+                                        </listbox>
+
+                                    </hbox>
+                                    <hbox height="100%" width="100%" style="margin: 5px;" align="stretch">
+                                        <cell width="90%" style="padding: 0px 5px 0px 5px;">
+                                            <label value="Full Command: "/>
+                                        </cell>
+                                        <cell width="10%" style="padding: 0px 5px 0px 5px;">
+                                            <button id="runCommandBtn" label="Run" iconSclass="z-icon-refresh" onClick="@command('run')" width="100%"/>
+                                        </cell>
+                                    </hbox>
+                                </vbox>
                             </vbox>
                             <separator width="100%" orient="horizontal"/>
-                            <grid id="runCommandGrid" model="@load(featuresVM.featureResults)" height="800px">
-                                <auxhead id="runCommandAuxHead">
-                                </auxhead>
-                                <columns menupopup="auto" sizable="true">
-                                    <column hflex="min" label="Id"/>
-                                    <column hflex="1" label="IP"/>
-                                </columns>
-                                <rows>
-                                    <template name="model" var="item">
-                                        <row style="cursor:pointer">
-                                            <label value="${item.id}"/>
-                                            <label value="${item.ip}" multiline="true"/>
-                                        </row>
-                                    </template>
-                                </rows>
-                                <foot>
-                                    <footer id="runCommandGridFooter" span="9" align="right" label="@load(featuresVM.runCommandTotalItems)"/>
-                                </foot>
-                            </grid>
+                            <vbox height="50%" width="100%">
+                                <grid id="runCommandGrid" model="@load(featuresVM.featuresResults)" height="800px">
+                                    <auxhead id="runCommandAuxHead">
+                                    </auxhead>
+                                    <columns menupopup="auto" sizable="true">
+                                        <column hflex="min" label="Id"/>
+                                        <column hflex="1" label="IP"/>
+                                    </columns>
+                                    <rows>
+                                        <template name="model" var="item">
+                                            <row style="cursor:pointer">
+                                                <label value="${item.id}"/>
+                                                <label value="${item.ip}" multiline="true"/>
+                                            </row>
+                                        </template>
+                                    </rows>
+                                    <foot>
+                                        <footer id="runCommandGridFooter" span="9" align="right" label="@load(featuresVM.runCommandTotalItems)"/>
+                                    </foot>
+                                </grid>
+                            </vbox>
                         </tabpanel>
 
                         <tabpanel>

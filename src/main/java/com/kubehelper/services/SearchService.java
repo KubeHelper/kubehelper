@@ -22,7 +22,6 @@ import com.kubehelper.common.Resource;
 import com.kubehelper.domain.models.SearchModel;
 import com.kubehelper.domain.results.SearchResult;
 import io.kubernetes.client.Exec;
-import io.kubernetes.client.extended.kubectl.Kubectl;
 import io.kubernetes.client.openapi.ApiException;
 import io.kubernetes.client.openapi.models.V1ConfigMap;
 import io.kubernetes.client.openapi.models.V1ConfigMapKeySelector;
@@ -71,7 +70,6 @@ import io.kubernetes.client.openapi.models.V1beta1Role;
 import io.kubernetes.client.openapi.models.V1beta1RoleBinding;
 import io.kubernetes.client.openapi.models.V1beta1RoleBindingList;
 import io.kubernetes.client.openapi.models.V1beta1RoleList;
-import io.kubernetes.client.util.Yaml;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
@@ -732,7 +730,7 @@ public class SearchService {
     private void mergeNativeEnvVarsToSearchResult(V1Pod pod, SearchModel searchModel) {
         Properties podEnvironmentVars = getPodEnvironmentVars(pod, searchModel);
         //copy list, because concurrent modification exception
-        List<SearchResult> searchResultList = new ArrayList<>(searchModel.getSearchResults().getInnerList());
+        List<SearchResult> searchResultList = new ArrayList<>(searchModel.getSearchResults());
         for (Map.Entry<Object, Object> entry : podEnvironmentVars.entrySet()) {
             String key = (String) entry.getKey(), envValue = (String) entry.getValue();
             boolean isEnvVarNotFound = true;

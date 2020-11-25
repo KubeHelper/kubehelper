@@ -21,7 +21,6 @@ import com.kubehelper.common.Global;
 import com.kubehelper.common.KubeHelperException;
 import com.kubehelper.domain.filters.IpsAndPortsFilter;
 import com.kubehelper.domain.results.IpsAndPortsResult;
-import org.zkoss.zul.ListModelList;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +35,7 @@ public class IpsAndPortsModel implements PageModel {
     public static String NAME = Global.IPS_AND_PORTS_MODEL;
     private String selectedNamespace = "all";
     private List<String> namespaces = new ArrayList<>();
-    private ListModelList<IpsAndPortsResult> ipsAndPortsResults = new ListModelList<>();
+    private List<IpsAndPortsResult> ipsAndPortsResults = new ArrayList<>();
     private IpsAndPortsFilter filter = new IpsAndPortsFilter();
     private List<KubeHelperException> searchExceptions = new ArrayList<>();
 
@@ -68,11 +67,11 @@ public class IpsAndPortsModel implements PageModel {
         return templateUrl;
     }
 
-    public ListModelList<IpsAndPortsResult> getIpsAndPortsResults() {
+    public List<IpsAndPortsResult> getIpsAndPortsResults() {
         return ipsAndPortsResults;
     }
 
-    public IpsAndPortsModel setIpsAndPortsResults(ListModelList<IpsAndPortsResult> ipsAndPortsResults) {
+    public IpsAndPortsModel setIpsAndPortsResults(List<IpsAndPortsResult> ipsAndPortsResults) {
         this.ipsAndPortsResults = ipsAndPortsResults;
         return this;
     }

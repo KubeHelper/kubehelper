@@ -19,6 +19,7 @@ package com.kubehelper.common;
 
 import com.kubehelper.domain.models.DashboardModel;
 import com.kubehelper.domain.models.EventsModel;
+import com.kubehelper.domain.models.FeaturesModel;
 import com.kubehelper.domain.models.IpsAndPortsModel;
 import com.kubehelper.domain.models.LabelsModel;
 import com.kubehelper.domain.models.PageModel;
@@ -59,7 +60,7 @@ public class Global {
             put(CUSTOM_RESOURCES_MODEL, new SearchModel());
             put(DEPRECATED_MODEL, new SearchModel());
             put(EVENTS_MODEL, new EventsModel());
-            put(FEATURES_MODEL, new SearchModel());
+            put(FEATURES_MODEL, new FeaturesModel());
             put(FEATURE_GATES_MODEL, new SearchModel());
             put(IPS_AND_PORTS_MODEL, new IpsAndPortsModel());
             put(VOLUMES_MODEL, new SearchModel());

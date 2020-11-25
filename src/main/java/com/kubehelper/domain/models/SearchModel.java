@@ -22,7 +22,6 @@ import com.kubehelper.common.KubeHelperException;
 import com.kubehelper.domain.filters.SearchFilter;
 import com.kubehelper.domain.results.SearchResult;
 import org.apache.commons.lang3.StringUtils;
-import org.zkoss.zul.ListModelList;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +35,7 @@ public class SearchModel implements PageModel {
     public static String NAME = Global.SEARCH_MODEL;
     private String selectedNamespace = "all";
     private List<String> namespaces = new ArrayList<>();
-    private ListModelList<SearchResult> searchResults = new ListModelList<>();
+    private List<SearchResult> searchResults = new ArrayList<>();
     private SearchFilter filter = new SearchFilter();
     private List<KubeHelperException> searchExceptions = new ArrayList<>();
     private String searchString = "";
@@ -84,7 +83,7 @@ public class SearchModel implements PageModel {
         return namespaces;
     }
 
-    public ListModelList<SearchResult> getSearchResults() {
+    public List<SearchResult> getSearchResults() {
         return searchResults;
     }
 
@@ -97,7 +96,7 @@ public class SearchModel implements PageModel {
         return this;
     }
 
-    public SearchModel setSearchResults(ListModelList<SearchResult> searchResults) {
+    public SearchModel setSearchResults(List<SearchResult> searchResults) {
         this.searchResults = searchResults;
         return this;
     }

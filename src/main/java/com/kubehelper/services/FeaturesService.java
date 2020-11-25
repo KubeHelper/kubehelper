@@ -117,9 +117,9 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * @author JDev
  */
 @Service
-public class SecurityService {
+public class FeaturesService {
 
-    private static Logger logger = LoggerFactory.getLogger(SecurityService.class);
+    private static Logger logger = LoggerFactory.getLogger(FeaturesService.class);
 
 //    TODO fix progress label
 //    private String progressLabel = "";
