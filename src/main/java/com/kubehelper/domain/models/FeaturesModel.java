@@ -31,6 +31,10 @@ import java.util.List;
 public class FeaturesModel implements PageModel {
 
     private String templateUrl = "~./zul/pages/features.zul";
+    private String predefinedCommandsPath = "/templates/features/commands.kh";
+
+    private String userCommandsPath = "C:\\temp\\kubehelper";
+//    private String userCommandsPath = "/tmp/kubehelper";
     public static String NAME = Global.FEATURES_MODEL;
     private List<String> namespaces = new ArrayList<>();
     private List<String> pods = new ArrayList<>();
@@ -124,6 +128,24 @@ public class FeaturesModel implements PageModel {
 
     public FeaturesModel setSelectedNamespace(String selectedNamespace) {
         this.selectedNamespace = selectedNamespace;
+        return this;
+    }
+
+    public String getPredefinedCommandsPath() {
+        return predefinedCommandsPath;
+    }
+
+    public FeaturesModel setPredefinedCommandsPath(String predefinedCommandsPath) {
+        this.predefinedCommandsPath = predefinedCommandsPath;
+        return this;
+    }
+
+    public String getUserCommandsPath() {
+        return userCommandsPath;
+    }
+
+    public FeaturesModel setUserCommandsPath(String userCommandsPath) {
+        this.userCommandsPath = userCommandsPath;
         return this;
     }
 }

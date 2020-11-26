@@ -11,8 +11,9 @@
                     <tabpanels>
                         <tabpanel>
                             <separator width="100%" orient="horizontal"/>
-                            <vbox height="50%" width="100%">
-                                <div style="overflow-y:auto;overflow-x:auto;font-family: Courier, Monaco, monospace;">
+                            <div height="50%" width="100%" style="overflow-y:auto;overflow-x:auto;font-family: Courier, Monaco, monospace;">
+                                <vbox height="50%" width="100%">
+
 
                                     <!--                                        <hlayout>-->
                                     <!--                                            <listbox rows="1" mold="select">-->
@@ -25,6 +26,7 @@
                                     <!--                                        </hlayout>-->
                                     <separator bar="true"/>
                                     <listbox id="featuresListBoxId">
+                                        <!--                                    <listbox id="featuresListBoxId" model="@load(featuresVM.featuresResults)">-->
                                         <!--                                            <attribute name="onSelect"><![CDATA[-->
                                         <!--            txt.setValue("Mail Received on "+-->
                                         <!--                    self.getSelectedItem().getLastChild().getLabel());-->
@@ -68,16 +70,17 @@
                                         <!--                                                <listcell label="2009/11/03 10:26:37"/>-->
                                         <!--                                            </listitem>-->
                                     </listbox>
-                                </div>
-                                <hbox height="100%" width="100%" style="margin: 5px;" align="stretch">
-                                    <cell width="90%" style="padding: 0px 5px 0px 5px;">
-                                        <label value="Full Command: "/>
-                                    </cell>
-                                    <cell width="10%" style="padding: 0px 5px 0px 5px;">
-                                        <button id="runCommandBtn" label="Run" iconSclass="z-icon-refresh" onClick="@command('run')" width="100%"/>
-                                    </cell>
-                                </hbox>
-                            </vbox>
+
+                                    <hbox height="100%" width="100%" style="margin: 5px;" align="stretch">
+                                        <cell width="90%" style="padding: 0px 5px 0px 5px;">
+                                            <label value="Full Command: "/>
+                                        </cell>
+                                        <cell width="10%" style="padding: 0px 5px 0px 5px;">
+                                            <button id="runCommandBtn" label="Run" iconSclass="z-icon-refresh" onClick="@command('run')" width="100%"/>
+                                        </cell>
+                                    </hbox>
+                                </vbox>
+                            </div>
                             <separator width="100%" orient="horizontal"/>
                             <vbox height="50%" width="100%">
                                 <grid id="runCommandGrid" model="@load(featuresVM.featuresResults)" height="800px">

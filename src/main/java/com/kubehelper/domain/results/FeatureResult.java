@@ -76,4 +76,16 @@ public class FeatureResult {
         this.command = command;
         return this;
     }
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("FeatureResult{");
+        sb.append("id=").append(id);
+        sb.append(", description='").append(description).append('\'');
+        sb.append(", group='").append(group).append('\'');
+        sb.append(", rows=").append(rows);
+        sb.append(", command='").append(command).append('\'');
+        sb.append('}');
+        return sb.toString();
+    }
 }

@@ -163,7 +163,9 @@ public class FeaturesVM implements EventListener {
     private void onInitPreparations() {
 
         featuresModel.setNamespaces(featuresModel.getNamespaces().isEmpty() ? commonService.getAllNamespaces() : featuresModel.getNamespaces());
-        featuresService.parsePredefinedCommands();
+        featuresService.parsePredefinedCommands(featuresModel);
+        featuresService.parseUserCommands(featuresModel);
+        featuresModel.getName();
 //        if (featuresModel.getFilter().isFilterActive() && !featuresModel.getSearchResults().isEmpty()) {
 //            filterSearches();
 //        } else {
@@ -190,7 +192,7 @@ public class FeaturesVM implements EventListener {
         listHead.appendChild(listHeader3);
         listBox.appendChild(listHead);
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 20; i++) {
             Listitem listItem1 = new Listitem();
             Listitem listItem2 = new Listitem();
             Listitem listItem3 = new Listitem();
