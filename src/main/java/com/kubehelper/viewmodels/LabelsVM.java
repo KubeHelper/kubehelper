@@ -153,11 +153,10 @@ public class LabelsVM implements EventListener {
         labelsModel.setSearchExceptions(new ArrayList<>());
         labelsService.search(labelsModel, selectedResources);
         labelsModel.groupSearchResults();
-        labelsModel.setNamespaces(commonService.getAllNamespaces());
         clearAllFilterComboboxes();
         isSearchButtonPressed = true;
-        logger.info("Found {} namespaces.", labelsModel.getNamespaces());
         onInitPreparations();
+        logger.info("Found {} namespaces.", labelsModel.getNamespaces());
     }
 
     /**

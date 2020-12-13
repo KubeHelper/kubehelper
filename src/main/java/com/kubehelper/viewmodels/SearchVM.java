@@ -152,11 +152,10 @@ public class SearchVM implements EventListener {
         searchModel.setFilter(new SearchFilter());
         searchModel.setSearchExceptions(new ArrayList<>());
         searchService.search(searchModel, selectedResources);
-        searchModel.setNamespaces(commonService.getAllNamespaces());
         clearAllFilterComboboxes();
         isSearchButtonPressed = true;
-        logger.info("Found {} namespaces.", searchModel.getNamespaces());
         onInitPreparations();
+        logger.info("Found {} namespaces.", searchModel.getNamespaces());
     }
 
     /**

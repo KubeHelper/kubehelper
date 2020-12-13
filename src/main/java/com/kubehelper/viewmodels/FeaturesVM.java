@@ -150,11 +150,10 @@ public class FeaturesVM implements EventListener {
         featuresModel.setFilter(new FeaturesFilter());
         featuresModel.setBuildExceptions(new ArrayList<>());
 //        searchService.search(featuresModel, selectedResources);
-        featuresModel.setNamespaces(commonService.getAllNamespaces());
         clearAllFilterComboboxes();
         isSearchButtonPressed = true;
-        logger.info("Found {} namespaces.", featuresModel.getNamespaces());
         onInitPreparations();
+        logger.info("Found {} namespaces.", featuresModel.getNamespaces());
     }
 
     /**

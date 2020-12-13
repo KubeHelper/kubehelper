@@ -99,11 +99,10 @@ public class IpsAndPortsVM {
     public void search() {
         ipsAndPortsModel.setFilter(new IpsAndPortsFilter());
         ipsAndPortsService.get(ipsAndPortsModel);
-        ipsAndPortsModel.setNamespaces(commonService.getAllNamespaces());
         ipsAndPortsModel.setSearchExceptions(new ArrayList<>());
         isGetButtonPressed = true;
-        logger.info("Found {} namespaces.", ipsAndPortsModel.getNamespaces());
         onInitPreparations();
+        logger.info("Found {} namespaces.", ipsAndPortsModel.getNamespaces());
     }
 
     private void onInitPreparations() {
