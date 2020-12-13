@@ -156,7 +156,6 @@ public class LabelsVM implements EventListener {
         clearAllFilterComboboxes();
         isSearchButtonPressed = true;
         onInitPreparations();
-        logger.info("Found {} namespaces.", labelsModel.getNamespaces());
     }
 
     /**
@@ -190,6 +189,7 @@ public class LabelsVM implements EventListener {
             groupedLabelColumns = new ListModelList<>();
         }
         sortResultsByNamespace();
+        logger.info("Found {} namespaces.", labelsModel.getNamespaces());
 //        updateHeightsAndRerenderVM();
     }
 

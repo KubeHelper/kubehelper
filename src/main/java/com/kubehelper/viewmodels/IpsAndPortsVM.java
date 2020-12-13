@@ -102,7 +102,6 @@ public class IpsAndPortsVM {
         ipsAndPortsModel.setSearchExceptions(new ArrayList<>());
         isGetButtonPressed = true;
         onInitPreparations();
-        logger.info("Found {} namespaces.", ipsAndPortsModel.getNamespaces());
     }
 
     private void onInitPreparations() {
@@ -113,6 +112,7 @@ public class IpsAndPortsVM {
             ipsAndPortsResults = new ListModelList<>(ipsAndPortsModel.getIpsAndPortsResults());
         }
         sortResultsByNamespace();
+        logger.info("Found {} namespaces.", ipsAndPortsModel.getNamespaces());
 //        updateHeightsAndRerenderVM();
     }
 

@@ -153,7 +153,6 @@ public class FeaturesVM implements EventListener {
         clearAllFilterComboboxes();
         isSearchButtonPressed = true;
         onInitPreparations();
-        logger.info("Found {} namespaces.", featuresModel.getNamespaces());
     }
 
     /**
@@ -171,6 +170,7 @@ public class FeaturesVM implements EventListener {
 //            featuresResults = new ListModelList<>(featuresModel.getSearchResults());
 //        }
 //        updateHeightsAndRerenderVM();
+        logger.info("Found {} namespaces.", featuresModel.getNamespaces());
     }
 
     private void buildCommandsListBox() {

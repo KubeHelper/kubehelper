@@ -99,11 +99,9 @@ public class EventsVM {
     public void search() {
         eventsModel.setFilter(new EventsFilter());
         eventsService.search(eventsModel);
-        eventsModel.setNamespaces(commonService.getAllNamespaces());
         eventsModel.setSearchExceptions(new ArrayList<>());
         clearAllFilterComboboxes();
         isSearchButtonPressed = true;
-        logger.info("Found {} namespaces.", eventsModel.getNamespaces());
         onInitPreparations();
     }
 
@@ -119,6 +117,7 @@ public class EventsVM {
             searchResults = new ListModelList<>(eventsModel.getSearchResults());
         }
         sortResultsByNamespace();
+        logger.info("Found {} namespaces.", eventsModel.getNamespaces());
     }
 
     private void sortResultsByNamespace() {

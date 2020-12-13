@@ -155,7 +155,6 @@ public class SearchVM implements EventListener {
         clearAllFilterComboboxes();
         isSearchButtonPressed = true;
         onInitPreparations();
-        logger.info("Found {} namespaces.", searchModel.getNamespaces());
     }
 
     /**
@@ -187,6 +186,7 @@ public class SearchVM implements EventListener {
             searchResults = new ListModelList<>(searchModel.getSearchResults());
         }
         sortResultsByNamespace();
+        logger.info("Found {} namespaces.", searchModel.getNamespaces());
 //        updateHeightsAndRerenderVM();
     }
 
