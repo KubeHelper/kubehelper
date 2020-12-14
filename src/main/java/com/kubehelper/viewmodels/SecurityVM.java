@@ -26,15 +26,19 @@ import com.kubehelper.domain.filters.RolesSecurityFilter;
 import com.kubehelper.domain.filters.ServiceAccountsSecurityFilter;
 import com.kubehelper.domain.models.SecurityModel;
 import com.kubehelper.domain.results.ContainerSecurityResult;
+import com.kubehelper.domain.results.IpsAndPortsResult;
 import com.kubehelper.domain.results.PodSecurityPoliciesResult;
 import com.kubehelper.domain.results.PodSecurityResult;
 import com.kubehelper.domain.results.RoleResult;
+import com.kubehelper.domain.results.SearchResult;
 import com.kubehelper.domain.results.ServiceAccountResult;
 import com.kubehelper.services.CommonService;
 import com.kubehelper.services.SecurityService;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zkoss.bind.annotation.AfterCompose;
+import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
 import org.zkoss.bind.annotation.ContextType;
@@ -59,6 +63,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+
+import static com.kubehelper.common.Resource.CONFIG_MAP;
 
 /**
  * @author JDev
@@ -110,8 +117,7 @@ public class SecurityVM {
     @Init
     public void init() {
         securityModel = (SecurityModel) Global.ACTIVE_MODELS.computeIfAbsent(Global.SECURITY_MODEL, (k) -> Global.NEW_MODELS.get(Global.SECURITY_MODEL));
-//        TODO
-//        onInitPreparations();
+        onInitPreparations();
     }
 
     /**
@@ -126,17 +132,17 @@ public class SecurityVM {
     @NotifyChange({"rolesTotalItems", "rolesResults", "rolesFilter"})
     public void getRoles() {
         securityModel.setRolesFilter(new RolesSecurityFilter());
-//        securityService.getRoles(securityModel);
+        securityService.getRoles(securityModel);
         securityModel.setSearchExceptions(new ArrayList<>());
         isGetRolesButtonPressed = true;
-//        onInitPreparations();
+        onInitPreparations();
     }
 
     @Command
     @NotifyChange({"podsTotalItems", "podsResults", "podsFilter"})
     public void getPods() {
         securityModel.setPodsFilter(new PodsSecurityFilter());
-//        securityService.getPods(securityModel);
+        securityService.getPods(securityModel);
         securityModel.setSearchExceptions(new ArrayList<>());
         isGetPodsButtonPressed = true;
 //        onInitPreparations();
@@ -175,35 +181,30 @@ public class SecurityVM {
     //    TODO onInitPreparations for each tab
     private void onInitPreparations() {
         securityModel.setNamespaces(securityModel.getNamespaces().isEmpty() ? commonService.getAllNamespaces() : securityModel.getNamespaces());
-        //        TODO remove call commonService.getAllNamespaces() and from other models and put logger in onInitPreparations
         logger.info("Found {} namespaces.", securityModel.getNamespaces());
-//        if (securityModel.getFilter().isFilterActive() && !ipsAndPortsModel.getIpsAndPortsResults().isEmpty()) {
+        if (securityModel.getRolesFilter().isFilterActive() && !securityModel.getRolesResults().isEmpty()) {
 //            filterIps();
-//        } else {
-//            ipsAndPortsResults = new ListModelList<>(securityModel.getRolesResults());
-//        }
+        } else {
+            rolesResults = new ListModelList<>(securityModel.getRolesResultsList());
+        }
 //        sortResultsByNamespace();
+        logger.info("Found {} namespaces.", securityModel.getNamespaces());
     }
 
-//    TODO Filters for all tabs
-
-//    @Command
-//    @NotifyChange({"totalItems", "ipsAndPortsResults"})
-//    public void filterIps() {
-//        ipsAndPortsResults.clear();
-//        for (IpsAndPortsResult ipsAndPortsResult : ipsAndPortsModel.getIpsAndPortsResults()) {
-//            if (ipsAndPortsResult.getIp().toLowerCase().contains(getFilter().getIp().toLowerCase()) &&
-//                    ipsAndPortsResult.getPorts().toLowerCase().contains(getFilter().getPorts().toLowerCase()) &&
-//                    ipsAndPortsResult.getHostInfo().toLowerCase().contains(getFilter().getHostInfo().toLowerCase()) &&
-//                    ipsAndPortsResult.getCreationTime().toLowerCase().contains(getFilter().getCreationTime().toLowerCase()) &&
-//                    ipsAndPortsResult.getResourceName().toLowerCase().contains(getFilter().getResourceName().toLowerCase()) &&
-//                    ipsAndPortsResult.getResourceType().toLowerCase().contains(getFilter().getResourceType().toLowerCase()) &&
-//                    ipsAndPortsResult.getNamespace().toLowerCase().contains(getFilter().getNamespace().toLowerCase())) {
-//                ipsAndPortsResults.add(ipsAndPortsResult);
-//            }
-//        }
+    @Command
+    @NotifyChange({"rolesTotalItems", "rolesResults"})
+    public void filterSecurityRoles() {
+        rolesResults.clear();
+        for (RoleResult roleResult : securityModel.getRolesResultsList()) {
+            if (StringUtils.containsIgnoreCase(roleResult.getCreationTime(), getRolesFilter().getCreationTime()) &&
+                    StringUtils.containsIgnoreCase(roleResult.getResourceName(), getRolesFilter().getResourceName()) &&
+                    StringUtils.containsIgnoreCase(roleResult.getResourceType(), getRolesFilter().getSelectedResourceTypeFilter()) &&
+                    StringUtils.containsIgnoreCase(roleResult.getNamespace(), getRolesFilter().getSelectedNamespaceFilter())) {
+                rolesResults.add(roleResult);
+            }
+        }
 //        sortResultsByNamespace();
-//    }
+    }
 
 
     @Command
@@ -283,6 +284,15 @@ public class SecurityVM {
 //    private void sortResultsByNamespace() {
 //        ipsAndPortsResults.sort(Comparator.comparing(IpsAndPortsResult::getNamespace));
 //    }
+
+
+    @Command
+    public void showRoleFullDefinition(@BindingParam("id") int id) {
+        RoleResult roleResult = securityModel.getRolesResults().get(id);
+        Map<String, String> parameters = Map.of("title", roleResult.getResourceName(), "content", roleResult.getFullDefinition());
+        Window window = (Window) Executions.createComponents("~./zul/components/file-display.zul", null, parameters);
+        window.doModal();
+    }
 
     public SecurityModel getModel() {
         return securityModel;
@@ -425,8 +435,12 @@ public class SecurityVM {
         return securityModel.getPodSecurityPoliciesFilter();
     }
 
+    //TODO
+    public void getRoleRulesCrud() {
+
+    }
+
     public List<String> getNamespaces() {
         return securityModel.getNamespaces();
     }
-
 }

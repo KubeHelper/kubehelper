@@ -47,4 +47,66 @@ public class RoleRuleResult {
         this.id = id;
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public RoleRuleResult setId(int id) {
+        this.id = id;
+        return this;
+    }
+
+    public List<String> getApiGroups() {
+        return apiGroups;
+    }
+
+    public RoleRuleResult setApiGroups(List<String> apiGroups) {
+        this.apiGroups = apiGroups;
+        return this;
+    }
+
+    public List<String> getNonResourceURLs() {
+        return nonResourceURLs;
+    }
+
+    public RoleRuleResult setNonResourceURLs(List<String> nonResourceURLs) {
+        this.nonResourceURLs = nonResourceURLs;
+        return this;
+    }
+
+    public List<String> getResourceNames() {
+        return resourceNames;
+    }
+
+    public RoleRuleResult setResourceNames(List<String> resourceNames) {
+        this.resourceNames = resourceNames;
+        return this;
+    }
+
+    public List<String> getResources() {
+        return resources;
+    }
+
+    public RoleRuleResult setResources(List<String> resources) {
+        this.resources = resources;
+        return this;
+    }
+
+    public List<String> getVerbs() {
+        return verbs;
+    }
+
+    public RoleRuleResult setVerbs(List<String> verbs) {
+        this.verbs = verbs;
+        return this;
+    }
+
+    public String getFullDefinition() {
+        return fullDefinition;
+    }
+
+    public RoleRuleResult setFullDefinition(String fullDefinition) {
+        this.fullDefinition = fullDefinition;
+        return this;
+    }
 }

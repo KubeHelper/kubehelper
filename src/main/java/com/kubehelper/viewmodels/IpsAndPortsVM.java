@@ -23,6 +23,7 @@ import com.kubehelper.domain.models.IpsAndPortsModel;
 import com.kubehelper.domain.results.IpsAndPortsResult;
 import com.kubehelper.services.CommonService;
 import com.kubehelper.services.IpsAndPortsService;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zkoss.bind.annotation.AfterCompose;
@@ -121,13 +122,13 @@ public class IpsAndPortsVM {
     public void filterIps() {
         ipsAndPortsResults.clear();
         for (IpsAndPortsResult ipsAndPortsResult : ipsAndPortsModel.getIpsAndPortsResults()) {
-            if (ipsAndPortsResult.getIp().toLowerCase().contains(getFilter().getIp().toLowerCase()) &&
-                    ipsAndPortsResult.getPorts().toLowerCase().contains(getFilter().getPorts().toLowerCase()) &&
-                    ipsAndPortsResult.getHostInfo().toLowerCase().contains(getFilter().getHostInfo().toLowerCase()) &&
-                    ipsAndPortsResult.getCreationTime().toLowerCase().contains(getFilter().getCreationTime().toLowerCase()) &&
-                    ipsAndPortsResult.getResourceName().toLowerCase().contains(getFilter().getResourceName().toLowerCase()) &&
-                    ipsAndPortsResult.getResourceType().toLowerCase().contains(getFilter().getResourceType().toLowerCase()) &&
-                    ipsAndPortsResult.getNamespace().toLowerCase().contains(getFilter().getNamespace().toLowerCase())) {
+            if (StringUtils.containsIgnoreCase(ipsAndPortsResult.getIp(), getFilter().getIp()) &&
+                    StringUtils.containsIgnoreCase(ipsAndPortsResult.getPorts(), getFilter().getPorts()) &&
+                    StringUtils.containsIgnoreCase(ipsAndPortsResult.getHostInfo(), getFilter().getHostInfo()) &&
+                    StringUtils.containsIgnoreCase(ipsAndPortsResult.getCreationTime(), getFilter().getCreationTime()) &&
+                    StringUtils.containsIgnoreCase(ipsAndPortsResult.getResourceName(), getFilter().getResourceName()) &&
+                    StringUtils.containsIgnoreCase(ipsAndPortsResult.getResourceType(), getFilter().getResourceType()) &&
+                    StringUtils.containsIgnoreCase(ipsAndPortsResult.getNamespace(), getFilter().getNamespace())) {
                 ipsAndPortsResults.add(ipsAndPortsResult);
             }
         }

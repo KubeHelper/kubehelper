@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package com.kubehelper.domain.results;
 
 import com.kubehelper.common.Resource;
+import io.kubernetes.client.openapi.models.V1beta1Subject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,19 +40,39 @@ public class RoleResult {
     private String namespace = "";
     private String creationTime = "";
     private String fullDefinition = "";
-    //TODO ClusterRolle or SimpleRole
     private Resource resourceType;
+    //TODO find role selectors
     private List<String> roleSelectors = new ArrayList<>();
-//    Subjects from role binding, belongs ro the role, pack into separate row
     private List<RoleBindingSubject> subjects = new ArrayList<>();
-    //key is Role Rule id
-    private Map<Integer, RoleRuleResult> roleRules = new HashMap<>();
+    private Map<Integer, List<RoleRuleResult>> roleRules = new HashMap<>();
 
     public RoleResult() {
     }
 
     public RoleResult(int id) {
         this.id = id;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getResourceName() {
+        return resourceName;
+    }
+
+    public RoleResult setResourceName(String resourceName) {
+        this.resourceName = resourceName;
+        return this;
+    }
+
+    public String getCreationTime() {
+        return creationTime;
+    }
+
+    public RoleResult setCreationTime(String creationTime) {
+        this.creationTime = creationTime;
+        return this;
     }
 
     public String getNamespace() {
@@ -72,17 +93,47 @@ public class RoleResult {
         return this;
     }
 
-    public List<RoleRuleResult> getRoleRules(int roleId) {
-//        return roleRules.get(roleId);
-        return new ArrayList<>();
+    public String getFullDefinition() {
+        return fullDefinition;
     }
 
-    public RoleResult setRoleRules(Map<Integer, RoleRuleResult> roleRules) {
+    public RoleResult setFullDefinition(String fullDefinition) {
+        this.fullDefinition = fullDefinition;
+        return this;
+    }
+
+    public List<RoleRuleResult> getRoleRules(int roleId) {
+        return roleRules.get(roleId);
+    }
+
+    public Map<Integer, List<RoleRuleResult>> getRoleRules() {
+        return roleRules;
+    }
+
+    public RoleResult setRoleRules(Map<Integer, List<RoleRuleResult>> roleRules) {
         this.roleRules = roleRules;
         return this;
     }
 
-    public class RoleBindingSubject{
+    public void addRoleRules(List<RoleRuleResult> rules) {
+        roleRules.put(this.id, rules);
+    }
+
+    public void addRoleSubjects(List<V1beta1Subject> kubeSubjects) {
+        kubeSubjects.forEach(s -> {
+            subjects.add(convertSubject(s));
+        });
+    }
+
+    public RoleBindingSubject convertSubject(V1beta1Subject subject) {
+        RoleBindingSubject roleBindingSubject = new RoleBindingSubject();
+        roleBindingSubject.kind = subject.getKind();
+        roleBindingSubject.name = subject.getName();
+        roleBindingSubject.namespace = subject.getNamespace();
+        return roleBindingSubject;
+    }
+
+    public class RoleBindingSubject {
         private String kind;
         private String name;
         private String namespace;

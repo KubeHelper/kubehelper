@@ -31,11 +31,13 @@ import com.kubehelper.domain.results.PodSecurityResult;
 import com.kubehelper.domain.results.RoleResult;
 import com.kubehelper.domain.results.RoleRuleResult;
 import com.kubehelper.domain.results.ServiceAccountResult;
+import io.kubernetes.client.openapi.models.V1beta1Subject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author JDev
@@ -79,6 +81,26 @@ public class SecurityModel implements PageModel {
 //        filter.addResourceNamesFilter(resourceName);
 //        return this;
 //    }
+
+    public SecurityModel addRoleResult(RoleResult roleResult) {
+        rolesResults.put(roleResult.getId(), roleResult);
+        rolesFilter.addNamespacesFilter(roleResult.getNamespace());
+//        TODO selectedResourcePropertyFilter
+//        rolesFilter.addResourcePropertiesFilter(roleResult.getr);
+        rolesFilter.addResourceTypesFilter(roleResult.getResourceType());
+        return this;
+    }
+
+    public void addRoleSubjects(String roleName, List<V1beta1Subject> subjects) {
+        Optional<RoleResult> role = findRole(roleName);
+        if (role.isPresent()){
+            role.get().addRoleSubjects(subjects);
+        }
+    }
+
+    private Optional<RoleResult> findRole(String name){
+        return rolesResults.values().stream().filter(item -> item.getResourceName().equals(name)).findFirst();
+    }
 
     public void addSearchException(Exception exception) {
         this.searchExceptions.add(new KubeHelperException(exception));
@@ -210,6 +232,9 @@ public class SecurityModel implements PageModel {
 
     public Map<Integer, RoleResult> getRolesResults() {
         return rolesResults;
+    }
+    public List<RoleResult> getRolesResultsList() {
+        return new ArrayList<>(rolesResults.values());
     }
 
     public SecurityModel setRolesResults(Map<Integer, RoleResult> rolesResults) {
