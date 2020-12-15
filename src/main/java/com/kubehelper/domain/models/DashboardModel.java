@@ -36,4 +36,8 @@ public class DashboardModel implements PageModel {
     public String getName() {
         return NAME;
     }
+
+    @Override
+    public void setPageMainContentHeight(int newHeight) {
+    }
 }

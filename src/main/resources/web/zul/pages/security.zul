@@ -48,7 +48,7 @@
                                 </tabs>
                                 <tabpanels>
                                     <tabpanel>
-                                        <grid id="securityRolesGrid" model="@load(securityVM.rolesResults)" height="400px">
+                                        <grid id="securityRolesGrid" model="@load(securityVM.rolesResults)" height="@load(securityVM.mainGridHeight)" sclass="mainGridClass">
                                             <auxhead id="rolesAuxHead">
                                                 <auxheader>
                                                     <span sclass="z-icon-hashtag"/>

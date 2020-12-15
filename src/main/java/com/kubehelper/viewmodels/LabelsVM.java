@@ -58,6 +58,8 @@ import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Vbox;
 import org.zkoss.zul.Window;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -94,7 +96,7 @@ import static com.kubehelper.common.Resource.STATEFUL_SET;
  * @author JDev
  */
 @VariableResolver(DelegatingVariableResolver.class)
-public class LabelsVM implements EventListener {
+public class LabelsVM implements EventListener, PropertyChangeListener {
 
     private static Logger logger = LoggerFactory.getLogger(LabelsVM.class);
 
@@ -131,6 +133,7 @@ public class LabelsVM implements EventListener {
     @NotifyChange("*")
     public void init() {
         labelsModel = (LabelsModel) Global.ACTIVE_MODELS.computeIfAbsent(Global.LABELS_MODEL, (k) -> Global.NEW_MODELS.get(Global.LABELS_MODEL));
+        labelsModel.addPropertyChangeListener(LabelsVM.this);
         onInitPreparations();
     }
 
@@ -386,7 +389,7 @@ public class LabelsVM implements EventListener {
      * Compose title and content into popup window.
      *
      * @param present - is value present.
-     * @param name - key=value string for title and content.
+     * @param name    - key=value string for title and content.
      */
     private void showDetailWindow(boolean present, String name) {
         if (present) {
@@ -514,6 +517,15 @@ public class LabelsVM implements EventListener {
 
     public List<String> getNamespaces() {
         return labelsModel.getNamespaces();
+    }
+
+    public String getMainGridHeight() {
+        return labelsModel.getMainGridHeight() + "px";
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        BindUtils.postNotifyChange(null, null, this, ".");
     }
 
 }

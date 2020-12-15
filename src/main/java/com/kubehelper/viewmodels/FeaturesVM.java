@@ -58,6 +58,8 @@ import org.zkoss.zul.Listheader;
 import org.zkoss.zul.Listitem;
 import org.zkoss.zul.Window;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -91,7 +93,7 @@ import static com.kubehelper.common.Resource.STATEFUL_SET;
  * @author JDev
  */
 @VariableResolver(DelegatingVariableResolver.class)
-public class FeaturesVM implements EventListener {
+public class FeaturesVM implements EventListener, PropertyChangeListener {
 
     private static Logger logger = LoggerFactory.getLogger(FeaturesVM.class);
 
@@ -103,7 +105,6 @@ public class FeaturesVM implements EventListener {
     private Set<Resource> selectedResources = new HashSet<>() {{
         add(CONFIG_MAP);
         add(POD);
-        add(SERVICE);
         add(NAMESPACE);
         add(DEPLOYMENT);
         add(STATEFUL_SET);
@@ -129,6 +130,7 @@ public class FeaturesVM implements EventListener {
     @NotifyChange("*")
     public void init() {
         featuresModel = (FeaturesModel) Global.ACTIVE_MODELS.computeIfAbsent(Global.FEATURES_MODEL, (k) -> Global.NEW_MODELS.get(Global.FEATURES_MODEL));
+        featuresModel.addPropertyChangeListener(FeaturesVM.this);
         onInitPreparations();
     }
 
@@ -317,6 +319,15 @@ public class FeaturesVM implements EventListener {
 
     public List<String> getNamespaces() {
         return featuresModel.getNamespaces();
+    }
+
+    public String getMainGridHeight() {
+        return featuresModel.getMainGridHeight() + "px";
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        BindUtils.postNotifyChange(null, null, this, ".");
     }
 
 }

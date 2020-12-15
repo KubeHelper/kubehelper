@@ -26,17 +26,16 @@ import com.kubehelper.domain.filters.RolesSecurityFilter;
 import com.kubehelper.domain.filters.ServiceAccountsSecurityFilter;
 import com.kubehelper.domain.models.SecurityModel;
 import com.kubehelper.domain.results.ContainerSecurityResult;
-import com.kubehelper.domain.results.IpsAndPortsResult;
 import com.kubehelper.domain.results.PodSecurityPoliciesResult;
 import com.kubehelper.domain.results.PodSecurityResult;
 import com.kubehelper.domain.results.RoleResult;
-import com.kubehelper.domain.results.SearchResult;
 import com.kubehelper.domain.results.ServiceAccountResult;
 import com.kubehelper.services.CommonService;
 import com.kubehelper.services.SecurityService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.AfterCompose;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
@@ -59,19 +58,18 @@ import org.zkoss.zul.Footer;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Window;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-
-import static com.kubehelper.common.Resource.CONFIG_MAP;
 
 /**
  * @author JDev
  */
 @VariableResolver(DelegatingVariableResolver.class)
-public class SecurityVM {
+public class SecurityVM implements PropertyChangeListener {
 
     private static Logger logger = LoggerFactory.getLogger(SecurityVM.class);
 
@@ -117,6 +115,7 @@ public class SecurityVM {
     @Init
     public void init() {
         securityModel = (SecurityModel) Global.ACTIVE_MODELS.computeIfAbsent(Global.SECURITY_MODEL, (k) -> Global.NEW_MODELS.get(Global.SECURITY_MODEL));
+        securityModel.addPropertyChangeListener(SecurityVM.this);
         onInitPreparations();
     }
 
@@ -442,5 +441,14 @@ public class SecurityVM {
 
     public List<String> getNamespaces() {
         return securityModel.getNamespaces();
+    }
+
+    public String getMainGridHeight() {
+        return securityModel.getMainGridHeight() + "px";
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        BindUtils.postNotifyChange(null, null, this, ".");
     }
 }

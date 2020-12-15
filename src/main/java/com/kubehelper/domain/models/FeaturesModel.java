@@ -22,6 +22,8 @@ import com.kubehelper.common.KubeHelperException;
 import com.kubehelper.domain.filters.FeaturesFilter;
 import com.kubehelper.domain.results.FeatureResult;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +31,9 @@ import java.util.List;
  * @author JDev
  */
 public class FeaturesModel implements PageModel {
+
+    private int mainGridHeight = 600;
+    private PropertyChangeSupport grid =new PropertyChangeSupport(this);
 
     private String templateUrl = "~./zul/pages/features.zul";
     private String predefinedCommandsPath = "/templates/features/commands.kh";
@@ -44,6 +49,21 @@ public class FeaturesModel implements PageModel {
     private String selectedNamespace = "all";
 
     public FeaturesModel() {
+    }
+
+    @Override
+    public void setPageMainContentHeight(int newHeight) {
+        int oldMainGridHeight = this.mainGridHeight;
+        this.mainGridHeight = newHeight;
+        grid.firePropertyChange(null, oldMainGridHeight, newHeight);
+    }
+
+    public int getMainGridHeight() {
+        return mainGridHeight;
+    }
+
+    public void addPropertyChangeListener(PropertyChangeListener pcl) {
+        grid.addPropertyChangeListener(pcl);
     }
 
     public void addFeatureResult(FeatureResult featureResult) {

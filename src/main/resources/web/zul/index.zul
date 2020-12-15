@@ -1,18 +1,25 @@
 <?page id="indexPage" title="Kube Helper"?>
 <zk>
     <script type="text/javascript">
-        function init() {
-        $('body').on('DOMSubtreeModified', '.mainGridDivId', function(){
-        $(".mainGridId").height($(".mainGridDivId").height()-50)
-        console.log('changed'+' '+$(".mainGridId").height() + ' '+$(".centerContentId").height());
-
-        <!--                if($(".mainGridId").height()==null || $(".mainGridId").height()=='undefined'){-->
-        <!--                    $(".mainGridId").height(600)-->
-        <!--                }-->
-        <!--        pageNorthClass.position - mainSouthFooterClass.position-->
+<!--        This method is called once after the initial page generation.-->
+        zk.afterMount(function() {
+        calculateMainContentHeight();
         });
+
+<!--        This method is called every time the window is resized.-->
+        $( window ).resize(function() {
+        calculateMainContentHeight();
+        });
+
+
+        function calculateMainContentHeight() {
+        var topPos = $(".mainGridClass")[0].getBoundingClientRect().top + $(window)['scrollTop']();
+        var topGlobalFooterPos = $(".mainSouthFooterClass")[0].getBoundingClientRect().top + $(window)['scrollTop']();
+        var gridHeight = topGlobalFooterPos - topPos;
+        console.log("gridHeight="+gridHeight);
+        zAu.send(new zk.Event(zk.Widget.$('$indexGlobalFooter'), "onResize", {mainContentHeight: gridHeight}, {toServer:true}));
         }
-        init()
+
     </script>
 
     <div id="indexWindow" viewModel="@id('indexVM') @init('com.kubehelper.viewmodels.IndexVM')" height="100%" width="100%">
@@ -74,9 +81,9 @@
                             <toolbarbutton id="ipsAndPortsMenuBtn" hflex="1" iconSclass="z-icon-cubes" label="&#160;Ips Ports" onClick="@command('switchView', modelName='ipsAndPorts')"/>
                             <toolbarbutton id="securityMenuBtn" hflex="1" iconSclass="z-icon-shield" label="&#160;Security" onClick="@command('switchView', modelName='security')"/>
                             <toolbarbutton id="labelsMenuBtn" hflex="1" iconSclass="z-icon-tags" label="&#160;Labels Annotations Selectors" onClick="@command('switchView', modelName='labels')"/>
-<!--                            <toolbarbutton id="auditingMenuBtn" hflex="1" iconSclass="z-icon-gears" label="&#160;Auditing" onClick="@command('switchView', modelName='auditing')"/>-->
+                            <!--                            <toolbarbutton id="auditingMenuBtn" hflex="1" iconSclass="z-icon-gears" label="&#160;Auditing" onClick="@command('switchView', modelName='auditing')"/>-->
                             <toolbarbutton id="featuresMenuBtn" hflex="1" iconSclass="z-icon-th" label="&#160;Features" onClick="@command('switchView', modelName='features')"/>
-<!--                            <toolbarbutton id="featureGatesMenuBtn" hflex="1" iconSclass="z-icon-home" label="&#160;Feature Gates" onClick="@command('switchView', modelName='featureGates')"/>-->
+                            <!--                            <toolbarbutton id="featureGatesMenuBtn" hflex="1" iconSclass="z-icon-home" label="&#160;Feature Gates" onClick="@command('switchView', modelName='featureGates')"/>-->
                             <!--                            <toolbarbutton id="customResourcesMenuBtn" hflex="1" iconSclass="z-icon-home" label="&#160;Custom Resources" onClick="@command('switchView', modelName='customResources')"/>-->
                             <!--                            <toolbarbutton id="deprecatedMenuBtn" hflex="1" iconSclass="z-icon-home" label="&#160;Deprecated" onClick="@command('switchView', modelName='deprecated')"/>-->
                             <!--                            <toolbarbutton id="eventsMenuBtn" hflex="1" iconSclass="z-icon-flash" label="&#160;Events" onClick="@command('switchView', modelName='events')"/>-->
@@ -116,7 +123,7 @@
             <center style="overflow:auto">
                 <include id="templateInclude" src="@load(indexVM.pageModel.templateUrl)"/>
             </center>
-            <south class="mainSouthFooterClass" size="3%">
+            <south id="indexGlobalFooter" class="mainSouthFooterClass" size="3%">
                 <toolbar align="center">
                     <toolbarbutton id="copyrightBtn" label="@load(indexVM.footerCopyrightText)" tooltiptext="https://github.com/JWebDev/kubehelper" href="https://github.com/JWebDev/kubehelper"
                                    target="_blank"

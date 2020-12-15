@@ -26,18 +26,17 @@ import com.kubehelper.services.IpsAndPortsService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.AfterCompose;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
 import org.zkoss.bind.annotation.ContextType;
-import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Path;
-import org.zkoss.zk.ui.event.OpenEvent;
 import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
@@ -50,6 +49,8 @@ import org.zkoss.zul.Footer;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Window;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -60,14 +61,13 @@ import java.util.Map;
  * @author JDev
  */
 @VariableResolver(DelegatingVariableResolver.class)
-public class IpsAndPortsVM {
+public class IpsAndPortsVM implements PropertyChangeListener {
 
     private static Logger logger = LoggerFactory.getLogger(IpsAndPortsVM.class);
 
     private boolean isGetButtonPressed;
 
     private String detailsLabel = "";
-    private String ipsAndPortsGridHeight = "800px";
 
     private IpsAndPortsModel ipsAndPortsModel;
     private ListModelList<IpsAndPortsResult> ipsAndPortsResults = new ListModelList<>();
@@ -84,6 +84,7 @@ public class IpsAndPortsVM {
     @Init
     public void init() {
         ipsAndPortsModel = (IpsAndPortsModel) Global.ACTIVE_MODELS.computeIfAbsent(Global.IPS_AND_PORTS_MODEL, (k) -> Global.NEW_MODELS.get(Global.IPS_AND_PORTS_MODEL));
+        ipsAndPortsModel.addPropertyChangeListener(IpsAndPortsVM.this);
         onInitPreparations();
     }
 
@@ -133,22 +134,6 @@ public class IpsAndPortsVM {
             }
         }
         sortResultsByNamespace();
-    }
-
-    //TODO Recalculate desktopHeight, change formula. And pass it to SearchVM.
-    @GlobalCommand
-    @NotifyChange({"*"})
-    public void updateHeightsAndRerenderVM() {
-//        ipsAndPortsGridHeight = ((float) ipsAndPortsModel.getDesktopHeight() / 100) * 68 + "px";
-        ipsAndPortsGridHeight = "900px";
-    }
-
-    @Command
-    @NotifyChange({"*"})
-    public void updateGridHeightOnSouthPanelChange(@ContextParam(ContextType.TRIGGER_EVENT) OpenEvent event) {
-//        int heightPercentage = event.isOpen() ? 68 : 78;
-//        ipsAndPortsGridHeight = ((float) ipsAndPortsModel.getDesktopHeight() / 100) * heightPercentage + "px";
-        ipsAndPortsGridHeight = "900px";
     }
 
     @Command
@@ -230,9 +215,13 @@ public class IpsAndPortsVM {
         return detailsLabel;
     }
 
-    //    The approximate heights of the components on the page as a percentage. Header: 15%, Grid: 68, Footer: 17%
-    public String getIpsAndPortsGridHeight() {
-        return ipsAndPortsGridHeight;
+    public String getMainGridHeight() {
+        return ipsAndPortsModel.getMainGridHeight() + "px";
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        BindUtils.postNotifyChange(null, null, this, ".");
     }
 
 }

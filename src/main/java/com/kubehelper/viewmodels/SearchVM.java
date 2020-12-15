@@ -56,6 +56,8 @@ import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Vbox;
 import org.zkoss.zul.Window;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -93,7 +95,7 @@ import static com.kubehelper.common.Resource.STATEFUL_SET;
  * @author JDev
  */
 @VariableResolver(DelegatingVariableResolver.class)
-public class SearchVM implements EventListener {
+public class SearchVM implements EventListener, PropertyChangeListener {
 
     private static Logger logger = LoggerFactory.getLogger(SearchVM.class);
 
@@ -105,7 +107,6 @@ public class SearchVM implements EventListener {
     private Set<Resource> selectedResources = new HashSet<>() {{
         add(CONFIG_MAP);
         add(POD);
-        add(SERVICE);
         add(NAMESPACE);
         add(DEPLOYMENT);
         add(STATEFUL_SET);
@@ -131,6 +132,7 @@ public class SearchVM implements EventListener {
     @NotifyChange("*")
     public void init() {
         searchModel = (SearchModel) Global.ACTIVE_MODELS.computeIfAbsent(Global.SEARCH_MODEL, (k) -> Global.NEW_MODELS.get(Global.SEARCH_MODEL));
+        searchModel.addPropertyChangeListener(SearchVM.this);
         onInitPreparations();
     }
 
@@ -389,6 +391,15 @@ public class SearchVM implements EventListener {
 
     public List<String> getNamespaces() {
         return searchModel.getNamespaces();
+    }
+
+    public String getMainGridHeight() {
+        return searchModel.getMainGridHeight() + "px";
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        BindUtils.postNotifyChange(null, null, this, ".");
     }
 
 }

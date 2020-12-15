@@ -23,6 +23,8 @@ import com.kubehelper.domain.filters.EventsFilter;
 import com.kubehelper.domain.results.EventResult;
 import org.apache.commons.lang3.StringUtils;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,6 +35,9 @@ public class EventsModel implements PageModel {
 
     private String templateUrl = "~./zul/pages/events.zul";
 
+    private int mainGridHeight = 600;
+    private PropertyChangeSupport grid =new PropertyChangeSupport(this);
+
     public static String NAME = Global.EVENTS_MODEL;
     private String selectedNamespace = "all";
     private List<String> namespaces = new ArrayList<>();
@@ -40,6 +45,20 @@ public class EventsModel implements PageModel {
     private EventsFilter filter = new EventsFilter();
     private List<KubeHelperException> searchExceptions = new ArrayList<>();
 
+    @Override
+    public void setPageMainContentHeight(int newHeight) {
+        int oldMainGridHeight = this.mainGridHeight;
+        this.mainGridHeight = newHeight;
+        grid.firePropertyChange(null, oldMainGridHeight, newHeight);
+    }
+
+    public int getMainGridHeight() {
+        return mainGridHeight;
+    }
+
+    public void addPropertyChangeListener(PropertyChangeListener pcl) {
+        grid.addPropertyChangeListener(pcl);
+    }
 
     public EventsModel addSearchResult(EventResult eventResult) {
         searchResults.add(eventResult);

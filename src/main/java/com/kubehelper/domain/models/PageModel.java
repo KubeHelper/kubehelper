@@ -28,5 +28,5 @@ public interface PageModel {
 //
 //    void setDesktopWithAndHeight(int width, int height);
     String getName();
-
+    void setPageMainContentHeight(int height);
 }
