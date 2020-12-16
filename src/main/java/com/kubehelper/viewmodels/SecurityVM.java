@@ -29,6 +29,7 @@ import com.kubehelper.domain.results.ContainerSecurityResult;
 import com.kubehelper.domain.results.PodSecurityPoliciesResult;
 import com.kubehelper.domain.results.PodSecurityResult;
 import com.kubehelper.domain.results.RoleResult;
+import com.kubehelper.domain.results.RoleRuleResult;
 import com.kubehelper.domain.results.ServiceAccountResult;
 import com.kubehelper.services.CommonService;
 import com.kubehelper.services.SecurityService;
@@ -82,11 +83,15 @@ public class SecurityVM implements PropertyChangeListener {
     private SecurityModel securityModel;
 
     private ListModelList<RoleResult> rolesResults = new ListModelList<>();
-    private ListModelList<RoleResult> roleRulesResults = new ListModelList<>();
+    private ListModelList<RoleResult.RoleBindingSubject> roleSubjectsResults = new ListModelList<>();
+    private ListModelList<RoleRuleResult> roleRulesResults = new ListModelList<>();
     private ListModelList<PodSecurityResult> podsResults = new ListModelList<>();
     private ListModelList<ContainerSecurityResult> containersResults = new ListModelList<>();
     private ListModelList<ServiceAccountResult> serviceAccountsResults = new ListModelList<>();
     private ListModelList<PodSecurityPoliciesResult> podSecurityPoliciesResults = new ListModelList<>();
+
+    private String clickedRoleBindingSubjectsLabel = "";
+    private String clickedRoleRulesLabel = "";
 
     @Wire
     private Footer rolesGridFooter;
@@ -286,11 +291,27 @@ public class SecurityVM implements PropertyChangeListener {
 
 
     @Command
-    public void showRoleFullDefinition(@BindingParam("id") int id) {
-        RoleResult roleResult = securityModel.getRolesResults().get(id);
-        Map<String, String> parameters = Map.of("title", roleResult.getResourceName(), "content", roleResult.getFullDefinition());
+    public void showRoleFullDefinition(@BindingParam("item") RoleResult item) {
+        Map<String, String> parameters = Map.of("title", item.getResourceName(), "content", item.getFullDefinition());
         Window window = (Window) Executions.createComponents("~./zul/components/file-display.zul", null, parameters);
         window.doModal();
+    }
+
+    @Command
+    public void showRoleRuleFullDefinition(@BindingParam("item") RoleRuleResult item) {
+        Map<String, String> parameters = Map.of("title", String.valueOf(item.getId()), "content", item.getFullDefinition());
+        Window window = (Window) Executions.createComponents("~./zul/components/file-display.zul", null, parameters);
+        window.doModal();
+    }
+
+    @Command
+    @NotifyChange({"roleSubjectsResults", "roleRulesResults", "clickedRoleBindingSubjectsLabel", "clickedRoleRulesLabel", "roleRulesTotalItems"})
+    public void showRoleRules(@BindingParam("clickedItem") RoleResult item) {
+        roleSubjectsResults = new ListModelList<>(item.getSubjects());
+        //TODO make simple, remove id from roleRules
+        roleRulesResults = new ListModelList<>(item.getRoleRules().get(item.getId()));
+        clickedRoleRulesLabel = item.getResourceName();
+        clickedRoleBindingSubjectsLabel = item.getResourceName();
     }
 
     public SecurityModel getModel() {
@@ -304,9 +325,12 @@ public class SecurityVM implements PropertyChangeListener {
         return rolesResults;
     }
 
-    public ListModelList<RoleResult> getRoleRulesResults() {
-//TODO add Method for get RoleRules by ID
+    public ListModelList<RoleRuleResult> getRoleRulesResults() {
         return roleRulesResults;
+    }
+
+    public ListModelList<RoleResult.RoleBindingSubject> getRoleSubjectsResults() {
+        return roleSubjectsResults;
     }
 
     public ListModelList<PodSecurityResult> getPodsResults() {
@@ -434,6 +458,14 @@ public class SecurityVM implements PropertyChangeListener {
         return securityModel.getPodSecurityPoliciesFilter();
     }
 
+    public String getClickedRoleBindingSubjectsLabel() {
+        return "Role Binding subjects for the Role: " + clickedRoleBindingSubjectsLabel;
+    }
+
+    public String getClickedRoleRulesLabel() {
+        return "Rules for the Role: " + clickedRoleRulesLabel;
+    }
+
     //TODO
     public void getRoleRulesCrud() {
 
@@ -443,9 +475,18 @@ public class SecurityVM implements PropertyChangeListener {
         return securityModel.getNamespaces();
     }
 
-    public String getMainGridHeight() {
-        return securityModel.getMainGridHeight() + "px";
+    public String getRolesGridHeight() {
+        return securityModel.getMainGridHeight() * 0.45 + "px";
     }
+
+    public String getSubjectsGridHeight() {
+        return securityModel.getMainGridHeight() * 0.1 + "px";
+    }
+
+    public String getRoleRulesGridHeight() {
+        return securityModel.getMainGridHeight() * 0.45 + "px";
+    }
+
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {

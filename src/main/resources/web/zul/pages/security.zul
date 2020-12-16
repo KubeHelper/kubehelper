@@ -48,7 +48,7 @@
                                 </tabs>
                                 <tabpanels>
                                     <tabpanel>
-                                        <grid id="securityRolesGrid" model="@load(securityVM.rolesResults)" height="@load(securityVM.mainGridHeight)" sclass="mainGridClass">
+                                        <grid id="securityRolesGrid" model="@load(securityVM.rolesResults)" height="@load(securityVM.rolesGridHeight)" sclass="mainGridClass">
                                             <auxhead id="rolesAuxHead">
                                                 <auxheader>
                                                     <span sclass="z-icon-hashtag"/>
@@ -101,8 +101,7 @@
                                                         <label value="${item.namespace}"/>
                                                         <label value="${item.resourceType}"/>
                                                         <label value="${item.creationTime}"/>
-                                                        <toolbarbutton label="Click to see Full Definition" onClick="@command('showRoleFullDefinition', id=item.id)" hflex="1"/>
-                                                        <!--                                                    <label value="${item.fullDefinition}"/>-->
+                                                        <toolbarbutton label="Click to see Full Definition" onClick="@command('showRoleFullDefinition', item=item)" hflex="1"/>
                                                     </row>
                                                 </template>
                                             </rows>
@@ -110,96 +109,92 @@
                                                 <footer id="rolesGridFooter" span="9" align="right" label="@load(securityVM.rolesTotalItems)"/>
                                             </foot>
                                         </grid>
-                                        <!--                            </hbox>-->
 
-                                        <!--                                <hbox height="10%">-->
-                                        <!--                            <listbox model="@load(securityVM.rolesSubjects)">-->
-                                        <!--                                &lt;!&ndash;                                <attribute name="onSelect"><![CDATA[&ndash;&gt;-->
-                                        <!--                                &lt;!&ndash;            txt.setValue("Mail Received on "+&ndash;&gt;-->
-                                        <!--                                &lt;!&ndash;                    self.getSelectedItem().getLastChild().getLabel());  &ndash;&gt;-->
-                                        <!--                                &lt;!&ndash;        ]]></attribute>&ndash;&gt;-->
-                                        <!--                                <listhead sizable="true">-->
-                                        <!--                                    <listheader label="Subject" width="50%" sort="auto"/>-->
-                                        <!--                                    <listheader label="Received" width="50%" sort="auto"/>-->
-                                        <!--                                </listhead>-->
-                                        <!--                                <template name="model" var="item">-->
-                                        <!--                                    <listitem>-->
-                                        <!--                                        <listcell image="/widgets/listbox/keystroke_command/img/ArrowUpOrange-16x16.png"/>-->
-                                        <!--                                        <listcell label="2010/06/29 17:41:29"/>-->
-                                        <!--                                    </listitem>-->
-                                        <!--                                </template>-->
-                                        <!--                            </listbox>-->
-                                        <!--                                </hbox>-->
+                                        <groupbox id="roleSubjectsGroupBox">
+                                            <caption iconSclass="z-icon-columns" label="@load(securityVM.clickedRoleBindingSubjectsLabel)"/>
+                                            <grid id="roleSubjectsResultsGrid" model="@load(securityVM.roleSubjectsResults)" height="@load(securityVM.subjectsGridHeight)">
+                                                <columns menupopup="auto" sizable="true">
+                                                    <column hflex="1" label="Kind" sort="auto(kind)"/>
+                                                    <column hflex="2" label="Name" sort="auto(name)"/>
+                                                    <column hflex="1" label="Namespace" sort="auto(namespace)"/>
+                                                </columns>
+                                                <rows>
+                                                    <template name="model" var="item">
+                                                        <row style="cursor:pointer">
+                                                            <label value="${item.kind}"/>
+                                                            <label value="${item.name}"/>
+                                                            <label value="${item.namespace}"/>
+                                                        </row>
+                                                    </template>
+                                                </rows>
+                                            </grid>
+                                        </groupbox>
 
-                                        <!--                                <hbox height="40%">-->
-                                        <!--                                    <grid id="securityRoleRulesGrid" model="@load(securityVM.roleRulesResults)" height="400px">-->
-                                        <!--                                        <auxhead id="roleRulesAuxHead">-->
-                                        <!--                                            <auxheader>-->
-                                        <!--                                                <span sclass="z-icon-hashtag"/>-->
-                                        <!--                                            </auxheader>-->
-                                        <!--                                            <auxheader colspan="1">-->
-                                        <!--                                                <span sclass="z-icon-filter"/>-->
-                                        <!--                                                <textbox instant="true" width="80%" value="@bind(securityVM.roleRulesFilter.name)" onChange="@command('filterRoleRules')"/>-->
-                                        <!--                                            </auxheader>-->
-                                        <!--                                        </auxhead>-->
-                                        <!--                                        <columns menupopup="auto" sizable="true">-->
-                                        <!--                                            <column hflex="min" label="Id" sort="auto(id)"/>-->
-                                        <!--                                            <column hflex="1" label="IP" sort="auto(ip)"/>-->
-                                        <!--                                            &lt;!&ndash;                                    <column hflex="1" label="Container Ports" sort="auto(ports)"/>&ndash;&gt;-->
-                                        <!--                                            &lt;!&ndash;                                    <column hflex="1" label="Resource Name" tooltiptext="Kubernetes Resource Name: [Pod containers]" sort="auto(resourceName)"/>&ndash;&gt;-->
-                                        <!--                                            &lt;!&ndash;                                    <column hflex="min" label="Namespace" sort="auto(namespace)"/>&ndash;&gt;-->
-                                        <!--                                            &lt;!&ndash;                                    <column hflex="min" label="Resource Type" sort="auto(resourceType)"/>&ndash;&gt;-->
-                                        <!--                                            &lt;!&ndash;                                    <column hflex="min" label="Host Info" tooltiptext="Node/Host Name: [Node IP]" sort="auto(hostInfo)"/>&ndash;&gt;-->
-                                        <!--                                            &lt;!&ndash;                                    <column hflex="1" label="Additional Info" sort="auto(additionalInfo)"/>&ndash;&gt;-->
-                                        <!--                                            &lt;!&ndash;                                    <column hflex="min" label="Creation Time" sort="auto(creationTime)"/>&ndash;&gt;-->
-                                        <!--                                        </columns>-->
-                                        <!--                                        <rows>-->
+                                        <groupbox id="roleRulesGroupBox">
+                                            <caption iconSclass="z-icon-columns" label="@load(securityVM.clickedRoleRulesLabel)"/>
+                                            <grid id="securityRoleRulesGrid" model="@load(securityVM.roleRulesResults)" height="@load(securityVM.roleRulesGridHeight)">
+                                                <!--                                            <auxhead id="roleRulesAuxHead">-->
+                                                <!--                                                <auxheader>-->
+                                                <!--                                                    <span sclass="z-icon-hashtag"/>-->
+                                                <!--                                                </auxheader>-->
+                                                <!--                                                <auxheader colspan="1">-->
+                                                <!--                                                    <span sclass="z-icon-filter"/>-->
+                                                <!--                                                    <textbox instant="true" width="80%" value="@bind(securityVM.roleRulesFilter.name)" onChange="@command('filterRoleRules')"/>-->
+                                                <!--                                                </auxheader>-->
+                                                <!--                                            </auxhead>-->
+                                                <columns menupopup="auto" sizable="true">
+                                                    <column hflex="min" label="Id" sort="auto(id)"/>
+                                                    <column hflex="1" label="API Groups" sort="auto(apiGroupsAsString)"/>
+                                                    <column hflex="1" label="Resources" sort="auto(resourcesAsString)"/>
+                                                    <column hflex="1" label="Verbs" sort="auto(verbsAsString)"/>
+                                                    <column hflex="1" label="Resource Names" sort="auto(resourceNamesAsString)"/>
+                                                    <column hflex="1" label="Non Resource URLs" sort="auto(nonResourceURLsAsString)"/>
+                                                    <column hflex="1" label="Full Definition"/>
+                                                </columns>
+                                                <rows>
+                                                    <template name="model" var="item">
+                                                        <row style="cursor:pointer">
+                                                            <label value="${item.id}" multiline="true"/>
+                                                            <label value="${item.apiGroupsAsString}" multiline="true"/>
+                                                            <label value="${item.resourcesAsString}" multiline="true"/>
+                                                            <label value="${item.verbsAsString}" multiline="true"/>
+                                                            <label value="${item.resourceNamesAsString}" multiline="true"/>
+                                                            <label value="${item.nonResourceURLsAsString}" multiline="true"/>
+                                                            <toolbarbutton label="Click to see Full Definition" onClick="@command('showRoleRuleFullDefinition', item=item)" hflex="1"/>
+                                                        </row>
+                                                    </template>
+                                                </rows>
+                                                <foot>
+                                                    <footer id="roleRulesGridFooter" span="9" align="right" label="@load(securityVM.roleRulesTotalItems)"/>
+                                                </foot>
+                                            </grid>
+                                        </groupbox>
+
+                                        <!--                                    <hbox height="10%">-->
+                                        <!--                                        <listbox model="@load(securityVM.roleRulesCrud)">-->
+                                        <!--                                            &lt;!&ndash;                                <attribute name="onSelect"><![CDATA[&ndash;&gt;-->
+                                        <!--                                            &lt;!&ndash;            txt.setValue("Mail Received on "+&ndash;&gt;-->
+                                        <!--                                            &lt;!&ndash;                    self.getSelectedItem().getLastChild().getLabel());  &ndash;&gt;-->
+                                        <!--                                            &lt;!&ndash;        ]]></attribute>&ndash;&gt;-->
+                                        <!--                                            <listhead sizable="true">-->
+                                        <!--                                                <listheader label="Subject" width="50%" sort="auto"/>-->
+                                        <!--                                                <listheader label="Received" width="50%" sort="auto"/>-->
+                                        <!--                                            </listhead>-->
                                         <!--                                            <template name="model" var="item">-->
-                                        <!--                                                <row onClick="@command('showRuleDetails', clickedItem=item)" style="cursor:pointer">-->
-                                        <!--                                                    <label value="${item.id}"/>-->
-                                        <!--                                                    <label value="${item.ip}" multiline="true"/>-->
-                                        <!--                                                    &lt;!&ndash;                                            <label value="${item.ports}" multiline="true"/>&ndash;&gt;-->
-                                        <!--                                                    &lt;!&ndash;                                            <label value="${item.resourceName}"/>&ndash;&gt;-->
-                                        <!--                                                    &lt;!&ndash;                                            <label value="${item.namespace}"/>&ndash;&gt;-->
-                                        <!--                                                    &lt;!&ndash;                                            <label value="${item.resourceType}"/>&ndash;&gt;-->
-                                        <!--                                                    &lt;!&ndash;                                            <label value="${item.hostInfo}"/>&ndash;&gt;-->
-                                        <!--                                                    &lt;!&ndash;                                            <label value="${item.additionalInfo}" multiline="true"/>&ndash;&gt;-->
-                                        <!--                                                    &lt;!&ndash;                                            <label value="${item.creationTime}"/>&ndash;&gt;-->
-                                        <!--                                                </row>-->
+                                        <!--                                                <listitem>-->
+                                        <!--                                                    <listcell image="/widgets/listbox/keystroke_command/img/ArrowUpOrange-16x16.png"/>-->
+                                        <!--                                                    <listcell label="2010/06/29 17:41:29"/>-->
+                                        <!--                                                </listitem>-->
                                         <!--                                            </template>-->
-                                        <!--                                        </rows>-->
-                                        <!--                                        <foot>-->
-                                        <!--                                            <footer id="roleRulesGridFooter" span="9" align="right" label="@load(securityVM.roleRulesTotalItems)"/>-->
-                                        <!--                                        </foot>-->
-                                        <!--                                    </grid>-->
-                                        <!--                                </hbox>-->
+                                        <!--                                        </listbox>-->
+                                        <!--                                    </hbox>-->
 
-                                        <!--                                <hbox height="10%">-->
-                                        <!--                                    <listbox model="@load(securityVM.roleRulesCrud)">-->
-                                        <!--                                        &lt;!&ndash;                                <attribute name="onSelect"><![CDATA[&ndash;&gt;-->
-                                        <!--                                        &lt;!&ndash;            txt.setValue("Mail Received on "+&ndash;&gt;-->
-                                        <!--                                        &lt;!&ndash;                    self.getSelectedItem().getLastChild().getLabel());  &ndash;&gt;-->
-                                        <!--                                        &lt;!&ndash;        ]]></attribute>&ndash;&gt;-->
-                                        <!--                                        <listhead sizable="true">-->
-                                        <!--                                            <listheader label="Subject" width="50%" sort="auto"/>-->
-                                        <!--                                            <listheader label="Received" width="50%" sort="auto"/>-->
-                                        <!--                                        </listhead>-->
-                                        <!--                                        <template name="model" var="item">-->
-                                        <!--                                            <listitem>-->
-                                        <!--                                                <listcell image="/widgets/listbox/keystroke_command/img/ArrowUpOrange-16x16.png"/>-->
-                                        <!--                                                <listcell label="2010/06/29 17:41:29"/>-->
-                                        <!--                                            </listitem>-->
-                                        <!--                                        </template>-->
-                                        <!--                                    </listbox>-->
-                                        <!--                                </hbox>-->
-
-                                        <!--                            </vbox>-->
                                     </tabpanel>
                                     <tabpanel width="100%" height="100%">
-                                            <div style="display: grid; grid-template-rows: 25% 75%; border: solid thick;">
-                                                <div style="background: magenta;">First two lines</div>
-                                                <div style="background: cyan;">Second</div>
-                                            </div>
+                                        <div style="display: grid; grid-template-rows: 25% 75%; border: solid thick;">
+                                            <div style="background: magenta;">First two lines</div>
+                                            <div style="background: cyan;">Second</div>
+                                        </div>
 
                                     </tabpanel>
                                 </tabpanels>

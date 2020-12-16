@@ -19,101 +19,31 @@ package com.kubehelper.services;
 
 import com.kubehelper.common.KubeAPI;
 import com.kubehelper.common.Resource;
-import com.kubehelper.domain.models.SearchModel;
 import com.kubehelper.domain.models.SecurityModel;
 import com.kubehelper.domain.results.RoleResult;
 import com.kubehelper.domain.results.RoleRuleResult;
-import com.kubehelper.domain.results.SearchResult;
 import io.kubernetes.client.Exec;
-import io.kubernetes.client.openapi.ApiException;
-import io.kubernetes.client.openapi.models.V1ConfigMap;
-import io.kubernetes.client.openapi.models.V1ConfigMapKeySelector;
-import io.kubernetes.client.openapi.models.V1ConfigMapList;
-import io.kubernetes.client.openapi.models.V1Container;
-import io.kubernetes.client.openapi.models.V1DaemonSet;
-import io.kubernetes.client.openapi.models.V1DaemonSetList;
-import io.kubernetes.client.openapi.models.V1Deployment;
-import io.kubernetes.client.openapi.models.V1DeploymentList;
-import io.kubernetes.client.openapi.models.V1EnvVar;
-import io.kubernetes.client.openapi.models.V1EnvVarSource;
-import io.kubernetes.client.openapi.models.V1Job;
-import io.kubernetes.client.openapi.models.V1JobList;
-import io.kubernetes.client.openapi.models.V1NetworkPolicy;
-import io.kubernetes.client.openapi.models.V1NetworkPolicyList;
 import io.kubernetes.client.openapi.models.V1ObjectMeta;
-import io.kubernetes.client.openapi.models.V1PersistentVolume;
-import io.kubernetes.client.openapi.models.V1PersistentVolumeClaim;
-import io.kubernetes.client.openapi.models.V1PersistentVolumeClaimList;
-import io.kubernetes.client.openapi.models.V1PersistentVolumeList;
-import io.kubernetes.client.openapi.models.V1Pod;
-import io.kubernetes.client.openapi.models.V1PodList;
-import io.kubernetes.client.openapi.models.V1PodSpec;
-import io.kubernetes.client.openapi.models.V1PodStatus;
-import io.kubernetes.client.openapi.models.V1ReplicaSet;
-import io.kubernetes.client.openapi.models.V1ReplicaSetList;
-import io.kubernetes.client.openapi.models.V1ResourceFieldSelector;
-import io.kubernetes.client.openapi.models.V1Secret;
-import io.kubernetes.client.openapi.models.V1SecretKeySelector;
-import io.kubernetes.client.openapi.models.V1SecretList;
-import io.kubernetes.client.openapi.models.V1Service;
-import io.kubernetes.client.openapi.models.V1ServiceAccount;
-import io.kubernetes.client.openapi.models.V1ServiceAccountList;
-import io.kubernetes.client.openapi.models.V1ServiceList;
-import io.kubernetes.client.openapi.models.V1StatefulSet;
-import io.kubernetes.client.openapi.models.V1StatefulSetList;
 import io.kubernetes.client.openapi.models.V1beta1ClusterRole;
 import io.kubernetes.client.openapi.models.V1beta1ClusterRoleBinding;
 import io.kubernetes.client.openapi.models.V1beta1ClusterRoleBindingList;
 import io.kubernetes.client.openapi.models.V1beta1ClusterRoleList;
-import io.kubernetes.client.openapi.models.V1beta1PodDisruptionBudget;
-import io.kubernetes.client.openapi.models.V1beta1PodDisruptionBudgetList;
-import io.kubernetes.client.openapi.models.V1beta1PodSecurityPolicy;
-import io.kubernetes.client.openapi.models.V1beta1PodSecurityPolicyList;
 import io.kubernetes.client.openapi.models.V1beta1PolicyRule;
 import io.kubernetes.client.openapi.models.V1beta1Role;
 import io.kubernetes.client.openapi.models.V1beta1RoleBinding;
 import io.kubernetes.client.openapi.models.V1beta1RoleBindingList;
 import io.kubernetes.client.openapi.models.V1beta1RoleList;
-import org.apache.commons.lang3.ObjectUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-import java.util.StringJoiner;
 
 import static com.kubehelper.common.Resource.CLUSTER_ROLE;
-import static com.kubehelper.common.Resource.CLUSTER_ROLE_BINDING;
-import static com.kubehelper.common.Resource.CONFIG_MAP;
-import static com.kubehelper.common.Resource.DAEMON_SET;
-import static com.kubehelper.common.Resource.DEPLOYMENT;
-import static com.kubehelper.common.Resource.ENV_VARIABLE;
-import static com.kubehelper.common.Resource.JOB;
-import static com.kubehelper.common.Resource.NETWORK_POLICY;
-import static com.kubehelper.common.Resource.PERSISTENT_VOLUME;
-import static com.kubehelper.common.Resource.PERSISTENT_VOLUME_CLAIM;
-import static com.kubehelper.common.Resource.POD;
-import static com.kubehelper.common.Resource.POD_DISRUPTION_BUDGET;
-import static com.kubehelper.common.Resource.POD_SECURITY_POLICY;
-import static com.kubehelper.common.Resource.REPLICA_SET;
 import static com.kubehelper.common.Resource.ROLE;
-import static com.kubehelper.common.Resource.ROLE_BINDING;
-import static com.kubehelper.common.Resource.SECRET;
-import static com.kubehelper.common.Resource.SERVICE;
-import static com.kubehelper.common.Resource.SERVICE_ACCOUNT;
-import static com.kubehelper.common.Resource.STATEFUL_SET;
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * Search service.
@@ -225,7 +155,7 @@ public class SecurityService {
     private void addRoleRulesToRoleResult(RoleResult roleResult, List<V1beta1PolicyRule> rules) {
         List<RoleRuleResult> roleRules = new ArrayList<>();
         rules.forEach(rule -> {
-            roleRules.add(new RoleRuleResult()
+            roleRules.add(new RoleRuleResult(roleRules.size() + 1)
                     .setApiGroups(rule.getApiGroups())
                     .setResources(rule.getResources())
                     .setNonResourceURLs(rule.getNonResourceURLs())

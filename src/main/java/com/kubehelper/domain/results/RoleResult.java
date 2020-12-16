@@ -115,6 +115,15 @@ public class RoleResult {
         return this;
     }
 
+    public List<RoleBindingSubject> getSubjects() {
+        return subjects;
+    }
+
+    public RoleResult setSubjects(List<RoleBindingSubject> subjects) {
+        this.subjects = subjects;
+        return this;
+    }
+
     public void addRoleRules(List<RoleRuleResult> rules) {
         roleRules.put(this.id, rules);
     }
@@ -137,5 +146,17 @@ public class RoleResult {
         private String kind;
         private String name;
         private String namespace;
+
+        public String getKind() {
+            return kind;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getNamespace() {
+            return namespace;
+        }
     }
 }
