@@ -19,7 +19,9 @@ package com.kubehelper.services;
 
 import com.kubehelper.common.KubeAPI;
 import com.kubehelper.common.Resource;
+import com.kubehelper.domain.models.SearchModel;
 import com.kubehelper.domain.models.SecurityModel;
+import com.kubehelper.domain.results.PodSecurityResult;
 import com.kubehelper.domain.results.RoleResult;
 import com.kubehelper.domain.results.RoleRuleResult;
 import io.kubernetes.client.Exec;
@@ -28,6 +30,9 @@ import io.kubernetes.client.openapi.models.V1beta1ClusterRole;
 import io.kubernetes.client.openapi.models.V1beta1ClusterRoleBinding;
 import io.kubernetes.client.openapi.models.V1beta1ClusterRoleBindingList;
 import io.kubernetes.client.openapi.models.V1beta1ClusterRoleList;
+import io.kubernetes.client.openapi.models.V1beta1PodSecurityPolicy;
+import io.kubernetes.client.openapi.models.V1beta1PodSecurityPolicyList;
+import io.kubernetes.client.openapi.models.V1beta1PodSecurityPolicySpec;
 import io.kubernetes.client.openapi.models.V1beta1PolicyRule;
 import io.kubernetes.client.openapi.models.V1beta1Role;
 import io.kubernetes.client.openapi.models.V1beta1RoleBinding;
@@ -43,6 +48,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.kubehelper.common.Resource.CLUSTER_ROLE;
+import static com.kubehelper.common.Resource.POD_SECURITY_POLICY;
 import static com.kubehelper.common.Resource.ROLE;
 
 /**
@@ -78,10 +84,7 @@ public class SecurityService {
     public void getPods(SecurityModel securityModel) {
         securityModel.getPodsResults().clear();
         securityModel.getSearchExceptions().clear();
-        searchInClusterRoles(securityModel);
-        searchInRoles(securityModel);
-        searchInClusterRoleBindings(securityModel);
-        searchInRoleBindings(securityModel);
+        searchInPodSecurityPolicies(securityModel);
     }
 
 
@@ -134,6 +137,19 @@ public class SecurityService {
         }
     }
 
+    private void searchInPodSecurityPolicies(SecurityModel securityModel) {
+        V1beta1PodSecurityPolicyList policiesList = kubeAPI.getPolicyV1beta1PodSecurityPolicyList();
+        for (V1beta1PodSecurityPolicy policy : policiesList.getItems()) {
+            try {
+                addPodSecurityPolicyToModel(policy.getMetadata(), securityModel, policy.getSpec(), policy.toString());
+            } catch (RuntimeException e) {
+                securityModel.addSearchException(e);
+                logger.error(e.getMessage(), e);
+            }
+        }
+    }
+
+
     /**
      * Add new found variable/text/string to search result.
      *
@@ -164,6 +180,26 @@ public class SecurityService {
                     .setFullDefinition(rule.toString()));
         });
         roleResult.addRoleRules(roleRules);
+    }
+
+    /**
+     * Add new found variable/text/string to search result.
+     *
+     * @param metadata      - kubernetes resource/object metadata
+     * @param securityModel - security model
+     */
+    private void addPodSecurityPolicyToModel(V1ObjectMeta metadata, SecurityModel securityModel, V1beta1PodSecurityPolicySpec spec, String fullDefinition) {
+        PodSecurityResult result = new PodSecurityResult(securityModel.getPodsResults().size() + 1)
+                .setFsGroup(spec.getFsGroup().toString())
+                .setNamespace(metadata.getNamespace())
+                .setRunAsGroup(spec.getRunAsGroup().toString())
+                .setRunAsUser(spec.getRunAsUser().toString())
+                .setFullDefinition(fullDefinition)
+                .setCreationTime(getParsedCreationTime(metadata.getCreationTimestamp()))
+                .setNamespace(metadata.getNamespace());
+//                .setRunAsNonRoot(spec.getr)
+        //TODO
+//        securityModel.addRoleResult(newRoleResult);
     }
 
 
