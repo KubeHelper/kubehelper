@@ -26,8 +26,8 @@ import com.kubehelper.domain.filters.RoleRulesSecurityFilter;
 import com.kubehelper.domain.filters.RolesSecurityFilter;
 import com.kubehelper.domain.filters.ServiceAccountsSecurityFilter;
 import com.kubehelper.domain.results.ContainerSecurityResult;
+import com.kubehelper.domain.results.PodSecurityContextResult;
 import com.kubehelper.domain.results.PodSecurityPoliciesResult;
-import com.kubehelper.domain.results.PodSecurityResult;
 import com.kubehelper.domain.results.RoleResult;
 import com.kubehelper.domain.results.RoleRuleResult;
 import com.kubehelper.domain.results.ServiceAccountResult;
@@ -53,14 +53,14 @@ public class SecurityModel implements PageModel {
     public static String NAME = Global.SECURITY_MODEL;
 
     private String selectedRolesNamespace = "all";
-    private String selectedPodsNamespace = "all";
+    private String selectedPodsSecurityContextsNamespace = "all";
     private String selectedContainersNamespace = "all";
     private String selectedServiceAccountsNamespace = "all";
     private String selectedPodSecurityPoliciesNamespace = "all";
 
     private List<String> namespaces = new ArrayList<>();
     private Map<Integer, RoleResult> rolesResults = new HashMap<>();
-    private List<PodSecurityResult> podsResults = new ArrayList<>();
+    private List<PodSecurityContextResult> podsSecurityContextResults = new ArrayList<>();
     private List<ContainerSecurityResult> containersResults = new ArrayList<>();
     private List<ServiceAccountResult> serviceAccountsResults = new ArrayList<>();
     private List<PodSecurityPoliciesResult> podSecurityPoliciesResults = new ArrayList<>();
@@ -111,6 +111,25 @@ public class SecurityModel implements PageModel {
         return this;
     }
 
+    public SecurityModel addPodSecurityContext(PodSecurityContextResult result) {
+        podsSecurityContextResults.add(result);
+//        TODO add filters
+//        rolesFilter.addNamespacesFilter(roleResult.getNamespace());
+//        rolesFilter.addResourcePropertiesFilter(roleResult.getr);
+//        rolesFilter.addResourceTypesFilter(roleResult.getResourceType());
+        return this;
+    }
+
+    public SecurityModel addPodSecurityPolicy(PodSecurityPoliciesResult result) {
+        podSecurityPoliciesResults.add(result);
+//        TODO add filters
+//        rolesFilter.addNamespacesFilter(roleResult.getNamespace());
+//        rolesFilter.addResourcePropertiesFilter(roleResult.getr);
+//        rolesFilter.addResourceTypesFilter(roleResult.getResourceType());
+        return this;
+    }
+
+
     public void addRoleSubjects(String roleName, List<V1beta1Subject> subjects) {
         Optional<RoleResult> role = findRole(roleName);
         if (role.isPresent()) {
@@ -160,12 +179,12 @@ public class SecurityModel implements PageModel {
         return this;
     }
 
-    public String getSelectedPodsNamespace() {
-        return selectedPodsNamespace;
+    public String getSelectedPodsSecurityContextsNamespace() {
+        return selectedPodsSecurityContextsNamespace;
     }
 
-    public SecurityModel setSelectedPodsNamespace(String selectedPodsNamespace) {
-        this.selectedPodsNamespace = selectedPodsNamespace;
+    public SecurityModel setSelectedPodsSecurityContextsNamespace(String selectedPodsSecurityContextsNamespace) {
+        this.selectedPodsSecurityContextsNamespace = selectedPodsSecurityContextsNamespace;
         return this;
     }
 
@@ -263,12 +282,12 @@ public class SecurityModel implements PageModel {
         return this;
     }
 
-    public List<PodSecurityResult> getPodsResults() {
-        return podsResults;
+    public List<PodSecurityContextResult> getPodsSecurityContextsResults() {
+        return podsSecurityContextResults;
     }
 
-    public SecurityModel setPodsResults(List<PodSecurityResult> podsResults) {
-        this.podsResults = podsResults;
+    public SecurityModel setPodsSecurityContextResults(List<PodSecurityContextResult> podsSecurityContextResults) {
+        this.podsSecurityContextResults = podsSecurityContextResults;
         return this;
     }
 

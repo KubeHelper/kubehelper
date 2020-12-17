@@ -19,13 +19,16 @@ package com.kubehelper.services;
 
 import com.kubehelper.common.KubeAPI;
 import com.kubehelper.common.Resource;
-import com.kubehelper.domain.models.SearchModel;
 import com.kubehelper.domain.models.SecurityModel;
-import com.kubehelper.domain.results.PodSecurityResult;
+import com.kubehelper.domain.results.PodSecurityContextResult;
+import com.kubehelper.domain.results.PodSecurityPoliciesResult;
 import com.kubehelper.domain.results.RoleResult;
 import com.kubehelper.domain.results.RoleRuleResult;
 import io.kubernetes.client.Exec;
 import io.kubernetes.client.openapi.models.V1ObjectMeta;
+import io.kubernetes.client.openapi.models.V1Pod;
+import io.kubernetes.client.openapi.models.V1PodList;
+import io.kubernetes.client.openapi.models.V1PodSecurityContext;
 import io.kubernetes.client.openapi.models.V1beta1ClusterRole;
 import io.kubernetes.client.openapi.models.V1beta1ClusterRoleBinding;
 import io.kubernetes.client.openapi.models.V1beta1ClusterRoleBindingList;
@@ -38,6 +41,7 @@ import io.kubernetes.client.openapi.models.V1beta1Role;
 import io.kubernetes.client.openapi.models.V1beta1RoleBinding;
 import io.kubernetes.client.openapi.models.V1beta1RoleBindingList;
 import io.kubernetes.client.openapi.models.V1beta1RoleList;
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +52,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.kubehelper.common.Resource.CLUSTER_ROLE;
-import static com.kubehelper.common.Resource.POD_SECURITY_POLICY;
 import static com.kubehelper.common.Resource.ROLE;
 
 /**
@@ -81,8 +84,14 @@ public class SecurityService {
         searchInRoleBindings(securityModel);
     }
 
-    public void getPods(SecurityModel securityModel) {
-        securityModel.getPodsResults().clear();
+    public void getPodsSecurityContexts(SecurityModel securityModel) {
+        securityModel.getPodsSecurityContextsResults().clear();
+        securityModel.getSearchExceptions().clear();
+        searchInPodSecurityContexts(securityModel);
+    }
+
+    public void getPodsSecurityPolicies(SecurityModel securityModel) {
+        securityModel.getPodSecurityPoliciesResults().clear();
         securityModel.getSearchExceptions().clear();
         searchInPodSecurityPolicies(securityModel);
     }
@@ -149,6 +158,18 @@ public class SecurityService {
         }
     }
 
+    private void searchInPodSecurityContexts(SecurityModel securityModel) {
+        V1PodList podsList = kubeAPI.getV1PodsList(securityModel.getSelectedPodsSecurityContextsNamespace());
+        for (V1Pod pod : podsList.getItems()) {
+            try {
+                addPodSecurityContextToModel(pod.getMetadata(), securityModel, pod.getSpec().getSecurityContext());
+            } catch (RuntimeException e) {
+                securityModel.addSearchException(e);
+                logger.error(e.getMessage(), e);
+            }
+        }
+    }
+
 
     /**
      * Add new found variable/text/string to search result.
@@ -189,17 +210,53 @@ public class SecurityService {
      * @param securityModel - security model
      */
     private void addPodSecurityPolicyToModel(V1ObjectMeta metadata, SecurityModel securityModel, V1beta1PodSecurityPolicySpec spec, String fullDefinition) {
-        PodSecurityResult result = new PodSecurityResult(securityModel.getPodsResults().size() + 1)
-                .setFsGroup(spec.getFsGroup().toString())
-                .setNamespace(metadata.getNamespace())
-                .setRunAsGroup(spec.getRunAsGroup().toString())
-                .setRunAsUser(spec.getRunAsUser().toString())
+        PodSecurityPoliciesResult result = new PodSecurityPoliciesResult(securityModel.getPodSecurityPoliciesResults().size() + 1)
+                .setAllowPrivilegeEscalation(spec.getAllowPrivilegeEscalation().toString())
+                .setDefaultAllowPrivilegeEscalation(spec.getDefaultAllowPrivilegeEscalation().toString())
+                .setAllowedCSIDrivers(spec.getAllowedCSIDrivers() == null ? "null" : spec.getAllowedCSIDrivers().toString())
+                .setAllowedCapabilities(spec.getAllowedCapabilities() == null ? "null" : spec.getAllowedCapabilities().toString())
+                .setAllowedFlexVolumes(spec.getAllowedFlexVolumes() == null ? "null" : spec.getAllowedFlexVolumes().toString())
+                .setAllowedHostPaths(spec.getAllowedHostPaths() == null ? "null" : spec.getAllowedHostPaths().toString())
+                .setAllowedProcMountTypes(spec.getAllowedProcMountTypes() == null ? "null" : spec.getAllowedProcMountTypes().toString())
+                .setAllowedUnsafeSysctls(spec.getAllowedUnsafeSysctls() == null ? "null" : spec.getAllowedUnsafeSysctls().toString())
+                .setDefaultAddCapabilities(spec.getDefaultAddCapabilities() == null ? "null" : spec.getDefaultAddCapabilities().toString())
+                .setForbiddenSysctls(spec.getForbiddenSysctls() == null ? "null" : spec.getForbiddenSysctls().toString())
+                .setFsGroup(spec.getFsGroup() == null ? "null" : spec.getFsGroup().toString())
+                .setHostIPC(spec.getHostIPC() == null ? "null" : spec.getHostIPC().toString())
+                .setHostNetwork(spec.getHostNetwork() == null ? "null" : spec.getHostNetwork().toString())
+                .setHostPID(spec.getHostPID() == null ? "null" : spec.getHostPID().toString())
+                .setHostPorts(spec.getHostPorts() == null ? "null" : spec.getHostPorts().toString())
+                .setPrivileged(spec.getPrivileged() == null ? "null" : spec.getPrivileged().toString())
+                .setReadOnlyRootFilesystem(spec.getReadOnlyRootFilesystem() == null ? "null" : spec.getReadOnlyRootFilesystem().toString())
+                .setRequiredDropCapabilities(spec.getRequiredDropCapabilities() == null ? "null" : spec.getRequiredDropCapabilities().toString())
+                .setRunAsGroup(spec.getRunAsGroup() == null ? "null" : spec.getRunAsGroup().toString())
+                .setRunAsUser(spec.getRunAsUser() == null ? "null" : spec.getRunAsUser().toString())
+                .setRuntimeClass(spec.getRuntimeClass() == null ? "null" : spec.getRuntimeClass().toString())
+                .setSeLinux(spec.getSeLinux() == null ? "null" : spec.getSeLinux().toString())
+                .setSupplementalGroups(spec.getSupplementalGroups() == null ? "null" : spec.getSupplementalGroups().toString())
+                .setVolumes(spec.getVolumes() == null ? "null" : spec.getVolumes().toString())
                 .setFullDefinition(fullDefinition)
                 .setCreationTime(getParsedCreationTime(metadata.getCreationTimestamp()))
                 .setNamespace(metadata.getNamespace());
-//                .setRunAsNonRoot(spec.getr)
-        //TODO
-//        securityModel.addRoleResult(newRoleResult);
+        securityModel.addPodSecurityPolicy(result);
+    }
+
+    private void addPodSecurityContextToModel(V1ObjectMeta metadata, SecurityModel securityModel, V1PodSecurityContext securityContext) {
+        PodSecurityContextResult result = new PodSecurityContextResult(securityModel.getPodsSecurityContextsResults().size() + 1)
+                .setResourceName(metadata.getName())
+                .setFsGroup(String.valueOf(securityContext.getFsGroup()))
+                .setFsGroupChangePolicy(StringUtils.isEmpty(securityContext.getFsGroupChangePolicy()) ? "null" : securityContext.getFsGroupChangePolicy())
+                .setRunAsGroup(String.valueOf(securityContext.getRunAsGroup()))
+                .setRunAsNonRoot(String.valueOf(securityContext.getRunAsNonRoot()))
+                .setRunAsUser(String.valueOf(securityContext.getRunAsUser()))
+                .setSeLinuxOptions(securityContext.getSeLinuxOptions() == null ? "null" : securityContext.getSeLinuxOptions().toString())
+                .setSupplementalGroups(securityContext.getSupplementalGroups() == null ? "null" : securityContext.getSupplementalGroups().toString())
+                .setSysctls(securityContext.getSysctls() == null ? "null" : securityContext.getSysctls().toString())
+                .setWindowsOptions(securityContext.getWindowsOptions() == null ? "null" : securityContext.getWindowsOptions().toString())
+                .setCreationTime(getParsedCreationTime(metadata.getCreationTimestamp()))
+                .setFullDefinition(securityContext.toString())
+                .setNamespace(metadata.getNamespace());
+        securityModel.addPodSecurityContext(result);
     }
 
 
