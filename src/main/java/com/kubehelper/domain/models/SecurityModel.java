@@ -19,15 +19,18 @@ package com.kubehelper.domain.models;
 
 import com.kubehelper.common.Global;
 import com.kubehelper.common.KubeHelperException;
+import com.kubehelper.common.Resource;
 import com.kubehelper.domain.filters.ContainersSecurityFilter;
 import com.kubehelper.domain.filters.PodsSecurityFilter;
 import com.kubehelper.domain.filters.PodsSecurityPoliciesSecurityFilter;
+import com.kubehelper.domain.filters.RBACFilter;
 import com.kubehelper.domain.filters.RoleRulesSecurityFilter;
 import com.kubehelper.domain.filters.RolesSecurityFilter;
 import com.kubehelper.domain.filters.ServiceAccountsSecurityFilter;
 import com.kubehelper.domain.results.ContainerSecurityResult;
 import com.kubehelper.domain.results.PodSecurityContextResult;
 import com.kubehelper.domain.results.PodSecurityPoliciesResult;
+import com.kubehelper.domain.results.RBACResult;
 import com.kubehelper.domain.results.RoleResult;
 import com.kubehelper.domain.results.RoleRuleResult;
 import com.kubehelper.domain.results.ServiceAccountResult;
@@ -53,6 +56,7 @@ public class SecurityModel implements PageModel {
     public static String NAME = Global.SECURITY_MODEL;
 
     private String selectedRolesNamespace = "all";
+    private String selectedRBACsNamespace = "all";
     private String selectedPodsSecurityContextsNamespace = "all";
     private String selectedContainersNamespace = "all";
     private String selectedServiceAccountsNamespace = "all";
@@ -61,12 +65,14 @@ public class SecurityModel implements PageModel {
     private List<String> namespaces = new ArrayList<>();
     private Map<Integer, RoleResult> rolesResults = new HashMap<>();
     private List<PodSecurityContextResult> podsSecurityContextResults = new ArrayList<>();
+    private List<RBACResult> rbacsResults = new ArrayList<>();
     private List<ContainerSecurityResult> containersResults = new ArrayList<>();
     private List<ServiceAccountResult> serviceAccountsResults = new ArrayList<>();
     private List<PodSecurityPoliciesResult> podSecurityPoliciesResults = new ArrayList<>();
     //key is RoleResult id
     private RolesSecurityFilter rolesFilter = new RolesSecurityFilter();
     private RoleRulesSecurityFilter roleRulesFilter = new RoleRulesSecurityFilter();
+    private RBACFilter rbacsFilter = new RBACFilter();
     private PodsSecurityFilter podsFilter = new PodsSecurityFilter();
     private ContainersSecurityFilter containersFilter = new ContainersSecurityFilter();
     private ServiceAccountsSecurityFilter serviceAccountsFilter = new ServiceAccountsSecurityFilter();
@@ -111,6 +117,15 @@ public class SecurityModel implements PageModel {
         return this;
     }
 
+    public SecurityModel addRBACResult(RBACResult rbacResult) {
+//        rolesResults.put(roleResult.getId(), roleResult);
+//        rolesFilter.addNamespacesFilter(roleResult.getNamespace());
+//        TODO selectedResourcePropertyFilter
+//        rolesFilter.addResourcePropertiesFilter(roleResult.getr);
+//        rolesFilter.addResourceTypesFilter(roleResult.getResourceType());
+        return this;
+    }
+
     public SecurityModel addPodSecurityContext(PodSecurityContextResult result) {
         podsSecurityContextResults.add(result);
 //        TODO add filters
@@ -130,15 +145,18 @@ public class SecurityModel implements PageModel {
     }
 
 
-    public void addRoleSubjects(String roleName, List<V1beta1Subject> subjects) {
-        Optional<RoleResult> role = findRole(roleName);
+    public void addRoleSubjects(String roleName, Resource resource, List<V1beta1Subject> subjects) {
+        if (roleName.equals("edit")) {
+            roleName.isEmpty();
+        }
+        Optional<RoleResult> role = findRole(roleName, resource);
         if (role.isPresent()) {
             role.get().addRoleSubjects(subjects);
         }
     }
 
-    private Optional<RoleResult> findRole(String name) {
-        return rolesResults.values().stream().filter(item -> item.getResourceName().equals(name)).findFirst();
+    private Optional<RoleResult> findRole(String name, Resource resource) {
+        return rolesResults.values().stream().filter(item -> item.getResourceName().equals(name) && item.getResourceType().equals(resource.getValue())).findFirst();
     }
 
     public void addSearchException(Exception exception) {
@@ -215,6 +233,15 @@ public class SecurityModel implements PageModel {
         return this;
     }
 
+    public String getSelectedRBACsNamespace() {
+        return selectedRBACsNamespace;
+    }
+
+    public SecurityModel setSelectedRBACsNamespace(String selectedRBACsNamespace) {
+        this.selectedRBACsNamespace = selectedRBACsNamespace;
+        return this;
+    }
+
     public RolesSecurityFilter getRolesFilter() {
         return rolesFilter;
     }
@@ -279,6 +306,24 @@ public class SecurityModel implements PageModel {
 
     public SecurityModel setRolesResults(Map<Integer, RoleResult> rolesResults) {
         this.rolesResults = rolesResults;
+        return this;
+    }
+
+    public List<RBACResult> getRbacsResults() {
+        return rbacsResults;
+    }
+
+    public SecurityModel setRbacsResults(List<RBACResult> rbacsResults) {
+        this.rbacsResults = rbacsResults;
+        return this;
+    }
+
+    public RBACFilter getRbacsFilter() {
+        return rbacsFilter;
+    }
+
+    public SecurityModel setRbacsFilter(RBACFilter rbacsFilter) {
+        this.rbacsFilter = rbacsFilter;
         return this;
     }
 

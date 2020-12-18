@@ -6,6 +6,7 @@
                 <tabbox width="100%" sclass="nav_tabs">
                     <tabs id="tabs">
                         <tab label="Roles"/>
+                        <tab label="RBAC"/>
                         <tab label="Pods Security Contexts"/>
                         <tab label="Containers"/>
                         <tab label="Service Accounts"/>
@@ -39,136 +40,205 @@
                                 </hbox>
                             </vbox>
                             <separator width="100%" orient="horizontal"/>
-                            <tabbox width="100%" sclass="nav_tabs">
-                                <tabs id="security-tabs">
-                                    <tab label="Roles"/>
-                                    <tab label="CRUD"/>
-                                </tabs>
-                                <tabpanels>
-                                    <tabpanel>
-                                        <grid id="securityRolesGrid" model="@load(securityVM.rolesResults)" height="@load(securityVM.rolesGridHeight)" sclass="mainGridClass">
-                                            <auxhead id="rolesAuxHead">
-                                                <auxheader>
-                                                    <span sclass="z-icon-hashtag"/>
-                                                </auxheader>
-                                                <auxheader colspan="1">
-                                                    <span sclass="z-icon-filter"/>
-                                                    <textbox instant="true" width="80%" value="@bind(securityVM.rolesFilter.resourceName)" onChange="@command('filterSecurityRoles')"/>
-                                                </auxheader>
-                                                <auxheader colspan="1">
-                                                    <span sclass="z-icon-filter"/>
-                                                    <combobox id="filterNamespacesCBox" width="80%" mold="rounded" model="@load(securityVM.rolesFilter.namespacesFilter)"
-                                                              selectedItem="@bind(securityVM.rolesFilter.selectedNamespaceFilter)"
-                                                              onChange="@command('filterSecurityRoles')">
-                                                        <template name="model">
-                                                            <comboitem label="@load(each)"/>
-                                                        </template>
-                                                    </combobox>
-                                                </auxheader>
-                                                <auxheader colspan="1">
-                                                    <span sclass="z-icon-filter"/>
-                                                    <combobox id="filterResourceTypesCBox" width="80%" model="@load(securityVM.rolesFilter.resourceTypesFilter)"
-                                                              selectedItem="@bind(securityVM.rolesFilter.selectedResourceTypeFilter)"
-                                                              onChange="@command('filterSecurityRoles')">
-                                                        <template name="model">
-                                                            <comboitem label="@load(each)"/>
-                                                        </template>
-                                                    </combobox>
-                                                </auxheader>
-                                                <auxheader colspan="1">
-                                                    <span sclass="z-icon-filter"/>
-                                                    <textbox instant="true" width="80%" value="@bind(securityVM.rolesFilter.creationTime)" onChange="@command('filterSecurityRoles')"/>
-                                                </auxheader>
-                                                <auxheader class="fullDefinitionIdHeader">
-                                                    <span sclass="z-icon-file-text"/>
-                                                </auxheader>
-                                            </auxhead>
-                                            <columns menupopup="auto" sizable="true">
-                                                <column hflex="min" label="Id" sort="auto(id)"/>
-                                                <column hflex="1" label="Resource Name" sort="auto(resourceName)"/>
-                                                <column hflex="0.5" label="Namespace" sort="auto(namespace)"/>
-                                                <column hflex="min" label="Resource Type" sort="auto(resourceType)"/>
-                                                <column hflex="min" label="Creation Time" sort="auto(creationTime)"/>
-                                                <column hflex="min" label="Full Definition"/>
-                                            </columns>
-                                            <rows>
-                                                <template name="model" var="item">
-                                                    <row onClick="@command('showRoleRules', clickedItem=item)" style="cursor:pointer">
-                                                        <label value="${item.id}"/>
-                                                        <label value="${item.resourceName}"/>
-                                                        <label value="${item.namespace}"/>
-                                                        <label value="${item.resourceType}"/>
-                                                        <label value="${item.creationTime}"/>
-                                                        <toolbarbutton label="Click to see Full Definition" onClick="@command('showRoleFullDefinition', item=item)" hflex="1"/>
-                                                    </row>
+                            <grid id="securityRolesGrid" model="@load(securityVM.rolesResults)" height="@load(securityVM.rolesGridHeight)" sclass="mainGridClass">
+                                <auxhead id="rolesAuxHead">
+                                    <auxheader>
+                                        <span sclass="z-icon-hashtag"/>
+                                    </auxheader>
+                                    <auxheader colspan="1">
+                                        <span sclass="z-icon-filter"/>
+                                        <textbox instant="true" width="80%" value="@bind(securityVM.rolesFilter.resourceName)" onChange="@command('filterSecurityRoles')"/>
+                                    </auxheader>
+                                    <auxheader colspan="1">
+                                        <span sclass="z-icon-filter"/>
+                                        <combobox id="filterNamespacesCBox" width="80%" mold="rounded" model="@load(securityVM.rolesFilter.namespacesFilter)"
+                                                  selectedItem="@bind(securityVM.rolesFilter.selectedNamespaceFilter)"
+                                                  onChange="@command('filterSecurityRoles')">
+                                            <template name="model">
+                                                <comboitem label="@load(each)"/>
+                                            </template>
+                                        </combobox>
+                                    </auxheader>
+                                    <auxheader colspan="1">
+                                        <span sclass="z-icon-filter"/>
+                                        <combobox id="filterResourceTypesCBox" width="80%" model="@load(securityVM.rolesFilter.resourceTypesFilter)"
+                                                  selectedItem="@bind(securityVM.rolesFilter.selectedResourceTypeFilter)"
+                                                  onChange="@command('filterSecurityRoles')">
+                                            <template name="model">
+                                                <comboitem label="@load(each)"/>
+                                            </template>
+                                        </combobox>
+                                    </auxheader>
+                                    <auxheader colspan="1">
+                                        <span sclass="z-icon-filter"/>
+                                        <textbox instant="true" width="80%" value="@bind(securityVM.rolesFilter.creationTime)" onChange="@command('filterSecurityRoles')"/>
+                                    </auxheader>
+                                    <auxheader class="fullDefinitionIdHeader">
+                                        <span sclass="z-icon-file-text"/>
+                                    </auxheader>
+                                </auxhead>
+                                <columns menupopup="auto" sizable="true">
+                                    <column hflex="min" label="Id" sort="auto(id)"/>
+                                    <column hflex="1" label="Role Name" sort="auto(resourceName)"/>
+                                    <column hflex="0.5" label="Namespace" sort="auto(namespace)"/>
+                                    <column hflex="min" label="Resource Type" sort="auto(resourceType)"/>
+                                    <column hflex="min" label="Creation Time" sort="auto(creationTime)"/>
+                                    <column hflex="min" label="Full Definition"/>
+                                </columns>
+                                <rows>
+                                    <template name="model" var="item">
+                                        <row onClick="@command('showRoleRules', clickedItem=item)" style="cursor:pointer">
+                                            <label value="${item.id}"/>
+                                            <label value="${item.resourceName}"/>
+                                            <label value="${item.namespace}"/>
+                                            <label value="${item.resourceType}"/>
+                                            <label value="${item.creationTime}"/>
+                                            <toolbarbutton label="Click to see Full Definition" onClick="@command('showRoleFullDefinition', item=item)" hflex="1"/>
+                                        </row>
+                                    </template>
+                                </rows>
+                                <foot>
+                                    <footer id="rolesGridFooter" span="9" align="right" label="@load(securityVM.rolesTotalItems)"/>
+                                </foot>
+                            </grid>
+
+                            <groupbox id="roleSubjectsGroupBox">
+                                <caption iconSclass="z-icon-columns" label="@load(securityVM.clickedRoleBindingSubjectsLabel)"/>
+                                <grid id="roleSubjectsResultsGrid" model="@load(securityVM.roleSubjectsResults)" height="@load(securityVM.subjectsGridHeight)">
+                                    <columns menupopup="auto" sizable="true">
+                                        <column hflex="1" label="Kind" sort="auto(kind)"/>
+                                        <column hflex="2" label="Name" sort="auto(name)"/>
+                                        <column hflex="1" label="Namespace" sort="auto(namespace)"/>
+                                    </columns>
+                                    <rows>
+                                        <template name="model" var="item">
+                                            <row style="cursor:pointer">
+                                                <label value="${item.kind}"/>
+                                                <label value="${item.name}"/>
+                                                <label value="${item.namespace}"/>
+                                            </row>
+                                        </template>
+                                    </rows>
+                                </grid>
+                            </groupbox>
+
+                            <groupbox id="roleRulesGroupBox">
+                                <caption iconSclass="z-icon-columns" label="@load(securityVM.clickedRoleRulesLabel)"/>
+                                <grid id="securityRoleRulesGrid" model="@load(securityVM.roleRulesResults)" height="@load(securityVM.roleRulesGridHeight)">
+                                    <columns menupopup="auto" sizable="true">
+                                        <column hflex="min" label="Id" sort="auto(id)"/>
+                                        <column hflex="1" label="Resources" sort="auto(resourcesAsString)"/>
+                                        <column hflex="1" label="Verbs" sort="auto(verbsAsString)"/>
+                                        <column hflex="1" label="API Groups" sort="auto(apiGroupsAsString)"/>
+                                        <column hflex="1" label="Resource Names" sort="auto(resourceNamesAsString)"/>
+                                        <column hflex="1" label="Non Resource URLs" sort="auto(nonResourceURLsAsString)"/>
+                                        <column hflex="1" label="Full Definition"/>
+                                    </columns>
+                                    <rows>
+                                        <template name="model" var="item">
+                                            <row style="cursor:pointer">
+                                                <label value="${item.id}" multiline="true"/>
+                                                <label value="${item.resourcesAsString}" multiline="true"/>
+                                                <label value="${item.verbsAsString}" multiline="true"/>
+                                                <label value="${item.apiGroupsAsString}" multiline="true"/>
+                                                <label value="${item.resourceNamesAsString}" multiline="true"/>
+                                                <label value="${item.nonResourceURLsAsString}" multiline="true"/>
+                                                <toolbarbutton label="Click to see Full Definition" onClick="@command('showRoleRuleFullDefinition', item=item)" hflex="1"/>
+                                            </row>
+                                        </template>
+                                    </rows>
+                                    <foot>
+                                        <footer id="roleRulesGridFooter" span="9" align="right" label="@load(securityVM.roleRulesTotalItems)"/>
+                                    </foot>
+                                </grid>
+                            </groupbox>
+
+                        </tabpanel>
+
+                        <tabpanel>
+                            <separator width="100%" orient="horizontal"/>
+                            <vbox height="100%" width="100%">
+                                <hbox id="menuHboxRBACs" height="100%" width="100%" style="margin: 5px;" align="stretch">
+                                    <cell id="clearAllCellRBACs" width="10%" style="padding: 0px 5px 0px 5px;" tooltip="clearAllTooltip">
+                                        <button id="clearAllBtnRBACs" iconSclass="z-icon-eraser" label="Clear all" onClick="@command('clearAllRBACs')"/>
+                                    </cell>
+                                    <separator width="100%" orient="vertical" bar="true"/>
+                                    <cell id="namespacesCellRBACs" width="30%" style="padding: 0px 5px 0px 5px;" align="left">
+                                        <hlayout valign="middle">
+                                            <label value="Namespace: "/>
+                                            <combobox id="namespacesCBoxRBACs" tooltip="namespacesTooltip" hflex="1" model="@load(securityVM.namespaces)"
+                                                      selectedItem="@bind(securityVM.selectedRBACsNamespace)" readonly="true">
+                                                <template name="model">
+                                                    <comboitem label="@load(each)"/>
                                                 </template>
-                                            </rows>
-                                            <foot>
-                                                <footer id="rolesGridFooter" span="9" align="right" label="@load(securityVM.rolesTotalItems)"/>
-                                            </foot>
-                                        </grid>
+                                            </combobox>
+                                        </hlayout>
+                                    </cell>
+                                    <cell width="49%" style="padding: 0px 5px 0px 5px;">
+                                    </cell>
+                                    <cell id="cellGetBtnRBACs" width="10%" style="padding: 0px 5px 0px 5px;">
+                                        <button id="getRBACsBtn" label="Get" iconSclass="z-icon-refresh" onClick="@command('getRBACs')" width="100%"/>
+                                    </cell>
+                                </hbox>
+                            </vbox>
+                            <separator width="100%" orient="horizontal"/>
+                            <grid id="securityRBACsGrid" model="@load(securityVM.RBACsResults)" height="@load(securityVM.RBACsGridHeight)">
+                                <!--                                <auxhead id="podsAuxHead">-->
+                                <!--                                    <auxheader>-->
+                                <!--                                        <span sclass="z-icon-hashtag"/>-->
+                                <!--                                    </auxheader>-->
+                                <!--                                    <auxheader colspan="1">-->
+                                <!--                                        <span sclass="z-icon-filter"/>-->
+                                <!--                                        <textbox instant="true" width="80%" value="@bind(securityVM.podsFilter.ip)" onChange="@command('filterPods')"/>-->
+                                <!--                                    </auxheader>-->
+                                <!--                                </auxhead>-->
+                                <columns menupopup="auto" sizable="true">
+                                    <column hflex="min" label="Id" sort="auto(id)"/>
+                                    <column hflex="2" label="Resource Name" sort="auto(resourceName)"/>
+                                    <column hflex="1.5" label="Subject Kind" sort="auto(subjectKind)"/>
+                                    <column hflex="1.5" label="Subject Name" sort="auto(subjectName)"/>
+                                    <column hflex="1.5" label="API Groups" sort="auto(apiGroups)"/>
+                                    <column hflex="1.5" label="Role Name" sort="auto(roleName)"/>
+                                    <column hflex="1.5" label="Namespace" sort="auto(namespace)"/>
 
-                                        <groupbox id="roleSubjectsGroupBox">
-                                            <caption iconSclass="z-icon-columns" label="@load(securityVM.clickedRoleBindingSubjectsLabel)"/>
-                                            <grid id="roleSubjectsResultsGrid" model="@load(securityVM.roleSubjectsResults)" height="@load(securityVM.subjectsGridHeight)">
-                                                <columns menupopup="auto" sizable="true">
-                                                    <column hflex="1" label="Kind" sort="auto(kind)"/>
-                                                    <column hflex="2" label="Name" sort="auto(name)"/>
-                                                    <column hflex="1" label="Namespace" sort="auto(namespace)"/>
-                                                </columns>
-                                                <rows>
-                                                    <template name="model" var="item">
-                                                        <row style="cursor:pointer">
-                                                            <label value="${item.kind}"/>
-                                                            <label value="${item.name}"/>
-                                                            <label value="${item.namespace}"/>
-                                                        </row>
-                                                    </template>
-                                                </rows>
-                                            </grid>
-                                        </groupbox>
-
-                                        <groupbox id="roleRulesGroupBox">
-                                            <caption iconSclass="z-icon-columns" label="@load(securityVM.clickedRoleRulesLabel)"/>
-                                            <grid id="securityRoleRulesGrid" model="@load(securityVM.roleRulesResults)" height="@load(securityVM.roleRulesGridHeight)">
-                                                <columns menupopup="auto" sizable="true">
-                                                    <column hflex="min" label="Id" sort="auto(id)"/>
-                                                    <column hflex="1" label="Resources" sort="auto(resourcesAsString)"/>
-                                                    <column hflex="1" label="Verbs" sort="auto(verbsAsString)"/>
-                                                    <column hflex="1" label="API Groups" sort="auto(apiGroupsAsString)"/>
-                                                    <column hflex="1" label="Resource Names" sort="auto(resourceNamesAsString)"/>
-                                                    <column hflex="1" label="Non Resource URLs" sort="auto(nonResourceURLsAsString)"/>
-                                                    <column hflex="1" label="Full Definition"/>
-                                                </columns>
-                                                <rows>
-                                                    <template name="model" var="item">
-                                                        <row style="cursor:pointer">
-                                                            <label value="${item.id}" multiline="true"/>
-                                                            <label value="${item.resourcesAsString}" multiline="true"/>
-                                                            <label value="${item.verbsAsString}" multiline="true"/>
-                                                            <label value="${item.apiGroupsAsString}" multiline="true"/>
-                                                            <label value="${item.resourceNamesAsString}" multiline="true"/>
-                                                            <label value="${item.nonResourceURLsAsString}" multiline="true"/>
-                                                            <toolbarbutton label="Click to see Full Definition" onClick="@command('showRoleRuleFullDefinition', item=item)" hflex="1"/>
-                                                        </row>
-                                                    </template>
-                                                </rows>
-                                                <foot>
-                                                    <footer id="roleRulesGridFooter" span="9" align="right" label="@load(securityVM.roleRulesTotalItems)"/>
-                                                </foot>
-                                            </grid>
-                                        </groupbox>
-
-                                    </tabpanel>
-                                    <tabpanel width="100%" height="100%">
-                                        <div style="display: grid; grid-template-rows: 25% 75%; border: solid thick;">
-                                            <div style="background: magenta;">First two lines</div>
-                                            <div style="background: cyan;">Second</div>
-                                        </div>
-
-                                    </tabpanel>
-                                </tabpanels>
-                            </tabbox>
+                                    <column hflex="0.5" label="*" sort="auto(all)"/>
+                                    <column hflex="0.5" label="get" sort="auto(get)"/>
+                                    <column hflex="0.5" label="list" sort="auto(list)"/>
+                                    <column hflex="0.5" label="create" sort="auto(create)"/>
+                                    <column hflex="0.5" label="update" sort="auto(update)"/>
+                                    <column hflex="0.5" label="patch" sort="auto(patch)"/>
+                                    <column hflex="0.5" label="watch" sort="auto(watch)"/>
+                                    <column hflex="0.5" label="delete" sort="auto(delete)"/>
+                                    <column hflex="1.5" label="deletecollection" sort="auto(deletecollection)"/>
+                                    <column hflex="1" label="others" sort="auto(others)"/>
+                                </columns>
+                                <rows>
+                                    <template name="model" var="item">
+                                        <row style="cursor:pointer">
+                                            <label value="${item.id}"/>
+                                            <label value="${item.resourceName}" multiline="true"/>
+                                            <label value="${item.subjectKind}" multiline="true"/>
+                                            <label value="${item.subjectName}" multiline="true"/>
+                                            <label value="${item.apiGroups}" multiline="true"/>
+                                            <label value="${item.roleName}" multiline="true"/>
+                                            <label value="${item.namespace}" multiline="true"/>
+                                            <label value="${item.all}" sclass="z-icon-refresh"/>
+                                            <label value="${item.get}"/>
+                                            <label value="${item.list}"/>
+                                            <label value="${item.create}"/>
+                                            <label value="${item.update}"/>
+                                            <label value="${item.patch}"/>
+                                            <label value="${item.watch}"/>
+                                            <label value="${item.delete}"/>
+                                            <label value="${item.deletecollection}"/>
+                                            <label value="${item.others}" multiline="true"/>
+                                        </row>
+                                    </template>
+                                </rows>
+                                <foot>
+                                    <footer id="RBACsGridFooter" span="9" align="right" label="@load(securityVM.RBACsTotalItems)"/>
+                                </foot>
+                            </grid>
                         </tabpanel>
 
                         <tabpanel>

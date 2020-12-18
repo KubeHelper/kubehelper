@@ -84,6 +84,31 @@ public class SecurityService {
         searchInRoleBindings(securityModel);
     }
 
+    public void getRBACs(SecurityModel securityModel) {
+        securityModel.getRbacsResults().clear();
+        securityModel.getSearchExceptions().clear();
+        searchForRBACs(securityModel);
+//        searchInRoles(securityModel);
+//        searchInClusterRoleBindings(securityModel);
+//        searchInRoleBindings(securityModel);
+    }
+
+    private void searchForRBACs(SecurityModel securityModel) {
+        V1beta1RoleList rolesList = kubeAPI.getV1RolesList(securityModel.getSelectedRolesNamespace());
+        V1beta1RoleBindingList rolesBindingsList = kubeAPI.getV1RolesBindingList(securityModel.getSelectedRolesNamespace());
+//        for (V1beta1ClusterRole clusterRole : clusterRolesList.getItems()) {
+        try {
+//
+////                kubeAPI.getV1RolesBindingList()
+////                addRoleResultToModel(clusterRole.getMetadata(), securityModel, CLUSTER_ROLE, clusterRole.toString(), clusterRole.getRules());
+        } catch (RuntimeException e) {
+            securityModel.addSearchException(e);
+            logger.error(e.getMessage(), e);
+        }
+//        }
+    }
+
+
     public void getPodsSecurityContexts(SecurityModel securityModel) {
         securityModel.getPodsSecurityContextsResults().clear();
         securityModel.getSearchExceptions().clear();
@@ -126,7 +151,7 @@ public class SecurityService {
         V1beta1ClusterRoleBindingList clusterRoleBindingsList = kubeAPI.getV1ClusterRolesBindingsList();
         for (V1beta1ClusterRoleBinding binding : clusterRoleBindingsList.getItems()) {
             try {
-                securityModel.addRoleSubjects(binding.getRoleRef().getName(), binding.getSubjects());
+                securityModel.addRoleSubjects(binding.getRoleRef().getName(), CLUSTER_ROLE, binding.getSubjects());
             } catch (RuntimeException e) {
                 securityModel.addSearchException(e);
                 logger.error(e.getMessage(), e);
@@ -138,7 +163,7 @@ public class SecurityService {
         V1beta1RoleBindingList rolesBindingsList = kubeAPI.getV1RolesBindingList(securityModel.getSelectedRolesNamespace());
         for (V1beta1RoleBinding roleBinding : rolesBindingsList.getItems()) {
             try {
-                securityModel.addRoleSubjects(roleBinding.getRoleRef().getName(), roleBinding.getSubjects());
+                securityModel.addRoleSubjects(roleBinding.getRoleRef().getName(), ROLE, roleBinding.getSubjects());
             } catch (RuntimeException e) {
                 securityModel.addSearchException(e);
                 logger.error(e.getMessage(), e);

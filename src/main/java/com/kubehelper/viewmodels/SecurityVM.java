@@ -28,6 +28,7 @@ import com.kubehelper.domain.models.SecurityModel;
 import com.kubehelper.domain.results.ContainerSecurityResult;
 import com.kubehelper.domain.results.PodSecurityContextResult;
 import com.kubehelper.domain.results.PodSecurityPoliciesResult;
+import com.kubehelper.domain.results.RBACResult;
 import com.kubehelper.domain.results.RoleResult;
 import com.kubehelper.domain.results.RoleRuleResult;
 import com.kubehelper.domain.results.ServiceAccountResult;
@@ -75,7 +76,8 @@ public class SecurityVM implements PropertyChangeListener {
     private static Logger logger = LoggerFactory.getLogger(SecurityVM.class);
 
     private boolean isGetRolesButtonPressed;
-    private boolean isGetPodsButtonPressed;
+    private boolean isGetPodsSecurityContextsButtonPressed;
+    private boolean isGetRBACsButtonPressed;
     private boolean isGetContainersButtonPressed;
     private boolean isGetServiceAccountsButtonPressed;
     private boolean isGetPodSecurityPoliciesButtonPressed;
@@ -85,6 +87,7 @@ public class SecurityVM implements PropertyChangeListener {
     private ListModelList<RoleResult> rolesResults = new ListModelList<>();
     private ListModelList<RoleResult.RoleBindingSubject> roleSubjectsResults = new ListModelList<>();
     private ListModelList<RoleRuleResult> roleRulesResults = new ListModelList<>();
+    private ListModelList<RBACResult> rbacsResults = new ListModelList<>();
     private ListModelList<PodSecurityContextResult> podsSecurityContextsResults = new ListModelList<>();
     private ListModelList<ContainerSecurityResult> containersResults = new ListModelList<>();
     private ListModelList<ServiceAccountResult> serviceAccountsResults = new ListModelList<>();
@@ -148,12 +151,22 @@ public class SecurityVM implements PropertyChangeListener {
     }
 
     @Command
+    @NotifyChange({"rbacsTotalItems", "rbacsResults", "rbacsFilter"})
+    public void getRBACs() {
+        securityModel.setServiceAccountsFilter(new ServiceAccountsSecurityFilter());
+        securityService.getRBACs(securityModel);
+        securityModel.setSearchExceptions(new ArrayList<>());
+        isGetServiceAccountsButtonPressed = true;
+//        onInitPreparations();
+    }
+
+    @Command
     @NotifyChange({"podsSecurityContextsTotalItems", "podsSecurityContextResults", "podsFilter"})
     public void getPodsSecurityContexts() {
         securityModel.setPodsFilter(new PodsSecurityFilter());
         securityService.getPodsSecurityContexts(securityModel);
         securityModel.setSearchExceptions(new ArrayList<>());
-        isGetPodsButtonPressed = true;
+        isGetPodsSecurityContextsButtonPressed = true;
 //        if (securityModel.getRolesFilter().isFilterActive() && !securityModel.getRolesResults().isEmpty()) {
 ////            filterIps();
 //        } else {
@@ -348,13 +361,17 @@ public class SecurityVM implements PropertyChangeListener {
         return roleRulesResults;
     }
 
+    public ListModelList<RBACResult> getRBACsResults() {
+        return rbacsResults;
+    }
+
     public ListModelList<RoleResult.RoleBindingSubject> getRoleSubjectsResults() {
         return roleSubjectsResults;
     }
 
     public ListModelList<PodSecurityContextResult> getPodsSecurityContextResults() {
-        showNotificationAndExceptions(isGetPodsButtonPressed, podsSecurityContextsResults, podsGridFooter);
-        isGetPodsButtonPressed = false;
+        showNotificationAndExceptions(isGetPodsSecurityContextsButtonPressed, podsSecurityContextsResults, podsGridFooter);
+        isGetPodsSecurityContextsButtonPressed = false;
         return podsSecurityContextsResults;
     }
 
@@ -393,8 +410,16 @@ public class SecurityVM implements PropertyChangeListener {
         return securityModel.getSelectedRolesNamespace();
     }
 
+    public String getSelectedRBACsNamespace() {
+        return securityModel.getSelectedRBACsNamespace();
+    }
+
     public void setSelectedRolesNamespace(String selectedRolesNamespace) {
         this.securityModel.setSelectedRolesNamespace(selectedRolesNamespace);
+    }
+
+    public void setSelectedRBACsNamespace(String selectedRBACsNamespace) {
+        this.securityModel.setSelectedRBACsNamespace(selectedRBACsNamespace);
     }
 
     public String getSelectedPodsSecurityContextsNamespace() {
@@ -432,9 +457,12 @@ public class SecurityVM implements PropertyChangeListener {
     public String getRolesTotalItems() {
         return String.format("Total Items: %d", rolesResults.size());
     }
-
     public String getRoleRulesTotalItems() {
         return String.format("Total Items: %d", roleRulesResults.size());
+    }
+
+    public String getRBACsTotalItems() {
+        return String.format("Total Items: %d", rbacsResults.size());
     }
 
     public String getPodsSecurityContextsTotalItems() {
@@ -495,15 +523,19 @@ public class SecurityVM implements PropertyChangeListener {
     }
 
     public String getRolesGridHeight() {
-        return securityModel.getMainGridHeight() * 0.45 + "px";
+        return securityModel.getMainGridHeight() * 0.43 + "px";
+    }
+
+    public String getRBACsGridHeight() {
+        return securityModel.getMainGridHeight() + "px";
     }
 
     public String getSubjectsGridHeight() {
-        return securityModel.getMainGridHeight() * 0.1 + "px";
+        return securityModel.getMainGridHeight() * 0.14 + "px";
     }
 
     public String getRoleRulesGridHeight() {
-        return securityModel.getMainGridHeight() * 0.45 + "px";
+        return securityModel.getMainGridHeight() * 0.43 + "px";
     }
 
     public String getPodsSecurityContextsGridHeight() {
