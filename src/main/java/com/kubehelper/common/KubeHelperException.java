@@ -30,6 +30,10 @@ public class KubeHelperException extends Exception {
         super(exception);
     }
 
+    public KubeHelperException(String message, Exception exception) {
+        super(message, exception);
+    }
+
     public String getMessage() {
         return super.getMessage();
     }

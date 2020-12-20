@@ -21,6 +21,7 @@ import com.kubehelper.common.Global;
 import com.kubehelper.domain.filters.ContainersSecurityFilter;
 import com.kubehelper.domain.filters.PodsSecurityFilter;
 import com.kubehelper.domain.filters.PodsSecurityPoliciesSecurityFilter;
+import com.kubehelper.domain.filters.RBACFilter;
 import com.kubehelper.domain.filters.RoleRulesSecurityFilter;
 import com.kubehelper.domain.filters.RolesSecurityFilter;
 import com.kubehelper.domain.filters.ServiceAccountsSecurityFilter;
@@ -64,6 +65,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -103,7 +105,10 @@ public class SecurityVM implements PropertyChangeListener {
     private Footer roleRulesGridFooter;
 
     @Wire
-    private Footer podsGridFooter;
+    private Footer podsSecurityContextsGridFooter;
+
+    @Wire
+    private Footer rbacsGridFooter;
 
     @Wire
     private Footer containersGridFooter;
@@ -124,7 +129,7 @@ public class SecurityVM implements PropertyChangeListener {
     public void init() {
         securityModel = (SecurityModel) Global.ACTIVE_MODELS.computeIfAbsent(Global.SECURITY_MODEL, (k) -> Global.NEW_MODELS.get(Global.SECURITY_MODEL));
         securityModel.addPropertyChangeListener(SecurityVM.this);
-        onInitPreparations();
+        setAllNamespacesToModel();
     }
 
     /**
@@ -135,29 +140,34 @@ public class SecurityVM implements PropertyChangeListener {
         Selectors.wireComponents(view, this, false);
     }
 
+    //  GETTING ================
+
     @Command
     @NotifyChange({"rolesTotalItems", "rolesResults", "rolesFilter"})
     public void getRoles() {
         securityModel.setRolesFilter(new RolesSecurityFilter());
         securityService.getRoles(securityModel);
-        securityModel.setSearchExceptions(new ArrayList<>());
         isGetRolesButtonPressed = true;
+        setAllNamespacesToModel();
         if (securityModel.getRolesFilter().isFilterActive() && !securityModel.getRolesResults().isEmpty()) {
-//            filterIps();
+            filterSecurityRoles();
         } else {
             rolesResults = new ListModelList<>(securityModel.getRolesResultsList());
         }
-        onInitPreparations();
     }
 
     @Command
     @NotifyChange({"rbacsTotalItems", "rbacsResults", "rbacsFilter"})
-    public void getRBACs() {
+    public void getRbacs() {
         securityModel.setServiceAccountsFilter(new ServiceAccountsSecurityFilter());
         securityService.getRBACs(securityModel);
-        securityModel.setSearchExceptions(new ArrayList<>());
-        isGetServiceAccountsButtonPressed = true;
-//        onInitPreparations();
+        isGetRBACsButtonPressed = true;
+        setAllNamespacesToModel();
+        if (securityModel.getRbacsFilter().isFilterActive() && !securityModel.getRbacsResults().isEmpty()) {
+            filterRbacs();
+        } else {
+            rbacsResults = new ListModelList<>(securityModel.getRbacsResults());
+        }
     }
 
     @Command
@@ -165,7 +175,6 @@ public class SecurityVM implements PropertyChangeListener {
     public void getPodsSecurityContexts() {
         securityModel.setPodsFilter(new PodsSecurityFilter());
         securityService.getPodsSecurityContexts(securityModel);
-        securityModel.setSearchExceptions(new ArrayList<>());
         isGetPodsSecurityContextsButtonPressed = true;
 //        if (securityModel.getRolesFilter().isFilterActive() && !securityModel.getRolesResults().isEmpty()) {
 ////            filterIps();
@@ -181,7 +190,6 @@ public class SecurityVM implements PropertyChangeListener {
     public void getContainers() {
         securityModel.setContainersFilter(new ContainersSecurityFilter());
 //        securityService.getContainers(securityModel);
-        securityModel.setSearchExceptions(new ArrayList<>());
         isGetContainersButtonPressed = true;
 //        onInitPreparations();
     }
@@ -191,7 +199,6 @@ public class SecurityVM implements PropertyChangeListener {
     public void getServiceAccounts() {
         securityModel.setServiceAccountsFilter(new ServiceAccountsSecurityFilter());
 //        securityService.getServiceAccounts(securityModel);
-        securityModel.setSearchExceptions(new ArrayList<>());
         isGetServiceAccountsButtonPressed = true;
 //        onInitPreparations();
     }
@@ -201,17 +208,17 @@ public class SecurityVM implements PropertyChangeListener {
     public void getPodsSecurityPolicies() {
         securityModel.setPodSecurityPoliciesFilter(new PodsSecurityPoliciesSecurityFilter());
         securityService.getPodsSecurityPolicies(securityModel);
-        securityModel.setSearchExceptions(new ArrayList<>());
         isGetPodSecurityPoliciesButtonPressed = true;
         podsSecurityPoliciesResults = new ListModelList<>(securityModel.getPodSecurityPoliciesResults());
-        onInitPreparations();
+        setAllNamespacesToModel();
     }
 
-    private void onInitPreparations() {
+    private void setAllNamespacesToModel() {
         securityModel.setNamespaces(securityModel.getNamespaces().isEmpty() ? commonService.getAllNamespaces() : securityModel.getNamespaces());
-//        sortResultsByNamespace();
         logger.info("Found {} namespaces.", securityModel.getNamespaces());
     }
+
+    //  FILTERING ================
 
     @Command
     @NotifyChange({"rolesTotalItems", "rolesResults"})
@@ -219,26 +226,88 @@ public class SecurityVM implements PropertyChangeListener {
         rolesResults.clear();
         for (RoleResult roleResult : securityModel.getRolesResultsList()) {
             if (StringUtils.containsIgnoreCase(roleResult.getCreationTime(), getRolesFilter().getCreationTime()) &&
-                    StringUtils.containsIgnoreCase(roleResult.getResourceName(), getRolesFilter().getResourceName()) &&
-                    StringUtils.containsIgnoreCase(roleResult.getResourceType(), getRolesFilter().getSelectedResourceTypeFilter()) &&
-                    StringUtils.containsIgnoreCase(roleResult.getNamespace(), getRolesFilter().getSelectedNamespaceFilter())) {
+                    checkEqualsFilter(roleResult.getResourceName(), getRolesFilter().getSelectedResourceNameFilter()) &&
+                    checkEqualsFilter(roleResult.getResourceType(), getRolesFilter().getSelectedResourceTypeFilter()) &&
+                    checkEqualsFilter(roleResult.getNamespace(), getRolesFilter().getSelectedNamespaceFilter())) {
                 rolesResults.add(roleResult);
             }
         }
-//        sortResultsByNamespace();
     }
+
+    @Command
+    @NotifyChange({"rbacsTotalItems", "rbacsResults"})
+    public void filterRbacs() {
+        rbacsResults.clear();
+        for (RBACResult rbacResult : securityModel.getRbacsResults()) {
+            if (StringUtils.containsIgnoreCase(rbacResult.getApiGroup(), getRbacFilter().getApiGroup()) &&
+                    checkEqualsFilter(rbacResult.getResourceName(), getRbacFilter().getSelectedResourceNameFilter()) &&
+                    checkEqualsFilter(rbacResult.getResourceType(), getRbacFilter().getSelectedResourceTypeFilter()) &&
+                    checkEqualsFilter(rbacResult.getNamespace(), getRbacFilter().getSelectedNamespaceFilter()) &&
+                    checkEqualsFilter(rbacResult.getSubjectKind(), getRbacFilter().getSelectedSubjectKindFilter()) &&
+                    checkEqualsFilter(rbacResult.getSubjectName(), getRbacFilter().getSelectedSubjectNameFilter()) &&
+                    checkEqualsFilter(rbacResult.getRoleName(), getRbacFilter().getSelectedRoleNameFilter()) &&
+                    getRbacFilter().getVerbAll().equals(checkRbacRoleFilter(getRbacFilter().getVerbAll(), rbacResult.isAll())) &&
+                    getRbacFilter().getVerbGet().equals(checkRbacRoleFilter(getRbacFilter().getVerbGet(), rbacResult.isGet())) &&
+                    getRbacFilter().getVerbList().equals(checkRbacRoleFilter(getRbacFilter().getVerbList(), rbacResult.isList())) &&
+                    getRbacFilter().getVerbCreate().equals(checkRbacRoleFilter(getRbacFilter().getVerbCreate(), rbacResult.isCreate())) &&
+                    getRbacFilter().getVerbUpdate().equals(checkRbacRoleFilter(getRbacFilter().getVerbUpdate(), rbacResult.isUpdate())) &&
+                    getRbacFilter().getVerbPatch().equals(checkRbacRoleFilter(getRbacFilter().getVerbPatch(), rbacResult.isPatch())) &&
+                    getRbacFilter().getVerbWatch().equals(checkRbacRoleFilter(getRbacFilter().getVerbWatch(), rbacResult.isWatch())) &&
+                    getRbacFilter().getVerbDelete().equals(checkRbacRoleFilter(getRbacFilter().getVerbDelete(), rbacResult.isDelete())) &&
+                    getRbacFilter().getVerbDeleteCollection().equals(checkRbacRoleFilter(getRbacFilter().getVerbDeleteCollection(), rbacResult.isDeletecollection())) &&
+                    StringUtils.containsIgnoreCase(rbacResult.getOthers(), getRbacFilter().getOthers())) {
+                rbacsResults.add(rbacResult);
+            }
+        }
+    }
+
+    private boolean checkEqualsFilter(String resource, String filter) {
+        if (filter.equals("")) {
+            return true;
+        }
+        if (resource.equals(filter)) {
+            return true;
+        }
+        return false;
+    }
+
+    private String checkRbacRoleFilter(String verb, boolean rbacVerb) {
+        if (rbacVerb && verb.equals("Yes")) {
+            return "Yes";
+        }
+        if (!rbacVerb && verb.equals("No")) {
+            return "No";
+        }
+        return "";
+    }
+
+    //  CLEARING ================
 
 
     @Command
-    @NotifyChange({"rolesTotalItems", "rolesResults", "rolesFilter", "selectedRolesNamespace"})
+    @NotifyChange({"rolesTotalItems", "rolesResults", "roleRulesResults", "roleSubjectsResults", "rolesFilter", "selectedRolesNamespace"})
     public void clearAllRoles() {
-//        securityModel.setRolesResults(new ListModelList<>())
-//                .setFilter(new IpsAndPortsFilter())
-//                .setNamespaces(commonService.getAllNamespaces())
-//                .setSelectedNamespace("all")
-//                .setSearchExceptions(new ArrayList<>());
+        securityModel.setRolesResults(new HashMap<>())
+                .setRolesFilter(new RolesSecurityFilter())
+                .setNamespaces(commonService.getAllNamespaces())
+                .setSelectedRolesNamespace("all")
+                .setSearchExceptions(new ArrayList<>());
         rolesResults = new ListModelList<>();
-        clearAllFilterComboboxes();
+        roleRulesResults = new ListModelList<>();
+        roleSubjectsResults = new ListModelList<>();
+        clearAllRolesFilterComboboxes();
+    }
+
+    @Command
+    @NotifyChange({"rbacsTotalItems", "rbacsResults", "rbacFilter", "selectedRBACsNamespace"})
+    public void clearAllRbacs() {
+        securityModel.setRbacsResults(new ArrayList<>())
+                .setRbacsFilter(new RBACFilter())
+                .setNamespaces(commonService.getAllNamespaces())
+                .setSelectedRBACsNamespace("all")
+                .setSearchExceptions(new ArrayList<>());
+        rbacsResults = new ListModelList<>();
+        clearAllRbacFilterComboboxes();
     }
 
     @Command
@@ -293,7 +362,7 @@ public class SecurityVM implements PropertyChangeListener {
      * Removes last selected value from all filter comboboxes.
      */
     private void clearAllFilterComboboxes() {
-        Auxhead searchGridAuxHead = (Auxhead) Path.getComponent("//indexPage/templateInclude/ipsAndPortsGridAuxHead");
+        Auxhead searchGridAuxHead = (Auxhead) Path.getComponent("//indexPage/templateInclude/rbacGridAuxHead");
         for (Component child : searchGridAuxHead.getFellows()) {
             if (Arrays.asList("filterResourceNamesCBox", "filterNamespacesCBox", "filterResourceTypesCBox").contains(child.getId())) {
                 Combobox cBox = (Combobox) child;
@@ -302,11 +371,30 @@ public class SecurityVM implements PropertyChangeListener {
         }
     }
 
-    //TODO get sort by namespace for each grid
-//    private void sortResultsByNamespace() {
-//        ipsAndPortsResults.sort(Comparator.comparing(IpsAndPortsResult::getNamespace));
-//    }
+    private void clearAllRolesFilterComboboxes() {
+        Auxhead searchGridAuxHead = (Auxhead) Path.getComponent("//indexPage/templateInclude/rolesGridAuxHead");
+        for (Component child : searchGridAuxHead.getFellows()) {
+            if (Arrays.asList("filterRolesNamespacesCBox", "filterRolesResourceTypesCBox", "filterRolesResourceNamesCBox").contains(child.getId())) {
+                Combobox cBox = (Combobox) child;
+                cBox.setValue("");
+            }
+        }
+    }
 
+    /**
+     * Removes last selected value from all filter comboboxes.
+     */
+    private void clearAllRbacFilterComboboxes() {
+        Auxhead searchGridAuxHead = (Auxhead) Path.getComponent("//indexPage/templateInclude/rbacGridAuxHead");
+        for (Component child : searchGridAuxHead.getFellows()) {
+            if (Arrays.asList("rbacResourceNamesFilterCBox", "rbacSubjectKindsFilterCBox", "rbacSubjectNamesFilterCBox", "rbacResourceTypesFilterCBox", "rbacNamespacesFilterCBox", "rbacVerbAllCBox", "rbacVerbGetCBox", "rbacVerbListCBox", "rbacVerbCreateCBox", "rbacVerbUpdateCBox", "rbacVerbPatchCBox", "rbacWerbWatchCBox", "rbacVerbDeleteCBox", "rbacVerbDeleteCollectionCBox", "rbacVerbPatchCBox").contains(child.getId())) {
+                Combobox cBox = (Combobox) child;
+                cBox.setValue("");
+            }
+        }
+    }
+
+    //  FULL DEFINITION / LOGIC ================
 
     @Command
     public void showRoleFullDefinition(@BindingParam("item") RoleResult item) {
@@ -346,9 +434,33 @@ public class SecurityVM implements PropertyChangeListener {
         clickedRoleBindingSubjectsLabel = item.getResourceName();
     }
 
+
+    public void showNotificationAndExceptions(boolean pressedButton, ListModelList results, Footer footer) {
+        if (pressedButton && results.isEmpty()) {
+            Notification.show("Nothing found.", "info", footer, "before_end", 2000);
+        }
+        if (pressedButton && !results.isEmpty()) {
+            Notification.show("Found: " + results.size() + " items", "info", footer, "before_end", 2000);
+        }
+        if (pressedButton && securityModel.hasSearchErrors()) {
+            Window window = (Window) Executions.createComponents("~./zul/components/errors.zul", null, Map.of("errors", securityModel.getSearchExceptions()));
+            window.doModal();
+            securityModel.setSearchExceptions(new ArrayList<>());
+        }
+    }
+
     public SecurityModel getModel() {
         return securityModel;
     }
+
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        BindUtils.postNotifyChange(null, null, this, ".");
+    }
+
+
+    //  RESULTS ================
 
 
     public ListModelList<RoleResult> getRolesResults() {
@@ -361,7 +473,9 @@ public class SecurityVM implements PropertyChangeListener {
         return roleRulesResults;
     }
 
-    public ListModelList<RBACResult> getRBACsResults() {
+    public ListModelList<RBACResult> getRbacsResults() {
+        showNotificationAndExceptions(isGetRBACsButtonPressed, rbacsResults, rbacsGridFooter);
+        isGetPodsSecurityContextsButtonPressed = false;
         return rbacsResults;
     }
 
@@ -370,7 +484,7 @@ public class SecurityVM implements PropertyChangeListener {
     }
 
     public ListModelList<PodSecurityContextResult> getPodsSecurityContextResults() {
-        showNotificationAndExceptions(isGetPodsSecurityContextsButtonPressed, podsSecurityContextsResults, podsGridFooter);
+        showNotificationAndExceptions(isGetPodsSecurityContextsButtonPressed, podsSecurityContextsResults, podsSecurityContextsGridFooter);
         isGetPodsSecurityContextsButtonPressed = false;
         return podsSecurityContextsResults;
     }
@@ -393,18 +507,8 @@ public class SecurityVM implements PropertyChangeListener {
         return podsSecurityPoliciesResults;
     }
 
-    public void showNotificationAndExceptions(boolean pressedButton, ListModelList results, Footer footer) {
-        if (pressedButton && results.isEmpty()) {
-            Notification.show("Nothing found.", "info", footer, "before_end", 2000);
-        }
-        if (pressedButton && !results.isEmpty()) {
-            Notification.show("Found: " + results.size() + " items", "info", footer, "before_end", 2000);
-        }
-        if (pressedButton && securityModel.hasSearchErrors()) {
-            Window window = (Window) Executions.createComponents("~./zul/components/errors.zul", null, Map.of("errors", securityModel.getSearchExceptions()));
-            window.doModal();
-        }
-    }
+
+    //  SELECTED NAMESPACES ================
 
     public String getSelectedRolesNamespace() {
         return securityModel.getSelectedRolesNamespace();
@@ -454,14 +558,18 @@ public class SecurityVM implements PropertyChangeListener {
         this.securityModel.setSelectedPodSecurityPoliciesNamespace(selectedPodSecurityPoliciesNamespace);
     }
 
+
+    //  TOTAL ITEMS ================
+
     public String getRolesTotalItems() {
         return String.format("Total Items: %d", rolesResults.size());
     }
+
     public String getRoleRulesTotalItems() {
         return String.format("Total Items: %d", roleRulesResults.size());
     }
 
-    public String getRBACsTotalItems() {
+    public String getRbacsTotalItems() {
         return String.format("Total Items: %d", rbacsResults.size());
     }
 
@@ -481,12 +589,19 @@ public class SecurityVM implements PropertyChangeListener {
         return String.format("Total Items: %d", podsSecurityPoliciesResults.size());
     }
 
+
+    //  FILTERS ================
+
     public RolesSecurityFilter getRolesFilter() {
         return securityModel.getRolesFilter();
     }
 
     public RoleRulesSecurityFilter getRoleRulesFilter() {
         return securityModel.getRoleRulesFilter();
+    }
+
+    public RBACFilter getRbacFilter() {
+        return securityModel.getRbacsFilter();
     }
 
     public PodsSecurityFilter getPodsFilter() {
@@ -505,6 +620,8 @@ public class SecurityVM implements PropertyChangeListener {
         return securityModel.getPodSecurityPoliciesFilter();
     }
 
+    //  LABELS / HEIGHTS / OTHERS ================
+
     public String getClickedRoleBindingSubjectsLabel() {
         return "Role Binding subjects for the Role: " + clickedRoleBindingSubjectsLabel;
     }
@@ -513,10 +630,14 @@ public class SecurityVM implements PropertyChangeListener {
         return "Rules for the Role: " + clickedRoleRulesLabel;
     }
 
-    //TODO
-    public void getRoleRulesCrud() {
-
+    public String getRBACIcon(@BindingParam("verb") boolean verb) {
+        return verb ? "z-icon-check" : "z-icon-times";
     }
+
+    public String getRBACIconColor(@BindingParam("verb") boolean verb) {
+        return verb ? "color:green;" : "color:red;";
+    }
+
 
     public List<String> getNamespaces() {
         return securityModel.getNamespaces();
@@ -526,16 +647,16 @@ public class SecurityVM implements PropertyChangeListener {
         return securityModel.getMainGridHeight() * 0.43 + "px";
     }
 
-    public String getRBACsGridHeight() {
+    public String getRbacsGridHeight() {
         return securityModel.getMainGridHeight() + "px";
     }
 
     public String getSubjectsGridHeight() {
-        return securityModel.getMainGridHeight() * 0.14 + "px";
+        return securityModel.getMainGridHeight() * 0.13 + "px";
     }
 
     public String getRoleRulesGridHeight() {
-        return securityModel.getMainGridHeight() * 0.43 + "px";
+        return securityModel.getMainGridHeight() * 0.44 + "px";
     }
 
     public String getPodsSecurityContextsGridHeight() {
@@ -546,9 +667,12 @@ public class SecurityVM implements PropertyChangeListener {
         return securityModel.getMainGridHeight() + "px";
     }
 
-
-    @Override
-    public void propertyChange(PropertyChangeEvent evt) {
-        BindUtils.postNotifyChange(null, null, this, ".");
+    public boolean isSkipKubeNamespaces() {
+        return securityModel.isSkipKubeNamespaces();
     }
+
+    public void setSkipKubeNamespaces(boolean skipKubeNamespaces) {
+        securityModel.setSkipKubeNamespaces(skipKubeNamespaces);
+    }
+
 }

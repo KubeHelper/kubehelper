@@ -20,24 +20,64 @@ package com.kubehelper.domain.filters;
 import org.apache.commons.lang3.StringUtils;
 import org.zkoss.zul.ListModelList;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * @author JDev
  */
 public class RBACFilter {
-    private String namespace = "", creationTime = "", foundString = "", additionalInfo = "";
+    private String apiGroup = "", others = "";
 
-    private String selectedNamespaceFilter = "";
-    private String selectedResourceTypeFilter = "";
     private String selectedResourceNameFilter = "";
+    private String selectedSubjectKindFilter = "";
+    private String selectedSubjectNameFilter = "";
+    private String selectedResourceTypeFilter = "";
+    private String selectedNamespaceFilter = "";
+    private String selectedRoleNameFilter = "";
 
-    private ListModelList<String> namespacesFilter = new ListModelList<>();
-    private ListModelList<String> resourceTypesFilter = new ListModelList<>();
+    private String verbAll = "";
+    private String verbGet = "";
+    private String verbList = "";
+    private String verbCreate = "";
+    private String verbUpdate = "";
+    private String verbPatch = "";
+    private String verbWatch = "";
+    private String verbDelete = "";
+    private String verbDeleteCollection = "";
+    private String verbOthers = "";
+
     private ListModelList<String> resourceNamesFilter = new ListModelList<>();
+    private ListModelList<String> subjectKindsFilter = new ListModelList<>();
+    private ListModelList<String> subjectNamesFilter = new ListModelList<>();
+    private ListModelList<String> resourceTypesFilter = new ListModelList<>();
+    private ListModelList<String> namespacesFilter = new ListModelList<>();
+    private ListModelList<String> roleNamesFilter = new ListModelList<>();
 
     public RBACFilter() {
     }
 
+    public void addResourceNamesFilter(String resourceNameFilter) {
+        if (!resourceNamesFilter.contains(resourceNameFilter)) {
+            resourceNamesFilter.add(resourceNameFilter);
+        }
+    }
+
+    public void addSubjectKindsFilter(String subjectKindFilter) {
+        if (!subjectKindsFilter.contains(subjectKindFilter)) {
+            subjectKindsFilter.add(subjectKindFilter);
+        }
+    }
+
+    public void addSubjectNamesFilter(String subjectNameFilter) {
+        if (!subjectNamesFilter.contains(subjectNameFilter)) {
+            subjectNamesFilter.add(subjectNameFilter);
+        }
+    }
+
+
     public void addNamespacesFilter(String namespaceFilter) {
+        namespaceFilter = namespaceFilter == null ? "N/A" : namespaceFilter;
         if (!namespacesFilter.contains(namespaceFilter)) {
             namespacesFilter.add(namespaceFilter);
         }
@@ -49,77 +89,57 @@ public class RBACFilter {
         }
     }
 
-    public void addResourceNamesFilter(String resourceNameFilter) {
-        if (!resourceNamesFilter.contains(resourceNameFilter)) {
-            resourceNamesFilter.add(resourceNameFilter);
+    public void addRoleNamesFilter(String roleName) {
+        if (!roleNamesFilter.contains(roleName)) {
+            roleNamesFilter.add(roleName);
         }
     }
 
-    public String getNamespace() {
-        return namespace;
-    }
-
-    public RBACFilter setNamespace(String namespace) {
-        this.namespace = namespace == null ? "" : namespace.trim();
-        return this;
-    }
-
-    public String getCreationTime() {
-        return creationTime;
-    }
-
-    public RBACFilter setCreationTime(String creationTime) {
-        this.creationTime = creationTime == null ? "" : creationTime.trim();
-        return this;
-    }
-
-    public String getFoundString() {
-        return foundString;
-    }
-
-    public RBACFilter setFoundString(String foundString) {
-        this.foundString = foundString;
-        return this;
-    }
-
-    public String getAdditionalInfo() {
-        return additionalInfo;
-    }
-
-    public RBACFilter setAdditionalInfo(String additionalInfo) {
-        this.additionalInfo = additionalInfo;
-        return this;
-    }
-
     public boolean isFilterActive() {
-        return StringUtils.isNoneBlank(namespace, creationTime, foundString, additionalInfo, selectedNamespaceFilter, selectedResourceTypeFilter, selectedResourceNameFilter);
+        return StringUtils.isNoneBlank(apiGroup, others, verbAll, verbGet, verbList, verbCreate, verbUpdate, verbPatch, verbWatch, verbDelete, verbDeleteCollection, verbOthers,
+                selectedRoleNameFilter, selectedResourceNameFilter, selectedSubjectKindFilter, selectedSubjectNameFilter, selectedResourceTypeFilter, selectedNamespaceFilter);
+    }
+
+    public String getApiGroup() {
+        return apiGroup;
+    }
+
+    public RBACFilter setApiGroup(String apiGroup) {
+        this.apiGroup = apiGroup;
+        return this;
+    }
+
+    public String getOthers() {
+        return others;
+    }
+
+    public RBACFilter setOthers(String others) {
+        this.others = others;
+        return this;
     }
 
     public ListModelList<String> getNamespacesFilter() {
         return namespacesFilter;
     }
 
-    public RBACFilter setNamespacesFilter(ListModelList<String> namespacesFilter) {
-        this.namespacesFilter = namespacesFilter;
-        return this;
-    }
-
     public ListModelList<String> getResourceTypesFilter() {
         return resourceTypesFilter;
-    }
-
-    public RBACFilter setResourceTypesFilter(ListModelList<String> resourceTypesFilter) {
-        this.resourceTypesFilter = resourceTypesFilter;
-        return this;
     }
 
     public ListModelList<String> getResourceNamesFilter() {
         return resourceNamesFilter;
     }
 
-    public RBACFilter setResourceNamesFilter(ListModelList<String> resourceNamesFilter) {
-        this.resourceNamesFilter = resourceNamesFilter;
-        return this;
+    public ListModelList<String> getSubjectKindsFilter() {
+        return subjectKindsFilter;
+    }
+
+    public ListModelList<String> getSubjectNamesFilter() {
+        return subjectNamesFilter;
+    }
+
+    public ListModelList<String> getRoleNamesFilter() {
+        return roleNamesFilter;
     }
 
     public String getSelectedNamespaceFilter() {
@@ -147,5 +167,126 @@ public class RBACFilter {
     public RBACFilter setSelectedResourceNameFilter(String selectedResourceNameFilter) {
         this.selectedResourceNameFilter = selectedResourceNameFilter == null ? "" : selectedResourceNameFilter;
         return this;
+    }
+
+    public String getSelectedSubjectKindFilter() {
+        return selectedSubjectKindFilter;
+    }
+
+    public RBACFilter setSelectedSubjectKindFilter(String selectedSubjectKindFilter) {
+        this.selectedSubjectKindFilter = selectedSubjectKindFilter == null ? "" : selectedSubjectKindFilter;
+        return this;
+    }
+
+    public String getSelectedSubjectNameFilter() {
+        return selectedSubjectNameFilter;
+    }
+
+    public RBACFilter setSelectedSubjectNameFilter(String selectedSubjectNameFilter) {
+        this.selectedSubjectNameFilter = selectedSubjectNameFilter == null ? "" : selectedSubjectNameFilter;
+        return this;
+    }
+
+    public String getSelectedRoleNameFilter() {
+        return selectedRoleNameFilter;
+    }
+
+    public RBACFilter setSelectedRoleNameFilter(String selectedRoleNameFilter) {
+        this.selectedRoleNameFilter = selectedRoleNameFilter == null ? "" : selectedRoleNameFilter;
+        return this;
+    }
+
+    public String getVerbAll() {
+        return verbAll;
+    }
+
+    public RBACFilter setVerbAll(String verbAll) {
+        this.verbAll = verbAll == null ? "" : verbAll;
+        return this;
+    }
+
+    public String getVerbGet() {
+        return verbGet;
+    }
+
+    public RBACFilter setVerbGet(String verbGet) {
+        this.verbGet = verbGet == null ? "" : verbGet;
+        return this;
+    }
+
+    public String getVerbList() {
+        return verbList;
+    }
+
+    public RBACFilter setVerbList(String verbList) {
+        this.verbList = verbList == null ? "" : verbList;
+        return this;
+    }
+
+    public String getVerbCreate() {
+        return verbCreate;
+    }
+
+    public RBACFilter setVerbCreate(String verbCreate) {
+        this.verbCreate = verbCreate == null ? "" : verbCreate;
+        return this;
+    }
+
+    public String getVerbUpdate() {
+        return verbUpdate;
+    }
+
+    public RBACFilter setVerbUpdate(String verbUpdate) {
+        this.verbUpdate = verbUpdate == null ? "" : verbUpdate;
+        return this;
+    }
+
+    public String getVerbPatch() {
+        return verbPatch;
+    }
+
+    public RBACFilter setVerbPatch(String verbPatch) {
+        this.verbPatch = verbPatch == null ? "" : verbPatch;
+        return this;
+    }
+
+    public String getVerbWatch() {
+        return verbWatch;
+    }
+
+    public RBACFilter setVerbWatch(String verbWatch) {
+        this.verbWatch = verbWatch == null ? "" : verbWatch;
+        return this;
+    }
+
+    public String getVerbDelete() {
+        return verbDelete;
+    }
+
+    public RBACFilter setVerbDelete(String verbDelete) {
+        this.verbDelete = verbDelete == null ? "" : verbDelete;
+        return this;
+    }
+
+    public String getVerbDeleteCollection() {
+        return verbDeleteCollection;
+    }
+
+    public RBACFilter setVerbDeleteCollection(String verbDeleteCollection) {
+        this.verbDeleteCollection = verbDeleteCollection == null ? "" : verbDeleteCollection;
+        return this;
+    }
+
+    public String getVerbOthers() {
+        return verbOthers;
+    }
+
+    public RBACFilter setVerbOthers(String verbOthers) {
+        this.verbOthers = verbOthers == null ? "" : verbOthers;
+        return this;
+    }
+
+    public ListModelList<String> getVerbsFilter() {
+        return new ListModelList<>(List.of("Yes", "No"));
     }
 }

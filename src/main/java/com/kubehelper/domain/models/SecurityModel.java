@@ -80,6 +80,7 @@ public class SecurityModel implements PageModel {
     private List<KubeHelperException> searchExceptions = new ArrayList<>();
     private int selectedRoleId;
     private int selectedRoleRuleId;
+    private boolean skipKubeNamespaces = true;
 //    private boolean caseSensitiveSearch = false;
 
     public SecurityModel() {
@@ -110,19 +111,20 @@ public class SecurityModel implements PageModel {
 
     public SecurityModel addRoleResult(RoleResult roleResult) {
         rolesResults.put(roleResult.getId(), roleResult);
+        rolesFilter.addResourceNamesFilter(roleResult.getResourceName());
         rolesFilter.addNamespacesFilter(roleResult.getNamespace());
-//        TODO selectedResourcePropertyFilter
-//        rolesFilter.addResourcePropertiesFilter(roleResult.getr);
         rolesFilter.addResourceTypesFilter(roleResult.getResourceType());
         return this;
     }
 
     public SecurityModel addRBACResult(RBACResult rbacResult) {
-//        rolesResults.put(roleResult.getId(), roleResult);
-//        rolesFilter.addNamespacesFilter(roleResult.getNamespace());
-//        TODO selectedResourcePropertyFilter
-//        rolesFilter.addResourcePropertiesFilter(roleResult.getr);
-//        rolesFilter.addResourceTypesFilter(roleResult.getResourceType());
+        rbacsResults.add(rbacResult);
+        rbacsFilter.addResourceNamesFilter(rbacResult.getResourceName());
+        rbacsFilter.addSubjectKindsFilter(rbacResult.getSubjectKind());
+        rbacsFilter.addSubjectNamesFilter(rbacResult.getSubjectName());
+        rbacsFilter.addResourceTypesFilter(rbacResult.getResourceType());
+        rbacsFilter.addNamespacesFilter(rbacResult.getNamespace());
+        rbacsFilter.addRoleNamesFilter(rbacResult.getRoleName());
         return this;
     }
 
@@ -146,9 +148,6 @@ public class SecurityModel implements PageModel {
 
 
     public void addRoleSubjects(String roleName, Resource resource, List<V1beta1Subject> subjects) {
-        if (roleName.equals("edit")) {
-            roleName.isEmpty();
-        }
         Optional<RoleResult> role = findRole(roleName, resource);
         if (role.isPresent()) {
             role.get().addRoleSubjects(subjects);
@@ -161,6 +160,10 @@ public class SecurityModel implements PageModel {
 
     public void addSearchException(Exception exception) {
         this.searchExceptions.add(new KubeHelperException(exception));
+    }
+
+    public void addSearchException(String message, Exception exception) {
+        this.searchExceptions.add(new KubeHelperException(message, exception));
     }
 
     public SecurityModel setSearchExceptions(List<KubeHelperException> searchExceptions) {
@@ -376,4 +379,12 @@ public class SecurityModel implements PageModel {
         return this;
     }
 
+    public boolean isSkipKubeNamespaces() {
+        return skipKubeNamespaces;
+    }
+
+    public SecurityModel setSkipKubeNamespaces(boolean skipKubeNamespaces) {
+        this.skipKubeNamespaces = skipKubeNamespaces;
+        return this;
+    }
 }

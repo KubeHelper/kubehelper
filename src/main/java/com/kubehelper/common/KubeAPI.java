@@ -17,6 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package com.kubehelper.common;
 
+import com.kubehelper.domain.models.SecurityModel;
 import io.kubernetes.client.openapi.ApiException;
 import io.kubernetes.client.openapi.apis.AppsV1Api;
 import io.kubernetes.client.openapi.apis.AuditregistrationV1alpha1Api;
@@ -47,10 +48,12 @@ import io.kubernetes.client.openapi.models.V1ServiceAccountList;
 import io.kubernetes.client.openapi.models.V1ServiceList;
 import io.kubernetes.client.openapi.models.V1StatefulSetList;
 import io.kubernetes.client.openapi.models.V1alpha1PodPresetList;
+import io.kubernetes.client.openapi.models.V1beta1ClusterRoleBinding;
 import io.kubernetes.client.openapi.models.V1beta1ClusterRoleBindingList;
 import io.kubernetes.client.openapi.models.V1beta1ClusterRoleList;
 import io.kubernetes.client.openapi.models.V1beta1PodDisruptionBudgetList;
 import io.kubernetes.client.openapi.models.V1beta1PodSecurityPolicyList;
+import io.kubernetes.client.openapi.models.V1beta1RoleBinding;
 import io.kubernetes.client.openapi.models.V1beta1RoleBindingList;
 import io.kubernetes.client.openapi.models.V1beta1RoleList;
 import io.kubernetes.client.util.Config;
@@ -201,6 +204,28 @@ public class KubeAPI {
             showErrorDialog(e);
         }
         return new V1beta1RoleBindingList();
+    }
+
+    public V1beta1RoleBinding getV1RoleBinding(String roleName, String namespace, SecurityModel securityModel) {
+        try {
+            return rbacAuthorizationV1beta1Api.readNamespacedRoleBinding(roleName, namespace, null);
+        } catch (ApiException e) {
+            String errorMessage = String.format("Error at getV1RoleBinding: roleName=%s, namespace=%s. Message: %s", roleName, namespace, e.getMessage());
+            securityModel.addSearchException(errorMessage, e);
+            logger.error(errorMessage, e);
+        }
+        return null;
+    }
+
+    public V1beta1ClusterRoleBinding getV1ClusterRoleBinding(String roleName, SecurityModel securityModel) {
+        try {
+            return rbacAuthorizationV1beta1Api.readClusterRoleBinding(roleName, null);
+        } catch (ApiException e) {
+            String errorMessage = String.format("Error at getV1ClusterRoleBinding: roleName=%s. Message: %s", roleName, e.getMessage());
+            securityModel.addSearchException(errorMessage, e);
+            logger.error(errorMessage, e);
+        }
+        return null;
     }
 
 

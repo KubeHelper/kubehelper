@@ -17,6 +17,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package com.kubehelper.domain.results;
 
+import com.kubehelper.common.Resource;
+
 /**
  * @author JDev
  */
@@ -25,8 +27,11 @@ public class RBACResult {
     private String resourceName = "";
     private String subjectKind = "";
     private String subjectName = "";
-    private String apiGroups = "";
     private String roleName = "";
+    private Resource resourceType;
+    private String namespace = "";
+    private String apiGroup = "";
+    //    private String resourceNames = "";
     private boolean all;
     private boolean get;
     private boolean list;
@@ -43,13 +48,36 @@ public class RBACResult {
     private boolean proxy;
     private boolean use;
     private boolean bind;
-    private String others;
+    private String others = "";
+
+//other verbs: impersonate,escalate approve,sign proxy use bind
 
     public RBACResult() {
     }
 
     public RBACResult(int id) {
         this.id = id;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public RBACResult setVerb(String verb) {
+
+        switch (verb) {
+            case "*" -> all = true;
+            case "get" -> get = true;
+            case "list" -> list = true;
+            case "create" -> create = true;
+            case "update" -> update = true;
+            case "patch" -> patch = true;
+            case "watch" -> watch = true;
+            case "delete" -> delete = true;
+            case "deletecollection" -> deletecollection = true;
+            default -> others = verb;
+        }
+        return this;
     }
 
     public String getResourceName() {
@@ -79,12 +107,30 @@ public class RBACResult {
         return this;
     }
 
-    public String getApiGroups() {
-        return apiGroups;
+    public String getNamespace() {
+        return namespace;
     }
 
-    public RBACResult setApiGroups(String apiGroups) {
-        this.apiGroups = apiGroups;
+    public RBACResult setNamespace(String namespace) {
+        this.namespace = namespace;
+        return this;
+    }
+
+    public String getResourceType() {
+        return Resource.getValueByKey(resourceType.name());
+    }
+
+    public RBACResult setResourceType(Resource resourceType) {
+        this.resourceType = resourceType;
+        return this;
+    }
+
+    public String getApiGroup() {
+        return apiGroup;
+    }
+
+    public RBACResult setApiGroup(String apiGroup) {
+        this.apiGroup = apiGroup;
         return this;
     }
 
@@ -249,9 +295,5 @@ public class RBACResult {
         this.others = others;
         return this;
     }
-
-    //    get, list, create, update, patch, watch, delete, and deletecollection  impersonate
-//escalate approve
-//sign proxy *
 
 }

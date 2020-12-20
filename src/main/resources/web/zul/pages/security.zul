@@ -1,7 +1,6 @@
 <zk>
     <div id="securityTemplate" viewModel="@id('securityVM') @init('com.kubehelper.viewmodels.SecurityVM')" width="100%" height="100%">
         <borderlayout>
-            <!--            TODO Paging and vflex="min" for center and remove height-->
             <center margins="0,3,3,3" title="Security">
                 <tabbox width="100%" sclass="nav_tabs">
                     <tabs id="tabs">
@@ -13,12 +12,15 @@
                         <tab label="Pod Security Policies"/>
                     </tabs>
                     <tabpanels>
+
+                        <!--                        ROLES-->
+
                         <tabpanel>
                             <separator width="100%" orient="horizontal"/>
                             <vbox height="100%" width="100%">
-                                <hbox id="menuHboxRoles" height="100%" width="100%" style="margin: 5px;" align="stretch">
+                                <hbox id="menuHboxRoles" height="100%" width="100%" align="stretch">
                                     <cell id="clearAllCellRoles" width="10%" style="padding: 0px 5px 0px 5px;" tooltip="clearAllTooltip">
-                                        <button id="clearAllBtnRoles" iconSclass="z-icon-eraser" label="Clear all" onClick="@command('clearAllRoles')"/>
+                                        <button id="clearAllBtnRoles" width="100%" iconSclass="z-icon-eraser" label="Clear all" onClick="@command('clearAllRoles')"/>
                                     </cell>
                                     <separator width="100%" orient="vertical" bar="true"/>
                                     <cell id="namespacesCellRoles" width="30%" style="padding: 0px 5px 0px 5px;" align="left">
@@ -41,17 +43,21 @@
                             </vbox>
                             <separator width="100%" orient="horizontal"/>
                             <grid id="securityRolesGrid" model="@load(securityVM.rolesResults)" height="@load(securityVM.rolesGridHeight)" sclass="mainGridClass">
-                                <auxhead id="rolesAuxHead">
+                                <auxhead id="rolesGridAuxHead">
                                     <auxheader>
                                         <span sclass="z-icon-hashtag"/>
                                     </auxheader>
                                     <auxheader colspan="1">
-                                        <span sclass="z-icon-filter"/>
-                                        <textbox instant="true" width="80%" value="@bind(securityVM.rolesFilter.resourceName)" onChange="@command('filterSecurityRoles')"/>
+                                        <combobox id="filterRolesResourceNamesCBox" hflex="1" mold="rounded" model="@load(securityVM.rolesFilter.resourceNamesFilter)"
+                                                  selectedItem="@bind(securityVM.rolesFilter.selectedResourceNameFilter)"
+                                                  onChange="@command('filterSecurityRoles')">
+                                            <template name="model">
+                                                <comboitem label="@load(each)"/>
+                                            </template>
+                                        </combobox>
                                     </auxheader>
                                     <auxheader colspan="1">
-                                        <span sclass="z-icon-filter"/>
-                                        <combobox id="filterNamespacesCBox" width="80%" mold="rounded" model="@load(securityVM.rolesFilter.namespacesFilter)"
+                                        <combobox id="filterRolesNamespacesCBox" hflex="1" mold="rounded" model="@load(securityVM.rolesFilter.namespacesFilter)"
                                                   selectedItem="@bind(securityVM.rolesFilter.selectedNamespaceFilter)"
                                                   onChange="@command('filterSecurityRoles')">
                                             <template name="model">
@@ -60,8 +66,7 @@
                                         </combobox>
                                     </auxheader>
                                     <auxheader colspan="1">
-                                        <span sclass="z-icon-filter"/>
-                                        <combobox id="filterResourceTypesCBox" width="80%" model="@load(securityVM.rolesFilter.resourceTypesFilter)"
+                                        <combobox id="filterRolesResourceTypesCBox" hflex="1" model="@load(securityVM.rolesFilter.resourceTypesFilter)"
                                                   selectedItem="@bind(securityVM.rolesFilter.selectedResourceTypeFilter)"
                                                   onChange="@command('filterSecurityRoles')">
                                             <template name="model">
@@ -70,8 +75,7 @@
                                         </combobox>
                                     </auxheader>
                                     <auxheader colspan="1">
-                                        <span sclass="z-icon-filter"/>
-                                        <textbox instant="true" width="80%" value="@bind(securityVM.rolesFilter.creationTime)" onChange="@command('filterSecurityRoles')"/>
+                                        <textbox instant="true" hflex="1" value="@bind(securityVM.rolesFilter.creationTime)" onChange="@command('filterSecurityRoles')"/>
                                     </auxheader>
                                     <auxheader class="fullDefinitionIdHeader">
                                         <span sclass="z-icon-file-text"/>
@@ -79,9 +83,9 @@
                                 </auxhead>
                                 <columns menupopup="auto" sizable="true">
                                     <column hflex="min" label="Id" sort="auto(id)"/>
-                                    <column hflex="1" label="Role Name" sort="auto(resourceName)"/>
-                                    <column hflex="0.5" label="Namespace" sort="auto(namespace)"/>
-                                    <column hflex="min" label="Resource Type" sort="auto(resourceType)"/>
+                                    <column hflex="3" label="Role Name" sort="auto(resourceName)"/>
+                                    <column hflex="2" label="Namespace" sort="auto(namespace)"/>
+                                    <column hflex="1" label="Resource Type" sort="auto(resourceType)"/>
                                     <column hflex="min" label="Creation Time" sort="auto(creationTime)"/>
                                     <column hflex="min" label="Full Definition"/>
                                 </columns>
@@ -98,7 +102,7 @@
                                     </template>
                                 </rows>
                                 <foot>
-                                    <footer id="rolesGridFooter" span="9" align="right" label="@load(securityVM.rolesTotalItems)"/>
+                                    <footer id="rolesGridFooter" span="6" align="right" label="@load(securityVM.rolesTotalItems)"/>
                                 </foot>
                             </grid>
 
@@ -130,9 +134,9 @@
                                         <column hflex="1" label="Resources" sort="auto(resourcesAsString)"/>
                                         <column hflex="1" label="Verbs" sort="auto(verbsAsString)"/>
                                         <column hflex="1" label="API Groups" sort="auto(apiGroupsAsString)"/>
-                                        <column hflex="1" label="Resource Names" sort="auto(resourceNamesAsString)"/>
+                                        <column hflex="1.5" label="Resource Names" sort="auto(resourceNamesAsString)"/>
                                         <column hflex="1" label="Non Resource URLs" sort="auto(nonResourceURLsAsString)"/>
-                                        <column hflex="1" label="Full Definition"/>
+                                        <column hflex="0.5" label="Full Definition"/>
                                     </columns>
                                     <rows>
                                         <template name="model" var="item">
@@ -155,18 +159,20 @@
 
                         </tabpanel>
 
+                        <!--                        RBAC-->
+
                         <tabpanel>
                             <separator width="100%" orient="horizontal"/>
                             <vbox height="100%" width="100%">
-                                <hbox id="menuHboxRBACs" height="100%" width="100%" style="margin: 5px;" align="stretch">
+                                <hbox id="menuHboxRBACs" height="100%" width="100%" align="stretch">
                                     <cell id="clearAllCellRBACs" width="10%" style="padding: 0px 5px 0px 5px;" tooltip="clearAllTooltip">
-                                        <button id="clearAllBtnRBACs" iconSclass="z-icon-eraser" label="Clear all" onClick="@command('clearAllRBACs')"/>
+                                        <button id="clearAllBtnRBACs" width="100%" iconSclass="z-icon-eraser" label="Clear all" onClick="@command('clearAllRbacs')"/>
                                     </cell>
                                     <separator width="100%" orient="vertical" bar="true"/>
-                                    <cell id="namespacesCellRBACs" width="30%" style="padding: 0px 5px 0px 5px;" align="left">
+                                    <cell id="namespacesCellRBACs" width="30%" align="left">
                                         <hlayout valign="middle">
                                             <label value="Namespace: "/>
-                                            <combobox id="namespacesCBoxRBACs" tooltip="namespacesTooltip" hflex="1" model="@load(securityVM.namespaces)"
+                                            <combobox id="namespacesCBoxRBACs" tooltip="namespacesRBACsTooltip" hflex="1" model="@load(securityVM.namespaces)"
                                                       selectedItem="@bind(securityVM.selectedRBACsNamespace)" readonly="true">
                                                 <template name="model">
                                                     <comboitem label="@load(each)"/>
@@ -174,34 +180,161 @@
                                             </combobox>
                                         </hlayout>
                                     </cell>
-                                    <cell width="49%" style="padding: 0px 5px 0px 5px;">
+                                    <cell width="10%">
+                                        <checkbox checked="@bind(securityVM.skipKubeNamespaces)" tooltip="skipKubeNamespacesTooltip"/>Skip kube* namespaces
+                                    </cell>
+                                    <cell width="39%">
                                     </cell>
                                     <cell id="cellGetBtnRBACs" width="10%" style="padding: 0px 5px 0px 5px;">
-                                        <button id="getRBACsBtn" label="Get" iconSclass="z-icon-refresh" onClick="@command('getRBACs')" width="100%"/>
+                                        <button id="getRBACsBtn" label="Get" iconSclass="z-icon-refresh" onClick="@command('getRbacs')" width="100%"/>
                                     </cell>
                                 </hbox>
                             </vbox>
                             <separator width="100%" orient="horizontal"/>
-                            <grid id="securityRBACsGrid" model="@load(securityVM.RBACsResults)" height="@load(securityVM.RBACsGridHeight)">
-                                <!--                                <auxhead id="podsAuxHead">-->
-                                <!--                                    <auxheader>-->
-                                <!--                                        <span sclass="z-icon-hashtag"/>-->
-                                <!--                                    </auxheader>-->
-                                <!--                                    <auxheader colspan="1">-->
-                                <!--                                        <span sclass="z-icon-filter"/>-->
-                                <!--                                        <textbox instant="true" width="80%" value="@bind(securityVM.podsFilter.ip)" onChange="@command('filterPods')"/>-->
-                                <!--                                    </auxheader>-->
-                                <!--                                </auxhead>-->
-                                <columns menupopup="auto" sizable="true">
+                            <grid id="securityRBACsGrid" model="@load(securityVM.rbacsResults)" height="@load(securityVM.rbacsGridHeight)">
+                                <auxhead id="rbacGridAuxHead">
+                                    <auxheader>
+                                        <span sclass="z-icon-hashtag"/>
+                                    </auxheader>
+                                    <auxheader colspan="1">
+                                        <combobox id="rbacResourceNamesFilterCBox" hflex="1" model="@load(securityVM.rbacFilter.resourceNamesFilter)"
+                                                  selectedItem="@bind(securityVM.rbacFilter.selectedResourceNameFilter)" onChange="@command('filterRbacs')">
+                                            <template name="model">
+                                                <comboitem label="@load(each)"/>
+                                            </template>
+                                        </combobox>
+                                    </auxheader>
+                                    <auxheader colspan="1">
+                                        <combobox id="rbacSubjectKindsFilterCBox" hflex="1" model="@load(securityVM.rbacFilter.subjectKindsFilter)"
+                                                  selectedItem="@bind(securityVM.rbacFilter.selectedSubjectKindFilter)" onChange="@command('filterRbacs')">
+                                            <template name="model">
+                                                <comboitem label="@load(each)"/>
+                                            </template>
+                                        </combobox>
+                                    </auxheader>
+                                    <auxheader colspan="1">
+                                        <combobox id="rbacSubjectNamesFilterCBox" hflex="1" model="@load(securityVM.rbacFilter.subjectNamesFilter)"
+                                                  selectedItem="@bind(securityVM.rbacFilter.selectedSubjectNameFilter)" onChange="@command('filterRbacs')">
+                                            <template name="model">
+                                                <comboitem label="@load(each)"/>
+                                            </template>
+                                        </combobox>
+                                    </auxheader>
+                                    <auxheader colspan="1">
+                                        <textbox hflex="1" value="@bind(securityVM.rbacFilter.apiGroup)" onChange="@command('filterRbacs')"/>
+                                    </auxheader>
+                                    <auxheader colspan="1">
+                                        <combobox id="rbacResourceTypesFilterCBox" hflex="1" model="@load(securityVM.rbacFilter.resourceTypesFilter)"
+                                                  selectedItem="@bind(securityVM.rbacFilter.selectedResourceTypeFilter)" onChange="@command('filterRbacs')">
+                                            <template name="model">
+                                                <comboitem label="@load(each)"/>
+                                            </template>
+                                        </combobox>
+                                    </auxheader>
+                                    <auxheader colspan="1">
+                                        <combobox id="rbacRoleNamesFilterCBox" hflex="1" mold="rounded" model="@load(securityVM.rbacFilter.roleNamesFilter)"
+                                                  selectedItem="@bind(securityVM.rbacFilter.selectedRoleNameFilter)"
+                                                  onChange="@command('filterRbacs')">
+                                            <template name="model">
+                                                <comboitem label="@load(each)"/>
+                                            </template>
+                                        </combobox>
+                                    </auxheader>
+                                    <auxheader colspan="1">
+                                        <combobox id="rbacNamespacesFilterCBox" hflex="1" model="@load(securityVM.rbacFilter.namespacesFilter)"
+                                                  selectedItem="@bind(securityVM.rbacFilter.selectedNamespaceFilter)" onChange="@command('filterRbacs')">
+                                            <template name="model">
+                                                <comboitem label="@load(each)"/>
+                                            </template>
+                                        </combobox>
+                                    </auxheader>
+                                    <auxheader colspan="1">
+                                        <combobox id="rbacVerbAllCBox" hflex="1" model="@bind(securityVM.rbacFilter.verbsFilter)"
+                                                  selectedItem="@bind(securityVM.rbacFilter.verbAll)" onChange="@command('filterRbacs')">
+                                            <template name="model">
+                                                <comboitem label="@load(each)"/>
+                                            </template>
+                                        </combobox>
+                                    </auxheader>
+                                    <auxheader colspan="1">
+                                        <combobox id="rbacVerbGetCBox" hflex="1" model="@load(securityVM.rbacFilter.verbsFilter)"
+                                                  selectedItem="@bind(securityVM.rbacFilter.verbGet)" onChange="@command('filterRbacs')">
+                                            <template name="model">
+                                                <comboitem label="@load(each)"/>
+                                            </template>
+                                        </combobox>
+                                    </auxheader>
+                                    <auxheader colspan="1">
+                                        <combobox id="rbacVerbListCBox" hflex="1" model="@load(securityVM.rbacFilter.verbsFilter)"
+                                                  selectedItem="@bind(securityVM.rbacFilter.verbList)" onChange="@command('filterRbacs')">
+                                            <template name="model">
+                                                <comboitem label="@load(each)"/>
+                                            </template>
+                                        </combobox>
+                                    </auxheader>
+                                    <auxheader colspan="1">
+                                        <combobox id="rbacVerbCreateCBox" hflex="1" model="@load(securityVM.rbacFilter.verbsFilter)"
+                                                  selectedItem="@bind(securityVM.rbacFilter.verbCreate)" onChange="@command('filterRbacs')">
+                                            <template name="model">
+                                                <comboitem label="@load(each)"/>
+                                            </template>
+                                        </combobox>
+                                    </auxheader>
+                                    <auxheader colspan="1">
+                                        <combobox id="rbacVerbUpdateCBox" hflex="1" model="@load(securityVM.rbacFilter.verbsFilter)"
+                                                  selectedItem="@bind(securityVM.rbacFilter.verbUpdate)" onChange="@command('filterRbacs')">
+                                            <template name="model">
+                                                <comboitem label="@load(each)"/>
+                                            </template>
+                                        </combobox>
+                                    </auxheader>
+                                    <auxheader colspan="1">
+                                        <combobox id="rbacVerbPatchCBox" hflex="1" model="@load(securityVM.rbacFilter.verbsFilter)"
+                                                  selectedItem="@bind(securityVM.rbacFilter.verbPatch)" onChange="@command('filterRbacs')">
+                                            <template name="model">
+                                                <comboitem label="@load(each)"/>
+                                            </template>
+                                        </combobox>
+                                    </auxheader>
+                                    <auxheader colspan="1">
+                                        <combobox id="rbacWerbWatchCBox" hflex="1" model="@load(securityVM.rbacFilter.verbsFilter)"
+                                                  selectedItem="@bind(securityVM.rbacFilter.verbWatch)" onChange="@command('filterRbacs')">
+                                            <template name="model">
+                                                <comboitem label="@load(each)"/>
+                                            </template>
+                                        </combobox>
+                                    </auxheader>
+                                    <auxheader colspan="1">
+                                        <combobox id="rbacVerbDeleteCBox" hflex="1" model="@load(securityVM.rbacFilter.verbsFilter)"
+                                                  selectedItem="@bind(securityVM.rbacFilter.verbDelete)" onChange="@command('filterRbacs')">
+                                            <template name="model">
+                                                <comboitem label="@load(each)"/>
+                                            </template>
+                                        </combobox>
+                                    </auxheader>
+                                    <auxheader colspan="1">
+                                        <combobox id="rbacVerbDeleteCollectionCBox" hflex="1" model="@load(securityVM.rbacFilter.verbsFilter)"
+                                                  selectedItem="@bind(securityVM.rbacFilter.verbDeleteCollection)" onChange="@command('filterRbacs')">
+                                            <template name="model">
+                                                <comboitem label="@load(each)"/>
+                                            </template>
+                                        </combobox>
+                                    </auxheader>
+                                    <auxheader colspan="1">
+                                        <textbox hflex="1" value="@bind(securityVM.rbacFilter.others)" onChange="@command('filterRbacs')"/>
+                                    </auxheader>
+                                </auxhead>
+                                <columns menupopup="auto" sizable="true" style="text-align: center;">
                                     <column hflex="min" label="Id" sort="auto(id)"/>
-                                    <column hflex="2" label="Resource Name" sort="auto(resourceName)"/>
-                                    <column hflex="1.5" label="Subject Kind" sort="auto(subjectKind)"/>
-                                    <column hflex="1.5" label="Subject Name" sort="auto(subjectName)"/>
-                                    <column hflex="1.5" label="API Groups" sort="auto(apiGroups)"/>
-                                    <column hflex="1.5" label="Role Name" sort="auto(roleName)"/>
-                                    <column hflex="1.5" label="Namespace" sort="auto(namespace)"/>
+                                    <column hflex="1" label="Resource Name" tooltiptext="Resource Name" sort="auto(resourceName)"/>
+                                    <column hflex="1" label="Subject Kind" tooltiptext="Subject Kind" sort="auto(subjectKind)"/>
+                                    <column hflex="2" label="Subject Name" tooltiptext="Subject Name" sort="auto(subjectName)"/>
+                                    <column hflex="1" label="API Group" tooltiptext="API Group" sort="auto(apiGroup)"/>
+                                    <column hflex="1" label="Role Type" tooltiptext="Role Type" sort="auto(resourceType)"/>
+                                    <column hflex="2" label="Role Name" tooltiptext="Role Name" sort="auto(roleName)"/>
+                                    <column hflex="1" label="Namespace" tooltiptext="Namespace" sort="auto(namespace)"/>
 
-                                    <column hflex="0.5" label="*" sort="auto(all)"/>
+                                    <column hflex="0.5" label="*" tooltiptext="all" sort="auto(all)"/>
                                     <column hflex="0.5" label="get" sort="auto(get)"/>
                                     <column hflex="0.5" label="list" sort="auto(list)"/>
                                     <column hflex="0.5" label="create" sort="auto(create)"/>
@@ -209,37 +342,40 @@
                                     <column hflex="0.5" label="patch" sort="auto(patch)"/>
                                     <column hflex="0.5" label="watch" sort="auto(watch)"/>
                                     <column hflex="0.5" label="delete" sort="auto(delete)"/>
-                                    <column hflex="1.5" label="deletecollection" sort="auto(deletecollection)"/>
+                                    <column hflex="1" label="deletecollection" sort="auto(deletecollection)"/>
                                     <column hflex="1" label="others" sort="auto(others)"/>
                                 </columns>
                                 <rows>
                                     <template name="model" var="item">
-                                        <row style="cursor:pointer">
+                                        <row style="cursor:pointer;">
                                             <label value="${item.id}"/>
                                             <label value="${item.resourceName}" multiline="true"/>
                                             <label value="${item.subjectKind}" multiline="true"/>
                                             <label value="${item.subjectName}" multiline="true"/>
-                                            <label value="${item.apiGroups}" multiline="true"/>
+                                            <label value="${item.apiGroup}" multiline="true"/>
+                                            <label value="${item.resourceType}" multiline="true"/>
                                             <label value="${item.roleName}" multiline="true"/>
                                             <label value="${item.namespace}" multiline="true"/>
-                                            <label value="${item.all}" sclass="z-icon-refresh"/>
-                                            <label value="${item.get}"/>
-                                            <label value="${item.list}"/>
-                                            <label value="${item.create}"/>
-                                            <label value="${item.update}"/>
-                                            <label value="${item.patch}"/>
-                                            <label value="${item.watch}"/>
-                                            <label value="${item.delete}"/>
-                                            <label value="${item.deletecollection}"/>
+                                            <toolbarbutton iconSclass="@load(securityVM.getRBACIcon(item.all))" style="@load(securityVM.getRBACIconColor(item.all))"/>
+                                            <toolbarbutton iconSclass="@load(securityVM.getRBACIcon(item.get))" style="@load(securityVM.getRBACIconColor(item.get))"/>
+                                            <toolbarbutton iconSclass="@load(securityVM.getRBACIcon(item.list))" style="@load(securityVM.getRBACIconColor(item.list))"/>
+                                            <toolbarbutton iconSclass="@load(securityVM.getRBACIcon(item.create))" style="@load(securityVM.getRBACIconColor(item.create))"/>
+                                            <toolbarbutton iconSclass="@load(securityVM.getRBACIcon(item.update))" style="@load(securityVM.getRBACIconColor(item.update))"/>
+                                            <toolbarbutton iconSclass="@load(securityVM.getRBACIcon(item.patch))" style="@load(securityVM.getRBACIconColor(item.patch))"/>
+                                            <toolbarbutton iconSclass="@load(securityVM.getRBACIcon(item.watch))" style="@load(securityVM.getRBACIconColor(item.watch))"/>
+                                            <toolbarbutton iconSclass="@load(securityVM.getRBACIcon(item.delete))" style="@load(securityVM.getRBACIconColor(item.delete))"/>
+                                            <toolbarbutton iconSclass="@load(securityVM.getRBACIcon(item.deletecollection))" style="@load(securityVM.getRBACIconColor(item.deletecollection))"/>
                                             <label value="${item.others}" multiline="true"/>
                                         </row>
                                     </template>
                                 </rows>
                                 <foot>
-                                    <footer id="RBACsGridFooter" span="9" align="right" label="@load(securityVM.RBACsTotalItems)"/>
+                                    <footer id="rbacsGridFooter" span="18" align="right" label="@load(securityVM.rbacsTotalItems)"/>
                                 </foot>
                             </grid>
                         </tabpanel>
+
+                        <!--                        POD SECURITY CONTEXTS-->
 
                         <tabpanel>
                             <separator width="100%" orient="horizontal"/>
@@ -315,7 +451,7 @@
                                     </template>
                                 </rows>
                                 <foot>
-                                    <footer id="podsGridFooter" span="9" align="right" label="@load(securityVM.podsSecurityContextsTotalItems)"/>
+                                    <footer id="podsSecurityContextsGridFooter" span="9" align="right" label="@load(securityVM.podsSecurityContextsTotalItems)"/>
                                 </foot>
                             </grid>
                         </tabpanel>
@@ -578,8 +714,14 @@
     <popup id="namespacesTooltip">
         All visible namespaces.
     </popup>
+    <popup id="namespacesRBACsTooltip">
+        All visible namespaces. I would recommend looking for RBAC in all namespaces and then filtering. Api is in beta and may not work properly.
+    </popup>
     <popup id="popupIpsAndPortsDetails">
         Show detailed information about pod in a pop-up window.
+    </popup>
+    <popup id="skipKubeNamespacesTooltip">
+        Skips search in kube* namespaces. Saves execution time.
     </popup>
     <!--    <popup id="getResourcesTooltip">-->
     <!--        Searching for resources(pods, services) from the selected namespace.-->

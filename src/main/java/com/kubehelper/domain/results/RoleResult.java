@@ -30,19 +30,13 @@ import java.util.Map;
  */
 public class RoleResult {
 
-//1Row(Table) ROLES info
-//2Row(List) 1-3 Rows with subjects in separate table
-//3Row(Table) Role rules in other table
-//4Row(List) click on rule shows CRUD with verbs below crud
-
     private int id;
     private String resourceName = "";
     private String namespace = "";
     private String creationTime = "";
     private String fullDefinition = "";
     private Resource resourceType;
-    //TODO find role selectors
-    private List<String> roleSelectors = new ArrayList<>();
+    //    private List<String> roleSelectors = new ArrayList<>();
     private List<RoleBindingSubject> subjects = new ArrayList<>();
     private Map<Integer, List<RoleRuleResult>> roleRules = new HashMap<>();
 
@@ -129,9 +123,11 @@ public class RoleResult {
     }
 
     public void addRoleSubjects(List<V1beta1Subject> kubeSubjects) {
-        kubeSubjects.forEach(s -> {
-            subjects.add(convertSubject(s));
-        });
+        if (kubeSubjects != null) {
+            kubeSubjects.forEach(s -> {
+                subjects.add(convertSubject(s));
+            });
+        }
     }
 
     public RoleBindingSubject convertSubject(V1beta1Subject subject) {
