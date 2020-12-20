@@ -21,9 +21,7 @@ import com.kubehelper.common.Resource;
 import io.kubernetes.client.openapi.models.V1beta1Subject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author JDev
@@ -38,7 +36,7 @@ public class RoleResult {
     private Resource resourceType;
     //    private List<String> roleSelectors = new ArrayList<>();
     private List<RoleBindingSubject> subjects = new ArrayList<>();
-    private Map<Integer, List<RoleRuleResult>> roleRules = new HashMap<>();
+    private List<RoleRuleResult> roleRules = new ArrayList<>();
 
     public RoleResult() {
     }
@@ -96,15 +94,11 @@ public class RoleResult {
         return this;
     }
 
-    public List<RoleRuleResult> getRoleRules(int roleId) {
-        return roleRules.get(roleId);
-    }
-
-    public Map<Integer, List<RoleRuleResult>> getRoleRules() {
+    public List<RoleRuleResult> getRoleRules() {
         return roleRules;
     }
 
-    public RoleResult setRoleRules(Map<Integer, List<RoleRuleResult>> roleRules) {
+    public RoleResult setRoleRules(List<RoleRuleResult> roleRules) {
         this.roleRules = roleRules;
         return this;
     }
@@ -119,7 +113,7 @@ public class RoleResult {
     }
 
     public void addRoleRules(List<RoleRuleResult> rules) {
-        roleRules.put(this.id, rules);
+        roleRules = rules;
     }
 
     public void addRoleSubjects(List<V1beta1Subject> kubeSubjects) {

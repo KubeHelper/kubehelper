@@ -319,9 +319,6 @@ public class SecurityModel implements PageModel {
         return this;
     }
 
-    public List<RoleRuleResult> getRoleRulesResults(int roleId) {
-        return rolesResults.get(roleId).getRoleRules(roleId);
-    }
 
     public List<ContainerSecurityResult> getContainersResults() {
         return containersResults;

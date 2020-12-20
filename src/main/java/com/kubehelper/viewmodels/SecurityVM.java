@@ -408,8 +408,7 @@ public class SecurityVM implements PropertyChangeListener {
     @NotifyChange({"roleSubjectsResults", "roleRulesResults", "clickedRoleBindingSubjectsLabel", "clickedRoleRulesLabel", "roleRulesTotalItems"})
     public void showRoleRules(@BindingParam("clickedItem") RoleResult item) {
         roleSubjectsResults = new ListModelList<>(item.getSubjects());
-        //TODO make simple, remove id from roleRules
-        roleRulesResults = new ListModelList<>(item.getRoleRules().get(item.getId()));
+        roleRulesResults = new ListModelList<>(item.getRoleRules());
         clickedRoleRulesLabel = item.getResourceName();
         clickedRoleBindingSubjectsLabel = item.getResourceName();
     }
