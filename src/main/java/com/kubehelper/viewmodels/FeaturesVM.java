@@ -292,11 +292,6 @@ public class FeaturesVM implements EventListener, PropertyChangeListener {
         return String.format("Total Items: %d", featuresResults.size());
     }
 
-    public String getProgressLabel() {
-        return "Progress: ";
-//        return "Progress: " + searchService.getProgressLabel();
-    }
-
     /**
      * Returns search results for grid and shows Notification if nothing was found or/and error window if some errors has occurred while parsing the results.
      *

@@ -474,11 +474,6 @@ public class LabelsVM implements EventListener, PropertyChangeListener {
     }
 
 
-    public String getProgressLabel() {
-        return "Progress: ";
-//        return "Progress: " + searchService.getProgressLabel();
-    }
-
     public String getClickedLabelsGroup() {
         return "Group Items for: " + labelsModel.getClickedLabelsGroup();
     }

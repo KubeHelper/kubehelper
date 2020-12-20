@@ -216,7 +216,7 @@ public class IpsAndPortsVM implements PropertyChangeListener {
     }
 
     public String getMainGridHeight() {
-        return ipsAndPortsModel.getMainGridHeight() + "px";
+        return ipsAndPortsModel.getMainGridHeight() * 0.8 + "px";
     }
 
     @Override

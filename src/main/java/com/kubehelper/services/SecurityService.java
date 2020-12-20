@@ -325,15 +325,48 @@ public class SecurityService {
     // POD SECURITY POLICIES =============
 
     private void searchInPodSecurityPolicies(SecurityModel securityModel) {
+
+        V1beta1PodSecurityPolicy policy = new V1beta1PodSecurityPolicy();
+        policy.setSpec(new V1beta1PodSecurityPolicySpec());
+        policy.setMetadata(new V1ObjectMeta());
+//        PodSecurityPoliciesResult result = new PodSecurityPoliciesResult(securityModel.getPodSecurityPoliciesResults().size() + 1)
+//                .setAllowPrivilegeEscalation(spec.getAllowPrivilegeEscalation().toString())
+//                .setDefaultAllowPrivilegeEscalation(spec.getDefaultAllowPrivilegeEscalation().toString())
+//                .setAllowedCSIDrivers(spec.getAllowedCSIDrivers() == null ? "null" : spec.getAllowedCSIDrivers().toString())
+//                .setAllowedCapabilities(spec.getAllowedCapabilities() == null ? "null" : spec.getAllowedCapabilities().toString())
+//                .setAllowedFlexVolumes(spec.getAllowedFlexVolumes() == null ? "null" : spec.getAllowedFlexVolumes().toString())
+//                .setAllowedHostPaths(spec.getAllowedHostPaths() == null ? "null" : spec.getAllowedHostPaths().toString())
+//                .setAllowedProcMountTypes(spec.getAllowedProcMountTypes() == null ? "null" : spec.getAllowedProcMountTypes().toString())
+//                .setAllowedUnsafeSysctls(spec.getAllowedUnsafeSysctls() == null ? "null" : spec.getAllowedUnsafeSysctls().toString())
+//                .setDefaultAddCapabilities(spec.getDefaultAddCapabilities() == null ? "null" : spec.getDefaultAddCapabilities().toString())
+//                .setForbiddenSysctls(spec.getForbiddenSysctls() == null ? "null" : spec.getForbiddenSysctls().toString())
+//                .setFsGroup(spec.getFsGroup() == null ? "null" : spec.getFsGroup().toString())
+//                .setHostIPC(spec.getHostIPC() == null ? "null" : spec.getHostIPC().toString())
+//                .setHostNetwork(spec.getHostNetwork() == null ? "null" : spec.getHostNetwork().toString())
+//                .setHostPID(spec.getHostPID() == null ? "null" : spec.getHostPID().toString())
+//                .setHostPorts(spec.getHostPorts() == null ? "null" : spec.getHostPorts().toString())
+//                .setPrivileged(spec.getPrivileged() == null ? "null" : spec.getPrivileged().toString())
+//                .setReadOnlyRootFilesystem(spec.getReadOnlyRootFilesystem() == null ? "null" : spec.getReadOnlyRootFilesystem().toString())
+//                .setRequiredDropCapabilities(spec.getRequiredDropCapabilities() == null ? "null" : spec.getRequiredDropCapabilities().toString())
+//                .setRunAsGroup(spec.getRunAsGroup() == null ? "null" : spec.getRunAsGroup().toString())
+//                .setRunAsUser(spec.getRunAsUser() == null ? "null" : spec.getRunAsUser().toString())
+//                .setRuntimeClass(spec.getRuntimeClass() == null ? "null" : spec.getRuntimeClass().toString())
+//                .setSeLinux(spec.getSeLinux() == null ? "null" : spec.getSeLinux().toString())
+//                .setSupplementalGroups(spec.getSupplementalGroups() == null ? "null" : spec.getSupplementalGroups().toString())
+//                .setVolumes(spec.getVolumes() == null ? "null" : spec.getVolumes().toString())
+//                .setFullDefinition(fullDefinition)
+//                .setCreationTime(getParsedCreationTime(metadata.getCreationTimestamp()))
+//                .setNamespace(metadata.getNamespace());
+
         V1beta1PodSecurityPolicyList policiesList = kubeAPI.getPolicyV1beta1PodSecurityPolicyList();
-        for (V1beta1PodSecurityPolicy policy : policiesList.getItems()) {
-            try {
-                addPodSecurityPolicyToModel(policy.getMetadata(), securityModel, policy.getSpec(), policy.toString());
-            } catch (RuntimeException e) {
-                securityModel.addSearchException(e);
-                logger.error(e.getMessage(), e);
-            }
+//        for (V1beta1PodSecurityPolicy policy : policiesList.getItems()) {
+        try {
+            addPodSecurityPolicyToModel(policy.getMetadata(), securityModel, policy.getSpec(), policy.toString());
+        } catch (RuntimeException e) {
+            securityModel.addSearchException(e);
+            logger.error(e.getMessage(), e);
         }
+//        }
     }
 
 
@@ -345,8 +378,9 @@ public class SecurityService {
      */
     private void addPodSecurityPolicyToModel(V1ObjectMeta metadata, SecurityModel securityModel, V1beta1PodSecurityPolicySpec spec, String fullDefinition) {
         PodSecurityPoliciesResult result = new PodSecurityPoliciesResult(securityModel.getPodSecurityPoliciesResults().size() + 1)
-                .setAllowPrivilegeEscalation(spec.getAllowPrivilegeEscalation().toString())
-                .setDefaultAllowPrivilegeEscalation(spec.getDefaultAllowPrivilegeEscalation().toString())
+                .setResourceName(metadata.getName() == null ? "null" : metadata.getName())
+                .setAllowPrivilegeEscalation(spec.getAllowPrivilegeEscalation() == null ? "null" : spec.getAllowPrivilegeEscalation().toString())
+                .setDefaultAllowPrivilegeEscalation(spec.getDefaultAllowPrivilegeEscalation() == null ? "null" : spec.getDefaultAllowPrivilegeEscalation().toString())
                 .setAllowedCSIDrivers(spec.getAllowedCSIDrivers() == null ? "null" : spec.getAllowedCSIDrivers().toString())
                 .setAllowedCapabilities(spec.getAllowedCapabilities() == null ? "null" : spec.getAllowedCapabilities().toString())
                 .setAllowedFlexVolumes(spec.getAllowedFlexVolumes() == null ? "null" : spec.getAllowedFlexVolumes().toString())
@@ -371,13 +405,13 @@ public class SecurityService {
                 .setVolumes(spec.getVolumes() == null ? "null" : spec.getVolumes().toString())
                 .setFullDefinition(fullDefinition)
                 .setCreationTime(getParsedCreationTime(metadata.getCreationTimestamp()))
-                .setNamespace(metadata.getNamespace());
+                .setNamespace(metadata.getNamespace() == null ? "null" : metadata.getNamespace());
         securityModel.addPodSecurityPolicy(result);
     }
 
 
     private String getParsedCreationTime(DateTime dateTime) {
-        return dateTime.toString("dd.MM.yyyy HH:mm:ss");
+        return dateTime == null ? "null" : dateTime.toString("dd.MM.yyyy HH:mm:ss");
     }
 
     private boolean skipKubeNamespace(SecurityModel securityModel, String namespace) {

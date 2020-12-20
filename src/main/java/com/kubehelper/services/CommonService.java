@@ -49,4 +49,15 @@ public class CommonService {
         }
         return namespaces;
     }
+
+
+    public boolean checkEqualsFilter(String resource, String filter) {
+        if (filter.equals("")) {
+            return true;
+        }
+        if (resource.equals(filter)) {
+            return true;
+        }
+        return false;
+    }
 }

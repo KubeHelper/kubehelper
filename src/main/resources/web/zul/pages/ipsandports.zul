@@ -2,17 +2,15 @@
     <div id="ipsAndPortsTemplate" viewModel="@id('ipsAndPortsVM') @init('com.kubehelper.viewmodels.IpsAndPortsVM')" width="100%" height="100%">
         <borderlayout>
             <north title="Ips Ports" collapsible="true" vflex="min" style="overflow-y:auto;overflow-x: hidden;">
-                <groupbox id="ipsAndPortsConfigGroupBox" width="100%" style="margin: 0px 5px 5px 5px;">
+                <groupbox id="labelsConfigGroupBox" width="100%" style="margin: 0px 5px 5px 5px;">
                     <caption iconSclass="z-icon-sliders" label="Search Configuration"/>
                     <vbox height="100%" width="100%">
-                        <hbox id="menuHbox" height="100%" width="100%" style="margin: 5px;" align="stretch">
+                        <hbox id="menuHbox" height="100%" width="100%" align="stretch">
                             <cell id="clearAllCell" width="10%" tooltip="clearAllTooltip">
                                 <button id="clearAll" iconSclass="z-icon-eraser" width="100%" label="Clear all" onClick="@command('clearAll')"/>
                             </cell>
-                            <cell width="3%">
-                                <separator hflex="1" orient="horizontal"/>
-                            </cell>
-                            <cell id="namespacesCell" width="62.6%">
+                            <separator width="15px" orient="vertical" bar="true"/>
+                            <cell id="namespacesCell" width="20%">
                                 <hlayout id="menuHlayout" valign="middle">
                                     <label value="Namespace: "/>
                                     <combobox tooltip="namespacesTooltip" id="namespacesCBox" hflex="1" model="@load(ipsAndPortsVM.namespaces)"
@@ -23,58 +21,45 @@
                                     </combobox>
                                 </hlayout>
                             </cell>
-                            <cell width="4%">
-                                <separator hflex="1" orient="horizontal"/>
+                            <cell width="59%">
                             </cell>
-                            <cell id="cellGetBtn" width="20%">
+                            <cell id="cellGetBtn" width="10%">
                                 <button id="getIpsBtn" label="Get" iconSclass="z-icon-refresh" onClick="@command('search')" width="100%"/>
                             </cell>
-                            <cell width="0.4%">
-                                <separator hflex="1" orient="horizontal"/>
-                            </cell>
                         </hbox>
+                        <separator width="100%" orient="horizontal" bar="false"/>
                     </vbox>
-                    <separator width="100%" orient="horizontal" bar="false"/>
                 </groupbox>
             </north>
             <center margins="0,3,3,3">
-                <!--            TODO Paging and vflex="min" for center and remove height-->
-                <grid id="ipsAndPortsGrid" model="@load(ipsAndPortsVM.ipsAndPortsResults)" height="700px">
+                <grid id="ipsAndPortsGrid" model="@load(ipsAndPortsVM.ipsAndPortsResults)" height="@load(ipsAndPortsVM.mainGridHeight)">
                     <auxhead id="ipsAndPortsGridAuxHead">
                         <auxheader>
                             <span sclass="z-icon-hashtag"/>
                         </auxheader>
                         <auxheader colspan="1">
-                            <span sclass="z-icon-filter"/>
-                            <textbox instant="true" width="80%" value="@bind(ipsAndPortsVM.filter.ip)" onChange="@command('filterIps')"/>
+                            <textbox instant="true" hflex="1" value="@bind(ipsAndPortsVM.filter.ip)" onChange="@command('filterIps')"/>
                         </auxheader>
                         <auxheader colspan="1">
-                            <span sclass="z-icon-filter"/>
-                            <textbox instant="true" width="80%" value="@bind(ipsAndPortsVM.filter.ports)" onChange="@command('filterIps')"/>
+                            <textbox instant="true" hflex="1" value="@bind(ipsAndPortsVM.filter.ports)" onChange="@command('filterIps')"/>
                         </auxheader>
                         <auxheader colspan="1">
-                            <span sclass="z-icon-filter"/>
-                            <textbox instant="true" width="80%" value="@bind(ipsAndPortsVM.filter.resourceName)" onChange="@command('filterIps')"/>
+                            <textbox instant="true" hflex="1" value="@bind(ipsAndPortsVM.filter.resourceName)" onChange="@command('filterIps')"/>
                         </auxheader>
                         <auxheader colspan="1">
-                            <span sclass="z-icon-filter"/>
-                            <textbox instant="true" width="80%" value="@bind(ipsAndPortsVM.filter.namespace)" onChange="@command('filterIps')"/>
+                            <textbox instant="true" hflex="1" value="@bind(ipsAndPortsVM.filter.namespace)" onChange="@command('filterIps')"/>
                         </auxheader>
                         <auxheader colspan="1">
-                            <span sclass="z-icon-filter"/>
-                            <textbox instant="true" width="80%" value="@bind(ipsAndPortsVM.filter.resourceType)" onChange="@command('filterIps')"/>
+                            <textbox instant="true" hflex="1" value="@bind(ipsAndPortsVM.filter.resourceType)" onChange="@command('filterIps')"/>
                         </auxheader>
                         <auxheader colspan="1">
-                            <span sclass="z-icon-filter"/>
-                            <textbox instant="true" width="80%" value="@bind(ipsAndPortsVM.filter.hostInfo)" onChange="@command('filterIps')"/>
+                            <textbox instant="true" hflex="1" value="@bind(ipsAndPortsVM.filter.hostInfo)" onChange="@command('filterIps')"/>
                         </auxheader>
                         <auxheader colspan="1">
-                            <span sclass="z-icon-filter"/>
-                            <textbox instant="true" width="80%" value="@bind(ipsAndPortsVM.filter.additionalInfo)" onChange="@command('filterIps')"/>
+                            <textbox instant="true" hflex="1" value="@bind(ipsAndPortsVM.filter.additionalInfo)" onChange="@command('filterIps')"/>
                         </auxheader>
                         <auxheader colspan="1">
-                            <span sclass="z-icon-filter"/>
-                            <textbox instant="true" width="80%" value="@bind(ipsAndPortsVM.filter.creationTime)" onChange="@command('filterIps')"/>
+                            <textbox instant="true" hflex="1" value="@bind(ipsAndPortsVM.filter.creationTime)" onChange="@command('filterIps')"/>
                         </auxheader>
                     </auxhead>
                     <columns menupopup="auto" sizable="true">

@@ -19,8 +19,6 @@ package com.kubehelper.viewmodels;
 
 import com.kubehelper.common.Global;
 import com.kubehelper.domain.filters.ContainersSecurityFilter;
-import com.kubehelper.domain.filters.PodsSecurityFilter;
-import com.kubehelper.domain.filters.PodsSecurityPoliciesSecurityFilter;
 import com.kubehelper.domain.filters.RBACFilter;
 import com.kubehelper.domain.filters.RoleRulesSecurityFilter;
 import com.kubehelper.domain.filters.RolesSecurityFilter;
@@ -171,18 +169,12 @@ public class SecurityVM implements PropertyChangeListener {
     }
 
     @Command
-    @NotifyChange({"podsSecurityContextsTotalItems", "podsSecurityContextResults", "podsFilter"})
+    @NotifyChange({"podsSecurityContextsTotalItems", "podsSecurityContextsResults"})
     public void getPodsSecurityContexts() {
-        securityModel.setPodsFilter(new PodsSecurityFilter());
         securityService.getPodsSecurityContexts(securityModel);
         isGetPodsSecurityContextsButtonPressed = true;
-//        if (securityModel.getRolesFilter().isFilterActive() && !securityModel.getRolesResults().isEmpty()) {
-////            filterIps();
-//        } else {
-//            rolesResults = new ListModelList<>(securityModel.getRolesResultsList());
-//        }
+        setAllNamespacesToModel();
         podsSecurityContextsResults = new ListModelList<>(securityModel.getPodsSecurityContextsResults());
-//        onInitPreparations();
     }
 
     @Command
@@ -206,7 +198,6 @@ public class SecurityVM implements PropertyChangeListener {
     @Command
     @NotifyChange({"podsSecurityPoliciesTotalItems", "podsSecurityPoliciesResults", "podSecurityPoliciesFilter"})
     public void getPodsSecurityPolicies() {
-        securityModel.setPodSecurityPoliciesFilter(new PodsSecurityPoliciesSecurityFilter());
         securityService.getPodsSecurityPolicies(securityModel);
         isGetPodSecurityPoliciesButtonPressed = true;
         podsSecurityPoliciesResults = new ListModelList<>(securityModel.getPodSecurityPoliciesResults());
@@ -226,9 +217,9 @@ public class SecurityVM implements PropertyChangeListener {
         rolesResults.clear();
         for (RoleResult roleResult : securityModel.getRolesResultsList()) {
             if (StringUtils.containsIgnoreCase(roleResult.getCreationTime(), getRolesFilter().getCreationTime()) &&
-                    checkEqualsFilter(roleResult.getResourceName(), getRolesFilter().getSelectedResourceNameFilter()) &&
-                    checkEqualsFilter(roleResult.getResourceType(), getRolesFilter().getSelectedResourceTypeFilter()) &&
-                    checkEqualsFilter(roleResult.getNamespace(), getRolesFilter().getSelectedNamespaceFilter())) {
+                    commonService.checkEqualsFilter(roleResult.getResourceName(), getRolesFilter().getSelectedResourceNameFilter()) &&
+                    commonService.checkEqualsFilter(roleResult.getResourceType(), getRolesFilter().getSelectedResourceTypeFilter()) &&
+                    commonService.checkEqualsFilter(roleResult.getNamespace(), getRolesFilter().getSelectedNamespaceFilter())) {
                 rolesResults.add(roleResult);
             }
         }
@@ -240,12 +231,12 @@ public class SecurityVM implements PropertyChangeListener {
         rbacsResults.clear();
         for (RBACResult rbacResult : securityModel.getRbacsResults()) {
             if (StringUtils.containsIgnoreCase(rbacResult.getApiGroup(), getRbacFilter().getApiGroup()) &&
-                    checkEqualsFilter(rbacResult.getResourceName(), getRbacFilter().getSelectedResourceNameFilter()) &&
-                    checkEqualsFilter(rbacResult.getResourceType(), getRbacFilter().getSelectedResourceTypeFilter()) &&
-                    checkEqualsFilter(rbacResult.getNamespace(), getRbacFilter().getSelectedNamespaceFilter()) &&
-                    checkEqualsFilter(rbacResult.getSubjectKind(), getRbacFilter().getSelectedSubjectKindFilter()) &&
-                    checkEqualsFilter(rbacResult.getSubjectName(), getRbacFilter().getSelectedSubjectNameFilter()) &&
-                    checkEqualsFilter(rbacResult.getRoleName(), getRbacFilter().getSelectedRoleNameFilter()) &&
+                    commonService.checkEqualsFilter(rbacResult.getResourceName(), getRbacFilter().getSelectedResourceNameFilter()) &&
+                    commonService.checkEqualsFilter(rbacResult.getResourceType(), getRbacFilter().getSelectedResourceTypeFilter()) &&
+                    commonService.checkEqualsFilter(rbacResult.getNamespace(), getRbacFilter().getSelectedNamespaceFilter()) &&
+                    commonService.checkEqualsFilter(rbacResult.getSubjectKind(), getRbacFilter().getSelectedSubjectKindFilter()) &&
+                    commonService.checkEqualsFilter(rbacResult.getSubjectName(), getRbacFilter().getSelectedSubjectNameFilter()) &&
+                    commonService.checkEqualsFilter(rbacResult.getRoleName(), getRbacFilter().getSelectedRoleNameFilter()) &&
                     getRbacFilter().getVerbAll().equals(checkRbacRoleFilter(getRbacFilter().getVerbAll(), rbacResult.isAll())) &&
                     getRbacFilter().getVerbGet().equals(checkRbacRoleFilter(getRbacFilter().getVerbGet(), rbacResult.isGet())) &&
                     getRbacFilter().getVerbList().equals(checkRbacRoleFilter(getRbacFilter().getVerbList(), rbacResult.isList())) &&
@@ -261,15 +252,6 @@ public class SecurityVM implements PropertyChangeListener {
         }
     }
 
-    private boolean checkEqualsFilter(String resource, String filter) {
-        if (filter.equals("")) {
-            return true;
-        }
-        if (resource.equals(filter)) {
-            return true;
-        }
-        return false;
-    }
 
     private String checkRbacRoleFilter(String verb, boolean rbacVerb) {
         if (rbacVerb && verb.equals("Yes")) {
@@ -285,7 +267,7 @@ public class SecurityVM implements PropertyChangeListener {
 
 
     @Command
-    @NotifyChange({"rolesTotalItems", "rolesResults", "roleRulesResults", "roleSubjectsResults", "rolesFilter", "selectedRolesNamespace"})
+    @NotifyChange({"rolesTotalItems", "rolesResults", "roleRulesResults", "roleSubjectsResults", "rolesFilter", "selectedRolesNamespace", "clickedRoleBindingSubjectsLabel", "clickedRoleRulesLabel"})
     public void clearAllRoles() {
         securityModel.setRolesResults(new HashMap<>())
                 .setRolesFilter(new RolesSecurityFilter())
@@ -295,6 +277,8 @@ public class SecurityVM implements PropertyChangeListener {
         rolesResults = new ListModelList<>();
         roleRulesResults = new ListModelList<>();
         roleSubjectsResults = new ListModelList<>();
+        clickedRoleBindingSubjectsLabel = "";
+        clickedRoleRulesLabel = "";
         clearAllRolesFilterComboboxes();
     }
 
@@ -311,15 +295,13 @@ public class SecurityVM implements PropertyChangeListener {
     }
 
     @Command
-    @NotifyChange({"podsTotalItems", "podsResults", "podsFilter", "selectedPodsNamespace"})
-    public void clearAllPods() {
-//        securityModel.setRolesResults(new ListModelList<>())
-//                .setFilter(new IpsAndPortsFilter())
-//                .setNamespaces(commonService.getAllNamespaces())
-//                .setSelectedNamespace("all")
-//                .setSearchExceptions(new ArrayList<>());
-        containersResults = new ListModelList<>();
-        clearAllFilterComboboxes();
+    @NotifyChange({"podsSecurityContextsTotalItems", "podsSecurityContextsResults", "selectedPodsSecurityContextsNamespace"})
+    public void clearAllPodsSecurityContexts() {
+        securityModel.setPodsSecurityContextResults(new ListModelList<>())
+                .setNamespaces(commonService.getAllNamespaces())
+                .setSelectedPodsSecurityContextsNamespace("all")
+                .setSearchExceptions(new ArrayList<>());
+        podsSecurityContextsResults = new ListModelList<>();
     }
 
     @Command
@@ -347,15 +329,13 @@ public class SecurityVM implements PropertyChangeListener {
     }
 
     @Command
-    @NotifyChange({"podSecurityPoliciesTotalItems", "podSecurityPoliciesResults", "podSecurityPoliciesFilter", "selectedPodSecurityPoliciesNamespace"})
+    @NotifyChange({"podsSecurityPoliciesTotalItems", "podsSecurityPoliciesResults", "selectedPodSecurityPoliciesNamespace"})
     public void clearAllPodSecurityPolicies() {
-//        securityModel.setRolesResults(new ListModelList<>())
-//                .setFilter(new IpsAndPortsFilter())
-//                .setNamespaces(commonService.getAllNamespaces())
-//                .setSelectedNamespace("all")
-//                .setSearchExceptions(new ArrayList<>());
+        securityModel.setPodSecurityPoliciesResults(new ListModelList<>())
+                .setNamespaces(commonService.getAllNamespaces())
+                .setSelectedPodSecurityPoliciesNamespace("all")
+                .setSearchExceptions(new ArrayList<>());
         podsSecurityPoliciesResults = new ListModelList<>();
-        clearAllFilterComboboxes();
     }
 
     /**
@@ -483,7 +463,7 @@ public class SecurityVM implements PropertyChangeListener {
         return roleSubjectsResults;
     }
 
-    public ListModelList<PodSecurityContextResult> getPodsSecurityContextResults() {
+    public ListModelList<PodSecurityContextResult> getPodsSecurityContextsResults() {
         showNotificationAndExceptions(isGetPodsSecurityContextsButtonPressed, podsSecurityContextsResults, podsSecurityContextsGridFooter);
         isGetPodsSecurityContextsButtonPressed = false;
         return podsSecurityContextsResults;
@@ -604,20 +584,12 @@ public class SecurityVM implements PropertyChangeListener {
         return securityModel.getRbacsFilter();
     }
 
-    public PodsSecurityFilter getPodsFilter() {
-        return securityModel.getPodsFilter();
-    }
-
     public ContainersSecurityFilter getContainersFilter() {
         return securityModel.getContainersFilter();
     }
 
     public ServiceAccountsSecurityFilter getServiceAccountsFilter() {
         return securityModel.getServiceAccountsFilter();
-    }
-
-    public PodsSecurityPoliciesSecurityFilter getPodSecurityPoliciesFilter() {
-        return securityModel.getPodSecurityPoliciesFilter();
     }
 
     //  LABELS / HEIGHTS / OTHERS ================

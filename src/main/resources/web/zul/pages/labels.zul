@@ -3,17 +3,15 @@
     <div id="labelsTemplate" viewModel="@id('labelsVM') @init('com.kubehelper.viewmodels.LabelsVM')" width="100%" height="100%">
         <borderlayout>
             <north title="Labels Annotations Selectors" collapsible="true" vflex="min" style="overflow-y:auto;overflow-x: hidden;">
-                <groupbox id="labelsConfigGroupBox" width="100%" style="margin: 0px 5px 5px 5px;">
+                <groupbox id="labelsConfigGroupBox" width="100%">
                     <caption iconSclass="z-icon-sliders" label="Search Configuration"/>
                     <vbox height="100%" width="100%">
-                        <hbox height="100%" width="100%" align="center" style="margin: 5px;">
+                        <hbox height="100%" width="100%" align="center" >
                             <cell id="clearAllCell" width="10%" tooltip="clearAllTooltip">
                                 <button id="clearAll" width="100%" iconSclass="z-icon-eraser" label="Clear all" onClick="@command('clearAll')"/>
                             </cell>
-                            <cell width="3%">
-                                <separator hflex="1" orient="horizontal"/>
-                            </cell>
-                            <cell width="38.6%">
+                            <separator width="15px" orient="vertical" bar="true"/>
+                            <cell width="20%">
                                 <hlayout valign="middle">
                                     <label value="Namespace: "/>
                                     <combobox tooltip="namespacesTooltip" id="namespacesCBox" hflex="1" model="@load(labelsVM.namespaces)" selectedItem="@bind(labelsVM.selectedNamespace)"
@@ -24,33 +22,26 @@
                                     </combobox>
                                 </hlayout>
                             </cell>
-                            <cell width="2%">
-                                <separator hflex="1" orient="horizontal"/>
-                            </cell>
+                            <separator width="15px" orient="vertical" bar="true"/>
                             <cell width="10%">
                                 <hlayout valign="middle">
                                     <checkbox id="skipKubeNamespacesCBox" checked="@bind(labelsVM.skipKubeNamespaces)" tooltip="skipKubeNamespacesTooltip"/>Skip kube* namespaces
                                 </hlayout>
                             </cell>
-                            <cell width="2%">
-                                <separator hflex="1" orient="horizontal"/>
-                            </cell>
+                            <separator width="15px" orient="vertical" bar="true"/>
                             <cell width="10%">
                                 <hlayout valign="middle">
                                     <checkbox id="skipHashLabelsCBox" checked="@bind(labelsVM.skipHashLabels)" tooltip="skipHashLabelsTooltip"/>Skip auto generated hash labels
                                 </hlayout>
                             </cell>
-                            <cell width="4%">
-                                <separator hflex="1" orient="horizontal"/>
+                            <cell width="37%">
                             </cell>
-                            <cell id="cellLabelsBtn" width="20%">
+                            <cell id="cellLabelsBtn" width="10%">
                                 <button id="searchBtn" label="Search" iconSclass="z-icon-search" width="100%" onClick="@command('search')"/>
                             </cell>
-                            <cell width="0.4%">
-                                <separator hflex="1" orient="horizontal"/>
-                            </cell>
                         </hbox>
-                        <groupbox id="kubeResourcesGBox" width="100%" style="padding: 5px;">
+                        <separator width="100%" orient="horizontal"/>
+                        <groupbox id="kubeResourcesGBox" width="100%">
                             <caption>
                                 <checkbox id="kubeResourcesGBoxCheckAll" checked="true" onCheck="@command('selectAllResources')"/>Resources
                             </caption>
@@ -70,19 +61,16 @@
                     <tabpanels>
                         <tabpanel>
                             <separator width="100%" orient="horizontal"/>
-                            <!--            TODO Paging and calculate grid and remove height-->
-                            <grid id="mainGridId" class="mainGridId" model="@load(labelsVM.searchResults)" height="800px">
+                            <grid id="mainGridId" class="mainGridId" model="@load(labelsVM.searchResults)" height="@load(labelsVM.mainGridHeight)">
                                 <auxhead id="searchGridAuxHead">
                                     <auxheader>
                                         <span sclass="z-icon-hashtag"/>
                                     </auxheader>
                                     <auxheader colspan="1">
-                                        <span sclass="z-icon-filter"/>
-                                        <textbox instant="true" width="80%" value="@bind(labelsVM.filter.name)" onChange="@command('filterSearches')"/>
+                                        <textbox instant="true" hflex="1" value="@bind(labelsVM.filter.name)" onChange="@command('filterSearches')"/>
                                     </auxheader>
                                     <auxheader colspan="1">
-                                        <span sclass="z-icon-filter"/>
-                                        <combobox id="filterResourcePropertyCBox" width="80%" model="@load(labelsVM.filter.resourcePropertiesFilter)"
+                                        <combobox id="filterResourcePropertyCBox" hflex="1" model="@load(labelsVM.filter.resourcePropertiesFilter)"
                                                   selectedItem="@bind(labelsVM.filter.selectedResourcePropertyFilter)" onChange="@command('filterSearches')">
                                             <template name="model">
                                                 <comboitem label="@load(each)"/>
@@ -90,8 +78,7 @@
                                         </combobox>
                                     </auxheader>
                                     <auxheader colspan="1">
-                                        <span sclass="z-icon-filter"/>
-                                        <combobox id="filterResourceTypesCBox" width="80%" model="@load(labelsVM.filter.resourceTypesFilter)"
+                                        <combobox id="filterResourceTypesCBox" hflex="1" model="@load(labelsVM.filter.resourceTypesFilter)"
                                                   selectedItem="@bind(labelsVM.filter.selectedResourceTypeFilter)" onChange="@command('filterSearches')">
                                             <template name="model">
                                                 <comboitem label="@load(each)"/>
@@ -99,8 +86,7 @@
                                         </combobox>
                                     </auxheader>
                                     <auxheader colspan="1">
-                                        <span sclass="z-icon-filter"/>
-                                        <combobox id="filterResourceNamesCBox" model="@load(labelsVM.filter.resourceNamesFilter)"
+                                        <combobox id="filterResourceNamesCBox" hflex="1" model="@load(labelsVM.filter.resourceNamesFilter)"
                                                   selectedItem="@bind(labelsVM.filter.selectedResourceNameFilter)" onChange="@command('filterSearches')">
                                             <template name="model">
                                                 <comboitem label="@load(each)"/>
@@ -108,8 +94,7 @@
                                         </combobox>
                                     </auxheader>
                                     <auxheader colspan="1">
-                                        <span sclass="z-icon-filter"/>
-                                        <combobox id="filterNamespacesCBox" width="80%" mold="rounded" model="@load(labelsVM.filter.namespacesFilter)"
+                                        <combobox id="filterNamespacesCBox" hflex="1" mold="rounded" model="@load(labelsVM.filter.namespacesFilter)"
                                                   selectedItem="@bind(labelsVM.filter.selectedNamespaceFilter)" onChange="@command('filterSearches')">
                                             <template name="model">
                                                 <comboitem label="@load(each)"/>
@@ -117,8 +102,7 @@
                                         </combobox>
                                     </auxheader>
                                     <auxheader colspan="1">
-                                        <span sclass="z-icon-filter"/>
-                                        <textbox instant="true" width="80%" value="@bind(labelsVM.filter.additionalInfo)" onChange="@command('filterSearches')"/>
+                                        <textbox instant="true" hflex="1" value="@bind(labelsVM.filter.additionalInfo)" onChange="@command('filterSearches')"/>
                                     </auxheader>
                                 </auxhead>
                                 <columns menupopup="auto" sizable="true">
@@ -148,8 +132,7 @@
                                     </template>
                                 </rows>
                                 <foot id="labelsFooter">
-                                    <footer id="labelsGridProgressFooter" span="5" align="left" label="@load(labelsVM.progressLabel)"/>
-                                    <footer id="labelsGridTotalItemsFooter" span="2" align="right" label="@load(labelsVM.totalItems)"/>
+                                    <footer id="labelsGridTotalItemsFooter" span="7" align="right" label="@load(labelsVM.totalItems)"/>
                                 </foot>
                             </grid>
                         </tabpanel>
@@ -157,19 +140,17 @@
                             <hbox spacing="10px" width="100%" style="padding: 0px 5px 5px 5px;">
                                 <cell width="40%">
                                     <groupbox id="labelsGroupedListGroupBox">
-                                        <caption iconSclass="z-icon-list" label="Group"/>
+                                        <caption iconSclass="z-icon-list" label="Groups"/>
                                         <grid id="groupedLabelsGrid" class="mainGridId" model="@load(labelsVM.groupedLabels)" height="800px">
                                             <auxhead id="groupedLabelsAuxHead">
                                                 <auxheader>
                                                     <span sclass="z-icon-hashtag"/>
                                                 </auxheader>
                                                 <auxheader colspan="1">
-                                                    <span sclass="z-icon-filter"/>
-                                                    <textbox instant="true" width="80%" value="@bind(labelsVM.groupedLabelsFilter.name)" onChange="@command('filterGroupedLabels')"/>
+                                                    <textbox instant="true" hflex="1" value="@bind(labelsVM.groupedLabelsFilter.name)" onChange="@command('filterGroupedLabels')"/>
                                                 </auxheader>
                                                 <auxheader colspan="1">
-                                                    <span sclass="z-icon-filter"/>
-                                                    <textbox instant="true" width="80%" value="@bind(labelsVM.groupedLabelsFilter.amount)" onChange="@command('filterGroupedLabels')"/>
+                                                    <textbox instant="true" hflex="1" value="@bind(labelsVM.groupedLabelsFilter.amount)" onChange="@command('filterGroupedLabels')"/>
                                                 </auxheader>
                                             </auxhead>
                                             <columns menupopup="auto" sizable="true">
@@ -191,8 +172,7 @@
                                                 </template>
                                             </rows>
                                             <foot id="groupedLabelsFooter">
-<!--                                                <footer id="labelsGroupedGridProgressFooter" span="5" align="left" label="@load(labelsVM.progressLabel)"/>-->
-                                                <footer id="labelsGroupedGridTotalItemsFooter" span="2" align="right" label="@load(labelsVM.totalGroupedItems)"/>
+                                                <footer id="labelsGroupedGridTotalItemsFooter" span="3" align="right" label="@load(labelsVM.totalGroupedItems)"/>
                                             </foot>
                                         </grid>
                                     </groupbox>
@@ -207,8 +187,7 @@
                                                     <span sclass="z-icon-hashtag"/>
                                                 </auxheader>
                                                 <auxheader colspan="1">
-                                                    <span sclass="z-icon-filter"/>
-                                                    <combobox id="filterGLCResourcePropertyCBox" width="80%" model="@load(labelsVM.groupedLabelColumnsFilter.resourcePropertiesFilter)"
+                                                    <combobox id="filterGLCResourcePropertyCBox" hflex="1" model="@load(labelsVM.groupedLabelColumnsFilter.resourcePropertiesFilter)"
                                                               selectedItem="@bind(labelsVM.groupedLabelColumnsFilter.selectedResourcePropertyFilter)" onChange="@command('filterGroupedLabelsColumns')">
                                                         <template name="model">
                                                             <comboitem label="@load(each)"/>
@@ -216,8 +195,7 @@
                                                     </combobox>
                                                 </auxheader>
                                                 <auxheader colspan="1">
-                                                    <span sclass="z-icon-filter"/>
-                                                    <combobox id="filterGLCResourceTypesCBox" width="80%" model="@load(labelsVM.groupedLabelColumnsFilter.resourceTypesFilter)"
+                                                    <combobox id="filterGLCResourceTypesCBox" hflex="1" model="@load(labelsVM.groupedLabelColumnsFilter.resourceTypesFilter)"
                                                               selectedItem="@bind(labelsVM.groupedLabelColumnsFilter.selectedResourceTypeFilter)" onChange="@command('filterGroupedLabelsColumns')">
                                                         <template name="model">
                                                             <comboitem label="@load(each)"/>
@@ -225,8 +203,7 @@
                                                     </combobox>
                                                 </auxheader>
                                                 <auxheader colspan="1">
-                                                    <span sclass="z-icon-filter"/>
-                                                    <combobox id="filterGLCResourceNamesCBox" model="@load(labelsVM.groupedLabelColumnsFilter.resourceNamesFilter)"
+                                                    <combobox id="filterGLCResourceNamesCBox" hflex="1" model="@load(labelsVM.groupedLabelColumnsFilter.resourceNamesFilter)"
                                                               selectedItem="@bind(labelsVM.groupedLabelColumnsFilter.selectedResourceNameFilter)" onChange="@command('filterGroupedLabelsColumns')">
                                                         <template name="model">
                                                             <comboitem label="@load(each)"/>
@@ -234,8 +211,7 @@
                                                     </combobox>
                                                 </auxheader>
                                                 <auxheader colspan="1">
-                                                    <span sclass="z-icon-filter"/>
-                                                    <combobox id="filterGLCNamespacesCBox" width="80%" mold="rounded" model="@load(labelsVM.groupedLabelColumnsFilter.namespacesFilter)"
+                                                    <combobox id="filterGLCNamespacesCBox" hflex="1" mold="rounded" model="@load(labelsVM.groupedLabelColumnsFilter.namespacesFilter)"
                                                               selectedItem="@bind(labelsVM.groupedLabelColumnsFilter.selectedNamespaceFilter)" onChange="@command('filterGroupedLabelsColumns')">
                                                         <template name="model">
                                                             <comboitem label="@load(each)"/>
@@ -243,8 +219,7 @@
                                                     </combobox>
                                                 </auxheader>
                                                 <auxheader colspan="1">
-                                                    <span sclass="z-icon-filter"/>
-                                                    <textbox instant="true" width="80%" value="@bind(labelsVM.groupedLabelColumnsFilter.additionalInfo)" onChange="@command('filterGroupedLabelsColumns')"/>
+                                                    <textbox instant="true" hflex="1" value="@bind(labelsVM.groupedLabelColumnsFilter.additionalInfo)" onChange="@command('filterGroupedLabelsColumns')"/>
                                                 </auxheader>
                                             </auxhead>
                                             <columns menupopup="auto" sizable="true">
@@ -268,16 +243,11 @@
                                                 </template>
                                             </rows>
                                             <foot id="groupedLabelsColumnsFooter">
-<!--                                                <footer id="groupedLabelsColumnProgressFooter" span="5" align="left" label="@load(labelsVM.progressLabel)"/>-->
-                                                <footer id="groupedLabelsColumnTotalItemsFooter" span="2" align="right" label="@load(labelsVM.totalGroupedLabelsColumnsItems)"/>
+                                                <footer id="groupedLabelsColumnTotalItemsFooter" span="6" align="right" label="@load(labelsVM.totalGroupedLabelsColumnsItems)"/>
                                             </foot>
                                         </grid>
                                     </groupbox>
-
                                 </cell>
-<!--                                <cell width="5%">-->
-<!--                                    <separator hflex="1" orient="vertical"/>-->
-<!--                                </cell>-->
                             </hbox>
                         </tabpanel>
                     </tabpanels>

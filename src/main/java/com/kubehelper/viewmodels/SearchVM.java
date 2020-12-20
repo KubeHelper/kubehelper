@@ -189,7 +189,6 @@ public class SearchVM implements EventListener, PropertyChangeListener {
         }
         sortResultsByNamespace();
         logger.info("Found {} namespaces.", searchModel.getNamespaces());
-//        updateHeightsAndRerenderVM();
     }
 
     private void sortResultsByNamespace() {
@@ -207,9 +206,9 @@ public class SearchVM implements EventListener, PropertyChangeListener {
             if (StringUtils.containsIgnoreCase(searchResult.getFoundString(), getFilter().getFoundString()) &&
                     StringUtils.containsIgnoreCase(searchResult.getCreationTime(), getFilter().getCreationTime()) &&
                     StringUtils.containsIgnoreCase(searchResult.getAdditionalInfo(), getFilter().getAdditionalInfo()) &&
-                    StringUtils.containsIgnoreCase(searchResult.getResourceName(), getFilter().getSelectedResourceNameFilter()) &&
-                    StringUtils.containsIgnoreCase(searchResult.getResourceType(), getFilter().getSelectedResourceTypeFilter()) &&
-                    StringUtils.containsIgnoreCase(searchResult.getNamespace(), getFilter().getSelectedNamespaceFilter())) {
+                    commonService.checkEqualsFilter(searchResult.getResourceName(), getFilter().getSelectedResourceNameFilter()) &&
+                    commonService.checkEqualsFilter(searchResult.getResourceType(), getFilter().getSelectedResourceTypeFilter()) &&
+                    commonService.checkEqualsFilter(searchResult.getNamespace(), getFilter().getSelectedNamespaceFilter())) {
                 searchResults.add(searchResult);
             }
         }
@@ -362,11 +361,6 @@ public class SearchVM implements EventListener, PropertyChangeListener {
 
     public String getTotalItems() {
         return String.format("Total Items: %d", searchResults.size());
-    }
-
-    public String getProgressLabel() {
-        return "Progress: ";
-//        return "Progress: " + searchService.getProgressLabel();
     }
 
     /**

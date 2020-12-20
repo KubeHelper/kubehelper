@@ -21,8 +21,6 @@ import com.kubehelper.common.Global;
 import com.kubehelper.common.KubeHelperException;
 import com.kubehelper.common.Resource;
 import com.kubehelper.domain.filters.ContainersSecurityFilter;
-import com.kubehelper.domain.filters.PodsSecurityFilter;
-import com.kubehelper.domain.filters.PodsSecurityPoliciesSecurityFilter;
 import com.kubehelper.domain.filters.RBACFilter;
 import com.kubehelper.domain.filters.RoleRulesSecurityFilter;
 import com.kubehelper.domain.filters.RolesSecurityFilter;
@@ -73,10 +71,8 @@ public class SecurityModel implements PageModel {
     private RolesSecurityFilter rolesFilter = new RolesSecurityFilter();
     private RoleRulesSecurityFilter roleRulesFilter = new RoleRulesSecurityFilter();
     private RBACFilter rbacsFilter = new RBACFilter();
-    private PodsSecurityFilter podsFilter = new PodsSecurityFilter();
     private ContainersSecurityFilter containersFilter = new ContainersSecurityFilter();
     private ServiceAccountsSecurityFilter serviceAccountsFilter = new ServiceAccountsSecurityFilter();
-    private PodsSecurityPoliciesSecurityFilter podSecurityPoliciesFilter = new PodsSecurityPoliciesSecurityFilter();
     private List<KubeHelperException> searchExceptions = new ArrayList<>();
     private int selectedRoleId;
     private int selectedRoleRuleId;
@@ -253,10 +249,6 @@ public class SecurityModel implements PageModel {
         return roleRulesFilter;
     }
 
-    public PodsSecurityFilter getPodsFilter() {
-        return podsFilter;
-    }
-
     public ContainersSecurityFilter getContainersFilter() {
         return containersFilter;
     }
@@ -265,9 +257,6 @@ public class SecurityModel implements PageModel {
         return serviceAccountsFilter;
     }
 
-    public PodsSecurityPoliciesSecurityFilter getPodSecurityPoliciesFilter() {
-        return podSecurityPoliciesFilter;
-    }
 
     public SecurityModel setRolesFilter(RolesSecurityFilter rolesFilter) {
         this.rolesFilter = rolesFilter;
@@ -276,11 +265,6 @@ public class SecurityModel implements PageModel {
 
     public SecurityModel setRoleRulesFilter(RoleRulesSecurityFilter roleRulesFilter) {
         this.roleRulesFilter = roleRulesFilter;
-        return this;
-    }
-
-    public SecurityModel setPodsFilter(PodsSecurityFilter podsFilter) {
-        this.podsFilter = podsFilter;
         return this;
     }
 
@@ -294,10 +278,6 @@ public class SecurityModel implements PageModel {
         return this;
     }
 
-    public SecurityModel setPodSecurityPoliciesFilter(PodsSecurityPoliciesSecurityFilter podSecurityPoliciesFilter) {
-        this.podSecurityPoliciesFilter = podSecurityPoliciesFilter;
-        return this;
-    }
 
     public Map<Integer, RoleResult> getRolesResults() {
         return rolesResults;
