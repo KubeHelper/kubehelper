@@ -153,7 +153,6 @@ public class LabelsVM implements EventListener, PropertyChangeListener {
     @NotifyChange({"totalItems", "searchResults", "filter", "groupedLabels", "groupedLabelsDetails", "totalGroupedItems"})
     public void search() {
         labelsModel.setFilter(new LabelsFilter());
-        labelsModel.setSearchExceptions(new ArrayList<>());
         labelsService.search(labelsModel, selectedResources);
         labelsModel.groupSearchResults();
         clearAllFilterComboboxes();
@@ -487,6 +486,7 @@ public class LabelsVM implements EventListener, PropertyChangeListener {
         if (isSearchButtonPressed && labelsModel.hasSearchErrors()) {
             Window window = (Window) Executions.createComponents("~./zul/components/errors.zul", null, Map.of("errors", labelsModel.getSearchExceptions()));
             window.doModal();
+            labelsModel.setSearchExceptions(new ArrayList<>());
         }
         isSearchButtonPressed = false;
         return searchResults;

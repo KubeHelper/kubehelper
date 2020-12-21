@@ -500,9 +500,6 @@
                                     <column hflex="1" label="runAsUser" tooltiptext="runAsUser" sort="auto(runAsUser)"/>
                                     <column hflex="1" label="seLinuxOptions" tooltiptext="seLinuxOptions" sort="auto(seLinuxOptions)"/>
                                     <column hflex="1" label="windowsOptions" tooltiptext="windowsOptions" sort="auto(windowsOptions)"/>
-                                    <column hflex="1" label="userAtContainer" tooltiptext="userAtContainer" sort="auto(userAtContainer)"/>
-                                    <column hflex="1" label="userAtContainerPermissions" tooltiptext="userAtContainerPermissions" sort="auto(userAtContainerPermissions)"/>
-                                    <column hflex="1" label="runCommand" tooltiptext="runCommand" sort="auto(runCommand)"/>
                                     <column hflex="1" label="namespace" tooltiptext="namespace" sort="auto(namespace)"/>
                                     <column hflex="1" label="creationTime" tooltiptext="creationTime" sort="auto(creationTime)"/>
                                     <column hflex="1" tooltiptext="Full Definition" label="Full Definition"/>
@@ -523,9 +520,6 @@
                                             <label value="${item.runAsUser}" multiline="true"/>
                                             <label value="${item.seLinuxOptions}" multiline="true"/>
                                             <label value="${item.windowsOptions}" multiline="true"/>
-                                            <label value="${item.userAtContainer}" multiline="true"/>
-                                            <label value="${item.userAtContainerPermissions}" multiline="true"/>
-                                            <label value="${item.runCommand}" multiline="true"/>
                                             <label value="${item.namespace}" multiline="true"/>
                                             <label value="${item.creationTime}" multiline="true"/>
                                             <toolbarbutton label="Full Definition" tooltiptext="Full Definition" onClick="@command('showContainerSecurityContextFullDefinition', item=item)"
@@ -534,7 +528,7 @@
                                     </template>
                                 </rows>
                                 <foot>
-                                    <footer id="containersSecurityGridFooter" span="19" align="right" label="@load(securityVM.containersSecurityTotalItems)"/>
+                                    <footer id="containersSecurityGridFooter" span="16" align="right" label="@load(securityVM.containersSecurityTotalItems)"/>
                                 </foot>
                             </grid>
                         </tabpanel>

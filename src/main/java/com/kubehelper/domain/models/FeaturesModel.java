@@ -33,13 +33,13 @@ import java.util.List;
 public class FeaturesModel implements PageModel {
 
     private int mainGridHeight = 600;
-    private PropertyChangeSupport grid =new PropertyChangeSupport(this);
+    private PropertyChangeSupport grid = new PropertyChangeSupport(this);
 
     private String templateUrl = "~./zul/pages/features.zul";
     private String predefinedCommandsPath = "/templates/features/commands.kh";
 
     private String userCommandsPath = "C:\\temp\\kubehelper";
-//    private String userCommandsPath = "/tmp/kubehelper";
+    //    private String userCommandsPath = "/tmp/kubehelper";
     public static String NAME = Global.FEATURES_MODEL;
     private List<String> namespaces = new ArrayList<>();
     private List<String> pods = new ArrayList<>();
@@ -81,6 +81,11 @@ public class FeaturesModel implements PageModel {
 
     public void addParseException(Exception exception) {
         this.buildExceptions.add(new KubeHelperException(exception));
+    }
+
+    @Override
+    public void addException(String message, Exception exception) {
+//        this.searchExceptions.add(new KubeHelperException(message, exception));
     }
 
     @Override

@@ -76,11 +76,6 @@ public class SecurityService {
 
     private static Logger logger = LoggerFactory.getLogger(SecurityService.class);
 
-//    TODO fix progress label
-//    private String progressLabel = "";
-//    private int currentItemNumber;
-//    private int totalItems;
-
     @Autowired
     private KubeAPI kubeAPI;
 
@@ -133,7 +128,7 @@ public class SecurityService {
 
     private void searchForRBACsInClusterRoles(SecurityModel securityModel) {
         try {
-            V1beta1ClusterRoleList rolesList = kubeAPI.getV1ClusterRolesList();
+            V1beta1ClusterRoleList rolesList = kubeAPI.getV1ClusterRolesList(securityModel);
             for (V1beta1ClusterRole role : rolesList.getItems()) {
                 V1beta1ClusterRoleBinding roleBinding = kubeAPI.getV1ClusterRoleBinding(role.getMetadata().getName(), securityModel);
                 if (Objects.nonNull(roleBinding) && Objects.nonNull(roleBinding.getSubjects())) {
@@ -150,7 +145,7 @@ public class SecurityService {
 
     private void searchForRBACsInRoles(SecurityModel securityModel) {
         try {
-            V1beta1RoleList rolesList = kubeAPI.getV1RolesList(securityModel.getSelectedRBACsNamespace());
+            V1beta1RoleList rolesList = kubeAPI.getV1RolesList(securityModel.getSelectedRBACsNamespace(), securityModel);
             for (V1beta1Role role : rolesList.getItems()) {
                 V1beta1RoleBinding roleBinding = kubeAPI.getV1RoleBinding(role.getMetadata().getName(), role.getMetadata().getNamespace() == null ? "default" : role.getMetadata().getNamespace(), securityModel);
                 if (Objects.nonNull(roleBinding) && Objects.nonNull(roleBinding.getSubjects())) {
@@ -227,7 +222,7 @@ public class SecurityService {
 
 
     private void searchInClusterRoles(SecurityModel securityModel) {
-        V1beta1ClusterRoleList clusterRolesList = kubeAPI.getV1ClusterRolesList();
+        V1beta1ClusterRoleList clusterRolesList = kubeAPI.getV1ClusterRolesList(securityModel);
         for (V1beta1ClusterRole clusterRole : clusterRolesList.getItems()) {
             try {
                 addRoleResultToModel(clusterRole.getMetadata(), securityModel, CLUSTER_ROLE, clusterRole.toString(), clusterRole.getRules());
@@ -240,7 +235,7 @@ public class SecurityService {
 
 
     private void searchInRoles(SecurityModel securityModel) {
-        V1beta1RoleList rolesList = kubeAPI.getV1RolesList(securityModel.getSelectedRolesNamespace());
+        V1beta1RoleList rolesList = kubeAPI.getV1RolesList(securityModel.getSelectedRolesNamespace(), securityModel);
         for (V1beta1Role role : rolesList.getItems()) {
             try {
                 addRoleResultToModel(role.getMetadata(), securityModel, ROLE, role.toString(), role.getRules());
@@ -252,7 +247,7 @@ public class SecurityService {
     }
 
     private void searchInClusterRoleBindings(SecurityModel securityModel) {
-        V1beta1ClusterRoleBindingList clusterRoleBindingsList = kubeAPI.getV1ClusterRolesBindingsList();
+        V1beta1ClusterRoleBindingList clusterRoleBindingsList = kubeAPI.getV1ClusterRolesBindingsList(securityModel);
         for (V1beta1ClusterRoleBinding binding : clusterRoleBindingsList.getItems()) {
             try {
                 securityModel.addRoleSubjects(binding.getRoleRef().getName(), CLUSTER_ROLE, binding.getSubjects());
@@ -264,7 +259,7 @@ public class SecurityService {
     }
 
     private void searchInRoleBindings(SecurityModel securityModel) {
-        V1beta1RoleBindingList rolesBindingsList = kubeAPI.getV1RolesBindingList(securityModel.getSelectedRolesNamespace());
+        V1beta1RoleBindingList rolesBindingsList = kubeAPI.getV1RolesBindingList(securityModel.getSelectedRolesNamespace(), securityModel);
         for (V1beta1RoleBinding roleBinding : rolesBindingsList.getItems()) {
             try {
                 securityModel.addRoleSubjects(roleBinding.getRoleRef().getName(), ROLE, roleBinding.getSubjects());
@@ -311,7 +306,7 @@ public class SecurityService {
     // POD SECURITY CONTEXTS =============
 
     private void searchInPodSecurityContexts(SecurityModel securityModel) {
-        V1PodList podsList = kubeAPI.getV1PodsList(securityModel.getSelectedPodsSecurityContextsNamespace());
+        V1PodList podsList = kubeAPI.getV1PodsList(securityModel.getSelectedPodsSecurityContextsNamespace(), securityModel);
         for (V1Pod pod : podsList.getItems()) {
             try {
                 addPodSecurityContextToModel(pod.getMetadata(), securityModel, pod.getSpec().getSecurityContext());
@@ -344,7 +339,7 @@ public class SecurityService {
     // CONTAINER SECURITY CONTEXTS =============
 
     private void searchInContainersSecurityContexts(SecurityModel securityModel) {
-        V1PodList podsList = kubeAPI.getV1PodsList(securityModel.getSelectedContainersSecurityNamespace());
+        V1PodList podsList = kubeAPI.getV1PodsList(securityModel.getSelectedContainersSecurityNamespace(), securityModel);
         for (V1Pod pod : podsList.getItems()) {
             try {
                 for (V1Container container : pod.getSpec().getContainers()) {
@@ -387,7 +382,7 @@ public class SecurityService {
     // SERVICE ACCOUNTS =============
 
     private void searchInServiceAccounts(SecurityModel securityModel) {
-        V1ServiceAccountList serviceAccountsList = kubeAPI.getV1ServiceAccountsList(securityModel.getSelectedServiceAccountsNamespace());
+        V1ServiceAccountList serviceAccountsList = kubeAPI.getV1ServiceAccountsList(securityModel.getSelectedServiceAccountsNamespace(), securityModel);
         for (V1ServiceAccount sa : serviceAccountsList.getItems()) {
             try {
                 ServiceAccountResult saResult = new ServiceAccountResult(securityModel.getServiceAccountsResults().size() + 1)
@@ -409,7 +404,7 @@ public class SecurityService {
     // POD SECURITY POLICIES =============
 
     private void searchInPodSecurityPolicies(SecurityModel securityModel) {
-        V1beta1PodSecurityPolicyList policiesList = kubeAPI.getPolicyV1beta1PodSecurityPolicyList();
+        V1beta1PodSecurityPolicyList policiesList = kubeAPI.getPolicyV1beta1PodSecurityPolicyList(securityModel);
         for (V1beta1PodSecurityPolicy policy : policiesList.getItems()) {
             try {
                 addPodSecurityPolicyToModel(policy.getMetadata(), securityModel, policy.getSpec(), policy.toString());

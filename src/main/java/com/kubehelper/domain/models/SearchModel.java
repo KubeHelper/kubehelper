@@ -34,7 +34,7 @@ import java.util.List;
 public class SearchModel implements PageModel {
 
     private int mainGridHeight = 600;
-    private PropertyChangeSupport grid =new PropertyChangeSupport(this);
+    private PropertyChangeSupport grid = new PropertyChangeSupport(this);
 
     private String templateUrl = "~./zul/pages/search.zul";
     public static String NAME = Global.SEARCH_MODEL;
@@ -81,6 +81,11 @@ public class SearchModel implements PageModel {
 
     public void addSearchException(Exception exception) {
         this.searchExceptions.add(new KubeHelperException(exception));
+    }
+
+    @Override
+    public void addException(String message, Exception exception) {
+        this.searchExceptions.add(new KubeHelperException(message, exception));
     }
 
     @Override

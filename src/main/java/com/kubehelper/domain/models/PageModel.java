@@ -23,6 +23,10 @@ package com.kubehelper.domain.models;
 public interface PageModel {
 
     String getTemplateUrl();
+
     String getName();
+
     void setPageMainContentHeight(int height);
+
+    void addException(String message, Exception exception);
 }

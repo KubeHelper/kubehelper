@@ -101,7 +101,6 @@ public class IpsAndPortsVM implements PropertyChangeListener {
     public void search() {
         ipsAndPortsModel.setFilter(new IpsAndPortsFilter());
         ipsAndPortsService.get(ipsAndPortsModel);
-        ipsAndPortsModel.setSearchExceptions(new ArrayList<>());
         isGetButtonPressed = true;
         onInitPreparations();
     }
@@ -201,6 +200,7 @@ public class IpsAndPortsVM implements PropertyChangeListener {
         if (isGetButtonPressed && ipsAndPortsModel.hasSearchErrors()) {
             Window window = (Window) Executions.createComponents("~./zul/components/errors.zul", null, Map.of("errors", ipsAndPortsModel.getSearchExceptions()));
             window.doModal();
+            ipsAndPortsModel.setSearchExceptions(new ArrayList<>());
         }
         isGetButtonPressed = false;
         return ipsAndPortsResults;

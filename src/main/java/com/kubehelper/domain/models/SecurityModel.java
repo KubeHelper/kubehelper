@@ -142,7 +142,8 @@ public class SecurityModel implements PageModel {
         this.searchExceptions.add(new KubeHelperException(exception));
     }
 
-    public void addSearchException(String message, Exception exception) {
+    @Override
+    public void addException(String message, Exception exception) {
         this.searchExceptions.add(new KubeHelperException(message, exception));
     }
 

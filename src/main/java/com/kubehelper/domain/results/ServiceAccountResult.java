@@ -17,11 +17,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package com.kubehelper.domain.results;
 
-import com.kubehelper.common.Resource;
-
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * @author JDev
  */

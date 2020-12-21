@@ -212,7 +212,7 @@ public class SearchService {
      * @param searchModel - search model
      */
     private void searchInPods(SearchModel searchModel) {
-        V1PodList podsList = kubeAPI.getV1PodsList(searchModel.getSelectedNamespace());
+        V1PodList podsList = kubeAPI.getV1PodsList(searchModel.getSelectedNamespace(), searchModel);
         for (V1Pod pod : podsList.getItems()) {
             try {
                 if (isStringsContainsSearchString(searchModel.getSearchString(), pod.getMetadata().getName())) {
@@ -231,7 +231,7 @@ public class SearchService {
      * @param searchModel - search model
      */
     private void searchInPersistentVolumes(SearchModel searchModel) {
-        V1PersistentVolumeList persistentVolumesList = kubeAPI.getV1PersistentVolumesList();
+        V1PersistentVolumeList persistentVolumesList = kubeAPI.getV1PersistentVolumesList(searchModel);
         for (V1PersistentVolume persistentVolume : persistentVolumesList.getItems()) {
             try {
                 if (isStringsContainsSearchString(searchModel.getSearchString(), persistentVolume.getMetadata().getName())) {
@@ -250,7 +250,7 @@ public class SearchService {
      * @param searchModel - search model
      */
     private void searchInPersistentVolumeClaims(SearchModel searchModel) {
-        V1PersistentVolumeClaimList persistentVolumeClaimsList = kubeAPI.getV1PersistentVolumeClaimsList(searchModel.getSelectedNamespace());
+        V1PersistentVolumeClaimList persistentVolumeClaimsList = kubeAPI.getV1PersistentVolumeClaimsList(searchModel.getSelectedNamespace(), searchModel);
         for (V1PersistentVolumeClaim persistentVolumeClaim : persistentVolumeClaimsList.getItems()) {
             try {
                 if (isStringsContainsSearchString(searchModel.getSearchString(), persistentVolumeClaim.getMetadata().getName())) {
@@ -269,7 +269,7 @@ public class SearchService {
      * @param searchModel - search model
      */
     private void searchInServices(SearchModel searchModel) {
-        V1ServiceList servicesList = kubeAPI.getV1ServicesList(searchModel.getSelectedNamespace());
+        V1ServiceList servicesList = kubeAPI.getV1ServicesList(searchModel.getSelectedNamespace(), searchModel);
         for (V1Service service : servicesList.getItems()) {
             try {
                 if (skipKubeNamespace(searchModel, service.getMetadata())) {
@@ -291,7 +291,7 @@ public class SearchService {
      * @param searchModel - search model
      */
     private void searchInServiceAccounts(SearchModel searchModel) {
-        V1ServiceAccountList serviceAccountsList = kubeAPI.getV1ServiceAccountsList(searchModel.getSelectedNamespace());
+        V1ServiceAccountList serviceAccountsList = kubeAPI.getV1ServiceAccountsList(searchModel.getSelectedNamespace(), searchModel);
         for (V1ServiceAccount serviceAccount : serviceAccountsList.getItems()) {
             try {
                 if (skipKubeNamespace(searchModel, serviceAccount.getMetadata())) {
@@ -318,7 +318,7 @@ public class SearchService {
      * @param searchModel - search model
      */
     private void searchInSecrets(SearchModel searchModel) {
-        V1SecretList secretsList = kubeAPI.getV1SecretsList(searchModel.getSelectedNamespace());
+        V1SecretList secretsList = kubeAPI.getV1SecretsList(searchModel.getSelectedNamespace(), searchModel);
         for (V1Secret secret : secretsList.getItems()) {
             try {
                 if (skipKubeNamespace(searchModel, secret.getMetadata())) {
@@ -346,7 +346,7 @@ public class SearchService {
      * @param searchModel - search model
      */
     private void searchInConfigMaps(SearchModel searchModel) {
-        V1ConfigMapList configMapsList = kubeAPI.getV1ConfigMapsList(searchModel.getSelectedNamespace());
+        V1ConfigMapList configMapsList = kubeAPI.getV1ConfigMapsList(searchModel.getSelectedNamespace(), searchModel);
         for (V1ConfigMap configMap : configMapsList.getItems()) {
             try {
                 if (skipKubeNamespace(searchModel, configMap.getMetadata())) {
@@ -368,7 +368,7 @@ public class SearchService {
 
 
     private void searchInDaemonSets(SearchModel searchModel) {
-        V1DaemonSetList daemonSetsList = kubeAPI.getV1DaemonSetList(searchModel.getSelectedNamespace());
+        V1DaemonSetList daemonSetsList = kubeAPI.getV1DaemonSetList(searchModel.getSelectedNamespace(), searchModel);
         for (V1DaemonSet daemonSet : daemonSetsList.getItems()) {
             try {
                 if (skipKubeNamespace(searchModel, daemonSet.getMetadata())) {
@@ -385,7 +385,7 @@ public class SearchService {
     }
 
     private void searchInDeployments(SearchModel searchModel) {
-        V1DeploymentList deploymentsList = kubeAPI.getV1DeploymentList(searchModel.getSelectedNamespace());
+        V1DeploymentList deploymentsList = kubeAPI.getV1DeploymentList(searchModel.getSelectedNamespace(), searchModel);
         for (V1Deployment deployment : deploymentsList.getItems()) {
             try {
                 if (skipKubeNamespace(searchModel, deployment.getMetadata())) {
@@ -402,7 +402,7 @@ public class SearchService {
     }
 
     private void searchInReplicaSets(SearchModel searchModel) {
-        V1ReplicaSetList replicaSetsList = kubeAPI.getV1ReplicaSetList(searchModel.getSelectedNamespace());
+        V1ReplicaSetList replicaSetsList = kubeAPI.getV1ReplicaSetList(searchModel.getSelectedNamespace(), searchModel);
         for (V1ReplicaSet replicaSet : replicaSetsList.getItems()) {
             try {
                 if (skipKubeNamespace(searchModel, replicaSet.getMetadata())) {
@@ -419,7 +419,7 @@ public class SearchService {
     }
 
     private void searchInStatefulSets(SearchModel searchModel) {
-        V1StatefulSetList statefulSetsList = kubeAPI.getV1StatefulSetList(searchModel.getSelectedNamespace());
+        V1StatefulSetList statefulSetsList = kubeAPI.getV1StatefulSetList(searchModel.getSelectedNamespace(), searchModel);
         for (V1StatefulSet statefulSet : statefulSetsList.getItems()) {
             try {
                 if (skipKubeNamespace(searchModel, statefulSet.getMetadata())) {
@@ -436,7 +436,7 @@ public class SearchService {
     }
 
     private void searchInJobs(SearchModel searchModel) {
-        V1JobList jobsList = kubeAPI.getV1JobList(searchModel.getSelectedNamespace());
+        V1JobList jobsList = kubeAPI.getV1JobList(searchModel.getSelectedNamespace(), searchModel);
         for (V1Job job : jobsList.getItems()) {
             try {
                 if (skipKubeNamespace(searchModel, job.getMetadata())) {
@@ -453,7 +453,7 @@ public class SearchService {
     }
 
     private void searchInClusterRoleBindings(SearchModel searchModel) {
-        V1beta1ClusterRoleBindingList clusterRoleBindingsList = kubeAPI.getV1ClusterRolesBindingsList();
+        V1beta1ClusterRoleBindingList clusterRoleBindingsList = kubeAPI.getV1ClusterRolesBindingsList(searchModel);
         for (V1beta1ClusterRoleBinding binding : clusterRoleBindingsList.getItems()) {
             try {
                 if (skipKubeNamespace(searchModel, binding.getMetadata())) {
@@ -470,7 +470,7 @@ public class SearchService {
     }
 
     private void searchInClusterRoles(SearchModel searchModel) {
-        V1beta1ClusterRoleList clusterRolesList = kubeAPI.getV1ClusterRolesList();
+        V1beta1ClusterRoleList clusterRolesList = kubeAPI.getV1ClusterRolesList(searchModel);
         for (V1beta1ClusterRole clusterRole : clusterRolesList.getItems()) {
             try {
                 if (skipKubeNamespace(searchModel, clusterRole.getMetadata())) {
@@ -487,7 +487,7 @@ public class SearchService {
     }
 
     private void searchInRoleBindings(SearchModel searchModel) {
-        V1beta1RoleBindingList rolesBindingsList = kubeAPI.getV1RolesBindingList(searchModel.getSelectedNamespace());
+        V1beta1RoleBindingList rolesBindingsList = kubeAPI.getV1RolesBindingList(searchModel.getSelectedNamespace(), searchModel);
         for (V1beta1RoleBinding roleBinding : rolesBindingsList.getItems()) {
             try {
                 if (skipKubeNamespace(searchModel, roleBinding.getMetadata())) {
@@ -504,7 +504,7 @@ public class SearchService {
     }
 
     private void searchInRoles(SearchModel searchModel) {
-        V1beta1RoleList rolesList = kubeAPI.getV1RolesList(searchModel.getSelectedNamespace());
+        V1beta1RoleList rolesList = kubeAPI.getV1RolesList(searchModel.getSelectedNamespace(), searchModel);
         for (V1beta1Role role : rolesList.getItems()) {
             try {
                 if (skipKubeNamespace(searchModel, role.getMetadata())) {
@@ -521,7 +521,7 @@ public class SearchService {
     }
 
     private void searchInNetworkPolicies(SearchModel searchModel) {
-        V1NetworkPolicyList networkPoliciesList = kubeAPI.getV1NetworkPolicyList(searchModel.getSelectedNamespace());
+        V1NetworkPolicyList networkPoliciesList = kubeAPI.getV1NetworkPolicyList(searchModel.getSelectedNamespace(), searchModel);
         for (V1NetworkPolicy policy : networkPoliciesList.getItems()) {
             try {
                 if (skipKubeNamespace(searchModel, policy.getMetadata())) {
@@ -538,7 +538,7 @@ public class SearchService {
     }
 
     private void searchInPodDistributionBudgets(SearchModel searchModel) {
-        V1beta1PodDisruptionBudgetList budgetsList = kubeAPI.getV1beta1PodDisruptionBudgetsList(searchModel.getSelectedNamespace());
+        V1beta1PodDisruptionBudgetList budgetsList = kubeAPI.getV1beta1PodDisruptionBudgetsList(searchModel.getSelectedNamespace(), searchModel);
         for (V1beta1PodDisruptionBudget budget : budgetsList.getItems()) {
             try {
                 if (skipKubeNamespace(searchModel, budget.getMetadata())) {
@@ -555,7 +555,7 @@ public class SearchService {
     }
 
     private void searchInPodSecurityPolicies(SearchModel searchModel) {
-        V1beta1PodSecurityPolicyList policiesList = kubeAPI.getPolicyV1beta1PodSecurityPolicyList();
+        V1beta1PodSecurityPolicyList policiesList = kubeAPI.getPolicyV1beta1PodSecurityPolicyList(searchModel);
         for (V1beta1PodSecurityPolicy policy : policiesList.getItems()) {
             try {
                 if (skipKubeNamespace(searchModel, policy.getMetadata())) {
@@ -579,7 +579,7 @@ public class SearchService {
      */
     private void searchInEnvironmentVariables(SearchModel searchModel) {
 
-        List<V1Pod> podList = kubeAPI.getV1PodsList(searchModel.getSelectedNamespace()).getItems();
+        List<V1Pod> podList = kubeAPI.getV1PodsList(searchModel.getSelectedNamespace(), searchModel).getItems();
         for (V1Pod pod : podList) {
 
             //skips search in kube- namespace

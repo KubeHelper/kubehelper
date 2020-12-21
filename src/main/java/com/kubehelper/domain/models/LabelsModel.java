@@ -160,6 +160,11 @@ public class LabelsModel implements PageModel {
     }
 
     @Override
+    public void addException(String message, Exception exception) {
+        this.searchExceptions.add(new KubeHelperException(message, exception));
+    }
+
+    @Override
     public String getName() {
         return NAME;
     }

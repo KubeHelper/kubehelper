@@ -152,7 +152,6 @@ public class SearchVM implements EventListener, PropertyChangeListener {
     @NotifyChange({"totalItems", "searchResults", "filter"})
     public void search() {
         searchModel.setFilter(new SearchFilter());
-        searchModel.setSearchExceptions(new ArrayList<>());
         searchService.search(searchModel, selectedResources);
         clearAllFilterComboboxes();
         isSearchButtonPressed = true;
@@ -378,6 +377,7 @@ public class SearchVM implements EventListener, PropertyChangeListener {
         if (isSearchButtonPressed && searchModel.hasSearchErrors()) {
             Window window = (Window) Executions.createComponents("~./zul/components/errors.zul", null, Map.of("errors", searchModel.getSearchExceptions()));
             window.doModal();
+            searchModel.setSearchExceptions(new ArrayList<>());
         }
         isSearchButtonPressed = false;
         return searchResults;

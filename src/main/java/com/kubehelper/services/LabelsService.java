@@ -208,7 +208,7 @@ public class LabelsService {
      * @param searchModel - search model
      */
     private void searchInPods(LabelsModel searchModel) {
-        V1PodList podsList = kubeAPI.getV1PodsList(searchModel.getSelectedNamespace());
+        V1PodList podsList = kubeAPI.getV1PodsList(searchModel.getSelectedNamespace(), searchModel);
         for (V1Pod pod : podsList.getItems()) {
             try {
                 V1ObjectMeta meta = pod.getMetadata();
@@ -230,7 +230,7 @@ public class LabelsService {
      * @param searchModel - search model
      */
     private void searchInConfigMaps(LabelsModel searchModel) {
-        V1ConfigMapList configMapsList = kubeAPI.getV1ConfigMapsList(searchModel.getSelectedNamespace());
+        V1ConfigMapList configMapsList = kubeAPI.getV1ConfigMapsList(searchModel.getSelectedNamespace(), searchModel);
         for (V1ConfigMap configMap : configMapsList.getItems()) {
             try {
                 V1ObjectMeta meta = configMap.getMetadata();
@@ -251,7 +251,7 @@ public class LabelsService {
      * @param searchModel - search model
      */
     private void searchInServices(LabelsModel searchModel) {
-        V1ServiceList servicesList = kubeAPI.getV1ServicesList(searchModel.getSelectedNamespace());
+        V1ServiceList servicesList = kubeAPI.getV1ServicesList(searchModel.getSelectedNamespace(), searchModel);
         for (V1Service service : servicesList.getItems()) {
             try {
                 V1ObjectMeta meta = service.getMetadata();
@@ -273,7 +273,7 @@ public class LabelsService {
      * @param searchModel - search model
      */
     private void searchInNamespaces(LabelsModel searchModel) {
-        V1NamespaceList namespacesList = kubeAPI.getV1NamespacesList();
+        V1NamespaceList namespacesList = kubeAPI.getV1NamespacesList(searchModel);
         for (V1Namespace namespace : namespacesList.getItems()) {
             try {
                 V1ObjectMeta meta = namespace.getMetadata();
@@ -294,7 +294,7 @@ public class LabelsService {
      * @param searchModel - search model
      */
     private void searchInPersistentVolumes(LabelsModel searchModel) {
-        V1PersistentVolumeList persistentVolumesList = kubeAPI.getV1PersistentVolumesList();
+        V1PersistentVolumeList persistentVolumesList = kubeAPI.getV1PersistentVolumesList(searchModel);
         for (V1PersistentVolume pv : persistentVolumesList.getItems()) {
             try {
                 V1ObjectMeta meta = pv.getMetadata();
@@ -313,7 +313,7 @@ public class LabelsService {
      * @param searchModel - search model
      */
     private void searchInPersistentVolumeClaims(LabelsModel searchModel) {
-        V1PersistentVolumeClaimList persistentVolumeClaimsList = kubeAPI.getV1PersistentVolumeClaimsList(searchModel.getSelectedNamespace());
+        V1PersistentVolumeClaimList persistentVolumeClaimsList = kubeAPI.getV1PersistentVolumeClaimsList(searchModel.getSelectedNamespace(), searchModel);
         for (V1PersistentVolumeClaim pvc : persistentVolumeClaimsList.getItems()) {
             try {
                 V1ObjectMeta meta = pvc.getMetadata();
@@ -336,7 +336,7 @@ public class LabelsService {
      * @param searchModel - search model
      */
     private void searchInServiceAccounts(LabelsModel searchModel) {
-        V1ServiceAccountList serviceAccountsList = kubeAPI.getV1ServiceAccountsList(searchModel.getSelectedNamespace());
+        V1ServiceAccountList serviceAccountsList = kubeAPI.getV1ServiceAccountsList(searchModel.getSelectedNamespace(), searchModel);
         for (V1ServiceAccount serviceAccount : serviceAccountsList.getItems()) {
             try {
                 V1ObjectMeta meta = serviceAccount.getMetadata();
@@ -357,7 +357,7 @@ public class LabelsService {
      * @param searchModel - search model
      */
     private void searchInSecrets(LabelsModel searchModel) {
-        V1SecretList secretsList = kubeAPI.getV1SecretsList(searchModel.getSelectedNamespace());
+        V1SecretList secretsList = kubeAPI.getV1SecretsList(searchModel.getSelectedNamespace(), searchModel);
         for (V1Secret secret : secretsList.getItems()) {
             try {
                 V1ObjectMeta meta = secret.getMetadata();
@@ -378,7 +378,7 @@ public class LabelsService {
      * @param searchModel - search model
      */
     private void searchInDaemonSets(LabelsModel searchModel) {
-        V1DaemonSetList setsList = kubeAPI.getV1DaemonSetList(searchModel.getSelectedNamespace());
+        V1DaemonSetList setsList = kubeAPI.getV1DaemonSetList(searchModel.getSelectedNamespace(), searchModel);
         for (V1DaemonSet set : setsList.getItems()) {
             try {
                 V1ObjectMeta meta = set.getMetadata();
@@ -402,7 +402,7 @@ public class LabelsService {
      * @param searchModel - search model
      */
     private void searchInDeployments(LabelsModel searchModel) {
-        V1DeploymentList deploymentsList = kubeAPI.getV1DeploymentList(searchModel.getSelectedNamespace());
+        V1DeploymentList deploymentsList = kubeAPI.getV1DeploymentList(searchModel.getSelectedNamespace(), searchModel);
         for (V1Deployment deployment : deploymentsList.getItems()) {
             try {
                 V1ObjectMeta meta = deployment.getMetadata();
@@ -426,7 +426,7 @@ public class LabelsService {
      * @param searchModel - search model
      */
     private void searchInReplicaSets(LabelsModel searchModel) {
-        V1ReplicaSetList replicaSetsList = kubeAPI.getV1ReplicaSetList(searchModel.getSelectedNamespace());
+        V1ReplicaSetList replicaSetsList = kubeAPI.getV1ReplicaSetList(searchModel.getSelectedNamespace(), searchModel);
         for (V1ReplicaSet replicaSet : replicaSetsList.getItems()) {
             try {
                 V1ObjectMeta meta = replicaSet.getMetadata();
@@ -449,7 +449,7 @@ public class LabelsService {
      * @param searchModel - search model
      */
     private void searchInStatefulSets(LabelsModel searchModel) {
-        V1StatefulSetList statefulSetstList = kubeAPI.getV1StatefulSetList(searchModel.getSelectedNamespace());
+        V1StatefulSetList statefulSetstList = kubeAPI.getV1StatefulSetList(searchModel.getSelectedNamespace(), searchModel);
         for (V1StatefulSet statefulSet : statefulSetstList.getItems()) {
             try {
                 V1ObjectMeta meta = statefulSet.getMetadata();
@@ -472,7 +472,7 @@ public class LabelsService {
      * @param searchModel - search model
      */
     private void searchInJobs(LabelsModel searchModel) {
-        V1JobList jobsList = kubeAPI.getV1JobList(searchModel.getSelectedNamespace());
+        V1JobList jobsList = kubeAPI.getV1JobList(searchModel.getSelectedNamespace(), searchModel);
         for (V1Job job : jobsList.getItems()) {
             try {
                 V1ObjectMeta meta = job.getMetadata();
@@ -495,7 +495,7 @@ public class LabelsService {
      * @param searchModel - search model
      */
     private void searchInClusterRoleBindings(LabelsModel searchModel) {
-        V1beta1ClusterRoleBindingList clusterRoleBindingsList = kubeAPI.getV1ClusterRolesBindingsList();
+        V1beta1ClusterRoleBindingList clusterRoleBindingsList = kubeAPI.getV1ClusterRolesBindingsList(searchModel);
         for (V1beta1ClusterRoleBinding binding : clusterRoleBindingsList.getItems()) {
             try {
                 V1ObjectMeta meta = binding.getMetadata();
@@ -516,7 +516,7 @@ public class LabelsService {
      * @param searchModel - search model
      */
     private void searchInClusterRoles(LabelsModel searchModel) {
-        V1beta1ClusterRoleList clusterRolesList = kubeAPI.getV1ClusterRolesList();
+        V1beta1ClusterRoleList clusterRolesList = kubeAPI.getV1ClusterRolesList(searchModel);
         for (V1beta1ClusterRole clusterRole : clusterRolesList.getItems()) {
             try {
                 V1ObjectMeta meta = clusterRole.getMetadata();
@@ -537,7 +537,7 @@ public class LabelsService {
      * @param searchModel - search model
      */
     private void searchInRoleBindings(LabelsModel searchModel) {
-        V1beta1RoleBindingList v1RolesBindingsList = kubeAPI.getV1RolesBindingList(searchModel.getSelectedNamespace());
+        V1beta1RoleBindingList v1RolesBindingsList = kubeAPI.getV1RolesBindingList(searchModel.getSelectedNamespace(), searchModel);
         for (V1beta1RoleBinding binding : v1RolesBindingsList.getItems()) {
             try {
                 V1ObjectMeta meta = binding.getMetadata();
@@ -558,7 +558,7 @@ public class LabelsService {
      * @param searchModel - search model
      */
     private void searchInRoles(LabelsModel searchModel) {
-        V1beta1RoleList clusterRolesList = kubeAPI.getV1RolesList(searchModel.getSelectedNamespace());
+        V1beta1RoleList clusterRolesList = kubeAPI.getV1RolesList(searchModel.getSelectedNamespace(), searchModel);
         for (V1beta1Role clusterRole : clusterRolesList.getItems()) {
             try {
                 V1ObjectMeta meta = clusterRole.getMetadata();
@@ -579,7 +579,7 @@ public class LabelsService {
      * @param searchModel - search model
      */
     private void searchInNetworkPolicies(LabelsModel searchModel) {
-        V1NetworkPolicyList networkPolicyList = kubeAPI.getV1NetworkPolicyList(searchModel.getSelectedNamespace());
+        V1NetworkPolicyList networkPolicyList = kubeAPI.getV1NetworkPolicyList(searchModel.getSelectedNamespace(), searchModel);
         for (V1NetworkPolicy networkPolicy : networkPolicyList.getItems()) {
             try {
                 V1ObjectMeta meta = networkPolicy.getMetadata();
@@ -602,7 +602,7 @@ public class LabelsService {
      * @param searchModel - search model
      */
     private void searchInPodDistributionBudgets(LabelsModel searchModel) {
-        V1beta1PodDisruptionBudgetList podDisruptionBudgetsList = kubeAPI.getV1beta1PodDisruptionBudgetsList(searchModel.getSelectedNamespace());
+        V1beta1PodDisruptionBudgetList podDisruptionBudgetsList = kubeAPI.getV1beta1PodDisruptionBudgetsList(searchModel.getSelectedNamespace(), searchModel);
         for (V1beta1PodDisruptionBudget budget : podDisruptionBudgetsList.getItems()) {
             try {
                 V1ObjectMeta meta = budget.getMetadata();
@@ -625,7 +625,7 @@ public class LabelsService {
      * @param searchModel - search model
      */
     private void searchInPodSecurityPolicies(LabelsModel searchModel) {
-        V1beta1PodSecurityPolicyList podSecurityPolicyList = kubeAPI.getPolicyV1beta1PodSecurityPolicyList();
+        V1beta1PodSecurityPolicyList podSecurityPolicyList = kubeAPI.getPolicyV1beta1PodSecurityPolicyList(searchModel);
         for (V1beta1PodSecurityPolicy policy : podSecurityPolicyList.getItems()) {
             try {
                 V1ObjectMeta meta = policy.getMetadata();

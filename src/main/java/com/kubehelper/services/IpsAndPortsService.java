@@ -82,10 +82,10 @@ public class IpsAndPortsService {
      * @param ipsAndPortsModel - model for @{@link com.kubehelper.viewmodels.IpsAndPortsVM}
      */
     public void get(IpsAndPortsModel ipsAndPortsModel) {
-        try{
-        ipsAndPortsModel.getIpsAndPortsResults().clear();
-        fillModelWithPodsInfo(ipsAndPortsModel);
-        fillModelWithServicesInfo(ipsAndPortsModel);
+        try {
+            ipsAndPortsModel.getIpsAndPortsResults().clear();
+            fillModelWithPodsInfo(ipsAndPortsModel);
+            fillModelWithServicesInfo(ipsAndPortsModel);
         } catch (RuntimeException e) {
             ipsAndPortsModel.addSearchException(e);
             logger.error(e.getMessage(), e);
@@ -98,7 +98,7 @@ public class IpsAndPortsService {
      * @param ipsAndPortsModel - model for @{@link com.kubehelper.viewmodels.IpsAndPortsVM} view.
      */
     private void fillModelWithPodsInfo(IpsAndPortsModel ipsAndPortsModel) {
-        for (V1Pod pod : kubeAPI.getV1PodsList(ipsAndPortsModel.getSelectedNamespace()).getItems()) {
+        for (V1Pod pod : kubeAPI.getV1PodsList(ipsAndPortsModel.getSelectedNamespace(), ipsAndPortsModel).getItems()) {
             IpsAndPortsResult ipsAndPortsResult = new IpsAndPortsResult(ipsAndPortsModel.getIpsAndPortsResults().size() + 1);
             StringJoiner portsJoiner = getStringsJoiner(), containerNamesJoiner = getStringsJoiner();
             String resourceName = pod.getMetadata().getName() + ": ";
@@ -159,7 +159,7 @@ public class IpsAndPortsService {
      */
     private void fillModelWithServicesInfo(IpsAndPortsModel ipsAndPortsModel) {
 
-        for (V1Service service : kubeAPI.getV1ServicesList(ipsAndPortsModel.getSelectedNamespace()).getItems()) {
+        for (V1Service service : kubeAPI.getV1ServicesList(ipsAndPortsModel.getSelectedNamespace(), ipsAndPortsModel).getItems()) {
             Map<String, String> detailsMap = new HashMap<>();
             IpsAndPortsResult ipsAndPortsResult = new IpsAndPortsResult(ipsAndPortsModel.getIpsAndPortsResults().size() + 1);
             StringBuilder servicePortsBuilder = new StringBuilder();
@@ -232,9 +232,9 @@ public class IpsAndPortsService {
     /**
      * Joins key/values from EntrySet into String-Map collector.
      *
-     * @param entries - key/values to join.
+     * @param entries   - key/values to join.
      * @param collector - String-Map collector
-     * @param key - key for save joins into map.
+     * @param key       - key for save joins into map.
      */
     private void joinKeyValuesFromEntrySet(Set<Map.Entry<String, String>> entries, Map<String, String> collector, String key) {
         StringJoiner joiner = getStringsJoiner();
@@ -252,7 +252,7 @@ public class IpsAndPortsService {
      * Build html string from template and map with key/values for replace.
      *
      * @param detailsMap - key/values for replace values in html template.
-     * @param template - html template.
+     * @param template   - html template.
      * @return - html string for render in details section.
      */
     private String buildHtmlDetails(Map<String, String> detailsMap, String template) {

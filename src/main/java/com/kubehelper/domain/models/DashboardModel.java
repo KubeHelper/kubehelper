@@ -40,4 +40,8 @@ public class DashboardModel implements PageModel {
     @Override
     public void setPageMainContentHeight(int newHeight) {
     }
+
+    @Override
+    public void addException(String message, Exception exception) {
+    }
 }

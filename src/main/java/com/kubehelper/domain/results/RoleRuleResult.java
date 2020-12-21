@@ -32,12 +32,6 @@ public class RoleRuleResult {
     private List<String> verbs = new ArrayList<>();
     private String fullDefinition = "";
 
-    //Generate a simple panel with 4 columns and 2 rows in one row create, read, update and delete and below ist verbs which belongs to this CRUD will be shown if rule is selected
-    private boolean create;
-    private boolean read;
-    private boolean update;
-    private boolean delete;
-
     public RoleRuleResult() {
     }
 
