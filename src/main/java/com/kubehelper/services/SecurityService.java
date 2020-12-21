@@ -26,6 +26,7 @@ import com.kubehelper.domain.results.PodSecurityPoliciesResult;
 import com.kubehelper.domain.results.RBACResult;
 import com.kubehelper.domain.results.RoleResult;
 import com.kubehelper.domain.results.RoleRuleResult;
+import com.kubehelper.domain.results.ServiceAccountResult;
 import io.kubernetes.client.Exec;
 import io.kubernetes.client.openapi.models.V1Container;
 import io.kubernetes.client.openapi.models.V1ObjectMeta;
@@ -33,6 +34,8 @@ import io.kubernetes.client.openapi.models.V1Pod;
 import io.kubernetes.client.openapi.models.V1PodList;
 import io.kubernetes.client.openapi.models.V1PodSecurityContext;
 import io.kubernetes.client.openapi.models.V1SecurityContext;
+import io.kubernetes.client.openapi.models.V1ServiceAccount;
+import io.kubernetes.client.openapi.models.V1ServiceAccountList;
 import io.kubernetes.client.openapi.models.V1beta1ClusterRole;
 import io.kubernetes.client.openapi.models.V1beta1ClusterRoleBinding;
 import io.kubernetes.client.openapi.models.V1beta1ClusterRoleBindingList;
@@ -47,6 +50,7 @@ import io.kubernetes.client.openapi.models.V1beta1RoleBindingList;
 import io.kubernetes.client.openapi.models.V1beta1RoleList;
 import io.kubernetes.client.openapi.models.V1beta1Subject;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.util.Strings;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,6 +61,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.kubehelper.common.Resource.CLUSTER_ROLE;
 import static com.kubehelper.common.Resource.ROLE;
@@ -112,11 +117,16 @@ public class SecurityService {
         searchInContainersSecurityContexts(securityModel);
     }
 
-
     public void getPodsSecurityPolicies(SecurityModel securityModel) {
         securityModel.getPodSecurityPoliciesResults().clear();
         securityModel.getSearchExceptions().clear();
         searchInPodSecurityPolicies(securityModel);
+    }
+
+    public void getServiceAccounts(SecurityModel securityModel) {
+        securityModel.getServiceAccountsResults().clear();
+        securityModel.getSearchExceptions().clear();
+        searchInServiceAccounts(securityModel);
     }
 
     // RBAC =============
@@ -297,6 +307,40 @@ public class SecurityService {
         roleResult.addRoleRules(roleRules);
     }
 
+
+    // POD SECURITY CONTEXTS =============
+
+    private void searchInPodSecurityContexts(SecurityModel securityModel) {
+        V1PodList podsList = kubeAPI.getV1PodsList(securityModel.getSelectedPodsSecurityContextsNamespace());
+        for (V1Pod pod : podsList.getItems()) {
+            try {
+                addPodSecurityContextToModel(pod.getMetadata(), securityModel, pod.getSpec().getSecurityContext());
+            } catch (RuntimeException e) {
+                securityModel.addSearchException(e);
+                logger.error(e.getMessage(), e);
+            }
+        }
+    }
+
+
+    private void addPodSecurityContextToModel(V1ObjectMeta metadata, SecurityModel securityModel, V1PodSecurityContext securityContext) {
+        PodSecurityContextResult result = new PodSecurityContextResult(securityModel.getPodsSecurityContextsResults().size() + 1)
+                .setResourceName(metadata.getName())
+                .setFsGroup(String.valueOf(securityContext.getFsGroup()))
+                .setFsGroupChangePolicy(StringUtils.isEmpty(securityContext.getFsGroupChangePolicy()) ? "null" : securityContext.getFsGroupChangePolicy())
+                .setRunAsGroup(String.valueOf(securityContext.getRunAsGroup()))
+                .setRunAsNonRoot(String.valueOf(securityContext.getRunAsNonRoot()))
+                .setRunAsUser(String.valueOf(securityContext.getRunAsUser()))
+                .setSeLinuxOptions(securityContext.getSeLinuxOptions() == null ? "null" : securityContext.getSeLinuxOptions().toString())
+                .setSupplementalGroups(securityContext.getSupplementalGroups() == null ? "null" : securityContext.getSupplementalGroups().toString())
+                .setSysctls(securityContext.getSysctls() == null ? "null" : securityContext.getSysctls().toString())
+                .setWindowsOptions(securityContext.getWindowsOptions() == null ? "null" : securityContext.getWindowsOptions().toString())
+                .setCreationTime(getParsedCreationTime(metadata.getCreationTimestamp()))
+                .setFullDefinition(securityContext.toString())
+                .setNamespace(metadata.getNamespace());
+        securityModel.addPodSecurityContext(result);
+    }
+
     // CONTAINER SECURITY CONTEXTS =============
 
     private void searchInContainersSecurityContexts(SecurityModel securityModel) {
@@ -339,37 +383,26 @@ public class SecurityService {
         securityModel.addContainerSecurityResult(result);
     }
 
-    // POD SECURITY CONTEXTS =============
 
-    private void searchInPodSecurityContexts(SecurityModel securityModel) {
-        V1PodList podsList = kubeAPI.getV1PodsList(securityModel.getSelectedPodsSecurityContextsNamespace());
-        for (V1Pod pod : podsList.getItems()) {
+    // SERVICE ACCOUNTS =============
+
+    private void searchInServiceAccounts(SecurityModel securityModel) {
+        V1ServiceAccountList serviceAccountsList = kubeAPI.getV1ServiceAccountsList(securityModel.getSelectedServiceAccountsNamespace());
+        for (V1ServiceAccount sa : serviceAccountsList.getItems()) {
             try {
-                addPodSecurityContextToModel(pod.getMetadata(), securityModel, pod.getSpec().getSecurityContext());
+                ServiceAccountResult saResult = new ServiceAccountResult(securityModel.getServiceAccountsResults().size() + 1)
+                        .setResourceName(sa.getMetadata().getName())
+                        .setKind(sa.getKind())
+                        .setNamespace(sa.getMetadata().getNamespace())
+                        .setSecrets(Strings.join(sa.getSecrets().stream().map(secret -> secret.getName()).collect(Collectors.toList()), ','))
+                        .setCreationTime(getParsedCreationTime(sa.getMetadata().getCreationTimestamp()))
+                        .setFullDefinition(sa.toString());
+                securityModel.addServiceAccountResult(saResult);
             } catch (RuntimeException e) {
                 securityModel.addSearchException(e);
                 logger.error(e.getMessage(), e);
             }
         }
-    }
-
-
-    private void addPodSecurityContextToModel(V1ObjectMeta metadata, SecurityModel securityModel, V1PodSecurityContext securityContext) {
-        PodSecurityContextResult result = new PodSecurityContextResult(securityModel.getPodsSecurityContextsResults().size() + 1)
-                .setResourceName(metadata.getName())
-                .setFsGroup(String.valueOf(securityContext.getFsGroup()))
-                .setFsGroupChangePolicy(StringUtils.isEmpty(securityContext.getFsGroupChangePolicy()) ? "null" : securityContext.getFsGroupChangePolicy())
-                .setRunAsGroup(String.valueOf(securityContext.getRunAsGroup()))
-                .setRunAsNonRoot(String.valueOf(securityContext.getRunAsNonRoot()))
-                .setRunAsUser(String.valueOf(securityContext.getRunAsUser()))
-                .setSeLinuxOptions(securityContext.getSeLinuxOptions() == null ? "null" : securityContext.getSeLinuxOptions().toString())
-                .setSupplementalGroups(securityContext.getSupplementalGroups() == null ? "null" : securityContext.getSupplementalGroups().toString())
-                .setSysctls(securityContext.getSysctls() == null ? "null" : securityContext.getSysctls().toString())
-                .setWindowsOptions(securityContext.getWindowsOptions() == null ? "null" : securityContext.getWindowsOptions().toString())
-                .setCreationTime(getParsedCreationTime(metadata.getCreationTimestamp()))
-                .setFullDefinition(securityContext.toString())
-                .setNamespace(metadata.getNamespace());
-        securityModel.addPodSecurityContext(result);
     }
 
 

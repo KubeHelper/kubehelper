@@ -28,10 +28,11 @@ import java.util.List;
 public class ServiceAccountResult {
     private int id;
     private String resourceName = "";
+    private String kind = "";
     private String namespace = "";
+    private String secrets = "";
     private String creationTime = "";
-    private String roleBindingName = "";
-    private List<RoleRef> roles = new ArrayList<>();
+    private String fullDefinition = "";
 
     public ServiceAccountResult() {
     }
@@ -40,10 +41,61 @@ public class ServiceAccountResult {
         this.id = id;
     }
 
+    public int getId() {
+        return id;
+    }
 
-    public class RoleRef{
-        private String apiGroup;
-        private String kind;
-        private String name;
+    public String getResourceName() {
+        return resourceName;
+    }
+
+    public ServiceAccountResult setResourceName(String resourceName) {
+        this.resourceName = resourceName;
+        return this;
+    }
+
+    public String getKind() {
+        return kind;
+    }
+
+    public ServiceAccountResult setKind(String kind) {
+        this.kind = kind;
+        return this;
+    }
+
+    public String getNamespace() {
+        return namespace;
+    }
+
+    public ServiceAccountResult setNamespace(String namespace) {
+        this.namespace = namespace;
+        return this;
+    }
+
+    public String getSecrets() {
+        return secrets;
+    }
+
+    public ServiceAccountResult setSecrets(String secrets) {
+        this.secrets = secrets;
+        return this;
+    }
+
+    public String getCreationTime() {
+        return creationTime;
+    }
+
+    public ServiceAccountResult setCreationTime(String creationTime) {
+        this.creationTime = creationTime;
+        return this;
+    }
+
+    public String getFullDefinition() {
+        return fullDefinition;
+    }
+
+    public ServiceAccountResult setFullDefinition(String fullDefinition) {
+        this.fullDefinition = fullDefinition;
+        return this;
     }
 }

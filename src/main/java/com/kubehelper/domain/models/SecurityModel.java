@@ -20,11 +20,9 @@ package com.kubehelper.domain.models;
 import com.kubehelper.common.Global;
 import com.kubehelper.common.KubeHelperException;
 import com.kubehelper.common.Resource;
-import com.kubehelper.domain.filters.ContainersSecurityFilter;
 import com.kubehelper.domain.filters.RBACFilter;
 import com.kubehelper.domain.filters.RoleRulesSecurityFilter;
 import com.kubehelper.domain.filters.RolesSecurityFilter;
-import com.kubehelper.domain.filters.ServiceAccountsSecurityFilter;
 import com.kubehelper.domain.results.ContainerSecurityResult;
 import com.kubehelper.domain.results.PodSecurityContextResult;
 import com.kubehelper.domain.results.PodSecurityPoliciesResult;
@@ -70,8 +68,6 @@ public class SecurityModel implements PageModel {
     private RolesSecurityFilter rolesFilter = new RolesSecurityFilter();
     private RoleRulesSecurityFilter roleRulesFilter = new RoleRulesSecurityFilter();
     private RBACFilter rbacsFilter = new RBACFilter();
-    private ContainersSecurityFilter containersFilter = new ContainersSecurityFilter();
-    private ServiceAccountsSecurityFilter serviceAccountsFilter = new ServiceAccountsSecurityFilter();
     private List<KubeHelperException> searchExceptions = new ArrayList<>();
     private int selectedRoleId;
     private int selectedRoleRuleId;
@@ -122,17 +118,16 @@ public class SecurityModel implements PageModel {
 
     public SecurityModel addContainerSecurityResult(ContainerSecurityResult containerResult) {
         containersSecurityResults.add(containerResult);
-//        rolesFilter.addResourceNamesFilter(roleResult.getResourceName());
-//        rolesFilter.addResourceTypesFilter(roleResult.getResourceType());
+        return this;
+    }
+
+    public SecurityModel addServiceAccountResult(ServiceAccountResult serviceAccountResult) {
+        serviceAccountsResults.add(serviceAccountResult);
         return this;
     }
 
     public SecurityModel addPodSecurityPolicy(PodSecurityPoliciesResult result) {
         podSecurityPoliciesResults.add(result);
-//        TODO add filters
-//        rolesFilter.addNamespacesFilter(roleResult.getNamespace());
-//        rolesFilter.addResourcePropertiesFilter(roleResult.getr);
-//        rolesFilter.addResourceTypesFilter(roleResult.getResourceType());
         return this;
     }
 
@@ -243,14 +238,6 @@ public class SecurityModel implements PageModel {
         return roleRulesFilter;
     }
 
-    public ContainersSecurityFilter getContainersSecurityFilter() {
-        return containersFilter;
-    }
-
-    public ServiceAccountsSecurityFilter getServiceAccountsFilter() {
-        return serviceAccountsFilter;
-    }
-
 
     public SecurityModel setRolesFilter(RolesSecurityFilter rolesFilter) {
         this.rolesFilter = rolesFilter;
@@ -259,16 +246,6 @@ public class SecurityModel implements PageModel {
 
     public SecurityModel setRoleRulesFilter(RoleRulesSecurityFilter roleRulesFilter) {
         this.roleRulesFilter = roleRulesFilter;
-        return this;
-    }
-
-    public SecurityModel setContainersSecurityFilter(ContainersSecurityFilter containersFilter) {
-        this.containersFilter = containersFilter;
-        return this;
-    }
-
-    public SecurityModel setServiceAccountsFilter(ServiceAccountsSecurityFilter serviceAccountsFilter) {
-        this.serviceAccountsFilter = serviceAccountsFilter;
         return this;
     }
 

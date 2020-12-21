@@ -18,11 +18,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package com.kubehelper.viewmodels;
 
 import com.kubehelper.common.Global;
-import com.kubehelper.domain.filters.ContainersSecurityFilter;
 import com.kubehelper.domain.filters.RBACFilter;
 import com.kubehelper.domain.filters.RoleRulesSecurityFilter;
 import com.kubehelper.domain.filters.RolesSecurityFilter;
-import com.kubehelper.domain.filters.ServiceAccountsSecurityFilter;
 import com.kubehelper.domain.models.SecurityModel;
 import com.kubehelper.domain.results.ContainerSecurityResult;
 import com.kubehelper.domain.results.PodSecurityContextResult;
@@ -157,7 +155,7 @@ public class SecurityVM implements PropertyChangeListener {
     @Command
     @NotifyChange({"rbacsTotalItems", "rbacsResults", "rbacsFilter"})
     public void getRbacs() {
-        securityModel.setServiceAccountsFilter(new ServiceAccountsSecurityFilter());
+        securityModel.setRbacsFilter(new RBACFilter());
         securityService.getRBACs(securityModel);
         isGetRBACsButtonPressed = true;
         setAllNamespacesToModel();
@@ -180,24 +178,19 @@ public class SecurityVM implements PropertyChangeListener {
     @Command
     @NotifyChange({"containersSecurityTotalItems", "containersSecurityResults", "containersSecurityFilter"})
     public void getContainersSecurityContexts() {
-        securityModel.setContainersSecurityFilter(new ContainersSecurityFilter());
         securityService.getContainersSecurityContexts(securityModel);
         isGetContainersSecurityContextsButtonPressed = true;
         setAllNamespacesToModel();
-        if (securityModel.getContainersSecurityFilter().isFilterActive() && !securityModel.getContainersSecurityResults().isEmpty()) {
-            filterContainersSecurityContexts();
-        } else {
-            containersSecurityResults = new ListModelList<>(securityModel.getContainersSecurityResults());
-        }
+        containersSecurityResults = new ListModelList<>(securityModel.getContainersSecurityResults());
     }
 
     @Command
     @NotifyChange({"serviceAccountsTotalItems", "serviceAccountsResults", "serviceAccountsFilter"})
     public void getServiceAccounts() {
-        securityModel.setServiceAccountsFilter(new ServiceAccountsSecurityFilter());
-//        securityService.getServiceAccounts(securityModel);
+        securityService.getServiceAccounts(securityModel);
         isGetServiceAccountsButtonPressed = true;
-//        onInitPreparations();
+        setAllNamespacesToModel();
+        serviceAccountsResults = new ListModelList<>(securityModel.getServiceAccountsResults());
     }
 
     @Command
@@ -257,21 +250,6 @@ public class SecurityVM implements PropertyChangeListener {
         }
     }
 
-    @Command
-    @NotifyChange({"containersSecurityTotalItems", "containersSecurityResults"})
-    public void filterContainersSecurityContexts() {
-//        TODO
-        rolesResults.clear();
-        for (RoleResult roleResult : securityModel.getRolesResultsList()) {
-            if (StringUtils.containsIgnoreCase(roleResult.getCreationTime(), getRolesFilter().getCreationTime()) &&
-                    commonService.checkEqualsFilter(roleResult.getResourceName(), getRolesFilter().getSelectedResourceNameFilter()) &&
-                    commonService.checkEqualsFilter(roleResult.getResourceType(), getRolesFilter().getSelectedResourceTypeFilter()) &&
-                    commonService.checkEqualsFilter(roleResult.getNamespace(), getRolesFilter().getSelectedNamespaceFilter())) {
-                rolesResults.add(roleResult);
-            }
-        }
-    }
-
 
     private String checkRbacRoleFilter(String verb, boolean rbacVerb) {
         if (rbacVerb && verb.equals("Yes")) {
@@ -325,27 +303,23 @@ public class SecurityVM implements PropertyChangeListener {
     }
 
     @Command
-    @NotifyChange({"containersSecurityTotalItems", "containersSecurityResults", "containersSecurityFilter", "selectedContainersSecurityNamespace"})
+    @NotifyChange({"containersSecurityTotalItems", "containersSecurityResults", "selectedContainersSecurityNamespace"})
     public void clearAllContainersSecurityContexts() {
         securityModel.setContainersSecurityResults(new ListModelList<>())
-                .setContainersSecurityFilter(new ContainersSecurityFilter())
                 .setNamespaces(commonService.getAllNamespaces())
                 .setSelectedContainersSecurityNamespace("all")
                 .setSearchExceptions(new ArrayList<>());
         containersSecurityResults = new ListModelList<>();
-        clearAllContainersSecurityFilterComboboxes();
     }
 
     @Command
-    @NotifyChange({"serviceAccountsTotalItems", "serviceAccountsResults", "serviceAccountsFilter", "selectedServiceAccountsNamespace"})
+    @NotifyChange({"serviceAccountsTotalItems", "serviceAccountsResults", "selectedServiceAccountsNamespace"})
     public void clearAllServiceAccounts() {
-//        securityModel.setRolesResults(new ListModelList<>())
-//                .setFilter(new IpsAndPortsFilter())
-//                .setNamespaces(commonService.getAllNamespaces())
-//                .setSelectedNamespace("all")
-//                .setSearchExceptions(new ArrayList<>());
+        securityModel.setServiceAccountsResults(new ListModelList<>())
+                .setNamespaces(commonService.getAllNamespaces())
+                .setSelectedServiceAccountsNamespace("all")
+                .setSearchExceptions(new ArrayList<>());
         serviceAccountsResults = new ListModelList<>();
-        clearAllFilterComboboxes();
     }
 
     @Command
@@ -358,18 +332,6 @@ public class SecurityVM implements PropertyChangeListener {
         podsSecurityPoliciesResults = new ListModelList<>();
     }
 
-    /**
-     * Removes last selected value from all filter comboboxes.
-     */
-    private void clearAllFilterComboboxes() {
-        Auxhead searchGridAuxHead = (Auxhead) Path.getComponent("//indexPage/templateInclude/rbacGridAuxHead");
-        for (Component child : searchGridAuxHead.getFellows()) {
-            if (Arrays.asList("filterResourceNamesCBox", "filterNamespacesCBox", "filterResourceTypesCBox").contains(child.getId())) {
-                Combobox cBox = (Combobox) child;
-                cBox.setValue("");
-            }
-        }
-    }
 
     private void clearAllRolesFilterComboboxes() {
         Auxhead searchGridAuxHead = (Auxhead) Path.getComponent("//indexPage/templateInclude/rolesGridAuxHead");
@@ -388,16 +350,6 @@ public class SecurityVM implements PropertyChangeListener {
         Auxhead searchGridAuxHead = (Auxhead) Path.getComponent("//indexPage/templateInclude/rbacGridAuxHead");
         for (Component child : searchGridAuxHead.getFellows()) {
             if (Arrays.asList("rbacResourceNamesFilterCBox", "rbacSubjectKindsFilterCBox", "rbacSubjectNamesFilterCBox", "rbacResourceTypesFilterCBox", "rbacNamespacesFilterCBox", "rbacVerbAllCBox", "rbacVerbGetCBox", "rbacVerbListCBox", "rbacVerbCreateCBox", "rbacVerbUpdateCBox", "rbacVerbPatchCBox", "rbacWerbWatchCBox", "rbacVerbDeleteCBox", "rbacVerbDeleteCollectionCBox", "rbacVerbPatchCBox").contains(child.getId())) {
-                Combobox cBox = (Combobox) child;
-                cBox.setValue("");
-            }
-        }
-    }
-
-    private void clearAllContainersSecurityFilterComboboxes() {
-        Auxhead searchGridAuxHead = (Auxhead) Path.getComponent("//indexPage/templateInclude/rolesGridAuxHead");
-        for (Component child : searchGridAuxHead.getFellows()) {
-            if (Arrays.asList("filterRolesNamespacesCBox", "filterRolesResourceTypesCBox", "filterRolesResourceNamesCBox").contains(child.getId())) {
                 Combobox cBox = (Combobox) child;
                 cBox.setValue("");
             }
@@ -428,9 +380,16 @@ public class SecurityVM implements PropertyChangeListener {
     }
 
     @Command
-    public void showContextSecurityContextFullDefinition(@BindingParam("item") ContainerSecurityResult item) {
+    public void showContainerSecurityContextFullDefinition(@BindingParam("item") ContainerSecurityResult item) {
         String title = item.getPodName() + " [ " + item.getResourceName() + " ]";
         Map<String, String> parameters = Map.of("title", title, "content", item.getFullDefinition());
+        Window window = (Window) Executions.createComponents("~./zul/components/file-display.zul", null, parameters);
+        window.doModal();
+    }
+
+    @Command
+    public void showServiceAccountFullDefinition(@BindingParam("item") ServiceAccountResult item) {
+        Map<String, String> parameters = Map.of("title", item.getResourceName(), "content", item.getFullDefinition());
         Window window = (Window) Executions.createComponents("~./zul/components/file-display.zul", null, parameters);
         window.doModal();
     }
@@ -621,13 +580,6 @@ public class SecurityVM implements PropertyChangeListener {
         return securityModel.getRbacsFilter();
     }
 
-    public ContainersSecurityFilter getContainersFilter() {
-        return securityModel.getContainersSecurityFilter();
-    }
-
-    public ServiceAccountsSecurityFilter getServiceAccountsFilter() {
-        return securityModel.getServiceAccountsFilter();
-    }
 
     //  LABELS / HEIGHTS / OTHERS ================
 
@@ -675,6 +627,11 @@ public class SecurityVM implements PropertyChangeListener {
     public String getContainersSecurityContextsGridHeight() {
         return securityModel.getMainGridHeight() + "px";
     }
+
+    public String getServiceAccountsGridHeight() {
+        return securityModel.getMainGridHeight() + "px";
+    }
+
 
     public String getPodsSecurityPoliciesGridHeight() {
         return securityModel.getMainGridHeight() + "px";

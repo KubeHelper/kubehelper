@@ -454,6 +454,8 @@
                             </grid>
                         </tabpanel>
 
+                        <!--                        CONTAINER SECURITY CONTEXTS-->
+
                         <tabpanel>
                             <groupbox width="100%">
                                 <caption iconSclass="z-icon-sliders" label="Search Configuration"/>
@@ -481,8 +483,8 @@
                                         </cell>
                                     </hbox>
                                 </vbox>
-                                <separator width="100%" orient="horizontal"/>
                             </groupbox>
+                            <separator width="100%" orient="horizontal"/>
                             <grid id="securityContainersGrid" model="@load(securityVM.containersSecurityResults)" height="@load(securityVM.containersSecurityContextsGridHeight)">
                                 <columns menupopup="auto" sizable="true">
                                     <column hflex="min" label="Id" sort="auto(id)"/>
@@ -526,7 +528,7 @@
                                             <label value="${item.runCommand}" multiline="true"/>
                                             <label value="${item.namespace}" multiline="true"/>
                                             <label value="${item.creationTime}" multiline="true"/>
-                                            <toolbarbutton label="Full Definition" tooltiptext="Full Definition" onClick="@command('showContextSecurityContextFullDefinition', item=item)"
+                                            <toolbarbutton label="Full Definition" tooltiptext="Full Definition" onClick="@command('showContainerSecurityContextFullDefinition', item=item)"
                                                            hflex="1"/>
                                         </row>
                                     </template>
@@ -537,75 +539,65 @@
                             </grid>
                         </tabpanel>
 
-                        <!--                        <tabpanel>-->
-                        <!--                            <separator width="100%" orient="horizontal"/>-->
-                        <!--                            <vbox height="100%" width="100%">-->
-                        <!--                                <hbox id="menuHboxServiceAccounts" height="100%" width="100%" style="margin: 5px;" align="stretch">-->
-                        <!--                                    <cell id="clearAllCellServiceAccounts" width="10%" style="padding: 0px 5px 0px 5px;" tooltip="clearAllTooltip">-->
-                        <!--                                        <button id="clearAllBtnServiceAccounts" iconSclass="z-icon-eraser" label="Clear all" onClick="@command('clearAllServiceAccounts')"/>-->
-                        <!--                                    </cell>-->
-                        <!--                                    <separator width="100%" orient="vertical" bar="true"/>-->
-                        <!--                                    <cell id="namespacesCellServiceAccounts" width="30%" style="padding: 0px 5px 0px 5px;" align="left">-->
-                        <!--                                        <hlayout valign="middle">-->
-                        <!--                                            <label value="Namespace: "/>-->
-                        <!--                                            <combobox id="namespacesCBoxServiceAccounts" tooltip="namespacesTooltip" hflex="1" model="@load(securityVM.namespaces)"-->
-                        <!--                                                      selectedItem="@bind(securityVM.selectedServiceAccountsNamespace)" readonly="true">-->
-                        <!--                                                <template name="model">-->
-                        <!--                                                    <comboitem label="@load(each)"/>-->
-                        <!--                                                </template>-->
-                        <!--                                            </combobox>-->
-                        <!--                                        </hlayout>-->
-                        <!--                                    </cell>-->
-                        <!--                                    <cell width="49%" style="padding: 0px 5px 0px 5px;">-->
-                        <!--                                    </cell>-->
-                        <!--                                    <cell id="cellGetBtnServiceAccounts" width="10%" style="padding: 0px 5px 0px 5px;">-->
-                        <!--                                        <button id="getServiceAccountsBtn" label="Get" iconSclass="z-icon-refresh" onClick="@command('getServiceAccounts')" width="100%"/>-->
-                        <!--                                    </cell>-->
-                        <!--                                </hbox>-->
-                        <!--                            </vbox>-->
-                        <!--                            <separator width="100%" orient="horizontal"/>-->
-                        <!--                            <grid id="securityServiceAccountsGrid" model="@load(securityVM.serviceAccountsResults)" height="800px">-->
-                        <!--                                <auxhead id="serviceAccountsAuxHead">-->
-                        <!--                                    <auxheader>-->
-                        <!--                                        <span sclass="z-icon-hashtag"/>-->
-                        <!--                                    </auxheader>-->
-                        <!--                                    <auxheader colspan="1">-->
-                        <!--                                        <span sclass="z-icon-filter"/>-->
-                        <!--                                        <textbox instant="true" width="80%" value="@bind(securityVM.serviceAccountsFilter.ip)" onChange="@command('filterServiceAccounts')"/>-->
-                        <!--                                    </auxheader>-->
-                        <!--                                </auxhead>-->
-                        <!--                                <columns menupopup="auto" sizable="true">-->
-                        <!--                                    <column hflex="min" label="Id" sort="auto(id)"/>-->
-                        <!--                                    <column hflex="1" label="IP" sort="auto(ip)"/>-->
-                        <!--                                    &lt;!&ndash;                                    <column hflex="1" label="Container Ports" sort="auto(ports)"/>&ndash;&gt;-->
-                        <!--                                    &lt;!&ndash;                                    <column hflex="1" label="Resource Name" tooltiptext="Kubernetes Resource Name: [Pod containers]" sort="auto(resourceName)"/>&ndash;&gt;-->
-                        <!--                                    &lt;!&ndash;                                    <column hflex="min" label="Namespace" sort="auto(namespace)"/>&ndash;&gt;-->
-                        <!--                                    &lt;!&ndash;                                    <column hflex="min" label="Resource Type" sort="auto(resourceType)"/>&ndash;&gt;-->
-                        <!--                                    &lt;!&ndash;                                    <column hflex="min" label="Host Info" tooltiptext="Node/Host Name: [Node IP]" sort="auto(hostInfo)"/>&ndash;&gt;-->
-                        <!--                                    &lt;!&ndash;                                    <column hflex="1" label="Additional Info" sort="auto(additionalInfo)"/>&ndash;&gt;-->
-                        <!--                                    &lt;!&ndash;                                    <column hflex="min" label="Creation Time" sort="auto(creationTime)"/>&ndash;&gt;-->
-                        <!--                                </columns>-->
-                        <!--                                <rows>-->
-                        <!--                                    <template name="model" var="item">-->
-                        <!--                                        <row style="cursor:pointer">-->
-                        <!--                                            <label value="${item.id}"/>-->
-                        <!--                                            <label value="${item.ip}" multiline="true"/>-->
-                        <!--                                            &lt;!&ndash;                                            <label value="${item.ports}" multiline="true"/>&ndash;&gt;-->
-                        <!--                                            &lt;!&ndash;                                            <label value="${item.resourceName}"/>&ndash;&gt;-->
-                        <!--                                            &lt;!&ndash;                                            <label value="${item.namespace}"/>&ndash;&gt;-->
-                        <!--                                            &lt;!&ndash;                                            <label value="${item.resourceType}"/>&ndash;&gt;-->
-                        <!--                                            &lt;!&ndash;                                            <label value="${item.hostInfo}"/>&ndash;&gt;-->
-                        <!--                                            &lt;!&ndash;                                            <label value="${item.additionalInfo}" multiline="true"/>&ndash;&gt;-->
-                        <!--                                            &lt;!&ndash;                                            <label value="${item.creationTime}"/>&ndash;&gt;-->
-                        <!--                                        </row>-->
-                        <!--                                    </template>-->
-                        <!--                                </rows>-->
-                        <!--                                <foot>-->
-                        <!--                                    <footer id="serviceAccountsGridFooter" span="9" align="right" label="@load(securityVM.serviceAccountsTotalItems)"/>-->
-                        <!--                                </foot>-->
-                        <!--                            </grid>-->
-                        <!--                        </tabpanel>-->
+                        <!--                        SERVICE ACCOUNTS-->
 
+                        <tabpanel>
+                            <groupbox width="100%">
+                                <caption iconSclass="z-icon-sliders" label="Search Configuration"/>
+                                <vbox height="100%" width="100%">
+                                    <hbox height="100%" width="100%" align="stretch">
+                                        <cell width="10%" tooltip="clearAllTooltip">
+                                            <button iconSclass="z-icon-eraser" width="100%" label="Clear all" onClick="@command('clearAllServiceAccounts')"/>
+                                        </cell>
+                                        <separator width="15px" orient="vertical" bar="true"/>
+                                        <cell width="20%" align="left">
+                                            <hlayout valign="middle">
+                                                <label value="Namespace: "/>
+                                                <combobox tooltip="namespacesTooltip" hflex="1" model="@load(securityVM.namespaces)"
+                                                          selectedItem="@bind(securityVM.selectedServiceAccountsNamespace)" readonly="true">
+                                                    <template name="model">
+                                                        <comboitem label="@load(each)"/>
+                                                    </template>
+                                                </combobox>
+                                            </hlayout>
+                                        </cell>
+                                        <cell width="59%">
+                                        </cell>
+                                        <cell width="10%">
+                                            <button label="Get" onClick="@command('getServiceAccounts')" width="100%"/>
+                                        </cell>
+                                    </hbox>
+                                </vbox>
+                            </groupbox>
+                            <separator width="100%" orient="horizontal"/>
+                            <grid id="securityServiceAccountsGrid" model="@load(securityVM.serviceAccountsResults)" height="@load(securityVM.serviceAccountsGridHeight)">
+                                <columns menupopup="auto" sizable="true">
+                                    <column hflex="min" label="Id" sort="auto(id)"/>
+                                    <column hflex="2" label="Service Account Name" tooltiptext="Service Account Name" sort="auto(resourceName)"/>
+                                    <column hflex="1" label="Kind" tooltiptext="Kind" sort="auto(kind)"/>
+                                    <column hflex="2" label="Secrets" tooltiptext="Secrets" sort="auto(secrets)"/>
+                                    <column hflex="1" label="Namespace" tooltiptext="Namespace" sort="auto(namespace)"/>
+                                    <column hflex="min" label="Creation Time" tooltiptext="Creation Time" sort="auto(creationTime)"/>
+                                    <column hflex="min" tooltiptext="Full Definition" label="Full Definition"/>
+                                </columns>
+                                <rows>
+                                    <template name="model" var="item">
+                                        <row style="cursor:pointer">
+                                            <label value="${item.id}"/>
+                                            <label value="${item.resourceName}" multiline="true"/>
+                                            <label value="${item.kind}" multiline="true"/>
+                                            <label value="${item.secrets}" multiline="true"/>
+                                            <label value="${item.namespace}" multiline="true"/>
+                                            <label value="${item.creationTime}"/>
+                                            <toolbarbutton label="Full Definition" tooltiptext="Full Definition" onClick="@command('showServiceAccountFullDefinition', item=item)" hflex="1"/>
+                                        </row>
+                                    </template>
+                                </rows>
+                                <foot>
+                                    <footer id="serviceAccountsGridFooter" span="7" align="right" label="@load(securityVM.serviceAccountsTotalItems)"/>
+                                </foot>
+                            </grid>
+                        </tabpanel>
 
                         <!--                        POD SECURITY POLICIES-->
 
@@ -618,7 +610,7 @@
                                             <button id="clearAllBtnPodSecurityPolicies" width="100%" iconSclass="z-icon-eraser" label="Clear all" onClick="@command('clearAllPodSecurityPolicies')"/>
                                         </cell>
                                         <separator width="15px" orient="vertical" bar="true"/>
-                                        <cell id="namespacesCellPodSecurityPolicies" width="30%" align="left">
+                                        <cell id="namespacesCellPodSecurityPolicies" width="20%" align="left">
                                             <hlayout valign="middle">
                                                 <label value="Namespace: "/>
                                                 <combobox id="namespacesCBoxPodSecurityPolicies" tooltip="namespacesTooltip" hflex="1" model="@load(securityVM.namespaces)"
@@ -629,10 +621,10 @@
                                                 </combobox>
                                             </hlayout>
                                         </cell>
-                                        <cell width="49%">
+                                        <cell width="59%">
                                         </cell>
                                         <cell id="cellGetBtnPodSecurityPolicies" width="10%">
-                                            <button id="getPodSecurityPoliciesBtn" label="Get" iconSclass="z-icon-refresh" onClick="@command('getPodsSecurityPolicies')" width="100%"/>
+                                            <button id="getPodSecurityPoliciesBtn" label="Get" iconSclass="z-icon-angle-double-right" onClick="@command('getPodsSecurityPolicies')" width="100%"/>
                                         </cell>
                                     </hbox>
                                 </vbox>
