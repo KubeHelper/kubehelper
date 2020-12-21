@@ -21,7 +21,6 @@ import com.kubehelper.common.Global;
 import com.kubehelper.common.KubeHelperException;
 import com.kubehelper.common.Resource;
 import com.kubehelper.domain.filters.RBACFilter;
-import com.kubehelper.domain.filters.RoleRulesSecurityFilter;
 import com.kubehelper.domain.filters.RolesSecurityFilter;
 import com.kubehelper.domain.results.ContainerSecurityResult;
 import com.kubehelper.domain.results.PodSecurityContextResult;
@@ -66,13 +65,9 @@ public class SecurityModel implements PageModel {
     private List<PodSecurityPoliciesResult> podSecurityPoliciesResults = new ArrayList<>();
     //key is RoleResult id
     private RolesSecurityFilter rolesFilter = new RolesSecurityFilter();
-    private RoleRulesSecurityFilter roleRulesFilter = new RoleRulesSecurityFilter();
     private RBACFilter rbacsFilter = new RBACFilter();
     private List<KubeHelperException> searchExceptions = new ArrayList<>();
-    private int selectedRoleId;
-    private int selectedRoleRuleId;
     private boolean skipKubeNamespaces = true;
-//    private boolean caseSensitiveSearch = false;
 
     public SecurityModel() {
     }
@@ -234,18 +229,9 @@ public class SecurityModel implements PageModel {
         return rolesFilter;
     }
 
-    public RoleRulesSecurityFilter getRoleRulesFilter() {
-        return roleRulesFilter;
-    }
-
 
     public SecurityModel setRolesFilter(RolesSecurityFilter rolesFilter) {
         this.rolesFilter = rolesFilter;
-        return this;
-    }
-
-    public SecurityModel setRoleRulesFilter(RoleRulesSecurityFilter roleRulesFilter) {
-        this.roleRulesFilter = roleRulesFilter;
         return this;
     }
 

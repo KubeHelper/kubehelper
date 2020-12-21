@@ -76,7 +76,7 @@
                                             <label value="Full Command: "/>
                                         </cell>
                                         <cell width="10%" style="padding: 0px 5px 0px 5px;">
-                                            <button id="runCommandBtn" label="Run" iconSclass="z-icon-refresh" onClick="@command('run')" width="100%"/>
+                                            <button id="runCommandBtn" label="Run" iconSclass="z-icon-search" onClick="@command('run')" width="100%"/>
                                         </cell>
                                     </hbox>
                                 </vbox>

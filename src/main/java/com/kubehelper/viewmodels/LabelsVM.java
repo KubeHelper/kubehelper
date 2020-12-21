@@ -193,7 +193,6 @@ public class LabelsVM implements EventListener, PropertyChangeListener {
         }
         sortResultsByNamespace();
         logger.info("Found {} namespaces.", labelsModel.getNamespaces());
-//        updateHeightsAndRerenderVM();
     }
 
     private void sortResultsByNamespace() {
@@ -209,11 +208,11 @@ public class LabelsVM implements EventListener, PropertyChangeListener {
         searchResults.clear();
         for (LabelResult searchResult : labelsModel.getSearchResults()) {
             if (StringUtils.containsIgnoreCase(searchResult.getName(), getFilter().getName()) &&
-                    StringUtils.containsIgnoreCase(searchResult.getResourceProperty(), getFilter().getSelectedResourcePropertyFilter()) &&
-                    StringUtils.containsIgnoreCase(searchResult.getResourceType(), getFilter().getSelectedResourceTypeFilter()) &&
-                    StringUtils.containsIgnoreCase(searchResult.getResourceName(), getFilter().getSelectedResourceNameFilter()) &&
+                    commonService.checkEqualsFilter(searchResult.getResourceProperty(), getFilter().getSelectedResourcePropertyFilter()) &&
+                    commonService.checkEqualsFilter(searchResult.getResourceType(), getFilter().getSelectedResourceTypeFilter()) &&
+                    commonService.checkEqualsFilter(searchResult.getResourceName(), getFilter().getSelectedResourceNameFilter()) &&
                     StringUtils.containsIgnoreCase(searchResult.getAdditionalInfo(), getFilter().getAdditionalInfo()) &&
-                    StringUtils.containsIgnoreCase(searchResult.getNamespace(), getFilter().getSelectedNamespaceFilter())) {
+                    commonService.checkEqualsFilter(searchResult.getNamespace(), getFilter().getSelectedNamespaceFilter())) {
                 searchResults.add(searchResult);
             }
         }
@@ -251,11 +250,11 @@ public class LabelsVM implements EventListener, PropertyChangeListener {
     public void filterGroupedLabelsColumns() {
         groupedLabelColumns.clear();
         for (LabelsModel.GroupedLabelColumn glc : labelsModel.getGroupedLabelsColumns()) {
-            if (StringUtils.containsIgnoreCase(glc.getResourceProperty(), getGroupedLabelColumnsFilter().getSelectedResourcePropertyFilter()) &&
-                    StringUtils.containsIgnoreCase(glc.getResourceType(), getGroupedLabelColumnsFilter().getSelectedResourceTypeFilter()) &&
-                    StringUtils.containsIgnoreCase(glc.getResourceName(), getGroupedLabelColumnsFilter().getSelectedResourceNameFilter()) &&
+            if (commonService.checkEqualsFilter(glc.getResourceProperty(), getGroupedLabelColumnsFilter().getSelectedResourcePropertyFilter()) &&
+                    commonService.checkEqualsFilter(glc.getResourceType(), getGroupedLabelColumnsFilter().getSelectedResourceTypeFilter()) &&
+                    commonService.checkEqualsFilter(glc.getResourceName(), getGroupedLabelColumnsFilter().getSelectedResourceNameFilter()) &&
                     StringUtils.containsIgnoreCase(glc.getAdditionalInfo(), getFilter().getAdditionalInfo()) &&
-                    StringUtils.containsIgnoreCase(glc.getNamespace(), getGroupedLabelColumnsFilter().getSelectedNamespaceFilter())) {
+                    commonService.checkEqualsFilter(glc.getNamespace(), getGroupedLabelColumnsFilter().getSelectedNamespaceFilter())) {
                 groupedLabelColumns.add(glc);
             }
         }
@@ -366,37 +365,32 @@ public class LabelsVM implements EventListener, PropertyChangeListener {
     /**
      * Shows popup window with full label value on main search grid.
      *
-     * @param id - clicked searched item id.
+     * @param item - clicked searched item.
      */
     @Command
-    public void showFullLabelValue(@BindingParam("id") int id) {
-        Optional<LabelResult> first = searchResults.getInnerList().stream().filter(item -> item.getId() == id).findFirst();
-        showDetailWindow(first.isPresent(), first.get().getName());
+    public void showFullLabelValue(@BindingParam("item") LabelResult item) {
+        showDetailWindow(item.getName());
     }
 
     /**
      * Shows popup window with full label value on grouped grid.
      *
-     * @param id - clicked grouped item id.
+     * @param item - clicked grouped item.
      */
     @Command
-    public void showFullGroupedLabelValue(@BindingParam("id") int id) {
-        Optional<LabelsModel.GroupedLabel> first = groupedLabels.getInnerList().stream().filter(item -> item.getId() == id).findFirst();
-        showDetailWindow(first.isPresent(), first.get().getName());
+    public void showFullGroupedLabelValue(@BindingParam("item") LabelsModel.GroupedLabel item) {
+        showDetailWindow(item.getName());
     }
 
     /**
      * Compose title and content into popup window.
      *
-     * @param present - is value present.
-     * @param name    - key=value string for title and content.
+     * @param name - key=value string for title and content.
      */
-    private void showDetailWindow(boolean present, String name) {
-        if (present) {
-            Map<String, String> parameters = Map.of("title", name.substring(0, name.indexOf("=")), "content", name.substring(name.indexOf("=") + 1));
-            Window window = (Window) Executions.createComponents("~./zul/components/file-display.zul", null, parameters);
-            window.doModal();
-        }
+    private void showDetailWindow(String name) {
+        Map<String, String> parameters = Map.of("title", name.substring(0, name.indexOf("=")), "content", name.substring(name.indexOf("=") + 1));
+        Window window = (Window) Executions.createComponents("~./zul/components/file-display.zul", null, parameters);
+        window.doModal();
     }
 
     /**

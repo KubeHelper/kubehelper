@@ -23,10 +23,6 @@ package com.kubehelper.domain.models;
 public interface PageModel {
 
     String getTemplateUrl();
-//    int getDesktopWidth();
-//    int getDesktopHeight();
-//
-//    void setDesktopWithAndHeight(int width, int height);
     String getName();
     void setPageMainContentHeight(int height);
 }

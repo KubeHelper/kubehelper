@@ -115,7 +115,6 @@ public class IpsAndPortsVM implements PropertyChangeListener {
         }
         sortResultsByNamespace();
         logger.info("Found {} namespaces.", ipsAndPortsModel.getNamespaces());
-//        updateHeightsAndRerenderVM();
     }
 
     @Command
@@ -128,8 +127,8 @@ public class IpsAndPortsVM implements PropertyChangeListener {
                     StringUtils.containsIgnoreCase(ipsAndPortsResult.getHostInfo(), getFilter().getHostInfo()) &&
                     StringUtils.containsIgnoreCase(ipsAndPortsResult.getCreationTime(), getFilter().getCreationTime()) &&
                     StringUtils.containsIgnoreCase(ipsAndPortsResult.getResourceName(), getFilter().getResourceName()) &&
-                    StringUtils.containsIgnoreCase(ipsAndPortsResult.getResourceType(), getFilter().getResourceType()) &&
-                    StringUtils.containsIgnoreCase(ipsAndPortsResult.getNamespace(), getFilter().getNamespace())) {
+                    commonService.checkEqualsFilter(ipsAndPortsResult.getResourceType(), getFilter().getSelectedResourceTypeFilter()) &&
+                    commonService.checkEqualsFilter(ipsAndPortsResult.getNamespace(), getFilter().getSelectedNamespaceFilter())) {
                 ipsAndPortsResults.add(ipsAndPortsResult);
             }
         }

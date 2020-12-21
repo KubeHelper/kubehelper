@@ -17,10 +17,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package com.kubehelper.domain.results;
 
-import io.kubernetes.client.openapi.models.V1Capabilities;
-import io.kubernetes.client.openapi.models.V1SELinuxOptions;
-import io.kubernetes.client.openapi.models.V1WindowsSecurityContextOptions;
-
 /**
  * @author JDev
  */

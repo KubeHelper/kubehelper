@@ -38,7 +38,7 @@
                                         <cell width="59%">
                                         </cell>
                                         <cell id="cellGetBtnRoles" width="10%">
-                                            <button id="getRolesBtn" label="Get" iconSclass="z-icon-refresh" onClick="@command('getRoles')" width="100%"/>
+                                            <button id="getRolesBtn" label="Search" iconSclass="z-icon-search" onClick="@command('getRoles')" width="100%"/>
                                         </cell>
                                     </hbox>
                                 </vbox>
@@ -154,7 +154,7 @@
                                         </template>
                                     </rows>
                                     <foot>
-                                        <footer id="roleRulesGridFooter" span="9" align="right" label="@load(securityVM.roleRulesTotalItems)"/>
+                                        <footer id="roleRulesGridFooter" span="7" align="right" label="@load(securityVM.roleRulesTotalItems)"/>
                                     </foot>
                                 </grid>
                             </groupbox>
@@ -190,7 +190,7 @@
                                         <cell width="48%">
                                         </cell>
                                         <cell id="cellGetBtnRBACs" width="10%">
-                                            <button id="getRBACsBtn" label="Get" iconSclass="z-icon-refresh" onClick="@command('getRbacs')" width="100%"/>
+                                            <button id="getRBACsBtn" label="Search" iconSclass="z-icon-search" onClick="@command('getRbacs')" width="100%"/>
                                         </cell>
                                     </hbox>
                                 </vbox>
@@ -405,7 +405,7 @@
                                         <cell width="59%">
                                         </cell>
                                         <cell id="cellGetBtnPods" width="10%">
-                                            <button id="getPodsBtn" label="Get" iconSclass="z-icon-refresh" onClick="@command('getPodsSecurityContexts')" width="100%"/>
+                                            <button id="getPodsBtn" label="Search" iconSclass="z-icon-search" onClick="@command('getPodsSecurityContexts')" width="100%"/>
                                         </cell>
                                     </hbox>
                                 </vbox>
@@ -479,7 +479,7 @@
                                         <cell width="59%">
                                         </cell>
                                         <cell id="cellGetBtnContainers" width="10%">
-                                            <button id="getContainersBtn" label="Get" iconSclass="z-icon-refresh" onClick="@command('getContainersSecurityContexts')" width="100%"/>
+                                            <button id="getContainersBtn" label="Search" iconSclass="z-icon-search" onClick="@command('getContainersSecurityContexts')" width="100%"/>
                                         </cell>
                                     </hbox>
                                 </vbox>
@@ -723,7 +723,4 @@
     <popup id="skipKubeNamespacesTooltip">
         Skips search in kube* namespaces. Saves execution time.
     </popup>
-    <!--    <popup id="getResourcesTooltip">-->
-    <!--        Searching for resources(pods, services) from the selected namespace.-->
-    <!--    </popup>-->
 </zk>

@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package com.kubehelper.common;
 
 import com.kubehelper.domain.models.DashboardModel;
-import com.kubehelper.domain.models.EventsModel;
 import com.kubehelper.domain.models.FeaturesModel;
 import com.kubehelper.domain.models.IpsAndPortsModel;
 import com.kubehelper.domain.models.LabelsModel;
@@ -37,15 +36,10 @@ public class Global {
     public static String DASHBOARD_MODEL = "dashboard";
     public static String SEARCH_MODEL = "search";
     public static String SECURITY_MODEL = "security";
-    public static String AUDITING_MODEL = "auditing";
     public static String LABELS_MODEL = "labels";
-    public static String CUSTOM_RESOURCES_MODEL = "customResources";
-    public static String DEPRECATED_MODEL = "deprecated";
-    public static String EVENTS_MODEL = "events";
     public static String FEATURES_MODEL = "features";
     public static String FEATURE_GATES_MODEL = "featureGates";
     public static String IPS_AND_PORTS_MODEL = "ipsAndPorts";
-    public static String VOLUMES_MODEL = "volumes";
 
     public static Map<String, PageModel> ACTIVE_MODELS = new HashMap<>() {
     };
@@ -56,14 +50,19 @@ public class Global {
             put(SEARCH_MODEL, new SearchModel());
             put(SECURITY_MODEL, new SecurityModel());
             put(LABELS_MODEL, new LabelsModel());
-            put(AUDITING_MODEL, new SearchModel());
-            put(CUSTOM_RESOURCES_MODEL, new SearchModel());
-            put(DEPRECATED_MODEL, new SearchModel());
-            put(EVENTS_MODEL, new EventsModel());
             put(FEATURES_MODEL, new FeaturesModel());
             put(FEATURE_GATES_MODEL, new SearchModel());
             put(IPS_AND_PORTS_MODEL, new IpsAndPortsModel());
-            put(VOLUMES_MODEL, new SearchModel());
         }
     };
+
+    //    public static String AUDITING_MODEL = "auditing";
+//    public static String VOLUMES_MODEL = "volumes";
+//    public static String CUSTOM_RESOURCES_MODEL = "customResources";
+//    public static String DEPRECATED_MODEL = "deprecated";
+//    public static String EVENTS_MODEL = "events";
+//            put(AUDITING_MODEL, new SearchModel());
+//            put(CUSTOM_RESOURCES_MODEL, new SearchModel());
+//            put(DEPRECATED_MODEL, new SearchModel());
+//            put(VOLUMES_MODEL, new SearchModel());
 }

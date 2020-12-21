@@ -46,7 +46,6 @@ public class SearchModel implements PageModel {
     private String searchString = "";
     private boolean skipKubeNamespaces = true;
     private boolean skipNativeEnvVars = true;
-//    private boolean caseSensitiveSearch = false;
 
     public SearchModel() {
     }

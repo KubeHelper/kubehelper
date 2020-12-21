@@ -1,7 +1,7 @@
 <zk>
     <div id="searchTemplate" viewModel="@id('searchVM') @init('com.kubehelper.viewmodels.SearchVM')" width="100%" height="100%">
         <borderlayout>
-            <north title="Search" collapsible="true" vflex="min" style="overflow-y:auto;overflow-x: hidden;">
+            <north title="Search" collapsible="true">
                 <groupbox width="100%">
                     <caption iconSclass="z-icon-sliders" label="Search Configuration"/>
                     <vbox height="100%" width="100%">
@@ -33,13 +33,17 @@
                                     <checkbox id="skipNativeEnvVarsCBox" checked="@bind(searchVM.skipNativeEnvVars)" tooltip="skipNativeEnvVarsTooltip"/>Skip native Env variables
                                 </hlayout>
                             </cell>
-                            <cell width="36%">
+                            <cell width="40%">
+                                <hlayout valign="middle">
+                                    <label value="Search: "/>
+                                    <textbox id="searchStringTBox" hflex="1" value="@bind(searchVM.searchString)" onOK="@command('search')"/>
+                                </hlayout>
                             </cell>
+                            <separator width="15px" orient="vertical" bar="true"/>
                             <cell id="cellSearchBtn" width="10%">
                                 <button id="searchBtn" label="Search" iconSclass="z-icon-search" width="100%" onClick="@command('search')"/>
                             </cell>
                         </hbox>
-                        <separator width="100%" orient="horizontal"/>
                         <groupbox id="kubeResourcesGBox" width="100%">
                             <caption>
                                 <checkbox id="kubeResourcesGBoxCheckAll" checked="true" onCheck="@command('selectAllResources')"/>Resources
@@ -132,14 +136,7 @@
                         <footer id="searchGridTotalItemsFooter" span="8" align="right" label="@load(searchVM.totalItems)"/>
                     </foot>
                 </grid>
-                <!--                </div>-->
             </center>
-            <!--            <south size="3%" maxsize="200" splittable="true" collapsible="true" margins="0,0,3,3">-->
-            <!--                <panel border="normal">-->
-            <!--                    <panelchildren style="overflow:auto;">-->
-            <!--                    </panelchildren>-->
-            <!--                </panel>-->
-            <!--            </south>-->
         </borderlayout>
     </div>
     <popup id="namespacesTooltip">

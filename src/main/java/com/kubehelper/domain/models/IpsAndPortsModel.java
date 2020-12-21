@@ -33,7 +33,7 @@ import java.util.List;
 public class IpsAndPortsModel implements PageModel {
 
     private int mainGridHeight = 600;
-    private PropertyChangeSupport grid =new PropertyChangeSupport(this);
+    private PropertyChangeSupport grid = new PropertyChangeSupport(this);
 
     private String templateUrl = "~./zul/pages/ipsandports.zul";
 
@@ -61,6 +61,8 @@ public class IpsAndPortsModel implements PageModel {
 
     public void addIpsAndPortsResult(IpsAndPortsResult ipsAndPortsResult) {
         ipsAndPortsResults.add(ipsAndPortsResult);
+        filter.addNamespacesFilter(ipsAndPortsResult.getNamespace());
+        filter.addResourceTypesFilter(ipsAndPortsResult.getResourceType());
     }
 
     public IpsAndPortsModel setNamespaces(List<String> namespaces) {

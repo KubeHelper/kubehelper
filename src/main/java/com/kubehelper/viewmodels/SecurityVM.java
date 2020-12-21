@@ -19,7 +19,6 @@ package com.kubehelper.viewmodels;
 
 import com.kubehelper.common.Global;
 import com.kubehelper.domain.filters.RBACFilter;
-import com.kubehelper.domain.filters.RoleRulesSecurityFilter;
 import com.kubehelper.domain.filters.RolesSecurityFilter;
 import com.kubehelper.domain.models.SecurityModel;
 import com.kubehelper.domain.results.ContainerSecurityResult;
@@ -572,10 +571,6 @@ public class SecurityVM implements PropertyChangeListener {
         return securityModel.getRolesFilter();
     }
 
-    public RoleRulesSecurityFilter getRoleRulesFilter() {
-        return securityModel.getRoleRulesFilter();
-    }
-
     public RBACFilter getRbacFilter() {
         return securityModel.getRbacsFilter();
     }
@@ -617,7 +612,7 @@ public class SecurityVM implements PropertyChangeListener {
     }
 
     public String getRoleRulesGridHeight() {
-        return securityModel.getMainGridHeight() * 0.44 + "px";
+        return securityModel.getMainGridHeight() * 0.33 + "px";
     }
 
     public String getPodsSecurityContextsGridHeight() {

@@ -18,28 +18,47 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package com.kubehelper.domain.filters;
 
 import org.apache.commons.lang3.StringUtils;
+import org.zkoss.zul.ListModelList;
 
 /**
  * @author JDev
  */
 public class IpsAndPortsFilter {
-    private String namespace = "", resourceType = "", resourceName = "", creationTime = "", ip = "", hostInfo = "", ports = "", additionalInfo = "";
+    private String resourceName = "", creationTime = "", ip = "", hostInfo = "", ports = "", additionalInfo = "";
 
-    public String getNamespace() {
-        return namespace;
+    private String selectedNamespaceFilter = "";
+    private String selectedResourceTypeFilter = "";
+
+    private ListModelList<String> namespacesFilter = new ListModelList<>();
+    private ListModelList<String> resourceTypesFilter = new ListModelList<>();
+
+    public void addNamespacesFilter(String namespaceFilter) {
+        if (!namespacesFilter.contains(namespaceFilter)) {
+            namespacesFilter.add(namespaceFilter);
+        }
     }
 
-    public IpsAndPortsFilter setNamespace(String namespace) {
-        this.namespace = namespace == null ? "" : namespace.trim();
+    public void addResourceTypesFilter(String resourceTypeFilter) {
+        if (!resourceTypesFilter.contains(resourceTypeFilter)) {
+            resourceTypesFilter.add(resourceTypeFilter);
+        }
+    }
+
+    public String getSelectedNamespaceFilter() {
+        return selectedNamespaceFilter;
+    }
+
+    public IpsAndPortsFilter setSelectedNamespaceFilter(String selectedNamespaceFilter) {
+        this.selectedNamespaceFilter = selectedNamespaceFilter == null ? "" : selectedNamespaceFilter;
         return this;
     }
 
-    public String getResourceType() {
-        return resourceType;
+    public String getSelectedResourceTypeFilter() {
+        return selectedResourceTypeFilter;
     }
 
-    public IpsAndPortsFilter setResourceType(String resourceType) {
-        this.resourceType = resourceType == null ? "" : resourceType.trim();
+    public IpsAndPortsFilter setSelectedResourceTypeFilter(String selectedResourceTypeFilter) {
+        this.selectedResourceTypeFilter = selectedResourceTypeFilter == null ? "" : selectedResourceTypeFilter;
         return this;
     }
 
@@ -97,7 +116,15 @@ public class IpsAndPortsFilter {
         return this;
     }
 
+    public ListModelList<String> getNamespacesFilter() {
+        return namespacesFilter;
+    }
+
+    public ListModelList<String> getResourceTypesFilter() {
+        return resourceTypesFilter;
+    }
+
     public boolean isFilterActive() {
-        return StringUtils.isNoneBlank(namespace, resourceType, resourceName, creationTime, ip, hostInfo, ports, additionalInfo);
+        return StringUtils.isNoneBlank(selectedNamespaceFilter, selectedResourceTypeFilter, resourceName, creationTime, ip, hostInfo, ports, additionalInfo);
     }
 }

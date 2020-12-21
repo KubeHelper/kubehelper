@@ -24,7 +24,7 @@
                             <cell width="59%">
                             </cell>
                             <cell id="cellGetBtn" width="10%">
-                                <button id="getIpsBtn" label="Get" iconSclass="z-icon-refresh" onClick="@command('search')" width="100%"/>
+                                <button id="getIpsBtn" label="Search" iconSclass="z-icon-search" onClick="@command('search')" width="100%"/>
                             </cell>
                         </hbox>
                         <separator width="100%" orient="horizontal" bar="false"/>
@@ -47,10 +47,20 @@
                             <textbox instant="true" hflex="1" value="@bind(ipsAndPortsVM.filter.resourceName)" onChange="@command('filterIps')"/>
                         </auxheader>
                         <auxheader colspan="1">
-                            <textbox instant="true" hflex="1" value="@bind(ipsAndPortsVM.filter.namespace)" onChange="@command('filterIps')"/>
+                            <combobox hflex="1" mold="rounded" model="@load(ipsAndPortsVM.filter.namespacesFilter)"
+                                      selectedItem="@bind(ipsAndPortsVM.filter.selectedNamespaceFilter)" onChange="@command('filterIps')">
+                                <template name="model">
+                                    <comboitem label="@load(each)"/>
+                                </template>
+                            </combobox>
                         </auxheader>
                         <auxheader colspan="1">
-                            <textbox instant="true" hflex="1" value="@bind(ipsAndPortsVM.filter.resourceType)" onChange="@command('filterIps')"/>
+                            <combobox hflex="1" model="@load(ipsAndPortsVM.filter.resourceTypesFilter)"
+                                      selectedItem="@bind(ipsAndPortsVM.filter.selectedResourceTypeFilter)" onChange="@command('filterIps')">
+                                <template name="model">
+                                    <comboitem label="@load(each)"/>
+                                </template>
+                            </combobox>
                         </auxheader>
                         <auxheader colspan="1">
                             <textbox instant="true" hflex="1" value="@bind(ipsAndPortsVM.filter.hostInfo)" onChange="@command('filterIps')"/>
@@ -65,9 +75,9 @@
                     <columns menupopup="auto" sizable="true">
                         <column hflex="min" label="Id" sort="auto(id)"/>
                         <column hflex="1" label="IP" sort="auto(ip)"/>
-                        <column hflex="1" label="Container Ports" sort="auto(ports)"/>
-                        <column hflex="1" label="Resource Name" tooltiptext="Kubernetes Resource Name: [Pod containers]" sort="auto(resourceName)"/>
-                        <column hflex="min" label="Namespace" sort="auto(namespace)"/>
+                        <column hflex="2" label="Container Ports" sort="auto(ports)"/>
+                        <column hflex="2" label="Resource Name" tooltiptext="Kubernetes Resource Name: [Pod containers]" sort="auto(resourceName)"/>
+                        <column hflex="1" label="Namespace" sort="auto(namespace)"/>
                         <column hflex="min" label="Resource Type" sort="auto(resourceType)"/>
                         <column hflex="min" label="Host Info" tooltiptext="Node/Host Name: [Node IP]" sort="auto(hostInfo)"/>
                         <column hflex="1" label="Additional Info" sort="auto(additionalInfo)"/>
@@ -109,7 +119,4 @@
     <popup id="popupIpsAndPortsDetails">
         Show detailed information about pod in a pop-up window.
     </popup>
-    <!--    <popup id="getResourcesTooltip">-->
-    <!--        Searching for resources(pods, services) from the selected namespace.-->
-    <!--    </popup>-->
 </zk>

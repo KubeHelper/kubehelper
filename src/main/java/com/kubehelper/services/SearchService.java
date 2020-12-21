@@ -121,11 +121,6 @@ public class SearchService {
 
     private static Logger logger = LoggerFactory.getLogger(SearchService.class);
 
-//    TODO fix progress label
-//    private String progressLabel = "";
-//    private int currentItemNumber;
-//    private int totalItems;
-
     @Autowired
     private KubeAPI kubeAPI;
 
@@ -138,9 +133,6 @@ public class SearchService {
      * @param searchModel - search model
      */
     public void search(SearchModel searchModel, Set<Resource> selectedResources) {
-
-        //TODO exp with kubectl
-//        Kubectl kubectl = Kubectl.apiResources().execute().;
 
         searchModel.getSearchResults().clear();
         searchModel.getSearchExceptions().clear();
@@ -794,17 +786,4 @@ public class SearchService {
     private boolean skipKubeNamespace(SearchModel searchModel, V1ObjectMeta meta) {
         return searchModel.isSkipKubeNamespaces() && StringUtils.isNotBlank(meta.getNamespace()) && meta.getNamespace().startsWith("kube-");
     }
-
-
-//    private void buildProgressLabel() {
-//        currentItemNumber++;
-//        this.progressLabel = String.format("Parsed %d of %d.", currentItemNumber, totalItems);
-//        this.progressUpdateListener.firePropertyChange("progressLabel", progressLabel, progressLabel);
-//        System.out.println("BuildProgressLabel :"+progressLabel);
-//    }
-//
-//    public String getProgressLabel() {
-//        System.out.println("getProgressLabel :"+progressLabel);
-//        return progressLabel;
-//    }
 }

@@ -2,11 +2,11 @@
 <zk>
     <div id="labelsTemplate" viewModel="@id('labelsVM') @init('com.kubehelper.viewmodels.LabelsVM')" width="100%" height="100%">
         <borderlayout>
-            <north title="Labels Annotations Selectors" collapsible="true" vflex="min" style="overflow-y:auto;overflow-x: hidden;">
+            <north title="Labels Annotations Selectors" collapsible="true" vflex="min">
                 <groupbox id="labelsConfigGroupBox" width="100%">
                     <caption iconSclass="z-icon-sliders" label="Search Configuration"/>
                     <vbox height="100%" width="100%">
-                        <hbox height="100%" width="100%" align="center" >
+                        <hbox height="100%" width="100%" align="stretch" >
                             <cell id="clearAllCell" width="10%" tooltip="clearAllTooltip">
                                 <button id="clearAll" width="100%" iconSclass="z-icon-eraser" label="Clear all" onClick="@command('clearAll')"/>
                             </cell>
@@ -51,7 +51,6 @@
                     </vbox>
                 </groupbox>
             </north>
-            <!--            TODO Paging and vflex="min" for center and remove height-->
             <center vflex="max" margins="0,3,3,3">
                 <tabbox width="100%" sclass="nav_tabs">
                     <tabs id="tabs">
