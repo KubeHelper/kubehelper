@@ -30,7 +30,6 @@ import com.kubehelper.domain.results.PodSecurityContextResult;
 import com.kubehelper.domain.results.PodSecurityPoliciesResult;
 import com.kubehelper.domain.results.RBACResult;
 import com.kubehelper.domain.results.RoleResult;
-import com.kubehelper.domain.results.RoleRuleResult;
 import com.kubehelper.domain.results.ServiceAccountResult;
 import io.kubernetes.client.openapi.models.V1beta1Subject;
 
@@ -56,7 +55,7 @@ public class SecurityModel implements PageModel {
     private String selectedRolesNamespace = "all";
     private String selectedRBACsNamespace = "all";
     private String selectedPodsSecurityContextsNamespace = "all";
-    private String selectedContainersNamespace = "all";
+    private String selectedContainersSecurityNamespace = "all";
     private String selectedServiceAccountsNamespace = "all";
     private String selectedPodSecurityPoliciesNamespace = "all";
 
@@ -64,7 +63,7 @@ public class SecurityModel implements PageModel {
     private Map<Integer, RoleResult> rolesResults = new HashMap<>();
     private List<PodSecurityContextResult> podsSecurityContextResults = new ArrayList<>();
     private List<RBACResult> rbacsResults = new ArrayList<>();
-    private List<ContainerSecurityResult> containersResults = new ArrayList<>();
+    private List<ContainerSecurityResult> containersSecurityResults = new ArrayList<>();
     private List<ServiceAccountResult> serviceAccountsResults = new ArrayList<>();
     private List<PodSecurityPoliciesResult> podSecurityPoliciesResults = new ArrayList<>();
     //key is RoleResult id
@@ -97,14 +96,6 @@ public class SecurityModel implements PageModel {
         grid.addPropertyChangeListener(pcl);
     }
 
-//    public SecurityModel addSearchResult(SearchResult searchResult) {
-//        searchResults.add(searchResult);
-//        filter.addResourceTypesFilter(searchResult.getResourceType());
-//        filter.addNamespacesFilter(searchResult.getNamespace());
-//        filter.addResourceNamesFilter(resourceName);
-//        return this;
-//    }
-
     public SecurityModel addRoleResult(RoleResult roleResult) {
         rolesResults.put(roleResult.getId(), roleResult);
         rolesFilter.addResourceNamesFilter(roleResult.getResourceName());
@@ -126,9 +117,12 @@ public class SecurityModel implements PageModel {
 
     public SecurityModel addPodSecurityContext(PodSecurityContextResult result) {
         podsSecurityContextResults.add(result);
-//        TODO add filters
-//        rolesFilter.addNamespacesFilter(roleResult.getNamespace());
-//        rolesFilter.addResourcePropertiesFilter(roleResult.getr);
+        return this;
+    }
+
+    public SecurityModel addContainerSecurityResult(ContainerSecurityResult containerResult) {
+        containersSecurityResults.add(containerResult);
+//        rolesFilter.addResourceNamesFilter(roleResult.getResourceName());
 //        rolesFilter.addResourceTypesFilter(roleResult.getResourceType());
         return this;
     }
@@ -205,12 +199,12 @@ public class SecurityModel implements PageModel {
         return this;
     }
 
-    public String getSelectedContainersNamespace() {
-        return selectedContainersNamespace;
+    public String getSelectedContainersSecurityNamespace() {
+        return selectedContainersSecurityNamespace;
     }
 
-    public SecurityModel setSelectedContainersNamespace(String selectedContainersNamespace) {
-        this.selectedContainersNamespace = selectedContainersNamespace;
+    public SecurityModel setSelectedContainersSecurityNamespace(String selectedContainersSecurityNamespace) {
+        this.selectedContainersSecurityNamespace = selectedContainersSecurityNamespace;
         return this;
     }
 
@@ -249,7 +243,7 @@ public class SecurityModel implements PageModel {
         return roleRulesFilter;
     }
 
-    public ContainersSecurityFilter getContainersFilter() {
+    public ContainersSecurityFilter getContainersSecurityFilter() {
         return containersFilter;
     }
 
@@ -268,7 +262,7 @@ public class SecurityModel implements PageModel {
         return this;
     }
 
-    public SecurityModel setContainersFilter(ContainersSecurityFilter containersFilter) {
+    public SecurityModel setContainersSecurityFilter(ContainersSecurityFilter containersFilter) {
         this.containersFilter = containersFilter;
         return this;
     }
@@ -320,12 +314,12 @@ public class SecurityModel implements PageModel {
     }
 
 
-    public List<ContainerSecurityResult> getContainersResults() {
-        return containersResults;
+    public List<ContainerSecurityResult> getContainersSecurityResults() {
+        return containersSecurityResults;
     }
 
-    public SecurityModel setContainersResults(List<ContainerSecurityResult> containersResults) {
-        this.containersResults = containersResults;
+    public SecurityModel setContainersSecurityResults(List<ContainerSecurityResult> containersSecurityResults) {
+        this.containersSecurityResults = containersSecurityResults;
         return this;
     }
 

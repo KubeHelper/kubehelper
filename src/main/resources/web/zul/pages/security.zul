@@ -99,7 +99,7 @@
                                             <label value="${item.namespace}"/>
                                             <label value="${item.resourceType}"/>
                                             <label value="${item.creationTime}"/>
-                                            <toolbarbutton label="Click to see Full Definition" onClick="@command('showRoleFullDefinition', item=item)" hflex="1"/>
+                                            <toolbarbutton label="Full Definition" onClick="@command('showRoleFullDefinition', item=item)" hflex="1"/>
                                         </row>
                                     </template>
                                 </rows>
@@ -149,7 +149,7 @@
                                                 <label value="${item.apiGroupsAsString}" multiline="true"/>
                                                 <label value="${item.resourceNamesAsString}" multiline="true"/>
                                                 <label value="${item.nonResourceURLsAsString}" multiline="true"/>
-                                                <toolbarbutton label="Click to see Full Definition" onClick="@command('showRoleRuleFullDefinition', item=item)" hflex="1"/>
+                                                <toolbarbutton label="Full Definition" onClick="@command('showRoleRuleFullDefinition', item=item)" hflex="1"/>
                                             </row>
                                         </template>
                                     </rows>
@@ -444,7 +444,7 @@
                                             <label value="${item.windowsOptions}" multiline="true"/>
                                             <label value="${item.namespace}" multiline="true"/>
                                             <label value="${item.creationTime}" multiline="true"/>
-                                            <toolbarbutton label="Click to see Full Definition" onClick="@command('showPodSecurityContextFullDefinition', item=item)" hflex="1"/>
+                                            <toolbarbutton label="Full Definition" onClick="@command('showPodSecurityContextFullDefinition', item=item)" hflex="1"/>
                                         </row>
                                     </template>
                                 </rows>
@@ -454,74 +454,88 @@
                             </grid>
                         </tabpanel>
 
-                        <!--                        <tabpanel>-->
-                        <!--                            <separator width="100%" orient="horizontal"/>-->
-                        <!--                            <vbox height="100%" width="100%">-->
-                        <!--                                <hbox id="menuHboxContainers" height="100%" width="100%" style="margin: 5px;" align="stretch">-->
-                        <!--                                    <cell id="clearAllCellContainers" width="10%" style="padding: 0px 5px 0px 5px;" tooltip="clearAllTooltip">-->
-                        <!--                                        <button id="clearAllBtnContainers" iconSclass="z-icon-eraser" label="Clear all" onClick="@command('clearAllContainers')"/>-->
-                        <!--                                    </cell>-->
-                        <!--                                    <separator width="100%" orient="vertical" bar="true"/>-->
-                        <!--                                    <cell id="namespacesCellContainers" width="30%" style="padding: 0px 5px 0px 5px;" align="left">-->
-                        <!--                                        <hlayout valign="middle">-->
-                        <!--                                            <label value="Namespace: "/>-->
-                        <!--                                            <combobox id="namespacesCBoxContainers" tooltip="namespacesTooltip" hflex="1" model="@load(securityVM.namespaces)"-->
-                        <!--                                                      selectedItem="@bind(securityVM.selectedContainersNamespace)" readonly="true">-->
-                        <!--                                                <template name="model">-->
-                        <!--                                                    <comboitem label="@load(each)"/>-->
-                        <!--                                                </template>-->
-                        <!--                                            </combobox>-->
-                        <!--                                        </hlayout>-->
-                        <!--                                    </cell>-->
-                        <!--                                    <cell width="49%" style="padding: 0px 5px 0px 5px;">-->
-                        <!--                                    </cell>-->
-                        <!--                                    <cell id="cellGetBtnContainers" width="10%" style="padding: 0px 5px 0px 5px;">-->
-                        <!--                                        <button id="getContainersBtn" label="Get" iconSclass="z-icon-refresh" onClick="@command('getContainers')" width="100%"/>-->
-                        <!--                                    </cell>-->
-                        <!--                                </hbox>-->
-                        <!--                            </vbox>-->
-                        <!--                            <separator width="100%" orient="horizontal"/>-->
-                        <!--                            <grid id="securityContainersGrid" model="@load(securityVM.containersResults)" height="800px">-->
-                        <!--                                <auxhead id="containersAuxHead">-->
-                        <!--                                    <auxheader>-->
-                        <!--                                        <span sclass="z-icon-hashtag"/>-->
-                        <!--                                    </auxheader>-->
-                        <!--                                    <auxheader colspan="1">-->
-                        <!--                                        <span sclass="z-icon-filter"/>-->
-                        <!--                                        <textbox instant="true" width="80%" value="@bind(securityVM.containersFilter.ip)" onChange="@command('filterContainers')"/>-->
-                        <!--                                    </auxheader>-->
-                        <!--                                </auxhead>-->
-                        <!--                                <columns menupopup="auto" sizable="true">-->
-                        <!--                                    <column hflex="min" label="Id" sort="auto(id)"/>-->
-                        <!--                                    <column hflex="1" label="IP" sort="auto(ip)"/>-->
-                        <!--                                    &lt;!&ndash;                                    <column hflex="1" label="Container Ports" sort="auto(ports)"/>&ndash;&gt;-->
-                        <!--                                    &lt;!&ndash;                                    <column hflex="1" label="Resource Name" tooltiptext="Kubernetes Resource Name: [Pod containers]" sort="auto(resourceName)"/>&ndash;&gt;-->
-                        <!--                                    &lt;!&ndash;                                    <column hflex="min" label="Namespace" sort="auto(namespace)"/>&ndash;&gt;-->
-                        <!--                                    &lt;!&ndash;                                    <column hflex="min" label="Resource Type" sort="auto(resourceType)"/>&ndash;&gt;-->
-                        <!--                                    &lt;!&ndash;                                    <column hflex="min" label="Host Info" tooltiptext="Node/Host Name: [Node IP]" sort="auto(hostInfo)"/>&ndash;&gt;-->
-                        <!--                                    &lt;!&ndash;                                    <column hflex="1" label="Additional Info" sort="auto(additionalInfo)"/>&ndash;&gt;-->
-                        <!--                                    &lt;!&ndash;                                    <column hflex="min" label="Creation Time" sort="auto(creationTime)"/>&ndash;&gt;-->
-                        <!--                                </columns>-->
-                        <!--                                <rows>-->
-                        <!--                                    <template name="model" var="item">-->
-                        <!--                                        <row style="cursor:pointer">-->
-                        <!--                                            <label value="${item.id}"/>-->
-                        <!--                                            <label value="${item.ip}" multiline="true"/>-->
-                        <!--                                            &lt;!&ndash;                                            <label value="${item.ports}" multiline="true"/>&ndash;&gt;-->
-                        <!--                                            &lt;!&ndash;                                            <label value="${item.resourceName}"/>&ndash;&gt;-->
-                        <!--                                            &lt;!&ndash;                                            <label value="${item.namespace}"/>&ndash;&gt;-->
-                        <!--                                            &lt;!&ndash;                                            <label value="${item.resourceType}"/>&ndash;&gt;-->
-                        <!--                                            &lt;!&ndash;                                            <label value="${item.hostInfo}"/>&ndash;&gt;-->
-                        <!--                                            &lt;!&ndash;                                            <label value="${item.additionalInfo}" multiline="true"/>&ndash;&gt;-->
-                        <!--                                            &lt;!&ndash;                                            <label value="${item.creationTime}"/>&ndash;&gt;-->
-                        <!--                                        </row>-->
-                        <!--                                    </template>-->
-                        <!--                                </rows>-->
-                        <!--                                <foot>-->
-                        <!--                                    <footer id="containersGridFooter" span="9" align="right" label="@load(securityVM.containersTotalItems)"/>-->
-                        <!--                                </foot>-->
-                        <!--                            </grid>-->
-                        <!--                        </tabpanel>-->
+                        <tabpanel>
+                            <groupbox width="100%">
+                                <caption iconSclass="z-icon-sliders" label="Search Configuration"/>
+                                <vbox height="100%" width="100%">
+                                    <hbox id="menuHboxContainers" height="100%" width="100%" align="stretch">
+                                        <cell width="10%" tooltip="clearAllTooltip">
+                                            <button iconSclass="z-icon-eraser" width="100%" label="Clear all" onClick="@command('clearAllContainersSecurityContexts')"/>
+                                        </cell>
+                                        <separator width="15px" orient="vertical" bar="true"/>
+                                        <cell id="namespacesCellContainers" width="20%" align="left">
+                                            <hlayout valign="middle">
+                                                <label value="Namespace: "/>
+                                                <combobox tooltip="namespacesTooltip" hflex="1" model="@load(securityVM.namespaces)"
+                                                          selectedItem="@bind(securityVM.selectedContainersSecurityNamespace)" readonly="true">
+                                                    <template name="model">
+                                                        <comboitem label="@load(each)"/>
+                                                    </template>
+                                                </combobox>
+                                            </hlayout>
+                                        </cell>
+                                        <cell width="59%">
+                                        </cell>
+                                        <cell id="cellGetBtnContainers" width="10%">
+                                            <button id="getContainersBtn" label="Get" iconSclass="z-icon-refresh" onClick="@command('getContainersSecurityContexts')" width="100%"/>
+                                        </cell>
+                                    </hbox>
+                                </vbox>
+                                <separator width="100%" orient="horizontal"/>
+                            </groupbox>
+                            <grid id="securityContainersGrid" model="@load(securityVM.containersSecurityResults)" height="@load(securityVM.containersSecurityContextsGridHeight)">
+                                <columns menupopup="auto" sizable="true">
+                                    <column hflex="min" label="Id" sort="auto(id)"/>
+                                    <column hflex="1" label="resourceName" tooltiptext="resourceName" sort="auto(resourceName)"/>
+                                    <column hflex="1" label="podName" tooltiptext="podName" sort="auto(podName)"/>
+                                    <column hflex="1" label="allowPrivilegeEscalation" tooltiptext="allowPrivilegeEscalation" sort="auto(allowPrivilegeEscalation)"/>
+                                    <column hflex="1" label="capabilities" tooltiptext="capabilities" sort="auto(capabilities)"/>
+                                    <column hflex="1" label="privileged" tooltiptext="privileged" sort="auto(privileged)"/>
+                                    <column hflex="1" label="procMount" tooltiptext="procMount" sort="auto(procMount)"/>
+                                    <column hflex="1" label="readOnlyRootFilesystem" tooltiptext="readOnlyRootFilesystem" sort="auto(readOnlyRootFilesystem)"/>
+                                    <column hflex="1" label="runAsGroup" tooltiptext="runAsGroup" sort="auto(runAsGroup)"/>
+                                    <column hflex="1" label="runAsNonRoot" tooltiptext="runAsNonRoot" sort="auto(runAsNonRoot)"/>
+                                    <column hflex="1" label="runAsUser" tooltiptext="runAsUser" sort="auto(runAsUser)"/>
+                                    <column hflex="1" label="seLinuxOptions" tooltiptext="seLinuxOptions" sort="auto(seLinuxOptions)"/>
+                                    <column hflex="1" label="windowsOptions" tooltiptext="windowsOptions" sort="auto(windowsOptions)"/>
+                                    <column hflex="1" label="userAtContainer" tooltiptext="userAtContainer" sort="auto(userAtContainer)"/>
+                                    <column hflex="1" label="userAtContainerPermissions" tooltiptext="userAtContainerPermissions" sort="auto(userAtContainerPermissions)"/>
+                                    <column hflex="1" label="runCommand" tooltiptext="runCommand" sort="auto(runCommand)"/>
+                                    <column hflex="1" label="namespace" tooltiptext="namespace" sort="auto(namespace)"/>
+                                    <column hflex="1" label="creationTime" tooltiptext="creationTime" sort="auto(creationTime)"/>
+                                    <column hflex="1" tooltiptext="Full Definition" label="Full Definition"/>
+                                </columns>
+                                <rows>
+                                    <template name="model" var="item">
+                                        <row style="cursor:pointer">
+                                            <label value="${item.id}"/>
+                                            <label value="${item.resourceName}" multiline="true"/>
+                                            <label value="${item.podName}" multiline="true"/>
+                                            <label value="${item.allowPrivilegeEscalation}" multiline="true"/>
+                                            <label value="${item.capabilities}" multiline="true"/>
+                                            <label value="${item.privileged}" multiline="true"/>
+                                            <label value="${item.procMount}" multiline="true"/>
+                                            <label value="${item.readOnlyRootFilesystem}" multiline="true"/>
+                                            <label value="${item.runAsGroup}" multiline="true"/>
+                                            <label value="${item.runAsNonRoot}" multiline="true"/>
+                                            <label value="${item.runAsUser}" multiline="true"/>
+                                            <label value="${item.seLinuxOptions}" multiline="true"/>
+                                            <label value="${item.windowsOptions}" multiline="true"/>
+                                            <label value="${item.userAtContainer}" multiline="true"/>
+                                            <label value="${item.userAtContainerPermissions}" multiline="true"/>
+                                            <label value="${item.runCommand}" multiline="true"/>
+                                            <label value="${item.namespace}" multiline="true"/>
+                                            <label value="${item.creationTime}" multiline="true"/>
+                                            <toolbarbutton label="Full Definition" tooltiptext="Full Definition" onClick="@command('showContextSecurityContextFullDefinition', item=item)"
+                                                           hflex="1"/>
+                                        </row>
+                                    </template>
+                                </rows>
+                                <foot>
+                                    <footer id="containersSecurityGridFooter" span="19" align="right" label="@load(securityVM.containersSecurityTotalItems)"/>
+                                </foot>
+                            </grid>
+                        </tabpanel>
 
                         <!--                        <tabpanel>-->
                         <!--                            <separator width="100%" orient="horizontal"/>-->
@@ -687,7 +701,7 @@
                                             <label value="${item.volumes}" multiline="true"/>
                                             <label value="${item.namespace}" multiline="true"/>
                                             <label value="${item.creationTime}" multiline="true"/>
-                                            <toolbarbutton label="Click to see Full Definition" onClick="@command('showPodSecurityPolicyFullDefinition', item=item)" hflex="1"/>
+                                            <toolbarbutton label="Full Definition" onClick="@command('showPodSecurityPolicyFullDefinition', item=item)" hflex="1"/>
                                         </row>
                                     </template>
                                 </rows>

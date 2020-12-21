@@ -26,31 +26,27 @@ import io.kubernetes.client.openapi.models.V1WindowsSecurityContextOptions;
  */
 public class ContainerSecurityResult {
     private int id;
-    private String resourceName = "";
-    private String podName = "";
+    private String resourceName = "null";
+    private String podName = "null";
 
-    private Boolean allowPrivilegeEscalation;
+    private String allowPrivilegeEscalation = "null";
+    private String capabilities = "null";
+    private String privileged = "null";
+    private String procMount = "null";
+    private String readOnlyRootFilesystem = "null";
+    private String runAsGroup = "null";
+    private String runAsNonRoot = "null";
+    private String runAsUser = "null";
+    private String seLinuxOptions = "null";
+    private String windowsOptions = "null";
 
-    //    TODO replace object with string joiners, look toString Method
-    private V1Capabilities capabilities;
-    private Boolean privileged;
-    private String procMount;
-    private Boolean readOnlyRootFilesystem;
-    private Long runAsGroup;
-    private Boolean runAsNonRoot;
-    private Long runAsUser;
-    private V1SELinuxOptions seLinuxOptions;
-    private V1WindowsSecurityContextOptions windowsOptions;
+//    private String userAtContainer = "null";
+//    private String userAtContainerPermissions = "null";
+//    private String runCommand = "null";
 
-    //TODO get active user from container
-    private String userAtContainer = "";
-    private String userAtContainerPermissions = "";
-    private String runCommand = "";
-
-
-    private String namespace = "";
-    private String creationTime = "";
-    private String fullDefinition = "";
+    private String namespace = "null";
+    private String creationTime = "null";
+    private String fullDefinition = "null";
 
     public ContainerSecurityResult() {
     }
@@ -59,4 +55,142 @@ public class ContainerSecurityResult {
         this.id = id;
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public String getResourceName() {
+        return resourceName;
+    }
+
+    public ContainerSecurityResult setResourceName(String resourceName) {
+        this.resourceName = resourceName;
+        return this;
+    }
+
+    public String getPodName() {
+        return podName;
+    }
+
+    public ContainerSecurityResult setPodName(String podName) {
+        this.podName = podName;
+        return this;
+    }
+
+    public String getAllowPrivilegeEscalation() {
+        return allowPrivilegeEscalation;
+    }
+
+    public ContainerSecurityResult setAllowPrivilegeEscalation(String allowPrivilegeEscalation) {
+        this.allowPrivilegeEscalation = allowPrivilegeEscalation;
+        return this;
+    }
+
+    public String getCapabilities() {
+        return capabilities;
+    }
+
+    public ContainerSecurityResult setCapabilities(String capabilities) {
+        this.capabilities = capabilities;
+        return this;
+    }
+
+    public String getPrivileged() {
+        return privileged;
+    }
+
+    public ContainerSecurityResult setPrivileged(String privileged) {
+        this.privileged = privileged;
+        return this;
+    }
+
+    public String getProcMount() {
+        return procMount;
+    }
+
+    public ContainerSecurityResult setProcMount(String procMount) {
+        this.procMount = procMount;
+        return this;
+    }
+
+    public String getReadOnlyRootFilesystem() {
+        return readOnlyRootFilesystem;
+    }
+
+    public ContainerSecurityResult setReadOnlyRootFilesystem(String readOnlyRootFilesystem) {
+        this.readOnlyRootFilesystem = readOnlyRootFilesystem;
+        return this;
+    }
+
+    public String getRunAsGroup() {
+        return runAsGroup;
+    }
+
+    public ContainerSecurityResult setRunAsGroup(String runAsGroup) {
+        this.runAsGroup = runAsGroup;
+        return this;
+    }
+
+    public String getRunAsNonRoot() {
+        return runAsNonRoot;
+    }
+
+    public ContainerSecurityResult setRunAsNonRoot(String runAsNonRoot) {
+        this.runAsNonRoot = runAsNonRoot;
+        return this;
+    }
+
+    public String getRunAsUser() {
+        return runAsUser;
+    }
+
+    public ContainerSecurityResult setRunAsUser(String runAsUser) {
+        this.runAsUser = runAsUser;
+        return this;
+    }
+
+    public String getSeLinuxOptions() {
+        return seLinuxOptions;
+    }
+
+    public ContainerSecurityResult setSeLinuxOptions(String seLinuxOptions) {
+        this.seLinuxOptions = seLinuxOptions;
+        return this;
+    }
+
+    public String getWindowsOptions() {
+        return windowsOptions;
+    }
+
+    public ContainerSecurityResult setWindowsOptions(String windowsOptions) {
+        this.windowsOptions = windowsOptions;
+        return this;
+    }
+
+    public String getNamespace() {
+        return namespace;
+    }
+
+    public ContainerSecurityResult setNamespace(String namespace) {
+        this.namespace = namespace;
+        return this;
+    }
+
+    public String getCreationTime() {
+        return creationTime;
+    }
+
+    public ContainerSecurityResult setCreationTime(String creationTime) {
+        this.creationTime = creationTime;
+        return this;
+    }
+
+    public String getFullDefinition() {
+        return fullDefinition;
+    }
+
+    public ContainerSecurityResult setFullDefinition(String fullDefinition) {
+        this.fullDefinition = fullDefinition;
+        return this;
+    }
 }

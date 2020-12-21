@@ -78,7 +78,7 @@ public class SecurityVM implements PropertyChangeListener {
     private boolean isGetRolesButtonPressed;
     private boolean isGetPodsSecurityContextsButtonPressed;
     private boolean isGetRBACsButtonPressed;
-    private boolean isGetContainersButtonPressed;
+    private boolean isGetContainersSecurityContextsButtonPressed;
     private boolean isGetServiceAccountsButtonPressed;
     private boolean isGetPodSecurityPoliciesButtonPressed;
 
@@ -89,7 +89,7 @@ public class SecurityVM implements PropertyChangeListener {
     private ListModelList<RoleRuleResult> roleRulesResults = new ListModelList<>();
     private ListModelList<RBACResult> rbacsResults = new ListModelList<>();
     private ListModelList<PodSecurityContextResult> podsSecurityContextsResults = new ListModelList<>();
-    private ListModelList<ContainerSecurityResult> containersResults = new ListModelList<>();
+    private ListModelList<ContainerSecurityResult> containersSecurityResults = new ListModelList<>();
     private ListModelList<ServiceAccountResult> serviceAccountsResults = new ListModelList<>();
     private ListModelList<PodSecurityPoliciesResult> podsSecurityPoliciesResults = new ListModelList<>();
 
@@ -109,7 +109,7 @@ public class SecurityVM implements PropertyChangeListener {
     private Footer rbacsGridFooter;
 
     @Wire
-    private Footer containersGridFooter;
+    private Footer containersSecurityGridFooter;
 
     @Wire
     private Footer serviceAccountsGridFooter;
@@ -178,12 +178,17 @@ public class SecurityVM implements PropertyChangeListener {
     }
 
     @Command
-    @NotifyChange({"containersTotalItems", "containersResults", "containersFilter"})
-    public void getContainers() {
-        securityModel.setContainersFilter(new ContainersSecurityFilter());
-//        securityService.getContainers(securityModel);
-        isGetContainersButtonPressed = true;
-//        onInitPreparations();
+    @NotifyChange({"containersSecurityTotalItems", "containersSecurityResults", "containersSecurityFilter"})
+    public void getContainersSecurityContexts() {
+        securityModel.setContainersSecurityFilter(new ContainersSecurityFilter());
+        securityService.getContainersSecurityContexts(securityModel);
+        isGetContainersSecurityContextsButtonPressed = true;
+        setAllNamespacesToModel();
+        if (securityModel.getContainersSecurityFilter().isFilterActive() && !securityModel.getContainersSecurityResults().isEmpty()) {
+            filterContainersSecurityContexts();
+        } else {
+            containersSecurityResults = new ListModelList<>(securityModel.getContainersSecurityResults());
+        }
     }
 
     @Command
@@ -252,6 +257,21 @@ public class SecurityVM implements PropertyChangeListener {
         }
     }
 
+    @Command
+    @NotifyChange({"containersSecurityTotalItems", "containersSecurityResults"})
+    public void filterContainersSecurityContexts() {
+//        TODO
+        rolesResults.clear();
+        for (RoleResult roleResult : securityModel.getRolesResultsList()) {
+            if (StringUtils.containsIgnoreCase(roleResult.getCreationTime(), getRolesFilter().getCreationTime()) &&
+                    commonService.checkEqualsFilter(roleResult.getResourceName(), getRolesFilter().getSelectedResourceNameFilter()) &&
+                    commonService.checkEqualsFilter(roleResult.getResourceType(), getRolesFilter().getSelectedResourceTypeFilter()) &&
+                    commonService.checkEqualsFilter(roleResult.getNamespace(), getRolesFilter().getSelectedNamespaceFilter())) {
+                rolesResults.add(roleResult);
+            }
+        }
+    }
+
 
     private String checkRbacRoleFilter(String verb, boolean rbacVerb) {
         if (rbacVerb && verb.equals("Yes")) {
@@ -305,15 +325,15 @@ public class SecurityVM implements PropertyChangeListener {
     }
 
     @Command
-    @NotifyChange({"containersTotalItems", "containersResults", "containersFilter", "selectedContainersNamespace"})
-    public void clearAllContainers() {
-//        securityModel.setRolesResults(new ListModelList<>())
-//                .setFilter(new IpsAndPortsFilter())
-//                .setNamespaces(commonService.getAllNamespaces())
-//                .setSelectedNamespace("all")
-//                .setSearchExceptions(new ArrayList<>());
-        containersResults = new ListModelList<>();
-        clearAllFilterComboboxes();
+    @NotifyChange({"containersSecurityTotalItems", "containersSecurityResults", "containersSecurityFilter", "selectedContainersSecurityNamespace"})
+    public void clearAllContainersSecurityContexts() {
+        securityModel.setContainersSecurityResults(new ListModelList<>())
+                .setContainersSecurityFilter(new ContainersSecurityFilter())
+                .setNamespaces(commonService.getAllNamespaces())
+                .setSelectedContainersSecurityNamespace("all")
+                .setSearchExceptions(new ArrayList<>());
+        containersSecurityResults = new ListModelList<>();
+        clearAllContainersSecurityFilterComboboxes();
     }
 
     @Command
@@ -374,6 +394,16 @@ public class SecurityVM implements PropertyChangeListener {
         }
     }
 
+    private void clearAllContainersSecurityFilterComboboxes() {
+        Auxhead searchGridAuxHead = (Auxhead) Path.getComponent("//indexPage/templateInclude/rolesGridAuxHead");
+        for (Component child : searchGridAuxHead.getFellows()) {
+            if (Arrays.asList("filterRolesNamespacesCBox", "filterRolesResourceTypesCBox", "filterRolesResourceNamesCBox").contains(child.getId())) {
+                Combobox cBox = (Combobox) child;
+                cBox.setValue("");
+            }
+        }
+    }
+
     //  FULL DEFINITION / LOGIC ================
 
     @Command
@@ -393,6 +423,14 @@ public class SecurityVM implements PropertyChangeListener {
     @Command
     public void showPodSecurityContextFullDefinition(@BindingParam("item") PodSecurityContextResult item) {
         Map<String, String> parameters = Map.of("title", String.valueOf(item.getId()), "content", item.getFullDefinition());
+        Window window = (Window) Executions.createComponents("~./zul/components/file-display.zul", null, parameters);
+        window.doModal();
+    }
+
+    @Command
+    public void showContextSecurityContextFullDefinition(@BindingParam("item") ContainerSecurityResult item) {
+        String title = item.getPodName() + " [ " + item.getResourceName() + " ]";
+        Map<String, String> parameters = Map.of("title", title, "content", item.getFullDefinition());
         Window window = (Window) Executions.createComponents("~./zul/components/file-display.zul", null, parameters);
         window.doModal();
     }
@@ -468,10 +506,10 @@ public class SecurityVM implements PropertyChangeListener {
         return podsSecurityContextsResults;
     }
 
-    public ListModelList<ContainerSecurityResult> getContainersResults() {
-        showNotificationAndExceptions(isGetContainersButtonPressed, containersResults, containersGridFooter);
-        isGetContainersButtonPressed = false;
-        return containersResults;
+    public ListModelList<ContainerSecurityResult> getContainersSecurityResults() {
+        showNotificationAndExceptions(isGetContainersSecurityContextsButtonPressed, containersSecurityResults, containersSecurityGridFooter);
+        isGetContainersSecurityContextsButtonPressed = false;
+        return containersSecurityResults;
     }
 
     public ListModelList<ServiceAccountResult> getServiceAccountsResults() {
@@ -513,12 +551,12 @@ public class SecurityVM implements PropertyChangeListener {
         this.securityModel.setSelectedPodsSecurityContextsNamespace(selectedPodsNamespace);
     }
 
-    public String getSelectedContainersNamespace() {
-        return securityModel.getSelectedContainersNamespace();
+    public String getSelectedContainersSecurityNamespace() {
+        return securityModel.getSelectedContainersSecurityNamespace();
     }
 
-    public void setSelectedContainersNamespace(String selectedContainersNamespace) {
-        this.securityModel.setSelectedContainersNamespace(selectedContainersNamespace);
+    public void setSelectedContainersSecurityNamespace(String selectedContainersNamespace) {
+        this.securityModel.setSelectedContainersSecurityNamespace(selectedContainersNamespace);
     }
 
     public String getSelectedServiceAccountsNamespace() {
@@ -556,8 +594,8 @@ public class SecurityVM implements PropertyChangeListener {
         return String.format("Total Items: %d", podsSecurityContextsResults.size());
     }
 
-    public String getContainersTotalItems() {
-        return String.format("Total Items: %d", containersResults.size());
+    public String getContainersSecurityTotalItems() {
+        return String.format("Total Items: %d", containersSecurityResults.size());
     }
 
     public String getServiceAccountsTotalItems() {
@@ -584,7 +622,7 @@ public class SecurityVM implements PropertyChangeListener {
     }
 
     public ContainersSecurityFilter getContainersFilter() {
-        return securityModel.getContainersFilter();
+        return securityModel.getContainersSecurityFilter();
     }
 
     public ServiceAccountsSecurityFilter getServiceAccountsFilter() {
@@ -631,6 +669,10 @@ public class SecurityVM implements PropertyChangeListener {
     }
 
     public String getPodsSecurityContextsGridHeight() {
+        return securityModel.getMainGridHeight() + "px";
+    }
+
+    public String getContainersSecurityContextsGridHeight() {
         return securityModel.getMainGridHeight() + "px";
     }
 
