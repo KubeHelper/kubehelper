@@ -23,17 +23,17 @@ import java.util.List;
 /**
  * @author JDev
  */
-public class FeatureResult {
+public class CommandsResult {
     private int id;
     private String description = "";
     private String group = "";
     private List<String> rows = new ArrayList<>();
     private String command = "";
 
-    public FeatureResult() {
+    public CommandsResult() {
     }
 
-    public FeatureResult(int id) {
+    public CommandsResult(int id) {
         this.id = id;
     }
 
@@ -45,7 +45,7 @@ public class FeatureResult {
         return description;
     }
 
-    public FeatureResult setDescription(String description) {
+    public CommandsResult setDescription(String description) {
         this.description = description;
         return this;
     }
@@ -54,7 +54,7 @@ public class FeatureResult {
         return group;
     }
 
-    public FeatureResult setGroup(String group) {
+    public CommandsResult setGroup(String group) {
         this.group = group;
         return this;
     }
@@ -63,7 +63,7 @@ public class FeatureResult {
         return rows;
     }
 
-    public FeatureResult setRows(List<String> rows) {
+    public CommandsResult setRows(List<String> rows) {
         this.rows = rows;
         return this;
     }
@@ -72,14 +72,14 @@ public class FeatureResult {
         return command;
     }
 
-    public FeatureResult setCommand(String command) {
+    public CommandsResult setCommand(String command) {
         this.command = command;
         return this;
     }
 
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("FeatureResult{");
+        final StringBuffer sb = new StringBuffer("CommandResult{");
         sb.append("id=").append(id);
         sb.append(", description='").append(description).append('\'');
         sb.append(", group='").append(group).append('\'');

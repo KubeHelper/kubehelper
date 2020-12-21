@@ -1,12 +1,12 @@
 <zk>
-    <div id="securityTemplate" viewModel="@id('featuresVM') @init('com.kubehelper.viewmodels.FeaturesVM')" width="100%" height="100%">
+    <div id="securityTemplate" viewModel="@id('commandsVM') @init('com.kubehelper.viewmodels.CommandsVM')" width="100%" height="100%">
         <borderlayout>
             <!--            TODO Paging and vflex="min" for center and remove height-->
             <center margins="0,3,3,3" title="Security">
                 <tabbox width="100%" sclass="nav_tabs">
                     <tabs id="tabs">
-                        <tab label="Features"/>
-                        <tab label="Features Constructor"/>
+                        <tab label="Commands"/>
+                        <tab label="Commands Constructor"/>
                     </tabs>
                     <tabpanels>
                         <tabpanel>
@@ -25,8 +25,8 @@
                                     <!--                                            <textbox id="txt" width="220px" style="color:#008FD2;"/>-->
                                     <!--                                        </hlayout>-->
                                     <separator bar="true"/>
-                                    <listbox id="featuresListBoxId">
-                                        <!--                                    <listbox id="featuresListBoxId" model="@load(featuresVM.featuresResults)">-->
+                                    <listbox id="commandsListBoxId">
+                                        <!--                                    <listbox id="commandsListBoxId" model="@load(commandsVM.commandsResults)">-->
                                         <!--                                            <attribute name="onSelect"><![CDATA[-->
                                         <!--            txt.setValue("Mail Received on "+-->
                                         <!--                    self.getSelectedItem().getLastChild().getLabel());-->
@@ -83,7 +83,7 @@
                             </div>
                             <separator width="100%" orient="horizontal"/>
                             <vbox height="50%" width="100%">
-                                <grid id="runCommandGrid" model="@load(featuresVM.featuresResults)" height="800px">
+                                <grid id="runCommandGrid" model="@load(commandsVM.commandsResults)" height="800px">
                                     <auxhead id="runCommandAuxHead">
                                     </auxhead>
                                     <columns menupopup="auto" sizable="true">
@@ -99,7 +99,7 @@
                                         </template>
                                     </rows>
                                     <foot>
-                                        <footer id="runCommandGridFooter" span="9" align="right" label="@load(featuresVM.runCommandTotalItems)"/>
+                                        <footer id="runCommandGridFooter" span="9" align="right" label="@load(commandsVM.runCommandTotalItems)"/>
                                     </foot>
                                 </grid>
                             </vbox>

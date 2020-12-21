@@ -19,9 +19,9 @@ package com.kubehelper.services;
 
 import com.google.common.io.Files;
 import com.kubehelper.common.KubeAPI;
-import com.kubehelper.domain.models.FeaturesModel;
+import com.kubehelper.domain.models.CommandsModel;
 import com.kubehelper.domain.models.SearchModel;
-import com.kubehelper.domain.results.FeatureResult;
+import com.kubehelper.domain.results.CommandsResult;
 import io.kubernetes.client.Exec;
 import io.kubernetes.client.openapi.ApiException;
 import io.kubernetes.client.openapi.models.V1Pod;
@@ -54,9 +54,9 @@ import java.util.stream.Stream;
  * @author JDev
  */
 @Service
-public class FeaturesService {
+public class CommandsService {
 
-    private static Logger logger = LoggerFactory.getLogger(FeaturesService.class);
+    private static Logger logger = LoggerFactory.getLogger(CommandsService.class);
 
     @Autowired
     private KubeAPI kubeAPI;
@@ -64,25 +64,25 @@ public class FeaturesService {
     @Autowired
     private Exec exec;
 
-    public void parsePredefinedCommands(FeaturesModel featuresModel) {
+    public void parsePredefinedCommands(CommandsModel commandsModel) {
         try {
-            List<String> lines = Files.readLines(new File(this.getClass().getResource(featuresModel.getPredefinedCommandsPath()).toURI()), Charset.forName("UTF-8"));
-            parsePredefinedCommandsFromLines(lines, featuresModel);
+            List<String> lines = Files.readLines(new File(this.getClass().getResource(commandsModel.getPredefinedCommandsPath()).toURI()), Charset.forName("UTF-8"));
+            parsePredefinedCommandsFromLines(lines, commandsModel);
         } catch (IOException | URISyntaxException e) {
-            featuresModel.addParseException(e);
+            commandsModel.addParseException(e);
             logger.error(e.getMessage(), e);
         }
     }
 
-    public void parseUserCommands(FeaturesModel featuresModel) {
+    public void parseUserCommands(CommandsModel commandsModel) {
         try {
-            Set<String> userCommandFiles = getUserCommandFilesPaths(featuresModel.getUserCommandsPath(), 5);
+            Set<String> userCommandFiles = getUserCommandFilesPaths(commandsModel.getUserCommandsPath(), 5);
             for (String filePath : userCommandFiles) {
                 List<String> lines = Files.readLines(new File(filePath), Charset.forName("UTF-8"));
-                parsePredefinedCommandsFromLines(lines, featuresModel);
+                parsePredefinedCommandsFromLines(lines, commandsModel);
             }
         } catch (IOException e) {
-            featuresModel.addParseException(e);
+            commandsModel.addParseException(e);
             logger.error(e.getMessage(), e);
         }
     }
@@ -96,33 +96,33 @@ public class FeaturesService {
     }
 
 
-    public void parsePredefinedCommandsFromLines(List<String> lines, FeaturesModel featuresModel) {
+    public void parsePredefinedCommandsFromLines(List<String> lines, CommandsModel commandsModel) {
         ListIterator<String> iterator = lines.listIterator();
         while (iterator.hasNext()) {
             try {
-                buildFeatureResult(iterator, featuresModel);
+                buildCommandResult(iterator, commandsModel);
             } catch (RuntimeException e) {
-                featuresModel.addParseException(e);
+                commandsModel.addParseException(e);
                 logger.error(e.getMessage(), e);
             }
         }
     }
 
-    private void buildFeatureResult(ListIterator<String> iterator, FeaturesModel featuresModel) {
-        FeatureResult featureResult = new FeatureResult(featuresModel.getFeaturesResults().size() + 1);
+    private void buildCommandResult(ListIterator<String> iterator, CommandsModel commandsModel) {
+        CommandsResult commandResult = new CommandsResult(commandsModel.getCommandsResults().size() + 1);
         String line = iterator.next();
         if (line.startsWith("Group:")) {
-            featureResult.setGroup(getLineContent(line));
+            commandResult.setGroup(getLineContent(line));
             line = iterator.next();
         }
         if (line.startsWith("Description:")) {
-            featureResult.setDescription(getLineContent(line));
+            commandResult.setDescription(getLineContent(line));
             line = iterator.next();
         }
 
         if (line.startsWith("Rows:")) {
             String[] split = getLineContent(line).split("\\|");
-            featureResult.setRows(Arrays.asList(split));
+            commandResult.setRows(Arrays.asList(split));
             line = iterator.next();
         }
 
@@ -135,19 +135,19 @@ public class FeaturesService {
             if (StringUtils.isNotBlank(line)) {
                 builder.append(line.trim());
             }
-            featureResult.setCommand(builder.toString());
+            commandResult.setCommand(builder.toString());
         }
         if (StringUtils.isNotBlank(line)) {
-            validateAndAddFeatureResult(featureResult, featuresModel);
+            validateAndAddCommandResult(commandResult, commandsModel);
         }
     }
 
-    private void validateAndAddFeatureResult(FeatureResult fr, FeaturesModel featuresModel) {
-        if (StringUtils.isAnyBlank(fr.getGroup(), fr.getDescription(), fr.getCommand())) {
-            featuresModel.addParseException(new RuntimeException("Command parse Error. Group, Description and command itself are mandatory fields. Object: " + fr.toString()));
-            logger.error("Command parse Error. Group, Description and command itself are mandatory fields. Object: " + fr.toString());
+    private void validateAndAddCommandResult(CommandsResult cr, CommandsModel commandsModel) {
+        if (StringUtils.isAnyBlank(cr.getGroup(), cr.getDescription(), cr.getCommand())) {
+            commandsModel.addParseException(new RuntimeException("Command parse Error. Group, Description and command itself are mandatory fields. Object: " + cr.toString()));
+            logger.error("Command parse Error. Group, Description and command itself are mandatory fields. Object: " + cr.toString());
         } else {
-            featuresModel.addFeatureResult(fr);
+            commandsModel.addCommandResult(cr);
         }
 
     }

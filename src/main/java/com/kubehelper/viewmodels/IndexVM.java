@@ -56,7 +56,6 @@ public class IndexVM {
     private PageModel pageModel;
     private String currentModelName;
 
-
     @Wire
     private Footer indexGlobalFooter;
 
@@ -70,10 +69,10 @@ public class IndexVM {
 //        BindUtils.postGlobalCommand(null, null, "updateHeightsAndRerenderVM", Map.of("eventType", "onClientInfo"));
 //    }
 
-    @Command
-    public void refreshMainGridSize() {
-        BindUtils.postNotifyChange(null, null, this, "mainGridId");
-    }
+//    @Command
+//    public void refreshMainGridSize() {
+//        BindUtils.postNotifyChange(null, null, this, "mainGridId");
+//    }
 
     @Listen("onResize=#indexGlobalFooter")
     public void onResize(Event evt){
@@ -85,11 +84,6 @@ public class IndexVM {
             Notification.show("The scripts on the page is disabled. Therefore, grids cannot fill the entire space. For the application to work correctly, allow run javascripts for this page.",
                     "warning", indexGlobalFooter, "overlap_after", 5000);
         }
-    }
-
-    @Command
-    public void onResize(@BindingParam("v") String value){
-        logger.info("1234");
     }
 
     @Init

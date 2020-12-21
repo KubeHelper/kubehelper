@@ -19,8 +19,8 @@ package com.kubehelper.domain.models;
 
 import com.kubehelper.common.Global;
 import com.kubehelper.common.KubeHelperException;
-import com.kubehelper.domain.filters.FeaturesFilter;
-import com.kubehelper.domain.results.FeatureResult;
+import com.kubehelper.domain.filters.CommandsFilter;
+import com.kubehelper.domain.results.CommandsResult;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -30,25 +30,25 @@ import java.util.List;
 /**
  * @author JDev
  */
-public class FeaturesModel implements PageModel {
+public class CommandsModel implements PageModel {
 
     private int mainGridHeight = 600;
     private PropertyChangeSupport grid = new PropertyChangeSupport(this);
 
-    private String templateUrl = "~./zul/pages/features.zul";
+    private String templateUrl = "~./zul/pages/commands.zul";
     private String predefinedCommandsPath = "/templates/features/commands.kh";
 
     private String userCommandsPath = "C:\\temp\\kubehelper";
     //    private String userCommandsPath = "/tmp/kubehelper";
-    public static String NAME = Global.FEATURES_MODEL;
+    public static String NAME = Global.COMMANDS_MODEL;
     private List<String> namespaces = new ArrayList<>();
     private List<String> pods = new ArrayList<>();
-    private List<FeatureResult> featuresResults = new ArrayList<>();
-    private FeaturesFilter filter = new FeaturesFilter();
+    private List<CommandsResult> commandsResults = new ArrayList<>();
+    private CommandsFilter filter = new CommandsFilter();
     private List<KubeHelperException> buildExceptions = new ArrayList<>();
     private String selectedNamespace = "all";
 
-    public FeaturesModel() {
+    public CommandsModel() {
     }
 
     @Override
@@ -66,13 +66,13 @@ public class FeaturesModel implements PageModel {
         grid.addPropertyChangeListener(pcl);
     }
 
-    public void addFeatureResult(FeatureResult featureResult) {
-        featuresResults.add(featureResult);
+    public void addCommandResult(CommandsResult commandResult) {
+        commandsResults.add(commandResult);
 //        filter.addResourceTypesFilter(searchResult.getResourceType());
 //        filter.addNamespacesFilter(searchResult.getNamespace());
     }
 
-    public FeaturesModel addGroupFilter(String resourceName) {
+    public CommandsModel addGroupFilter(String resourceName) {
 //        if (StringUtils.isNotBlank(resourceName)) {
 //            filter.addResourceNamesFilter(resourceName);
 //        }
@@ -102,7 +102,7 @@ public class FeaturesModel implements PageModel {
         return namespaces;
     }
 
-    public FeaturesModel setNamespaces(List<String> namespaces) {
+    public CommandsModel setNamespaces(List<String> namespaces) {
         this.namespaces = namespaces;
         return this;
     }
@@ -111,17 +111,17 @@ public class FeaturesModel implements PageModel {
         return pods;
     }
 
-    public FeaturesModel setPods(List<String> pods) {
+    public CommandsModel setPods(List<String> pods) {
         this.pods = pods;
         return this;
     }
 
-    public List<FeatureResult> getFeaturesResults() {
-        return featuresResults;
+    public List<CommandsResult> getCommandsResults() {
+        return commandsResults;
     }
 
-    public FeaturesModel setFeaturesResults(List<FeatureResult> featuresResults) {
-        this.featuresResults = featuresResults;
+    public CommandsModel setCommandsResults(List<CommandsResult> commandsResults) {
+        this.commandsResults = commandsResults;
         return this;
     }
 
@@ -129,7 +129,7 @@ public class FeaturesModel implements PageModel {
         return buildExceptions;
     }
 
-    public FeaturesModel setBuildExceptions(List<KubeHelperException> buildExceptions) {
+    public CommandsModel setBuildExceptions(List<KubeHelperException> buildExceptions) {
         this.buildExceptions = buildExceptions;
         return this;
     }
@@ -138,11 +138,11 @@ public class FeaturesModel implements PageModel {
         return !buildExceptions.isEmpty();
     }
 
-    public FeaturesFilter getFilter() {
+    public CommandsFilter getFilter() {
         return filter;
     }
 
-    public FeaturesModel setFilter(FeaturesFilter filter) {
+    public CommandsModel setFilter(CommandsFilter filter) {
         this.filter = filter;
         return this;
     }
@@ -151,7 +151,7 @@ public class FeaturesModel implements PageModel {
         return selectedNamespace;
     }
 
-    public FeaturesModel setSelectedNamespace(String selectedNamespace) {
+    public CommandsModel setSelectedNamespace(String selectedNamespace) {
         this.selectedNamespace = selectedNamespace;
         return this;
     }
@@ -160,7 +160,7 @@ public class FeaturesModel implements PageModel {
         return predefinedCommandsPath;
     }
 
-    public FeaturesModel setPredefinedCommandsPath(String predefinedCommandsPath) {
+    public CommandsModel setPredefinedCommandsPath(String predefinedCommandsPath) {
         this.predefinedCommandsPath = predefinedCommandsPath;
         return this;
     }
@@ -169,7 +169,7 @@ public class FeaturesModel implements PageModel {
         return userCommandsPath;
     }
 
-    public FeaturesModel setUserCommandsPath(String userCommandsPath) {
+    public CommandsModel setUserCommandsPath(String userCommandsPath) {
         this.userCommandsPath = userCommandsPath;
         return this;
     }

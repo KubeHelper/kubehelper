@@ -19,11 +19,11 @@ package com.kubehelper.viewmodels;
 
 import com.kubehelper.common.Global;
 import com.kubehelper.common.Resource;
-import com.kubehelper.domain.filters.FeaturesFilter;
-import com.kubehelper.domain.models.FeaturesModel;
-import com.kubehelper.domain.results.FeatureResult;
+import com.kubehelper.domain.filters.CommandsFilter;
+import com.kubehelper.domain.models.CommandsModel;
+import com.kubehelper.domain.results.CommandsResult;
 import com.kubehelper.services.CommonService;
-import com.kubehelper.services.FeaturesService;
+import com.kubehelper.services.CommandsService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -93,9 +93,9 @@ import static com.kubehelper.common.Resource.STATEFUL_SET;
  * @author JDev
  */
 @VariableResolver(DelegatingVariableResolver.class)
-public class FeaturesVM implements EventListener, PropertyChangeListener {
+public class CommandsVM implements EventListener, PropertyChangeListener {
 
-    private static Logger logger = LoggerFactory.getLogger(FeaturesVM.class);
+    private static Logger logger = LoggerFactory.getLogger(CommandsVM.class);
 
     private boolean isSearchButtonPressed;
 
@@ -116,21 +116,21 @@ public class FeaturesVM implements EventListener, PropertyChangeListener {
     }};
     private List<Resource> searchResources = Arrays.asList(ENV_VARIABLE, POD, CONFIG_MAP, SECRET, SERVICE_ACCOUNT, SERVICE, DAEMON_SET, DEPLOYMENT, REPLICA_SET, STATEFUL_SET, JOB, NAMESPACE,
             PERSISTENT_VOLUME_CLAIM, PERSISTENT_VOLUME, CLUSTER_ROLE_BINDING, CLUSTER_ROLE, ROLE_BINDING, ROLE, NETWORK_POLICY, POD_DISRUPTION_BUDGET, POD_SECURITY_POLICY);
-    private ListModelList<FeatureResult> featuresResults = new ListModelList<>();
+    private ListModelList<CommandsResult> commandsResults = new ListModelList<>();
 
-    private FeaturesModel featuresModel;
+    private CommandsModel commandsModel;
 
     @WireVariable
     private CommonService commonService;
 
     @WireVariable
-    private FeaturesService featuresService;
+    private CommandsService commandsService;
 
     @Init
     @NotifyChange("*")
     public void init() {
-        featuresModel = (FeaturesModel) Global.ACTIVE_MODELS.computeIfAbsent(Global.FEATURES_MODEL, (k) -> Global.NEW_MODELS.get(Global.FEATURES_MODEL));
-        featuresModel.addPropertyChangeListener(FeaturesVM.this);
+        commandsModel = (CommandsModel) Global.ACTIVE_MODELS.computeIfAbsent(Global.COMMANDS_MODEL, (k) -> Global.NEW_MODELS.get(Global.COMMANDS_MODEL));
+        commandsModel.addPropertyChangeListener(CommandsVM.this);
         onInitPreparations();
     }
 
@@ -149,9 +149,9 @@ public class FeaturesVM implements EventListener, PropertyChangeListener {
     @Command
     @NotifyChange({"totalItems", "searchResults", "filter"})
     public void search() {
-        featuresModel.setFilter(new FeaturesFilter());
-        featuresModel.setBuildExceptions(new ArrayList<>());
-//        searchService.search(featuresModel, selectedResources);
+        commandsModel.setFilter(new CommandsFilter());
+        commandsModel.setBuildExceptions(new ArrayList<>());
+//        searchService.search(commandsModel, selectedResources);
         clearAllFilterComboboxes();
         isSearchButtonPressed = true;
         onInitPreparations();
@@ -162,21 +162,21 @@ public class FeaturesVM implements EventListener, PropertyChangeListener {
      */
     private void onInitPreparations() {
 
-        featuresModel.setNamespaces(featuresModel.getNamespaces().isEmpty() ? commonService.getAllNamespaces() : featuresModel.getNamespaces());
-        featuresService.parsePredefinedCommands(featuresModel);
-        featuresService.parseUserCommands(featuresModel);
-        featuresModel.getName();
-//        if (featuresModel.getFilter().isFilterActive() && !featuresModel.getSearchResults().isEmpty()) {
+        commandsModel.setNamespaces(commandsModel.getNamespaces().isEmpty() ? commonService.getAllNamespaces() : commandsModel.getNamespaces());
+        commandsService.parsePredefinedCommands(commandsModel);
+        commandsService.parseUserCommands(commandsModel);
+        commandsModel.getName();
+//        if (fcommandsModel.getFilter().isFilterActive() && !commandsModel.getSearchResults().isEmpty()) {
 //            filterSearches();
 //        } else {
-//            featuresResults = new ListModelList<>(featuresModel.getSearchResults());
+//            commandsResults = new ListModelList<>(commandsModel.getSearchResults());
 //        }
 //        updateHeightsAndRerenderVM();
-        logger.info("Found {} namespaces.", featuresModel.getNamespaces());
+        logger.info("Found {} namespaces.", commandsModel.getNamespaces());
     }
 
     private void buildCommandsListBox() {
-        Listbox listBox = (Listbox) Path.getComponent("//indexPage/templateInclude/featuresListBoxId");
+        Listbox listBox = (Listbox) Path.getComponent("//indexPage/templateInclude/commandsListBoxId");
 
         Listheader listHeader1 = new Listheader();
         listHeader1.setLabel("ABC");
@@ -215,13 +215,13 @@ public class FeaturesVM implements EventListener, PropertyChangeListener {
      */
     @Command
     @NotifyChange({"totalItems", "searchResults"})
-    public void filterFeatures() {
-        featuresResults.clear();
-        for (FeatureResult featureResult : featuresModel.getFeaturesResults()) {
-            if (StringUtils.containsIgnoreCase(featureResult.getGroup(), getFilter().getGroup()) &&
-                    StringUtils.containsIgnoreCase(featureResult.getCommand(), getFilter().getCommand()) &&
-                    StringUtils.containsIgnoreCase(featureResult.getDescription(), getFilter().getDescription())) {
-                featuresResults.add(featureResult);
+    public void filterCommands() {
+        commandsResults.clear();
+        for (CommandsResult commandeResult : commandsModel.getCommandsResults()) {
+            if (StringUtils.containsIgnoreCase(commandeResult.getGroup(), getFilter().getGroup()) &&
+                    StringUtils.containsIgnoreCase(commandeResult.getCommand(), getFilter().getCommand()) &&
+                    StringUtils.containsIgnoreCase(commandeResult.getDescription(), getFilter().getDescription())) {
+                commandsResults.add(commandeResult);
             }
         }
     }
@@ -267,7 +267,7 @@ public class FeaturesVM implements EventListener, PropertyChangeListener {
     @Command
     public void showFullCommand(@BindingParam("id") int id) {
         String content = "";
-//        Optional<SearchResult> first = featuresResults.getInnerList().stream().filter(item -> item.getId() == id).findFirst();
+//        Optional<SearchResult> first = commandsResults.getInnerList().stream().filter(item -> item.getId() == id).findFirst();
 //        if (first.isPresent()) {
 //            Map<String, String> parameters = Map.of("title", first.get().getResourceName(), "content", first.get().getFullDefinition());
 //            Window window = (Window) Executions.createComponents("~./zul/components/file-display.zul", null, parameters);
@@ -276,20 +276,20 @@ public class FeaturesVM implements EventListener, PropertyChangeListener {
     }
 
     public String getSelectedNamespace() {
-        return featuresModel.getSelectedNamespace();
+        return commandsModel.getSelectedNamespace();
     }
 
-    public FeaturesVM setSelectedNamespace(String selectedNamespace) {
-        this.featuresModel.setSelectedNamespace(selectedNamespace);
+    public CommandsVM setSelectedNamespace(String selectedNamespace) {
+        this.commandsModel.setSelectedNamespace(selectedNamespace);
         return this;
     }
 
-    public FeaturesFilter getFilter() {
-        return featuresModel.getFilter();
+    public CommandsFilter getFilter() {
+        return commandsModel.getFilter();
     }
 
     public String getRunCommandTotalItems() {
-        return String.format("Total Items: %d", featuresResults.size());
+        return String.format("Total Items: %d", commandsResults.size());
     }
 
     /**
@@ -297,27 +297,27 @@ public class FeaturesVM implements EventListener, PropertyChangeListener {
      *
      * @return - search results
      */
-    public ListModelList<FeatureResult> getFeaturesResults() {
-        if (isSearchButtonPressed && featuresResults.isEmpty()) {
+    public ListModelList<CommandsResult> getCommandsResults() {
+        if (isSearchButtonPressed && commandsResults.isEmpty()) {
             Notification.show("Nothing found.", "info", searchGridTotalItemsFooter, "before_end", 2000);
         }
-        if (isSearchButtonPressed && !featuresResults.isEmpty()) {
-            Notification.show("Found: " + featuresResults.size() + " items", "info", searchGridTotalItemsFooter, "before_end", 2000);
+        if (isSearchButtonPressed && !commandsResults.isEmpty()) {
+            Notification.show("Found: " + commandsResults.size() + " items", "info", searchGridTotalItemsFooter, "before_end", 2000);
         }
-        if (isSearchButtonPressed && featuresModel.hasBuildErrors()) {
-            Window window = (Window) Executions.createComponents("~./zul/components/errors.zul", null, Map.of("errors", featuresModel.getBuildExceptions()));
+        if (isSearchButtonPressed && commandsModel.hasBuildErrors()) {
+            Window window = (Window) Executions.createComponents("~./zul/components/errors.zul", null, Map.of("errors", commandsModel.getBuildExceptions()));
             window.doModal();
         }
         isSearchButtonPressed = false;
-        return featuresResults;
+        return commandsResults;
     }
 
     public List<String> getNamespaces() {
-        return featuresModel.getNamespaces();
+        return commandsModel.getNamespaces();
     }
 
     public String getMainGridHeight() {
-        return featuresModel.getMainGridHeight() + "px";
+        return commandsModel.getMainGridHeight() + "px";
     }
 
     @Override

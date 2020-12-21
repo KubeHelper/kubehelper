@@ -25,14 +25,14 @@ import java.util.List;
 /**
  * @author JDev
  */
-public class FeaturesFilter {
+public class CommandsFilter {
     private String description = "", group = "", command = "";
 
     private String selectedGroupFilter = "";
 
     private List<String> groupsFilter = new ArrayList<>();
 
-    public FeaturesFilter() {
+    public CommandsFilter() {
     }
 
     public void addGroupFilter(String groupFilter) {
@@ -49,7 +49,7 @@ public class FeaturesFilter {
         return description;
     }
 
-    public FeaturesFilter setDescription(String description) {
+    public CommandsFilter setDescription(String description) {
         this.description = description == null ? "" : description;
         return this;
     }
@@ -58,7 +58,7 @@ public class FeaturesFilter {
         return group;
     }
 
-    public FeaturesFilter setGroup(String group) {
+    public CommandsFilter setGroup(String group) {
         this.group = group;
         return this;
     }
@@ -67,7 +67,7 @@ public class FeaturesFilter {
         return command;
     }
 
-    public FeaturesFilter setCommand(String command) {
+    public CommandsFilter setCommand(String command) {
         this.command = command == null ? "" : command;
         return this;
     }
@@ -76,7 +76,7 @@ public class FeaturesFilter {
         return selectedGroupFilter;
     }
 
-    public FeaturesFilter setSelectedGroupFilter(String selectedGroupFilter) {
+    public CommandsFilter setSelectedGroupFilter(String selectedGroupFilter) {
         this.selectedGroupFilter = selectedGroupFilter == null ? "" : selectedGroupFilter;
         return this;
     }

@@ -82,7 +82,7 @@
                             <toolbarbutton id="securityMenuBtn" hflex="1" iconSclass="z-icon-shield" label="&#160;Security" onClick="@command('switchView', modelName='security')"/>
                             <toolbarbutton id="labelsMenuBtn" hflex="1" iconSclass="z-icon-tags" label="&#160;Labels Annotations Selectors" onClick="@command('switchView', modelName='labels')"/>
                             <!--                            <toolbarbutton id="auditingMenuBtn" hflex="1" iconSclass="z-icon-gears" label="&#160;Auditing" onClick="@command('switchView', modelName='auditing')"/>-->
-                            <toolbarbutton id="featuresMenuBtn" hflex="1" iconSclass="z-icon-th" label="&#160;Features" onClick="@command('switchView', modelName='features')"/>
+                            <toolbarbutton id="commandsMenuBtn" hflex="1" iconSclass="z-icon-th" label="&#160;Commands" onClick="@command('switchView', modelName='commands')"/>
                             <!--                            <toolbarbutton id="featureGatesMenuBtn" hflex="1" iconSclass="z-icon-home" label="&#160;Feature Gates" onClick="@command('switchView', modelName='featureGates')"/>-->
                             <!--                            <toolbarbutton id="customResourcesMenuBtn" hflex="1" iconSclass="z-icon-home" label="&#160;Custom Resources" onClick="@command('switchView', modelName='customResources')"/>-->
                             <!--                            <toolbarbutton id="deprecatedMenuBtn" hflex="1" iconSclass="z-icon-home" label="&#160;Deprecated" onClick="@command('switchView', modelName='deprecated')"/>-->
@@ -114,7 +114,7 @@
                         </panelchildren>
                     </panel>
                     <panel width="100%" border="normal"
-                           title="Features">
+                           title="Commands">
                         <panelchildren>
                         </panelchildren>
                     </panel>
