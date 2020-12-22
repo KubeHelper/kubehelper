@@ -38,9 +38,11 @@ import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Path;
+import org.zkoss.zk.ui.event.AfterSizeEvent;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.select.Selectors;
+import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
@@ -93,11 +95,13 @@ import static com.kubehelper.common.Resource.STATEFUL_SET;
  * @author JDev
  */
 @VariableResolver(DelegatingVariableResolver.class)
-public class CommandsVM implements EventListener, PropertyChangeListener {
+public class CommandsVM implements EventListener {
 
     private static Logger logger = LoggerFactory.getLogger(CommandsVM.class);
 
     private boolean isSearchButtonPressed;
+
+    private int centerLayoutHeight = 600;
 
     @Wire
     private Footer searchGridTotalItemsFooter;
@@ -130,7 +134,6 @@ public class CommandsVM implements EventListener, PropertyChangeListener {
     @NotifyChange("*")
     public void init() {
         commandsModel = (CommandsModel) Global.ACTIVE_MODELS.computeIfAbsent(Global.COMMANDS_MODEL, (k) -> Global.NEW_MODELS.get(Global.COMMANDS_MODEL));
-        commandsModel.addPropertyChangeListener(CommandsVM.this);
         onInitPreparations();
     }
 
@@ -142,8 +145,15 @@ public class CommandsVM implements EventListener, PropertyChangeListener {
      */
     @AfterCompose
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) {
-        buildCommandsListBox();
         Selectors.wireComponents(view, this, false);
+        Selectors.wireEventListeners(view, this);
+        buildCommandsListBox();
+    }
+
+    @Listen("onAfterSize=#centerLayoutCommandsID")
+    public void onAfterSizeCenter(AfterSizeEvent event) {
+        centerLayoutHeight = event.getHeight() - 3;
+        BindUtils.postNotifyChange(null, null, this, ".");
     }
 
     @Command
@@ -317,12 +327,7 @@ public class CommandsVM implements EventListener, PropertyChangeListener {
     }
 
     public String getMainGridHeight() {
-        return commandsModel.getMainGridHeight() + "px";
-    }
-
-    @Override
-    public void propertyChange(PropertyChangeEvent evt) {
-        BindUtils.postNotifyChange(null, null, this, ".");
+        return centerLayoutHeight + "px";
     }
 
 }

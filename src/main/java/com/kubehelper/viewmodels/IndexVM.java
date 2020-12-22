@@ -32,20 +32,16 @@ import org.zkoss.bind.annotation.Init;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Path;
-import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.select.Selectors;
-import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
-import org.zkoss.zk.ui.util.Notification;
 import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Footer;
 import org.zkoss.zul.Toolbarbutton;
 import org.zkoss.zul.Window;
 
 import java.time.LocalDate;
-import java.util.Map;
 
 /**
  * @author JDev
@@ -63,29 +59,6 @@ public class IndexVM {
     private CommonService commonService;
     private static Logger logger = LoggerFactory.getLogger(IndexVM.class);
 
-//    @Command
-//    public void onClientInfoEvent(ClientInfoEvent evt) {
-//        pageModel.setDesktopWithAndHeight(evt.getDesktopWidth(), evt.getDesktopHeight());
-//        BindUtils.postGlobalCommand(null, null, "updateHeightsAndRerenderVM", Map.of("eventType", "onClientInfo"));
-//    }
-
-//    @Command
-//    public void refreshMainGridSize() {
-//        BindUtils.postNotifyChange(null, null, this, "mainGridId");
-//    }
-
-    @Listen("onResize=#indexGlobalFooter")
-    public void onResize(Event evt){
-        try {
-            int mainContentHeight = (Integer) ((Map) evt.getData()).get("mainContentHeight");
-            pageModel.setPageMainContentHeight(mainContentHeight);
-        }catch (RuntimeException e){
-            logger.error(e.getMessage(), e);
-            Notification.show("The scripts on the page is disabled. Therefore, grids cannot fill the entire space. For the application to work correctly, allow run javascripts for this page.",
-                    "warning", indexGlobalFooter, "overlap_after", 5000);
-        }
-    }
-
     @Init
     public void init() {
 //        pageModel = new DashboardModel();
@@ -102,7 +75,6 @@ public class IndexVM {
     @AfterCompose
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) {
         Selectors.wireEventListeners(view, this);
-//        BindUtils.postNotifyChange(null, null, this, "mainGridId");
         enableDisableMenuItem(pageModel.getName());
     }
 

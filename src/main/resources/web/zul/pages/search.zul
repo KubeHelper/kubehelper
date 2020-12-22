@@ -54,8 +54,8 @@
                     </vbox>
                 </groupbox>
             </north>
-            <center margins="0,3,3,3" vflex="max">
-                <grid id="mainGridId" class="mainGridId" model="@load(searchVM.searchResults)" height="@load(searchVM.mainGridHeight)">
+            <center id="centerLayoutSearchID" margins="0,3,3,3" vflex="max">
+                <grid model="@load(searchVM.searchResults)" height="@load(searchVM.mainGridHeight)">
                     <auxhead id="searchGridAuxHead">
                         <auxheader class="pageNorthClass">
                             <span sclass="z-icon-hashtag"/>

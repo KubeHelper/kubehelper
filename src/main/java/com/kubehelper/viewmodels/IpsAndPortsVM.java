@@ -37,7 +37,9 @@ import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Path;
+import org.zkoss.zk.ui.event.AfterSizeEvent;
 import org.zkoss.zk.ui.select.Selectors;
+import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
@@ -49,8 +51,6 @@ import org.zkoss.zul.Footer;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Window;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -61,11 +61,13 @@ import java.util.Map;
  * @author JDev
  */
 @VariableResolver(DelegatingVariableResolver.class)
-public class IpsAndPortsVM implements PropertyChangeListener {
+public class IpsAndPortsVM {
 
     private static Logger logger = LoggerFactory.getLogger(IpsAndPortsVM.class);
 
     private boolean isGetButtonPressed;
+
+    private int centerLayoutHeight = 600;
 
     private String detailsLabel = "";
 
@@ -84,7 +86,6 @@ public class IpsAndPortsVM implements PropertyChangeListener {
     @Init
     public void init() {
         ipsAndPortsModel = (IpsAndPortsModel) Global.ACTIVE_MODELS.computeIfAbsent(Global.IPS_AND_PORTS_MODEL, (k) -> Global.NEW_MODELS.get(Global.IPS_AND_PORTS_MODEL));
-        ipsAndPortsModel.addPropertyChangeListener(IpsAndPortsVM.this);
         onInitPreparations();
     }
 
@@ -94,6 +95,13 @@ public class IpsAndPortsVM implements PropertyChangeListener {
     @AfterCompose
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) {
         Selectors.wireComponents(view, this, false);
+        Selectors.wireEventListeners(view, this);
+    }
+
+    @Listen("onAfterSize=#centerLayoutIpsAndPortsID")
+    public void onAfterSizeCenter(AfterSizeEvent event) {
+        centerLayoutHeight = event.getHeight() - 3;
+        BindUtils.postNotifyChange(null, null, this, ".");
     }
 
     @Command
@@ -215,12 +223,7 @@ public class IpsAndPortsVM implements PropertyChangeListener {
     }
 
     public String getMainGridHeight() {
-        return ipsAndPortsModel.getMainGridHeight() * 0.8 + "px";
-    }
-
-    @Override
-    public void propertyChange(PropertyChangeEvent evt) {
-        BindUtils.postNotifyChange(null, null, this, ".");
+        return centerLayoutHeight + "px";
     }
 
 }

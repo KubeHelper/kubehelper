@@ -44,7 +44,9 @@ import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Path;
+import org.zkoss.zk.ui.event.AfterSizeEvent;
 import org.zkoss.zk.ui.select.Selectors;
+import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
@@ -56,8 +58,6 @@ import org.zkoss.zul.Footer;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Window;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -68,7 +68,7 @@ import java.util.Map;
  * @author JDev
  */
 @VariableResolver(DelegatingVariableResolver.class)
-public class SecurityVM implements PropertyChangeListener {
+public class SecurityVM {
 
     private static Logger logger = LoggerFactory.getLogger(SecurityVM.class);
 
@@ -92,6 +92,7 @@ public class SecurityVM implements PropertyChangeListener {
 
     private String clickedRoleBindingSubjectsLabel = "";
     private String clickedRoleRulesLabel = "";
+    private int centerLayoutHeight = 600;
 
     @Wire
     private Footer rolesGridFooter;
@@ -123,7 +124,6 @@ public class SecurityVM implements PropertyChangeListener {
     @Init
     public void init() {
         securityModel = (SecurityModel) Global.ACTIVE_MODELS.computeIfAbsent(Global.SECURITY_MODEL, (k) -> Global.NEW_MODELS.get(Global.SECURITY_MODEL));
-        securityModel.addPropertyChangeListener(SecurityVM.this);
         setAllNamespacesToModel();
     }
 
@@ -133,6 +133,13 @@ public class SecurityVM implements PropertyChangeListener {
     @AfterCompose
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) {
         Selectors.wireComponents(view, this, false);
+        Selectors.wireEventListeners(view, this);
+    }
+
+    @Listen("onAfterSize=#centerLayoutSecurityID")
+    public void onAfterSizeCenter(AfterSizeEvent event) {
+        centerLayoutHeight = event.getHeight() - 120;
+        BindUtils.postNotifyChange(null, null, this, ".");
     }
 
     //  GETTING ================
@@ -429,12 +436,6 @@ public class SecurityVM implements PropertyChangeListener {
     }
 
 
-    @Override
-    public void propertyChange(PropertyChangeEvent evt) {
-        BindUtils.postNotifyChange(null, null, this, ".");
-    }
-
-
     //  RESULTS ================
 
 
@@ -600,36 +601,35 @@ public class SecurityVM implements PropertyChangeListener {
     }
 
     public String getRolesGridHeight() {
-        return securityModel.getMainGridHeight() * 0.43 + "px";
-    }
-
-    public String getRbacsGridHeight() {
-        return securityModel.getMainGridHeight() + "px";
+        return centerLayoutHeight * 0.40 + "px";
     }
 
     public String getSubjectsGridHeight() {
-        return securityModel.getMainGridHeight() * 0.13 + "px";
+        return centerLayoutHeight * 0.15 + "px";
     }
 
     public String getRoleRulesGridHeight() {
-        return securityModel.getMainGridHeight() * 0.33 + "px";
+        return centerLayoutHeight * 0.35 + "px";
+    }
+
+    public String getRbacsGridHeight() {
+        return centerLayoutHeight + "px";
     }
 
     public String getPodsSecurityContextsGridHeight() {
-        return securityModel.getMainGridHeight() + "px";
+        return centerLayoutHeight + "px";
     }
 
     public String getContainersSecurityContextsGridHeight() {
-        return securityModel.getMainGridHeight() + "px";
+        return centerLayoutHeight + "px";
     }
 
     public String getServiceAccountsGridHeight() {
-        return securityModel.getMainGridHeight() + "px";
+        return centerLayoutHeight + "px";
     }
 
-
     public String getPodsSecurityPoliciesGridHeight() {
-        return securityModel.getMainGridHeight() + "px";
+        return centerLayoutHeight + "px";
     }
 
     public boolean isSkipKubeNamespaces() {

@@ -3,12 +3,12 @@
         <borderlayout>
             <!--            TODO Paging and vflex="min" for center and remove height-->
             <center margins="0,3,3,3" title="Security">
-                <tabbox width="100%" sclass="nav_tabs">
+                <tabbox width="100%" sclass="nav_tabs" style="border-color: red">
                     <tabs id="tabs">
                         <tab label="Commands"/>
                         <tab label="Commands Constructor"/>
                     </tabs>
-                    <tabpanels>
+                    <tabpanels id="centerLayoutCommandsID" style="border-color: blue">
                         <tabpanel>
                             <separator width="100%" orient="horizontal"/>
                             <div height="50%" width="100%" style="overflow-y:auto;overflow-x:auto;font-family: Courier, Monaco, monospace;">

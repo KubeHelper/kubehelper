@@ -1,34 +1,6 @@
 <?page id="indexPage" title="Kube Helper"?>
 <zk>
-    <script type="text/javascript">
-<!--        This method is called once after the initial page generation.-->
-        zk.afterMount(function() {
-        calculateMainContentHeight();
-        });
-
-<!--        This method is called every time the window is resized.-->
-        $( window ).resize(function() {
-        calculateMainContentHeight();
-        });
-
-
-        function calculateMainContentHeight() {
-        var topPos = $(".mainGridClass")[0].getBoundingClientRect().top + $(window)['scrollTop']();
-        var topGlobalFooterPos = $(".mainSouthFooterClass")[0].getBoundingClientRect().top + $(window)['scrollTop']();
-        var gridHeight = topGlobalFooterPos - topPos;
-        console.log("gridHeight="+gridHeight);
-        zAu.send(new zk.Event(zk.Widget.$('$indexGlobalFooter'), "onResize", {mainContentHeight: gridHeight}, {toServer:true}));
-        }
-
-    </script>
-
     <div id="indexWindow" viewModel="@id('indexVM') @init('com.kubehelper.viewmodels.IndexVM')" height="100%" width="100%">
-        <!--    <div id="indexWindow" viewModel="@id('indexVM') @init('com.kubehelper.viewmodels.IndexVM')" height="100%" width="100%" onClientInfo="onClientInfo(event)">-->
-        <!--        <zscript>-->
-        <!--            void onClientInfo(ClientInfoEvent evt) {-->
-        <!--            indexVM.onClientInfoEvent(evt);-->
-        <!--            }-->
-        <!--        </zscript>-->
         <borderlayout sclass="complex-layout">
             <north size="5%" border="0" style="background: #3498DB">
                 <!--                <panel border="normal" height="100%" width="100%">-->
@@ -120,10 +92,10 @@
                     </panel>
                 </vlayout>
             </west>
-            <center style="overflow:auto">
+            <center>
                 <include id="templateInclude" src="@load(indexVM.pageModel.templateUrl)"/>
             </center>
-            <south id="indexGlobalFooter" class="mainSouthFooterClass" size="3%">
+            <south id="indexGlobalFooter" size="4%">
                 <toolbar align="center">
                     <toolbarbutton id="copyrightBtn" label="@load(indexVM.footerCopyrightText)" tooltiptext="https://github.com/JWebDev/kubehelper" href="https://github.com/JWebDev/kubehelper"
                                    target="_blank"

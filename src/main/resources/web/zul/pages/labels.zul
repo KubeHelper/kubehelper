@@ -6,7 +6,7 @@
                 <groupbox id="labelsConfigGroupBox" width="100%">
                     <caption iconSclass="z-icon-sliders" label="Search Configuration"/>
                     <vbox height="100%" width="100%">
-                        <hbox height="100%" width="100%" align="stretch" >
+                        <hbox height="100%" width="100%" align="stretch">
                             <cell id="clearAllCell" width="10%" tooltip="clearAllTooltip">
                                 <button id="clearAll" width="100%" iconSclass="z-icon-eraser" label="Clear all" onClick="@command('clearAll')"/>
                             </cell>
@@ -51,7 +51,7 @@
                     </vbox>
                 </groupbox>
             </north>
-            <center vflex="max" margins="0,3,3,3">
+            <center id="centerLayoutLabelsID" vflex="max" margins="0,3,3,3">
                 <tabbox width="100%" sclass="nav_tabs">
                     <tabs id="tabs">
                         <tab label="All"/>
@@ -59,8 +59,7 @@
                     </tabs>
                     <tabpanels>
                         <tabpanel>
-                            <separator width="100%" orient="horizontal"/>
-                            <grid id="mainGridId" class="mainGridId" model="@load(labelsVM.searchResults)" height="@load(labelsVM.mainGridHeight)">
+                            <grid model="@load(labelsVM.searchResults)" height="@load(labelsVM.mainGridHeight)">
                                 <auxhead id="searchGridAuxHead">
                                     <auxheader>
                                         <span sclass="z-icon-hashtag"/>
@@ -140,7 +139,7 @@
                                 <cell width="40%">
                                     <groupbox id="labelsGroupedListGroupBox">
                                         <caption iconSclass="z-icon-list" label="Groups"/>
-                                        <grid id="groupedLabelsGrid" class="mainGridId" model="@load(labelsVM.groupedLabels)" height="800px">
+                                        <grid id="groupedLabelsGrid" model="@load(labelsVM.groupedLabels)" height="@load(labelsVM.mainGridGroupedHeight)">
                                             <auxhead id="groupedLabelsAuxHead">
                                                 <auxheader>
                                                     <span sclass="z-icon-hashtag"/>
@@ -180,7 +179,7 @@
                                 <cell width="60%">
                                     <groupbox id="labelsGroupedColumnsGroupBox">
                                         <caption iconSclass="z-icon-columns" label="@load(labelsVM.clickedLabelsGroup)"/>
-                                        <grid id="groupedLabelsColumnGrid" class="mainGridId" model="@load(labelsVM.groupedLabelColumns)" height="800px">
+                                        <grid id="groupedLabelsColumnGrid" model="@load(labelsVM.groupedLabelColumns)" height="@load(labelsVM.mainGridGroupedHeight)">
                                             <auxhead id="groupedLabelsColumnGridAuxHead">
                                                 <auxheader>
                                                     <span sclass="z-icon-hashtag"/>
@@ -218,7 +217,8 @@
                                                     </combobox>
                                                 </auxheader>
                                                 <auxheader colspan="1">
-                                                    <textbox instant="true" hflex="1" value="@bind(labelsVM.groupedLabelColumnsFilter.additionalInfo)" onChange="@command('filterGroupedLabelsColumns')"/>
+                                                    <textbox instant="true" hflex="1" value="@bind(labelsVM.groupedLabelColumnsFilter.additionalInfo)"
+                                                             onChange="@command('filterGroupedLabelsColumns')"/>
                                                 </auxheader>
                                             </auxhead>
                                             <columns menupopup="auto" sizable="true">

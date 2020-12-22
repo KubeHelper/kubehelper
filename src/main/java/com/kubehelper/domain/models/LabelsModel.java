@@ -26,8 +26,6 @@ import com.kubehelper.domain.filters.LabelsGroupedColumnsFilter;
 import com.kubehelper.domain.filters.LabelsGroupedFilter;
 import com.kubehelper.domain.results.LabelResult;
 
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -38,9 +36,6 @@ import java.util.Map;
  * @author JDev
  */
 public class LabelsModel implements PageModel {
-
-    private int mainGridHeight = 600;
-    private PropertyChangeSupport grid = new PropertyChangeSupport(this);
 
     private String templateUrl = "~./zul/pages/labels.zul";
     public static String NAME = Global.LABELS_MODEL;
@@ -59,21 +54,6 @@ public class LabelsModel implements PageModel {
     private String clickedLabelsGroup = "";
 
     public LabelsModel() {
-    }
-
-    @Override
-    public void setPageMainContentHeight(int newHeight) {
-        int oldMainGridHeight = this.mainGridHeight;
-        this.mainGridHeight = newHeight;
-        grid.firePropertyChange(null, oldMainGridHeight, newHeight);
-    }
-
-    public int getMainGridHeight() {
-        return mainGridHeight;
-    }
-
-    public void addPropertyChangeListener(PropertyChangeListener pcl) {
-        grid.addPropertyChangeListener(pcl);
     }
 
     public LabelsModel addSearchResult(LabelResult searchResult) {

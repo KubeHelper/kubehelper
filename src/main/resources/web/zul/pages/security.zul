@@ -1,7 +1,7 @@
 <zk>
     <div id="securityTemplate" viewModel="@id('securityVM') @init('com.kubehelper.viewmodels.SecurityVM')" width="100%" height="100%">
         <borderlayout>
-            <center margins="0,3,3,3" title="Security">
+            <center margins="0,3,3,3" title="Security" id="centerLayoutSecurityID">
                 <tabbox width="100%" sclass="nav_tabs">
                     <tabs id="tabs">
                         <tab label="Roles"/>
@@ -44,7 +44,7 @@
                                 </vbox>
                             </groupbox>
                             <separator width="100%" orient="horizontal"/>
-                            <grid id="securityRolesGrid" model="@load(securityVM.rolesResults)" height="@load(securityVM.rolesGridHeight)" sclass="mainGridClass">
+                            <grid id="securityRolesGrid" model="@load(securityVM.rolesResults)" height="@load(securityVM.rolesGridHeight)">
                                 <auxhead id="rolesGridAuxHead">
                                     <auxheader>
                                         <span sclass="z-icon-hashtag"/>

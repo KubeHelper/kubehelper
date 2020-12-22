@@ -39,9 +39,11 @@ import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Path;
+import org.zkoss.zk.ui.event.AfterSizeEvent;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.select.Selectors;
+import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
@@ -56,8 +58,6 @@ import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Vbox;
 import org.zkoss.zul.Window;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -95,7 +95,7 @@ import static com.kubehelper.common.Resource.STATEFUL_SET;
  * @author JDev
  */
 @VariableResolver(DelegatingVariableResolver.class)
-public class SearchVM implements EventListener, PropertyChangeListener {
+public class SearchVM implements EventListener {
 
     private static Logger logger = LoggerFactory.getLogger(SearchVM.class);
 
@@ -128,13 +128,26 @@ public class SearchVM implements EventListener, PropertyChangeListener {
     @WireVariable
     private SearchService searchService;
 
+    private int centerLayoutHeight = 600;
+
     @Init
     @NotifyChange("*")
     public void init() {
         searchModel = (SearchModel) Global.ACTIVE_MODELS.computeIfAbsent(Global.SEARCH_MODEL, (k) -> Global.NEW_MODELS.get(Global.SEARCH_MODEL));
-        searchModel.addPropertyChangeListener(SearchVM.this);
         onInitPreparations();
     }
+
+    @Command
+    public void onAfterSize(AfterSizeEvent event) {
+        event.getHeight();
+    }
+
+    @Listen("onAfterSize=#centerLayoutSearchID")
+    public void onAfterSizeCenter(AfterSizeEvent event) {
+        centerLayoutHeight = event.getHeight()-3;
+        BindUtils.postNotifyChange(null, null, this, ".");
+    }
+
 
     /**
      * Creates CheckBox components Dynamically after UI render.
@@ -144,8 +157,9 @@ public class SearchVM implements EventListener, PropertyChangeListener {
      */
     @AfterCompose
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) {
-        createKubeResourcesCheckboxes();
         Selectors.wireComponents(view, this, false);
+        Selectors.wireEventListeners(view, this);
+        createKubeResourcesCheckboxes();
     }
 
     @Command
@@ -388,12 +402,7 @@ public class SearchVM implements EventListener, PropertyChangeListener {
     }
 
     public String getMainGridHeight() {
-        return searchModel.getMainGridHeight() + "px";
-    }
-
-    @Override
-    public void propertyChange(PropertyChangeEvent evt) {
-        BindUtils.postNotifyChange(null, null, this, ".");
+        return centerLayoutHeight+ "px";
     }
 
 }

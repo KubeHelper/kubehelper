@@ -31,7 +31,7 @@
                     </vbox>
                 </groupbox>
             </north>
-            <center margins="0,3,3,3">
+            <center margins="0,3,3,3" id="centerLayoutIpsAndPortsID">
                 <grid id="ipsAndPortsGrid" model="@load(ipsAndPortsVM.ipsAndPortsResults)" height="@load(ipsAndPortsVM.mainGridHeight)">
                     <auxhead id="ipsAndPortsGridAuxHead">
                         <auxheader>

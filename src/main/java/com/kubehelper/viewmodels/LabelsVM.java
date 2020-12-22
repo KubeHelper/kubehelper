@@ -41,9 +41,11 @@ import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Path;
+import org.zkoss.zk.ui.event.AfterSizeEvent;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.select.Selectors;
+import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
@@ -58,8 +60,6 @@ import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Vbox;
 import org.zkoss.zul.Window;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -67,7 +67,6 @@ import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.StreamSupport;
 
@@ -96,11 +95,13 @@ import static com.kubehelper.common.Resource.STATEFUL_SET;
  * @author JDev
  */
 @VariableResolver(DelegatingVariableResolver.class)
-public class LabelsVM implements EventListener, PropertyChangeListener {
+public class LabelsVM implements EventListener {
 
     private static Logger logger = LoggerFactory.getLogger(LabelsVM.class);
 
     private boolean isSearchButtonPressed;
+
+    private int centerLayoutHeight = 600;
 
     @Wire
     private Footer labelsGridTotalItemsFooter;
@@ -133,7 +134,6 @@ public class LabelsVM implements EventListener, PropertyChangeListener {
     @NotifyChange("*")
     public void init() {
         labelsModel = (LabelsModel) Global.ACTIVE_MODELS.computeIfAbsent(Global.LABELS_MODEL, (k) -> Global.NEW_MODELS.get(Global.LABELS_MODEL));
-        labelsModel.addPropertyChangeListener(LabelsVM.this);
         onInitPreparations();
     }
 
@@ -145,8 +145,15 @@ public class LabelsVM implements EventListener, PropertyChangeListener {
      */
     @AfterCompose
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) {
-        createKubeResourcesCheckboxes();
         Selectors.wireComponents(view, this, false);
+        Selectors.wireEventListeners(view, this);
+        createKubeResourcesCheckboxes();
+    }
+
+    @Listen("onAfterSize=#centerLayoutLabelsID")
+    public void onAfterSizeCenter(AfterSizeEvent event) {
+        centerLayoutHeight = event.getHeight();
+        BindUtils.postNotifyChange(null, null, this, ".");
     }
 
     @Command
@@ -509,12 +516,11 @@ public class LabelsVM implements EventListener, PropertyChangeListener {
     }
 
     public String getMainGridHeight() {
-        return labelsModel.getMainGridHeight() + "px";
+        return centerLayoutHeight - 43 + "px";
     }
 
-    @Override
-    public void propertyChange(PropertyChangeEvent evt) {
-        BindUtils.postNotifyChange(null, null, this, ".");
+    public String getMainGridGroupedHeight() {
+        return centerLayoutHeight - 80 + "px";
     }
 
 }

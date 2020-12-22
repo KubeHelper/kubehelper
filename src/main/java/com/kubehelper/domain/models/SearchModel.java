@@ -23,8 +23,6 @@ import com.kubehelper.domain.filters.SearchFilter;
 import com.kubehelper.domain.results.SearchResult;
 import org.apache.commons.lang3.StringUtils;
 
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,9 +30,6 @@ import java.util.List;
  * @author JDev
  */
 public class SearchModel implements PageModel {
-
-    private int mainGridHeight = 600;
-    private PropertyChangeSupport grid = new PropertyChangeSupport(this);
 
     private String templateUrl = "~./zul/pages/search.zul";
     public static String NAME = Global.SEARCH_MODEL;
@@ -50,20 +45,6 @@ public class SearchModel implements PageModel {
     public SearchModel() {
     }
 
-    @Override
-    public void setPageMainContentHeight(int newHeight) {
-        int oldMainGridHeight = this.mainGridHeight;
-        this.mainGridHeight = newHeight;
-        grid.firePropertyChange(null, oldMainGridHeight, newHeight);
-    }
-
-    public int getMainGridHeight() {
-        return mainGridHeight;
-    }
-
-    public void addPropertyChangeListener(PropertyChangeListener pcl) {
-        grid.addPropertyChangeListener(pcl);
-    }
 
     public SearchModel addSearchResult(SearchResult searchResult) {
         searchResults.add(searchResult);

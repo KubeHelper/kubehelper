@@ -26,7 +26,5 @@ public interface PageModel {
 
     String getName();
 
-    void setPageMainContentHeight(int height);
-
     void addException(String message, Exception exception);
 }
