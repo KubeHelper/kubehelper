@@ -67,7 +67,7 @@ public class IpsAndPortsVM {
 
     private boolean isGetButtonPressed;
 
-    private int centerLayoutHeight = 600;
+    private int centerLayoutHeight = 700;
 
     private String detailsLabel = "";
 

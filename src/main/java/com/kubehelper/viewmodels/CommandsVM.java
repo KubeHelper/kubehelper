@@ -17,13 +17,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package com.kubehelper.viewmodels;
 
+import com.google.common.collect.Iterables;
 import com.kubehelper.common.Global;
 import com.kubehelper.common.Resource;
 import com.kubehelper.domain.filters.CommandsFilter;
 import com.kubehelper.domain.models.CommandsModel;
 import com.kubehelper.domain.results.CommandsResult;
-import com.kubehelper.services.CommonService;
 import com.kubehelper.services.CommandsService;
+import com.kubehelper.services.CommonService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,75 +53,36 @@ import org.zkoss.zul.Auxhead;
 import org.zkoss.zul.Checkbox;
 import org.zkoss.zul.Combobox;
 import org.zkoss.zul.Footer;
+import org.zkoss.zul.Hbox;
+import org.zkoss.zul.Html;
 import org.zkoss.zul.ListModelList;
-import org.zkoss.zul.Listbox;
-import org.zkoss.zul.Listcell;
-import org.zkoss.zul.Listhead;
-import org.zkoss.zul.Listheader;
-import org.zkoss.zul.Listitem;
+import org.zkoss.zul.Toolbarbutton;
+import org.zkoss.zul.Vbox;
 import org.zkoss.zul.Window;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
+import javax.tools.Tool;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
-import static com.kubehelper.common.Resource.CLUSTER_ROLE;
-import static com.kubehelper.common.Resource.CLUSTER_ROLE_BINDING;
-import static com.kubehelper.common.Resource.CONFIG_MAP;
-import static com.kubehelper.common.Resource.DAEMON_SET;
-import static com.kubehelper.common.Resource.DEPLOYMENT;
-import static com.kubehelper.common.Resource.ENV_VARIABLE;
-import static com.kubehelper.common.Resource.JOB;
-import static com.kubehelper.common.Resource.NAMESPACE;
-import static com.kubehelper.common.Resource.NETWORK_POLICY;
-import static com.kubehelper.common.Resource.PERSISTENT_VOLUME;
-import static com.kubehelper.common.Resource.PERSISTENT_VOLUME_CLAIM;
-import static com.kubehelper.common.Resource.POD;
-import static com.kubehelper.common.Resource.POD_DISRUPTION_BUDGET;
-import static com.kubehelper.common.Resource.POD_SECURITY_POLICY;
-import static com.kubehelper.common.Resource.REPLICA_SET;
-import static com.kubehelper.common.Resource.ROLE;
-import static com.kubehelper.common.Resource.ROLE_BINDING;
-import static com.kubehelper.common.Resource.SECRET;
-import static com.kubehelper.common.Resource.SERVICE;
-import static com.kubehelper.common.Resource.SERVICE_ACCOUNT;
-import static com.kubehelper.common.Resource.STATEFUL_SET;
+import java.util.stream.StreamSupport;
 
 /**
  * @author JDev
  */
 @VariableResolver(DelegatingVariableResolver.class)
-public class CommandsVM implements EventListener {
+public class CommandsVM implements EventListener<Event> {
 
     private static Logger logger = LoggerFactory.getLogger(CommandsVM.class);
 
-    private boolean isSearchButtonPressed;
+    private boolean isRunButtonPressed;
+    private boolean isOnInit = true;
 
-    private int centerLayoutHeight = 600;
+    private int centerLayoutHeight = 700;
 
-    @Wire
-    private Footer searchGridTotalItemsFooter;
-
-    private Set<Resource> selectedResources = new HashSet<>() {{
-        add(CONFIG_MAP);
-        add(POD);
-        add(NAMESPACE);
-        add(DEPLOYMENT);
-        add(STATEFUL_SET);
-        add(REPLICA_SET);
-        add(ENV_VARIABLE);
-        add(DAEMON_SET);
-        add(SERVICE_ACCOUNT);
-        add(SERVICE);
-    }};
-    private List<Resource> searchResources = Arrays.asList(ENV_VARIABLE, POD, CONFIG_MAP, SECRET, SERVICE_ACCOUNT, SERVICE, DAEMON_SET, DEPLOYMENT, REPLICA_SET, STATEFUL_SET, JOB, NAMESPACE,
-            PERSISTENT_VOLUME_CLAIM, PERSISTENT_VOLUME, CLUSTER_ROLE_BINDING, CLUSTER_ROLE, ROLE_BINDING, ROLE, NETWORK_POLICY, POD_DISRUPTION_BUDGET, POD_SECURITY_POLICY);
     private ListModelList<CommandsResult> commandsResults = new ListModelList<>();
+    private ListModelList<CommandsResult> commandOutputResults = new ListModelList<>();
+    private String fullCommand = "";
 
     private CommandsModel commandsModel;
 
@@ -129,6 +91,12 @@ public class CommandsVM implements EventListener {
 
     @WireVariable
     private CommandsService commandsService;
+
+    @Wire
+    private Footer commandsGridFooter;
+
+    @Wire
+    private Footer commandOutputGridFooter;
 
     @Init
     @NotifyChange("*")
@@ -147,7 +115,9 @@ public class CommandsVM implements EventListener {
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) {
         Selectors.wireComponents(view, this, false);
         Selectors.wireEventListeners(view, this);
-        buildCommandsListBox();
+        createCommandsToolbarButtons();
+//        TODO call method after refresh, components should be in DOM
+//        enableDisableMenuItem(commandsModel.getSelectedCommandsSource(), true, "bold;");
     }
 
     @Listen("onAfterSize=#centerLayoutCommandsID")
@@ -157,13 +127,11 @@ public class CommandsVM implements EventListener {
     }
 
     @Command
-    @NotifyChange({"totalItems", "searchResults", "filter"})
-    public void search() {
+    @NotifyChange({"commandOutputTotalItems", "commandOutputResults"})
+    public void run() {
         commandsModel.setFilter(new CommandsFilter());
-        commandsModel.setBuildExceptions(new ArrayList<>());
-//        searchService.search(commandsModel, selectedResources);
         clearAllFilterComboboxes();
-        isSearchButtonPressed = true;
+        isRunButtonPressed = true;
         onInitPreparations();
     }
 
@@ -171,69 +139,48 @@ public class CommandsVM implements EventListener {
      * Prepare view for result depends on filters or new searches
      */
     private void onInitPreparations() {
-
-        commandsModel.setNamespaces(commandsModel.getNamespaces().isEmpty() ? commonService.getAllNamespaces() : commandsModel.getNamespaces());
         commandsService.parsePredefinedCommands(commandsModel);
-        commandsService.parseUserCommands(commandsModel);
-        commandsModel.getName();
-//        if (fcommandsModel.getFilter().isFilterActive() && !commandsModel.getSearchResults().isEmpty()) {
-//            filterSearches();
-//        } else {
-//            commandsResults = new ListModelList<>(commandsModel.getSearchResults());
-//        }
-//        updateHeightsAndRerenderVM();
-        logger.info("Found {} namespaces.", commandsModel.getNamespaces());
-    }
-
-    private void buildCommandsListBox() {
-        Listbox listBox = (Listbox) Path.getComponent("//indexPage/templateInclude/commandsListBoxId");
-
-        Listheader listHeader1 = new Listheader();
-        listHeader1.setLabel("ABC");
-        listHeader1.setWidth("10%");
-        Listheader listHeader2 = new Listheader();
-        listHeader2.setLabel("XYZ");
-        listHeader2.setWidth("10%");
-        Listheader listHeader3 = new Listheader();
-        listHeader3.setLabel("PQR");
-        listHeader3.setWidth("10%");
-        Listhead listHead = new Listhead();
-        listHead.appendChild(listHeader1);
-        listHead.appendChild(listHeader2);
-        listHead.appendChild(listHeader3);
-        listBox.appendChild(listHead);
-
-        for (int i = 0; i < 20; i++) {
-            Listitem listItem1 = new Listitem();
-            Listitem listItem2 = new Listitem();
-            Listitem listItem3 = new Listitem();
-            Listcell listCell1 = new Listcell();
-            Listcell listCell2 = new Listcell();
-            Listcell listCell3 = new Listcell();
-            listCell1.setLabel(i + "Default");
-            listCell2.setLabel(i + "Default");
-            listCell3.setLabel(i + "Default");
-            listItem1.appendChild(listCell1);
-            listItem1.appendChild(listCell2);
-            listItem1.appendChild(listCell3);
-            listBox.appendChild(listItem1);
+//        commandsService.parseUserCommands(commandsModel);
+//        TODO change after
+        commandsModel.setSelectedCommandsSourceLabel("Predefined Commands");
+        commandsModel.setSelectedCommandsSourceRaw(commandsModel.getCommandsSources().get("Predefined Commands").getRawSource());
+        commandsResults = new ListModelList<>(commandsModel.getCommandsResults());
+        if (commandsModel.getFilter().isFilterActive() && !commandsModel.getCommandsResults().isEmpty()) {
+            filterCommands();
+        } else {
+            commandsResults = new ListModelList<>(commandsModel.getCommandsResults());
         }
+        commandsModel.setNamespaces(commandsModel.getNamespaces().isEmpty() ? commonService.getAllNamespaces() : commandsModel.getNamespaces());
+        logger.info("Found {} namespaces.", commandsModel.getNamespaces());
     }
 
     /**
      * Filters searches and refresh total items label and search results view.
      */
     @Command
-    @NotifyChange({"totalItems", "searchResults"})
+    @NotifyChange({"commandsTotalItems", "commandsResults"})
     public void filterCommands() {
         commandsResults.clear();
         for (CommandsResult commandeResult : commandsModel.getCommandsResults()) {
-            if (StringUtils.containsIgnoreCase(commandeResult.getGroup(), getFilter().getGroup()) &&
-                    StringUtils.containsIgnoreCase(commandeResult.getCommand(), getFilter().getCommand()) &&
+            if (commonService.checkEqualsFilter(commandeResult.getGroup(), getFilter().getSelectedGroupFilter()) &&
+                    commonService.checkEqualsFilter(commandeResult.getOperation(), getFilter().getSelectedOperationFilter()) &&
+                    StringUtils.containsIgnoreCase(commandeResult.getViewCommand(), getFilter().getCommand()) &&
                     StringUtils.containsIgnoreCase(commandeResult.getDescription(), getFilter().getDescription())) {
                 commandsResults.add(commandeResult);
             }
         }
+    }
+
+    private void createCommandsToolbarButtons() {
+        Vbox commandsSourcesToolbarID = (Vbox) Path.getComponent("//indexPage/templateInclude/commandsSourcesToolbarID");
+        commandsModel.getCommandsSources().keySet().forEach(key -> {
+            Toolbarbutton toolbarbutton = new Toolbarbutton(key);
+            toolbarbutton.setId(getCommandToolbarButtonId(key));
+            toolbarbutton.setIconSclass("z-icon-file");
+            toolbarbutton.addEventListener("onClick", this);
+            toolbarbutton.setHflex("1");
+            commandsSourcesToolbarID.appendChild(toolbarbutton);
+        });
     }
 
 
@@ -241,48 +188,85 @@ public class CommandsVM implements EventListener {
      * Removes last selected value from all filter comboboxes.
      */
     private void clearAllFilterComboboxes() {
-        Auxhead searchGridAuxHead = (Auxhead) Path.getComponent("//indexPage/templateInclude/searchGridAuxHead");
+        Auxhead searchGridAuxHead = (Auxhead) Path.getComponent("//indexPage/templateInclude/commandsGridAuxHead");
         for (Component child : searchGridAuxHead.getFellows()) {
-            if (Arrays.asList("filterResourceNamesCBox", "filterNamespacesCBox", "filterResourceTypesCBox").contains(child.getId())) {
+            if (Arrays.asList("operationsGroupCBox", "groupsGroupCBox").contains(child.getId())) {
                 Combobox cBox = (Combobox) child;
                 cBox.setValue("");
             }
         }
     }
 
-    /**
-     * Kubernetes Resources CheckBoxes Events handling.
-     *
-     * @param event - onCheck event.
-     */
-    @Override
-    public void onEvent(Event event) {
-        //Add or remove selected resource to selectedResources model.
-        String resourceId = ((Checkbox) event.getTarget()).getId();
-        String resourceName = resourceId.substring(0, resourceId.lastIndexOf("_"));
-        if (selectedResources.contains(Resource.valueOf(resourceName))) {
-            selectedResources.remove(Resource.valueOf(resourceName));
-        } else {
-            selectedResources.add(Resource.valueOf(resourceName));
-        }
-
-        //Set checked kubeResourcesGBoxCheckAll CheckBox if at least one resource selected.
-        Checkbox kubeResourcesCheckAll = (Checkbox) Path.getComponent("//indexPage/templateInclude/kubeResourcesGBoxCheckAll");
-        if (!kubeResourcesCheckAll.isChecked() && !selectedResources.isEmpty()) {
-            kubeResourcesCheckAll.setChecked(true);
-            BindUtils.postNotifyChange(null, null, this, "kubeResourcesGBoxCheckAll");
-        }
+    @Command
+    @NotifyChange({"fullCommand"})
+    public void showFullCommand(@BindingParam("clickedItem") CommandsResult item) {
+        this.fullCommand = item.getViewCommand();
     }
 
-    @Command
-    public void showFullCommand(@BindingParam("id") int id) {
-        String content = "";
-//        Optional<SearchResult> first = commandsResults.getInnerList().stream().filter(item -> item.getId() == id).findFirst();
-//        if (first.isPresent()) {
-//            Map<String, String> parameters = Map.of("title", first.get().getResourceName(), "content", first.get().getFullDefinition());
-//            Window window = (Window) Executions.createComponents("~./zul/components/file-display.zul", null, parameters);
+    @Override
+    public void onEvent(Event event) {
+        String label = ((Toolbarbutton) event.getTarget()).getLabel();
+        String oldToolbarbuttonId = getCommandToolbarButtonId(commandsModel.getSelectedCommandsSourceLabel());
+        String newToolbarbuttonId = getCommandToolbarButtonId(label);
+        enableDisableMenuItem(oldToolbarbuttonId, false, "normal;");
+        enableDisableMenuItem(newToolbarbuttonId, true, "bold;");
+        changePredefinedCommandsRawSource(label);
+    }
+
+    //    @NotifyChange({"selectedCommandsSource","selectedCommandsRaw"})
+    private void changePredefinedCommandsRawSource(String label) {
+//        Html selectedCommandsRaw = (Html) Path.getComponent("//indexPage/templateInclude/selectedCommandsRawId");
+        commandsModel.setSelectedCommandsSourceLabel(label);
+        commandsModel.setSelectedCommandsSourceRaw("<![CDATA[<pre><code>" + commandsModel.getCommandsSources().get(label).getRawSource() + "</code></pre>]]>");
+//        selectedCommandsRaw.setContent(commandsModel.getSelectedCommandsSourceRaw());
+        BindUtils.postNotifyChange(null, null, this, ".");
+    }
+
+    private String getCommandToolbarButtonId(String label) {
+        return label.replaceAll("[^a-zA-Z0-9]", "") + "Id";
+    }
+
+
+    private void enableDisableMenuItem(String toolbarbuttonId, boolean disabled, String fontWeight) {
+        Toolbarbutton toolbarbutton = (Toolbarbutton) Path.getComponent("//indexPage/templateInclude/" + toolbarbuttonId);
+        toolbarbutton.setDisabled(disabled);
+        toolbarbutton.setStyle("font-weight: " + fontWeight);
+    }
+
+    /**
+     * Returns search results for grid and shows Notification if nothing was found or/and error window if some errors has occurred while parsing the results.
+     *
+     * @return - search results
+     */
+    public ListModelList<CommandsResult> getCommandsResults() {
+        if (isOnInit && commandsResults.isEmpty()) {
+            Notification.show("Nothing found.", "info", commandsGridFooter, "before_end", 2000);
+        }
+        if (isOnInit && !commandsResults.isEmpty()) {
+            Notification.show("Found: " + commandsResults.size() + " items", "info", commandsGridFooter, "before_end", 2000);
+        }
+        if (isOnInit && commandsModel.hasBuildErrors()) {
+            Window window = (Window) Executions.createComponents("~./zul/components/errors.zul", null, Map.of("errors", commandsModel.getBuildExceptions()));
+            window.doModal();
+            commandsModel.setBuildExceptions(new ArrayList<>());
+        }
+        isOnInit = false;
+        return commandsResults;
+    }
+
+    public ListModelList<CommandsResult> getCommandOutputResults() {
+//        if (isRunButtonPressed && commandOutputResults.isEmpty()) {
+//            Notification.show("Nothing found.", "info", commandOutputGridFooter, "before_end", 2000);
+//        }
+//        if (isRunButtonPressed && !commandOutputResults.isEmpty()) {
+//            Notification.show("Found: " + commandsResults.size() + " items", "info", commandOutputGridFooter, "before_end", 2000);
+//        }
+//        if (isRunButtonPressed && commandsModel.hasBuildErrors()) {
+//            Window window = (Window) Executions.createComponents("~./zul/components/errors.zul", null, Map.of("errors", commandsModel.getBuildExceptions()));
 //            window.doModal();
 //        }
+        isRunButtonPressed = false;
+        return commandOutputResults;
     }
 
     public String getSelectedNamespace() {
@@ -298,36 +282,97 @@ public class CommandsVM implements EventListener {
         return commandsModel.getFilter();
     }
 
-    public String getRunCommandTotalItems() {
+    public String getCommandOutputTotalItems() {
         return String.format("Total Items: %d", commandsResults.size());
     }
 
-    /**
-     * Returns search results for grid and shows Notification if nothing was found or/and error window if some errors has occurred while parsing the results.
-     *
-     * @return - search results
-     */
-    public ListModelList<CommandsResult> getCommandsResults() {
-        if (isSearchButtonPressed && commandsResults.isEmpty()) {
-            Notification.show("Nothing found.", "info", searchGridTotalItemsFooter, "before_end", 2000);
-        }
-        if (isSearchButtonPressed && !commandsResults.isEmpty()) {
-            Notification.show("Found: " + commandsResults.size() + " items", "info", searchGridTotalItemsFooter, "before_end", 2000);
-        }
-        if (isSearchButtonPressed && commandsModel.hasBuildErrors()) {
-            Window window = (Window) Executions.createComponents("~./zul/components/errors.zul", null, Map.of("errors", commandsModel.getBuildExceptions()));
-            window.doModal();
-        }
-        isSearchButtonPressed = false;
-        return commandsResults;
+    public String getCommandsTotalItems() {
+        return String.format("Total Items: %d", commandsResults.size());
+    }
+
+
+    public CommandsFilter getCommandsFilter() {
+        return commandsModel.getFilter();
+    }
+
+    public String getFullCommand() {
+        return fullCommand;
+    }
+
+    public String getSelectedCommandsSourceRaw() {
+        return commandsModel.getSelectedCommandsSourceRaw();
+    }
+
+    public String getSelectedCommandsSourceLabel() {
+        return commandsModel.getSelectedCommandsSourceLabel();
+    }
+
+    public void setSelectedCommandsSourceLabel(String selectedCommandsSource) {
+        commandsModel.setSelectedCommandsSourceLabel(selectedCommandsSource);
     }
 
     public List<String> getNamespaces() {
         return commandsModel.getNamespaces();
     }
 
-    public String getMainGridHeight() {
-        return centerLayoutHeight + "px";
+    public String getCommandsGridHeight() {
+        return centerLayoutHeight * 0.38 + "px";
+    }
+
+    public String getFullCommandBoxHeight() {
+        return centerLayoutHeight * 0.1 + "px";
+    }
+
+    public String getCommandOutputHeight() {
+        return centerLayoutHeight * 0.4 + "px";
+    }
+
+    public String getCommandsSrcViewHeight() {
+        return centerLayoutHeight - 50 + "px";
+    }
+
+    public String getCommandsManagementHeight() {
+        return centerLayoutHeight - 50 + "px";
+    }
+
+    public String getCommandsManagementSrcPanelHeight() {
+        return centerLayoutHeight - 95 + "px";
+    }
+
+    public String getCommandsHistoryHeight() {
+        return centerLayoutHeight - 50 + "px";
+    }
+
+    public void setGitUrl(String gitUrl) {
+        Global.GIT_URL = gitUrl;
+    }
+
+    public String getGitUrl() {
+        return Global.GIT_URL;
+    }
+
+    public void setGitUsername(String gitUsername) {
+        Global.GIT_USERNAME = gitUsername;
+    }
+
+    public String getGitUsername() {
+        return Global.GIT_USERNAME;
+    }
+
+    public void setGitPassword(String gitPassword) {
+        Global.GIT_PASSWORD = gitPassword;
+    }
+
+    public String getGitPassword() {
+        return Global.GIT_PASSWORD;
+    }
+
+    public boolean isMarkCredentials() {
+        return Global.MARK_CREDENTIALS;
+    }
+
+    public void setMarkCredentials(@ContextParam(ContextType.COMPONENT) Checkbox markCredentials) {
+        Global.MARK_CREDENTIALS = markCredentials.isChecked();
     }
 
 }

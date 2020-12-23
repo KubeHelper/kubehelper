@@ -98,8 +98,7 @@
             <south id="indexGlobalFooter" size="4%">
                 <toolbar align="center">
                     <toolbarbutton id="copyrightBtn" label="@load(indexVM.footerCopyrightText)" tooltiptext="https://github.com/JWebDev/kubehelper" href="https://github.com/JWebDev/kubehelper"
-                                   target="_blank"
-                                   style="font-family: Courier, Monaco, monospace;font-size: 14px;font-weight: bold;"/>
+                                   target="_blank" style="font-family: Courier, Monaco, monospace;font-size: 14px;font-weight: bold;"/>
                     <toolbarbutton id="copyrightSeparator" label="|" disabled="true" style="font-family: Courier, Monaco, monospace;font-size: 14px;font-weight: bold;"/>
                     <toolbarbutton id="autorBtn" label="JDev" tooltiptext="https://github.com/JWebDev" href="https://github.com/JWebDev" target="_blank"
                                    style="font-family: Courier, Monaco, monospace;font-size: 14px;font-weight: bold;"/>

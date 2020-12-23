@@ -29,8 +29,10 @@ public class CommandsFilter {
     private String description = "", group = "", command = "";
 
     private String selectedGroupFilter = "";
+    private String selectedOperationFilter = "";
 
     private List<String> groupsFilter = new ArrayList<>();
+    private List<String> operationsFilter = new ArrayList<>();
 
     public CommandsFilter() {
     }
@@ -41,8 +43,14 @@ public class CommandsFilter {
         }
     }
 
+    public void addOperationFilter(String operationFilter) {
+        if (!operationsFilter.contains(operationFilter)) {
+            operationsFilter.add(operationFilter);
+        }
+    }
+
     public boolean isFilterActive() {
-        return StringUtils.isNoneBlank(description, group, command, selectedGroupFilter);
+        return StringUtils.isNoneBlank(description, group, command, selectedGroupFilter, selectedOperationFilter);
     }
 
     public String getDescription() {
@@ -51,15 +59,6 @@ public class CommandsFilter {
 
     public CommandsFilter setDescription(String description) {
         this.description = description == null ? "" : description;
-        return this;
-    }
-
-    public String getGroup() {
-        return group;
-    }
-
-    public CommandsFilter setGroup(String group) {
-        this.group = group;
         return this;
     }
 
@@ -72,6 +71,8 @@ public class CommandsFilter {
         return this;
     }
 
+
+
     public String getSelectedGroupFilter() {
         return selectedGroupFilter;
     }
@@ -81,8 +82,20 @@ public class CommandsFilter {
         return this;
     }
 
+    public String getSelectedOperationFilter() {
+        return selectedOperationFilter;
+    }
+
+    public CommandsFilter setSelectedOperationFilter(String selectedOperationFilter) {
+        this.selectedOperationFilter = selectedOperationFilter == null ? "" : selectedOperationFilter;
+        return this;
+    }
+
     public List<String> getGroupsFilter() {
         return groupsFilter;
     }
 
+    public List<String> getOperationsFilter() {
+        return operationsFilter;
+    }
 }

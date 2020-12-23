@@ -19,12 +19,16 @@ package com.kubehelper.services;
 
 import com.google.common.io.Files;
 import com.kubehelper.common.KubeAPI;
+import com.kubehelper.common.Operation;
 import com.kubehelper.domain.models.CommandsModel;
 import com.kubehelper.domain.models.SearchModel;
 import com.kubehelper.domain.results.CommandsResult;
 import io.kubernetes.client.Exec;
+import io.kubernetes.client.extended.kubectl.Kubectl;
+import io.kubernetes.client.extended.kubectl.KubectlExec;
 import io.kubernetes.client.openapi.ApiException;
 import io.kubernetes.client.openapi.models.V1Pod;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -43,6 +47,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -57,6 +62,7 @@ import java.util.stream.Stream;
 public class CommandsService {
 
     private static Logger logger = LoggerFactory.getLogger(CommandsService.class);
+    private String predefinedCommandsPath = "/templates/features/commands.kh";
 
     @Autowired
     private KubeAPI kubeAPI;
@@ -65,13 +71,22 @@ public class CommandsService {
     private Exec exec;
 
     public void parsePredefinedCommands(CommandsModel commandsModel) {
+//        KubectlExec exec = Kubectl.exec();
+
         try {
-            List<String> lines = Files.readLines(new File(this.getClass().getResource(commandsModel.getPredefinedCommandsPath()).toURI()), Charset.forName("UTF-8"));
+            File predefinedCommands = new File(this.getClass().getResource(predefinedCommandsPath).toURI());
+            List<String> lines = Files.readLines(predefinedCommands, Charset.forName("UTF-8"));
             parsePredefinedCommandsFromLines(lines, commandsModel);
+            initPredefinedCommands(commandsModel, predefinedCommands);
         } catch (IOException | URISyntaxException e) {
             commandsModel.addParseException(e);
             logger.error(e.getMessage(), e);
         }
+    }
+
+    private void initPredefinedCommands(CommandsModel commandsModel, File file) throws IOException {
+        String commandsRaw = FileUtils.readFileToString(file, "UTF-8");
+        commandsModel.addCommandSource("Predefined Commands", predefinedCommandsPath, commandsRaw);
     }
 
     public void parseUserCommands(CommandsModel commandsModel) {
@@ -79,6 +94,8 @@ public class CommandsService {
             Set<String> userCommandFiles = getUserCommandFilesPaths(commandsModel.getUserCommandsPath(), 5);
             for (String filePath : userCommandFiles) {
                 List<String> lines = Files.readLines(new File(filePath), Charset.forName("UTF-8"));
+//                TODO
+//                commandsModel.addCommandSource("Predefined Commands", predefinedCommandsPath, commandsRaw);
                 parsePredefinedCommandsFromLines(lines, commandsModel);
             }
         } catch (IOException e) {
@@ -115,6 +132,12 @@ public class CommandsService {
             commandResult.setGroup(getLineContent(line));
             line = iterator.next();
         }
+
+        if (line.startsWith("Operation:")) {
+            commandResult.setOperation(getLineContent(line));
+            line = iterator.next();
+        }
+
         if (line.startsWith("Description:")) {
             commandResult.setDescription(getLineContent(line));
             line = iterator.next();
@@ -126,16 +149,20 @@ public class CommandsService {
             line = iterator.next();
         }
 
-        if (!StringUtils.startsWithAny(line, "Group:", "Description:", "Rows:") && StringUtils.isNotBlank(line)) {
-            StringBuilder builder = new StringBuilder();
+        if (StringUtils.startsWithAny(line, "kubectl") && StringUtils.isNotBlank(line)) {
+            StringBuilder viewBuilder = new StringBuilder(), runBuilder = new StringBuilder();
             while (line.trim().endsWith("\\")) {
-                builder.append(line.substring(0, line.lastIndexOf("\\")).trim()).append(" ");
+                String commandLine = line.substring(0, line.lastIndexOf("\\")).trim();
+                viewBuilder.append(commandLine).append("\n");
+                runBuilder.append(commandLine).append(" ");
                 line = iterator.next();
             }
             if (StringUtils.isNotBlank(line)) {
-                builder.append(line.trim());
+                viewBuilder.append(line.trim());
+                runBuilder.append(line.trim());
             }
-            commandResult.setCommand(builder.toString());
+            commandResult.setViewCommand(viewBuilder.toString());
+            commandResult.setRunCommand(runBuilder.toString());
         }
         if (StringUtils.isNotBlank(line)) {
             validateAndAddCommandResult(commandResult, commandsModel);
@@ -143,52 +170,16 @@ public class CommandsService {
     }
 
     private void validateAndAddCommandResult(CommandsResult cr, CommandsModel commandsModel) {
-        if (StringUtils.isAnyBlank(cr.getGroup(), cr.getDescription(), cr.getCommand())) {
-            commandsModel.addParseException(new RuntimeException("Command parse Error. Group, Description and command itself are mandatory fields. Object: " + cr.toString()));
-            logger.error("Command parse Error. Group, Description and command itself are mandatory fields. Object: " + cr.toString());
+        if (StringUtils.isAnyBlank(cr.getGroup(), cr.getDescription(), cr.getRunCommand()) || Operation.isOperationInvalid(cr.getOperation())) {
+            commandsModel.addParseException(new RuntimeException("Command parse Error. Group, Operation, Description and command itself are mandatory fields. Object: " + cr.toString()));
+            logger.error("Command parse Error. Group, Operation Description and command itself are mandatory fields. Object: " + cr.toString());
         } else {
             commandsModel.addCommandResult(cr);
         }
-
     }
 
     private String getLineContent(String line) {
         return line.substring(line.indexOf(":") + 1).trim();
-    }
-
-
-    /**
-     * Executes env command on pod, and collects native environment variables.
-     *
-     * @param pod         - kubernetes pod
-     * @param searchModel - search model
-     * @return - properties object with key=value native environment variables map.
-     */
-    private Properties getPodEnvironmentVars(V1Pod pod, SearchModel searchModel) {
-        Properties envVars = new Properties();
-        String[] command = new String[]{"env"};
-        try {
-            Process process = exec.exec(pod, command, false);
-            BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            String line;
-            while ((line = br.readLine()) != null) {
-                int idx = line.indexOf('=');
-                if (idx != -1) {
-                    String key = line.substring(0, idx);
-                    String value = line.substring(idx + 1);
-                    envVars.setProperty(key, value);
-                }
-            }
-        } catch (ApiException | IOException | RuntimeException e) {
-            searchModel.addSearchException(e);
-            logger.error(e.getMessage(), e);
-        }
-        return envVars;
-    }
-
-
-    private String getParsedCreationTime(DateTime dateTime) {
-        return dateTime.toString("dd.MM.yyyy HH:mm:ss");
     }
 
 }

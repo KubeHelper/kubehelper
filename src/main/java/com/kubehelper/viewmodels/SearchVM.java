@@ -128,7 +128,7 @@ public class SearchVM implements EventListener {
     @WireVariable
     private SearchService searchService;
 
-    private int centerLayoutHeight = 600;
+    private int centerLayoutHeight = 700;
 
     @Init
     @NotifyChange("*")

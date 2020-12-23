@@ -2,126 +2,169 @@
     <div id="securityTemplate" viewModel="@id('commandsVM') @init('com.kubehelper.viewmodels.CommandsVM')" width="100%" height="100%">
         <borderlayout>
             <!--            TODO Paging and vflex="min" for center and remove height-->
-            <center margins="0,3,3,3" title="Security">
-                <tabbox width="100%" sclass="nav_tabs" style="border-color: red">
+            <center id="centerLayoutCommandsID" margins="0,3,3,3" title="Commands">
+                <tabbox width="100%" sclass="nav_tabs">
                     <tabs id="tabs">
                         <tab label="Commands"/>
-                        <tab label="Commands Constructor"/>
+                        <tab label="Commands Management"/>
+                        <tab label="Commands History"/>
                     </tabs>
-                    <tabpanels id="centerLayoutCommandsID" style="border-color: blue">
+                    <tabpanels>
                         <tabpanel>
-                            <separator width="100%" orient="horizontal"/>
-                            <div height="50%" width="100%" style="overflow-y:auto;overflow-x:auto;font-family: Courier, Monaco, monospace;">
-                                <vbox height="50%" width="100%">
+                            <grid id="commandsGridID" model="@load(commandsVM.commandsResults)" height="@load(commandsVM.commandsGridHeight)">
+                                <auxhead id="commandsGridAuxHead">
+                                    <auxheader>
+                                        <span sclass="z-icon-hashtag"/>
+                                    </auxheader>
+                                    <auxheader colspan="1">
+                                        <combobox id="commandsGroupCBox" hflex="1" mold="rounded" model="@load(commandsVM.commandsFilter.groupsFilter)"
+                                                  selectedItem="@bind(commandsVM.commandsFilter.selectedGroupFilter)"
+                                                  onChange="@command('filterCommands')">
+                                            <template name="model">
+                                                <comboitem label="@load(each)"/>
+                                            </template>
+                                        </combobox>
+                                    </auxheader>
+                                    <auxheader colspan="1">
+                                        <combobox id="operationsGroupCBox" hflex="1" mold="rounded" model="@load(commandsVM.commandsFilter.operationsFilter)"
+                                                  selectedItem="@bind(commandsVM.commandsFilter.selectedOperationFilter)"
+                                                  onChange="@command('filterCommands')">
+                                            <template name="model">
+                                                <comboitem label="@load(each)"/>
+                                            </template>
+                                        </combobox>
+                                    </auxheader>
+                                    <auxheader colspan="1">
+                                        <textbox hflex="1" value="@bind(commandsVM.commandsFilter.command)" onChange="@command('filterCommands')"/>
+                                    </auxheader>
+                                    <auxheader colspan="1">
+                                        <textbox instant="true" hflex="1" value="@bind(commandsVM.commandsFilter.description)" onChange="@command('filterCommands')"/>
+                                    </auxheader>
+                                </auxhead>
+                                <columns menupopup="auto" sizable="true">
+                                    <column hflex="min" label="Id" sort="auto(id)"/>
+                                    <column hflex="1" label="Group" sort="auto(group)"/>
+                                    <column hflex="1" label="Operation" sort="auto(operation)"/>
+                                    <column hflex="5" label="Command" sort="auto(command)"/>
+                                    <column hflex="2" label="Description" sort="auto(description)"/>
+                                </columns>
+                                <rows>
+                                    <template name="model" var="item">
+                                        <row onClick="@command('showFullCommand', clickedItem=item)" style="cursor:pointer">
+                                            <label value="${item.id}"/>
+                                            <label value="${item.group}"/>
+                                            <label value="${item.operation}"/>
+                                            <label value="${item.viewCommand}" multiline="true"/>
+                                            <label value="${item.description}" multiline="true"/>
+                                        </row>
+                                    </template>
+                                </rows>
+                                <foot>
+                                    <footer id="commandsGridFooter" span="5" align="right" label="@load(commandsVM.commandsTotalItems)"/>
+                                </foot>
+                            </grid>
 
+                            <groupbox>
+                                <caption iconSclass="z-icon-terminal" label="Full Command"/>
+                                <!--                                TODO change to panel and make resizable-->
+                                <hbox width="100%" align="start" height="@load(commandsVM.fullCommandBoxHeight)">
+                                    <cell width="89%" align="left">
+                                        <div style="overflow-y:auto;overflow-x: hidden;" height="@load(commandsVM.fullCommandBoxHeight)" width="100%">
+                                            <label value="@load(commandsVM.fullCommand)" multiline="true"
+                                                   style="font-family: Courier, Monaco, monospace;color: blue;font-size: 13px;line-height: 1.4;"/>
+                                        </div>
+                                    </cell>
+                                    <separator width="1%" orient="vertical"/>
+                                    <cell width="10%" valign="middle">
+                                        <button id="runCommandBtn" label="Run" iconSclass="z-icon-search" onClick="@command('run')" width="100%"/>
+                                    </cell>
+                                </hbox>
+                            </groupbox>
 
-                                    <!--                                        <hlayout>-->
-                                    <!--                                            <listbox rows="1" mold="select">-->
-                                    <!--                                                <listitem selected="true" label="Inbox"/>-->
-                                    <!--                                                <listitem label="Received"/>-->
-                                    <!--                                                <listitem label="Draft"/>-->
-                                    <!--                                            </listbox>-->
-                                    <!--                                            <separator spacing="5px"/>-->
-                                    <!--                                            <textbox id="txt" width="220px" style="color:#008FD2;"/>-->
-                                    <!--                                        </hlayout>-->
-                                    <separator bar="true"/>
-                                    <listbox id="commandsListBoxId">
-                                        <!--                                    <listbox id="commandsListBoxId" model="@load(commandsVM.commandsResults)">-->
-                                        <!--                                            <attribute name="onSelect"><![CDATA[-->
-                                        <!--            txt.setValue("Mail Received on "+-->
-                                        <!--                    self.getSelectedItem().getLastChild().getLabel());-->
-                                        <!--        ]]></attribute>-->
-                                        <!--                                            <listhead sizable="true">-->
-                                        <!--                                                <listheader align="center" width="40px"-->
-                                        <!--                                                            image="./img/kubehelper-logo-256.png"/>-->
-                                        <!--                                                <listheader align="center" width="40px"-->
-                                        <!--                                                            image="./img/kubehelper-logo-256.png"/>-->
-                                        <!--                                                <listheader align="center" width="40px"-->
-                                        <!--                                                            image="./img/kubehelper-logo-256.png"/>-->
-                                        <!--                                                <listheader label="Subject" sort="auto"/>-->
-                                        <!--                                                <listheader label="Received" sort="auto"/>-->
-                                        <!--                                            </listhead>-->
-                                        <!--                                            <listitem height="28px">-->
-                                        <!--                                                <listcell image="./img/kubehelper-logo-256.png"/>-->
-                                        <!--                                                <listcell image="./img/kubehelper-logo-256.png"/>-->
-                                        <!--                                                <listcell image="./img/kubehelper-logo-256.png"/>-->
-                                        <!--                                                <listcell label="ZK 5.0.3 Released!"/>-->
-                                        <!--                                                <listcell label="2010/06/29 17:41:29"/>-->
-                                        <!--                                            </listitem>-->
-                                        <!--                                            <listitem height="28px">-->
-                                        <!--                                                <listcell image="./img/kubehelper-logo-256.png"/>-->
-                                        <!--                                                <listcell image="./img/kubehelper-logo-256.png"/>-->
-                                        <!--                                                <listcell image="./img/kubehelper-logo-256.png"/>-->
-                                        <!--                                                <listcell label="ZK 5.0.2 Released!"/>-->
-                                        <!--                                                <listcell label="2010/05/12 15:56:37"/>-->
-                                        <!--                                            </listitem>-->
-                                        <!--                                            <listitem height="28px">-->
-                                        <!--                                                <listcell image="./img/kubehelper-logo-256.png"/>-->
-                                        <!--                                                <listcell image="./img/kubehelper-logo-256.png"/>-->
-                                        <!--                                                <listcell label="&#160;"/>-->
-                                        <!--                                                <listcell label="ZK 5 Released!"/>-->
-                                        <!--                                                <listcell label="2010/01/26 13:23:07"/>-->
-                                        <!--                                            </listitem>-->
-                                        <!--                                            <listitem height="28px">-->
-                                        <!--                                                <listcell image="./img/kubehelper-logo-256.png"/>-->
-                                        <!--                                                <listcell image="./img/kubehelper-logo-256.png"/>-->
-                                        <!--                                                <listcell label="&#160;"/>-->
-                                        <!--                                                <listcell label="ZK 3.6.3 Released!"/>-->
-                                        <!--                                                <listcell label="2009/11/03 10:26:37"/>-->
-                                        <!--                                            </listitem>-->
-                                    </listbox>
-
-                                    <hbox height="100%" width="100%" style="margin: 5px;" align="stretch">
-                                        <cell width="90%" style="padding: 0px 5px 0px 5px;">
-                                            <label value="Full Command: "/>
-                                        </cell>
-                                        <cell width="10%" style="padding: 0px 5px 0px 5px;">
-                                            <button id="runCommandBtn" label="Run" iconSclass="z-icon-search" onClick="@command('run')" width="100%"/>
-                                        </cell>
-                                    </hbox>
-                                </vbox>
-                            </div>
-                            <separator width="100%" orient="horizontal"/>
-                            <vbox height="50%" width="100%">
-                                <grid id="runCommandGrid" model="@load(commandsVM.commandsResults)" height="800px">
-                                    <auxhead id="runCommandAuxHead">
-                                    </auxhead>
+                            <groupbox>
+                                <caption iconSclass="z-icon-terminal" label="Command Output"/>
+                                <grid id="runCommandGrid" model="@load(commandsVM.commandOutputResults)" height="@load(commandsVM.commandOutputHeight)">
                                     <columns menupopup="auto" sizable="true">
-                                        <column hflex="min" label="Id"/>
-                                        <column hflex="1" label="IP"/>
                                     </columns>
                                     <rows>
                                         <template name="model" var="item">
                                             <row style="cursor:pointer">
-                                                <label value="${item.id}"/>
-                                                <label value="${item.ip}" multiline="true"/>
                                             </row>
                                         </template>
                                     </rows>
                                     <foot>
-                                        <footer id="runCommandGridFooter" span="9" align="right" label="@load(commandsVM.runCommandTotalItems)"/>
+                                        <footer id="commandOutputGridFooter" span="9" align="right" label="@load(commandsVM.commandOutputTotalItems)"/>
                                     </foot>
                                 </grid>
-                            </vbox>
+                            </groupbox>
                         </tabpanel>
 
                         <tabpanel>
-                            <listbox>
-                                <!--                                <attribute name="onSelect"><![CDATA[-->
-                                <!--            txt.setValue("Mail Received on "+-->
-                                <!--                    self.getSelectedItem().getLastChild().getLabel());  -->
-                                <!--        ]]></attribute>-->
-                                <listhead sizable="true">
-                                    <listheader label="Subject" width="50%" sort="auto"/>
-                                    <listheader label="Received" width="50%" sort="auto"/>
-                                </listhead>
-                                <template name="model" var="item">
-                                    <listitem>
-                                        <listcell image="/widgets/listbox/keystroke_command/img/ArrowUpOrange-16x16.png"/>
-                                        <listcell label="2010/06/29 17:41:29"/>
-                                    </listitem>
-                                </template>
-                            </listbox>
+                            <borderlayout width="100%" height="@load(commandsVM.commandsManagementHeight)">
+                                <north collapsible="true" splittable="true">
+                                    <hbox height="100%" width="100%" align="stretch" spacing="10">
+                                        <cell width="20%" tooltip="Git URL">
+                                            <textbox width="100%" placeholder="Git URL" value="@bind(commandsVM.gitUrl)" onOK="@command('cloneCommands')" type="url"/>
+                                        </cell>
+                                        <separator></separator>
+                                        <cell width="10%" tooltip="Username">
+                                            <textbox width="100%" placeholder="Username" value="@bind(commandsVM.gitUsername)"/>
+                                        </cell>
+                                        <cell width="10%" tooltip="Password">
+                                            <textbox placeholder="Password" width="100%" value="@bind(commandsVM.gitPassword)" type="password"/>
+                                        </cell>
+                                        <cell width="5%">
+                                            <checkbox label="Mark" tooltiptext="Mark Credentials" checked="@load(commandsVM.markCredentials)" onCheck="markCredentials()"/>
+                                        </cell>
+                                        <cell width="10%" tooltip="Clone">
+                                            <button label="Clone" iconSclass="z-icon-clone" width="100%" onClick="@command('cloneCommands')"/>
+                                        </cell>
+                                        <cell width="45%">
+                                            <hbox height="100%" width="100%" align="end" pack="end">
+                                                <button label="Pull" iconSclass="z-icon-cloud-download" onClick="@command('cloneCommands')"/>
+                                                <button label="Push" iconSclass="z-icon-cloud-upload" onClick="@command('cloneCommands')"/>
+                                            </hbox>
+                                        </cell>
+                                    </hbox>
+                                    <!--                                    <hbox align="stretch" spacing="20px">-->
+                                    <!--                                        <textbox value="text..."/>-->
+                                    <!--                                        <textbox value="secret" type="password"/>-->
+                                    <!--                                        <button label="Button 3"/>-->
+                                    <!--                                        <button label="Button 4"/>-->
+                                    <!--                                        <button label="Button 4"/>-->
+                                    <!--                                        <button label="Button 4"/>-->
+                                    <!--                                        <button label="Button 4"/>-->
+                                    <!--                                        <button label="Button 4"/>-->
+                                    <!--                                    </hbox>-->
+                                </north>
+                                <!--                                <south collapsible="true" splittable="true">-->
+                                <!--                                    <div style="background:#112f37;color:white;">S</div>-->
+                                <!--                                </south>-->
+                                <center>
+                                    <div>
+                                        <panel title="@load(commandsVM.selectedCommandsSourceLabel)" width="100%" height="@load(commandsVM.commandsManagementSrcPanelHeight)">
+                                            <caption iconSclass="z-icon-list"/>
+                                            <panelchildren style="overflow: auto;font-family: Courier, Monaco, monospace;font-size: 14px;line-height: 1.5;">
+<!--                                                <html id="selectedCommandsRawId"></html>-->
+                                                <html id="selectedCommandsRawId">"<![CDATA[<pre><code>${commandsVM.selectedCommandsSourceRaw}</code></pre>]]>"</html>
+                                            </panelchildren>
+                                        </panel>
+                                    </div>
+                                </center>
+                                <west title="Commands Sources" collapsible="true" splittable="true" autoscroll="true" size="10%" maxsize="250">
+                                    <div vflex="1">
+                                        <vbox id="commandsSourcesToolbarID">
+                                        </vbox>
+                                    </div>
+                                </west>
+                            </borderlayout>
+                        </tabpanel>
+
+                        <tabpanel>
+                            <div style="overflow-y:auto;overflow-x:auto;font-family: Courier, Monaco, monospace;font-size: 14px;line-height: 1.5;" height="@load(commandsVM.commandsSrcViewHeight)"
+                                 width="100%">
+<!--                                <html><![CDATA[<pre><code>${commandsVM.selectedCommandsRaw}</code></pre>]]></html>-->
+                            </div>
                         </tabpanel>
 
                     </tabpanels>
@@ -129,16 +172,4 @@
             </center>
         </borderlayout>
     </div>
-    <popup id="clearAllTooltip">
-        Clears the entire model and sets the view to its original state.
-    </popup>
-    <popup id="namespacesTooltip">
-        All visible namespaces.
-    </popup>
-    <popup id="popupIpsAndPortsDetails">
-        Show detailed information about pod in a pop-up window.
-    </popup>
-    <!--    <popup id="getResourcesTooltip">-->
-    <!--        Searching for resources(pods, services) from the selected namespace.-->
-    <!--    </popup>-->
 </zk>

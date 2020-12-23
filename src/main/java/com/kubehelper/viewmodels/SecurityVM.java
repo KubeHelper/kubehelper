@@ -92,7 +92,7 @@ public class SecurityVM {
 
     private String clickedRoleBindingSubjectsLabel = "";
     private String clickedRoleRulesLabel = "";
-    private int centerLayoutHeight = 600;
+    private int centerLayoutHeight = 700;
 
     @Wire
     private Footer rolesGridFooter;

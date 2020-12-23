@@ -101,7 +101,7 @@ public class LabelsVM implements EventListener {
 
     private boolean isSearchButtonPressed;
 
-    private int centerLayoutHeight = 600;
+    private int centerLayoutHeight = 700;
 
     @Wire
     private Footer labelsGridTotalItemsFooter;

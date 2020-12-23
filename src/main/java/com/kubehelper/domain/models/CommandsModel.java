@@ -23,7 +23,9 @@ import com.kubehelper.domain.filters.CommandsFilter;
 import com.kubehelper.domain.results.CommandsResult;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author JDev
@@ -31,34 +33,39 @@ import java.util.List;
 public class CommandsModel implements PageModel {
 
     private String templateUrl = "~./zul/pages/commands.zul";
-    private String predefinedCommandsPath = "/templates/features/commands.kh";
 
-    private String userCommandsPath = "C:\\temp\\kubehelper";
-    //    private String userCommandsPath = "/tmp/kubehelper";
+//    private String userCommandsPath = "C:\\temp\\kubehelper";
+        private String userCommandsPath = "/tmp/kubehelper";
     public static String NAME = Global.COMMANDS_MODEL;
     private List<String> namespaces = new ArrayList<>();
-    private List<String> pods = new ArrayList<>();
     private List<CommandsResult> commandsResults = new ArrayList<>();
     private CommandsFilter filter = new CommandsFilter();
     private List<KubeHelperException> buildExceptions = new ArrayList<>();
     private String selectedNamespace = "all";
+    private String selectedCommandsSourceLabel = "";
+    private String selectedCommandsSourceRaw = "";
+
+    private Map<String, CommandSource> commandsSources = new HashMap<>() {
+    };
+
 
     public CommandsModel() {
     }
 
-
     public void addCommandResult(CommandsResult commandResult) {
         commandsResults.add(commandResult);
-//        filter.addResourceTypesFilter(searchResult.getResourceType());
-//        filter.addNamespacesFilter(searchResult.getNamespace());
+        filter.addGroupFilter(commandResult.getGroup());
+        filter.addOperationFilter(commandResult.getOperation());
     }
 
-    public CommandsModel addGroupFilter(String resourceName) {
-//        if (StringUtils.isNotBlank(resourceName)) {
-//            filter.addResourceNamesFilter(resourceName);
-//        }
-        return this;
+    public void addCommandSource(String label, String filePath, String rawSource) {
+        CommandSource commandSource = new CommandSource();
+        commandSource.setLabel(label);
+        commandSource.setFilePath(filePath);
+        commandSource.setRawSource(rawSource);
+        commandsSources.put(label, commandSource);
     }
+
 
     public void addParseException(Exception exception) {
         this.buildExceptions.add(new KubeHelperException(exception));
@@ -66,7 +73,7 @@ public class CommandsModel implements PageModel {
 
     @Override
     public void addException(String message, Exception exception) {
-//        this.searchExceptions.add(new KubeHelperException(message, exception));
+        this.buildExceptions.add(new KubeHelperException(message, exception));
     }
 
     @Override
@@ -85,15 +92,6 @@ public class CommandsModel implements PageModel {
 
     public CommandsModel setNamespaces(List<String> namespaces) {
         this.namespaces = namespaces;
-        return this;
-    }
-
-    public List<String> getPods() {
-        return pods;
-    }
-
-    public CommandsModel setPods(List<String> pods) {
-        this.pods = pods;
         return this;
     }
 
@@ -137,12 +135,12 @@ public class CommandsModel implements PageModel {
         return this;
     }
 
-    public String getPredefinedCommandsPath() {
-        return predefinedCommandsPath;
+    public String getSelectedCommandsSourceRaw() {
+        return selectedCommandsSourceRaw;
     }
 
-    public CommandsModel setPredefinedCommandsPath(String predefinedCommandsPath) {
-        this.predefinedCommandsPath = predefinedCommandsPath;
+    public CommandsModel setSelectedCommandsSourceRaw(String selectedCommandsSourceRaw) {
+        this.selectedCommandsSourceRaw = selectedCommandsSourceRaw;
         return this;
     }
 
@@ -153,5 +151,56 @@ public class CommandsModel implements PageModel {
     public CommandsModel setUserCommandsPath(String userCommandsPath) {
         this.userCommandsPath = userCommandsPath;
         return this;
+    }
+
+    public CommandsModel setCommandsSources(Map<String, CommandSource> commandsSources) {
+        this.commandsSources = commandsSources;
+        return this;
+    }
+
+    public Map<String, CommandSource> getCommandsSources() {
+        return commandsSources;
+    }
+
+    public String getSelectedCommandsSourceLabel() {
+        return selectedCommandsSourceLabel;
+    }
+
+    public CommandsModel setSelectedCommandsSourceLabel(String selectedCommandsSourceLabel) {
+        this.selectedCommandsSourceLabel = selectedCommandsSourceLabel;
+        return this;
+    }
+
+    public class CommandSource {
+        private String label;
+        private String filePath;
+        private String rawSource;
+
+        public String getLabel() {
+            return label;
+        }
+
+        public CommandSource setLabel(String label) {
+            this.label = label;
+            return this;
+        }
+
+        public String getFilePath() {
+            return filePath;
+        }
+
+        public CommandSource setFilePath(String filePath) {
+            this.filePath = filePath;
+            return this;
+        }
+
+        public String getRawSource() {
+            return rawSource;
+        }
+
+        public CommandSource setRawSource(String rawSource) {
+            this.rawSource = rawSource;
+            return this;
+        }
     }
 }

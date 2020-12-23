@@ -25,10 +25,12 @@ import java.util.List;
  */
 public class CommandsResult {
     private int id;
-    private String description = "";
     private String group = "";
+    private String operation = "";
+    private String description = "";
     private List<String> rows = new ArrayList<>();
-    private String command = "";
+    private String viewCommand = "";
+    private String runCommand = "";
 
     public CommandsResult() {
     }
@@ -41,21 +43,30 @@ public class CommandsResult {
         return id;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public CommandsResult setDescription(String description) {
-        this.description = description;
-        return this;
-    }
-
     public String getGroup() {
         return group;
     }
 
     public CommandsResult setGroup(String group) {
         this.group = group;
+        return this;
+    }
+
+    public String getOperation() {
+        return operation;
+    }
+
+    public CommandsResult setOperation(String operation) {
+        this.operation = operation;
+        return this;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public CommandsResult setDescription(String description) {
+        this.description = description;
         return this;
     }
 
@@ -68,23 +79,34 @@ public class CommandsResult {
         return this;
     }
 
-    public String getCommand() {
-        return command;
+    public String getViewCommand() {
+        return viewCommand;
     }
 
-    public CommandsResult setCommand(String command) {
-        this.command = command;
+    public CommandsResult setViewCommand(String viewCommand) {
+        this.viewCommand = viewCommand;
+        return this;
+    }
+
+    public String getRunCommand() {
+        return runCommand;
+    }
+
+    public CommandsResult setRunCommand(String runCommand) {
+        this.runCommand = runCommand;
         return this;
     }
 
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("CommandResult{");
+        final StringBuffer sb = new StringBuffer("CommandsResult{");
         sb.append("id=").append(id);
-        sb.append(", description='").append(description).append('\'');
         sb.append(", group='").append(group).append('\'');
+        sb.append(", operation='").append(operation).append('\'');
+        sb.append(", description='").append(description).append('\'');
         sb.append(", rows=").append(rows);
-        sb.append(", command='").append(command).append('\'');
+        sb.append(", viewCommand='").append(viewCommand).append('\'');
+        sb.append(", runCommand='").append(runCommand).append('\'');
         sb.append('}');
         return sb.toString();
     }
