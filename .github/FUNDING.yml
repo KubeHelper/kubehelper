@@ -9,4 +9,4 @@ community_bridge: kube-helper
 liberapay: kube-helper
 issuehunt: kube-helper
 otechie: kube-helper
-paypal: developer.paypal.com
+custom: [developer.paypal.com, other.paypal.com]
