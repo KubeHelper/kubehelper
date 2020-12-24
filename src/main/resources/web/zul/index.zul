@@ -1,50 +1,17 @@
 <?page id="indexPage" title="Kube Helper"?>
 <zk>
     <div id="indexWindow" viewModel="@id('indexVM') @init('com.kubehelper.viewmodels.IndexVM')" height="100%" width="100%">
-        <borderlayout sclass="complex-layout">
-            <north size="5%" border="0" style="background: #3498DB">
-                <!--                <panel border="normal" height="100%" width="100%">-->
-                <!--                    <panelchildren>-->
-                <!--                        <image src="~./img/kubehelper-logo-256.png"/>-->
-                <!--                        <hbox height="100%" width="100%">-->
-                <!--                            <button label="Test">-->
-                <!--                            </button>-->
-                <!--                        </hbox>-->
-                <!--                    </panelchildren>-->
-                <!--                </panel>-->
-                <hbox height="100%" width="100%">
-                    <cell hflex="2" align="center" valign="middle">
-                        <label value="LOGO TODO "/>
-                        <!--                        <image style="width: 100%;height: 100%" src="~./img/kubehelper-logo-256.png"/>-->
-                    </cell>
-                    <cell hflex="8" align="center" valign="middle">
-                        <label style="color: White; font-weight: bold; font-size: 2.6em;" value="Kube Helper"/>
-                    </cell>
-                    <cell hflex="2" valign="middle" align="right">
-                        <!--                        <textbox sclass="demo-search-inp" value="@bind(vm.search)"/>-->
-                        <!--                        <button label="Search ZK Resource" onClick="@command('search')"/>-->
-                        <button iconSclass="z-icon-heartbeat" hflex="1" label="Donate" dir="reverse"/>
-                    </cell>
-                </hbox>
-
-                <!--                <div>-->
-                <!--                    <div style="float:right">-->
-                <!--                        <textbox sclass="demo-search-inp" value="@bind(vm.search)"/>-->
-                <!--                        <button label="Search ZK Resource"-->
-                <!--                                onClick="@command('search')"/>-->
-                <!--                    </div>-->
-                <!--                    <div style="float:left">-->
-                <!--                        <image style="width: 100%;max-height: 100%" src="~./img/kubehelper-logo-256.png"/>-->
-                <!--                    </div>-->
-                <!--                    <div style="float:left">-->
-                <!--                        <label sclass="complex-layout-header-label" value="Kube Helper"/>-->
-                <!--                    </div>-->
-
-                <!--                </div>-->
-            </north>
+        <borderlayout>
             <!-- Sidebar -->
-            <west title="Navigation" size="10%" maxsize="200" splittable="true" collapsible="true" autoscroll="true" margins="0,5,0,0">
+            <west title="Kube Helper" size="10%" maxsize="200" splittable="true" collapsible="true" autoscroll="true">
                 <vlayout spacing="0">
+                    <panel width="100%">
+                        <panelchildren style="text-align: center;">
+                            <image src="~./img/kubehelper-logo-256.png" height="150px"/>
+                            <label value="Kube Helper" style="font-family: Courier, Monaco, monospace;font-size: 18px;font-weight: bold;color: blue;display: block;"/>
+                            <separator orient="horizontal" bar="true" style="padding: 10px;"/>
+                        </panelchildren>
+                    </panel>
                     <panel width="100%" title="Menu" collapsible="true">
                         <panelchildren>
                             <toolbarbutton id="dashboardMenuBtn" hflex="1" iconSclass="z-icon-dashboard" label="&#160;Dashboard" style="text-align: left; padding-left: 2px;"
@@ -91,9 +58,10 @@
                                            tooltiptext="https://github.com/JWebDev/kubehelper/stargazers" href="https://github.com/JWebDev/kubehelper/stargazers" target="_blank"/>
                         </panelchildren>
                     </panel>
-                    <panel width="100%" border="normal"
-                           title="Commands">
+                    <panel width="100%">
                         <panelchildren>
+                            <button iconSclass="z-icon-heartbeat" height="50px" width="100%" label="Donate" dir="reverse"
+                                    style="font-family: Courier, Monaco, monospace;font-size: 18px;font-weight: bold;"/>
                         </panelchildren>
                     </panel>
                 </vlayout>
@@ -105,8 +73,7 @@
                 <toolbar align="center">
                     <toolbarbutton id="copyrightBtn" label="@load(indexVM.footerCopyrightText)" tooltiptext="https://github.com/JWebDev/kubehelper" href="https://github.com/JWebDev/kubehelper"
                                    target="_blank" style="font-family: Courier, Monaco, monospace;font-size: 14px;font-weight: bold;"/>
-<!--                    <toolbarbutton id="copyrightSeparator" label="|" disabled="true" style="font-family: Courier, Monaco, monospace;font-size: 14px;font-weight: bold;"/>-->
-                    <separator orient="horizontal" bar="true"></separator>
+                    <html style="vertical-align: middle">|</html>
                     <toolbarbutton id="autorBtn" label="JDev" tooltiptext="https://github.com/JWebDev" href="https://github.com/JWebDev" target="_blank"
                                    style="font-family: Courier, Monaco, monospace;font-size: 14px;font-weight: bold;"/>
                 </toolbar>
