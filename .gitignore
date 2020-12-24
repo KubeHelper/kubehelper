@@ -1,13 +1,4 @@
 target/
-!.mvn/wrapper/maven-wrapper.jar
-
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
 
 ### IntelliJ IDEA ###
 .idea
@@ -16,38 +7,4 @@ target/
 *.ipr
 out/
 
-### NetBeans ###
-nbproject/private/
-build/
-nbbuild/
-dist/
-nbdist/
-.nb-gradle/
-
-.gradle
-*.sw?
-.#*
-*#
-*~
-/build
-/code
-.metadata
-.recommenders
-bin
-build
-lib/
-target
-interpolated*.xml
-dependency-reduced-pom.xml
-build.log
-_site/
-.*.md.html
-manifest.yml
-MANIFEST.MF
-settings.xml
-activemq-data
-overridedb.*
-*.jar
-.DS_Store
-dump.rdb
-transaction-logs
+.github/
