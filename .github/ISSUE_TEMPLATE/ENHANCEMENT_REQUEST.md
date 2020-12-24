@@ -1,6 +1,6 @@
 ---
 name: "💥 Enhancement Request"
-about: Suggest an enhancement to the Kube Helper project
+about: Suggest an enhancement to the Kube Helper
 labels: kind:Enhancement
 
 ---

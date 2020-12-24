@@ -1,5 +1,5 @@
 ---
-name: "🚀 Feature request"
+name: "🚀 Feature Request"
 about: Suggest an idea for improving Kube Helper
 labels: 'kind:Feature'
 
