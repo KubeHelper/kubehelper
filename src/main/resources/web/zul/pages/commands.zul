@@ -81,21 +81,33 @@
                                 </hbox>
                             </groupbox>
 
-                            <groupbox>
+                            <groupbox width="100%" height="@load(commandsVM.commandOutputHeight)">
                                 <caption iconSclass="z-icon-terminal" label="Command Output"/>
-                                <grid id="runCommandGrid" model="@load(commandsVM.commandOutputResults)" height="@load(commandsVM.commandOutputHeight)">
-                                    <columns menupopup="auto" sizable="true">
-                                    </columns>
-                                    <rows>
-                                        <template name="model" var="item">
-                                            <row style="cursor:pointer">
-                                            </row>
-                                        </template>
-                                    </rows>
-                                    <foot>
-                                        <footer id="commandOutputGridFooter" span="9" align="right" label="@load(commandsVM.commandOutputTotalItems)"/>
-                                    </foot>
-                                </grid>
+                                <!--                                <grid id="runCommandGrid" model="@load(commandsVM.commandOutputResults)" height="@load(commandsVM.commandOutputHeight)">-->
+                                <!--                                    <columns menupopup="auto" sizable="true">-->
+                                <!--                                    </columns>-->
+                                <!--                                    <rows>-->
+                                <!--                                        <template name="model" var="item">-->
+                                <!--                                            <row style="cursor:pointer">-->
+                                <!--                                            </row>-->
+                                <!--                                        </template>-->
+                                <!--                                    </rows>-->
+                                <!--                                    <foot>-->
+                                <!--                                        <footer id="commandOutputGridFooter" span="9" align="right" label="@load(commandsVM.commandOutputTotalItems)"/>-->
+                                <!--                                    </foot>-->
+                                <!--                                </grid>-->
+                                <panel sizable="true"
+                                       maximizable="true" minimizable="true" border="normal"
+                                       width="100%" height="@load(commandsVM.commandOutputHeight)">
+                                    <toolbar>
+                                        <toolbar>
+                                            <textbox width="100%" height="100%"/>
+                                        </toolbar>
+                                    </toolbar>
+                                    <panelchildren style="overflow: auto;font-family: Courier, Monaco, monospace;font-size: 14px;line-height: 1.5;">
+                                        <html>"<![CDATA[<pre><code>${commandsVM.selectedCommandsSourceRaw}</code></pre>]]>"</html>
+                                    </panelchildren>
+                                </panel>
                             </groupbox>
                         </tabpanel>
 
@@ -126,16 +138,6 @@
                                             </hbox>
                                         </cell>
                                     </hbox>
-                                    <!--                                    <hbox align="stretch" spacing="20px">-->
-                                    <!--                                        <textbox value="text..."/>-->
-                                    <!--                                        <textbox value="secret" type="password"/>-->
-                                    <!--                                        <button label="Button 3"/>-->
-                                    <!--                                        <button label="Button 4"/>-->
-                                    <!--                                        <button label="Button 4"/>-->
-                                    <!--                                        <button label="Button 4"/>-->
-                                    <!--                                        <button label="Button 4"/>-->
-                                    <!--                                        <button label="Button 4"/>-->
-                                    <!--                                    </hbox>-->
                                 </north>
                                 <!--                                <south collapsible="true" splittable="true">-->
                                 <!--                                    <div style="background:#112f37;color:white;">S</div>-->
@@ -145,7 +147,7 @@
                                         <panel title="@load(commandsVM.selectedCommandsSourceLabel)" width="100%" height="@load(commandsVM.commandsManagementSrcPanelHeight)">
                                             <caption iconSclass="z-icon-list"/>
                                             <panelchildren style="overflow: auto;font-family: Courier, Monaco, monospace;font-size: 14px;line-height: 1.5;">
-<!--                                                <html id="selectedCommandsRawId"></html>-->
+                                                <!--                                                <html id="selectedCommandsRawId"></html>-->
                                                 <html id="selectedCommandsRawId">"<![CDATA[<pre><code>${commandsVM.selectedCommandsSourceRaw}</code></pre>]]>"</html>
                                             </panelchildren>
                                         </panel>
@@ -163,7 +165,13 @@
                         <tabpanel>
                             <div style="overflow-y:auto;overflow-x:auto;font-family: Courier, Monaco, monospace;font-size: 14px;line-height: 1.5;" height="@load(commandsVM.commandsSrcViewHeight)"
                                  width="100%">
-<!--                                <html><![CDATA[<pre><code>${commandsVM.selectedCommandsRaw}</code></pre>]]></html>-->
+                                <panel sizable="true" framable="true" width="100%" height="@load(commandsVM.commandsSrcViewHeight)"
+                                       title="Panel" maximizable="true" minimizable="true" border="normal" collapsible="true" closable="true">
+                                    <panelchildren>
+                                        <textbox width="100%" height="100%"/>
+                                    </panelchildren>
+                                </panel>
+                                <!--                                <html><![CDATA[<pre><code>${commandsVM.selectedCommandsRaw}</code></pre>]]></html>-->
                             </div>
                         </tabpanel>
 

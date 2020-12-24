@@ -19,27 +19,21 @@ package com.kubehelper.services;
 
 import com.google.common.io.Files;
 import com.kubehelper.common.KubeAPI;
+import com.kubehelper.common.KubectlHelper;
 import com.kubehelper.common.Operation;
 import com.kubehelper.domain.models.CommandsModel;
-import com.kubehelper.domain.models.SearchModel;
 import com.kubehelper.domain.results.CommandsResult;
-import io.kubernetes.client.Exec;
-import io.kubernetes.client.extended.kubectl.Kubectl;
-import io.kubernetes.client.extended.kubectl.KubectlExec;
-import io.kubernetes.client.openapi.ApiException;
-import io.kubernetes.client.openapi.models.V1Pod;
+import io.kubernetes.client.extended.kubectl.KubectlGet;
+import io.kubernetes.client.extended.kubectl.exception.KubectlException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
@@ -47,8 +41,6 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Optional;
-import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -67,9 +59,6 @@ public class CommandsService {
     @Autowired
     private KubeAPI kubeAPI;
 
-    @Autowired
-    private Exec exec;
-
     public void parsePredefinedCommands(CommandsModel commandsModel) {
 //        KubectlExec exec = Kubectl.exec();
 
@@ -83,6 +72,18 @@ public class CommandsService {
             logger.error(e.getMessage(), e);
         }
     }
+
+    public void run(CommandsModel commandsModel) {
+        try {
+            KubectlGet pods = KubectlHelper.getKubectlGet("pods");
+            List name = pods.namespace("spark").execute();
+            name.size();
+        } catch (IOException | KubectlException e) {
+            commandsModel.addException("Error" + e.getMessage(), e);
+            logger.error(e.getMessage(), e);
+        }
+    }
+
 
     private void initPredefinedCommands(CommandsModel commandsModel, File file) throws IOException {
         String commandsRaw = FileUtils.readFileToString(file, "UTF-8");

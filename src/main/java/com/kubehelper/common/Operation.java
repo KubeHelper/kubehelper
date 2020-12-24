@@ -26,11 +26,9 @@ import java.util.Optional;
  */
 public enum Operation {
 
-    API_VERSIONS("api-versions"),
-    DESCRIBE("describe"),
     EXEC("exec"),
-    EXPLAIN("explain"),
-    GET("get");
+    GET("get"),
+    API_RESOURCES("api-resources");
 
     private String value;
 

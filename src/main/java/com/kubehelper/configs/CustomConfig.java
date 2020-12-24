@@ -79,7 +79,6 @@ public class CustomConfig {
         return new PolicyV1beta1Api(Config.defaultClient());
     }
 
-
     @Bean
     public Exec getExec() throws IOException {
         return new Exec(Config.defaultClient());

@@ -119,7 +119,7 @@
                                             <label value="${item.name}" multiline="true" if="${c:length(item.name) lt 150}"></label>
                                             <hlayout if="${c:length(item.name) ge 150}">
                                                 <label value="${c:substring(item.name, 0, c:indexOf(item.name,'='))}  =" multiline="true"></label>
-                                                <toolbarbutton label="Value ist too long. Click to see full Value" onClick="@command('showFullLabelValue', id=item.id)"/>
+                                                <toolbarbutton label="Value ist too long. Click to see full Value" onClick="@command('showFullLabelValue', item=item)"/>
                                             </hlayout>
                                             <label value="${item.resourceProperty}"></label>
                                             <label value="${item.resourceType}"></label>
@@ -163,7 +163,7 @@
                                                         <label value="${item.name}" multiline="true" if="${c:length(item.name) lt 150}"></label>
                                                         <hlayout if="${c:length(item.name) ge 150}">
                                                             <label value="${c:substring(item.name, 0, c:indexOf(item.name,'='))}  =" multiline="true"></label>
-                                                            <toolbarbutton label="Value ist too long. Click to see full Value" onClick="@command('showFullGroupedLabelValue', id=item.id)"/>
+                                                            <toolbarbutton label="Value ist too long. Click to see full Value" onClick="@command('showFullGroupedLabelValue', item=item)"/>
                                                         </hlayout>
                                                         <label value="${item.amount}"></label>
                                                     </row>

@@ -129,10 +129,11 @@ public class CommandsVM implements EventListener<Event> {
     @Command
     @NotifyChange({"commandOutputTotalItems", "commandOutputResults"})
     public void run() {
-        commandsModel.setFilter(new CommandsFilter());
-        clearAllFilterComboboxes();
-        isRunButtonPressed = true;
-        onInitPreparations();
+          commandsService.run(commandsModel);
+//        commandsModel.setFilter(new CommandsFilter());
+//        clearAllFilterComboboxes();
+//        isRunButtonPressed = true;
+//        onInitPreparations();
     }
 
     /**
