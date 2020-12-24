@@ -1,0 +1,167 @@
+Group: Predefined
+Operation: get
+Description: Simple command description
+Rows: Column1|Column2|Column3|Column4|Column5
+kubectl get pods -A --field-selector=status.phase!=Running | grep -v Complete
+
+Group: Predefined
+Operation: get
+Description: Simple command description
+Rows: Column1|Column2|Column3|Column4|Column5
+kubectl get no -o json | \
+  jq -r '.items | sort_by(.status.capacity.memory)[]|[.metadata.name,.status.capacity.memory]| @tsv'
+
+Group: Predefined
+Operation: get
+Description: Simple command description
+Rows: Column1|Column2|Column3|Column4|Column5
+kubectl get pods -A --field-selector=status.phase!=Running\
+    | grep -v Complete
+
+Group: Predefined
+Operation: get
+Description: Simple command description
+Rows: Column1|Column2|Column3|Column4|Column5
+kubectl get no -o json | \
+  jq -r '.items | sort_by(.status.capacity.memory)[]|[.metadata.name,.status.capacity.memory] \
+  | @tsv'
+
+Group: Predefined
+Operation: get
+Description: Simple command description
+Rows: Column1|Column2|Column3|Column4|Column5
+kubectl get pods -A --field-selector=status.phase!=Running | grep -v Complete
+
+Group: Predefined
+Operation: get
+Description: Simple command description
+Rows: Column1|Column2|Column3|Column4|Column5
+kubectl get no -o json | \
+  jq -r '.items | sort_by(.status.capacity.memory)[]|[.metadata.name,.status.capacity.memory]| @tsv'
+
+Group: Predefined
+Operation: get
+Description: Simple command description
+Rows: Column1|Column2|Column3|Column4|Column5
+kubectl get pods -A --field-selector=status.phase!=Running\
+    | grep -v Complete
+
+Group: Predefined
+Operation: get
+Description: Simple command description
+Rows: Column1|Column2|Column3|Column4|Column5
+kubectl get no -o json | \
+  jq -r '.items | sort_by(.status.capacity.memory)[]|[.metadata.name,.status.capacity.memory] \
+  | @tsv'
+
+Group: Predefined
+Operation: exec
+Description: Simple command description
+Rows: Column1|Column2|Column3|Column4|Column5
+kubectl get pods -A --field-selector=status.phase!=Running | grep -v Complete
+
+Group: Predefined
+Operation: exec
+Description: Simple command description
+Rows: Column1|Column2|Column3|Column4|Column5
+kubectl get no -o json | \
+  jq -r '.items | sort_by(.status.capacity.memory)[]|[.metadata.name,.status.capacity.memory]| @tsv'
+
+Group: Predefined
+Operation: exec
+Description: Simple command description
+Rows: Column1|Column2|Column3|Column4|Column5
+kubectl get pods -A --field-selector=status.phase!=Running\
+    | grep -v Complete
+
+Group: Predefined
+Operation: exec
+Description: Simple command description
+Rows: Column1|Column2|Column3|Column4|Column5
+kubectl get no -o json | \
+  jq -r '.items | sort_by(.status.capacity.memory)[]|[.metadata.name,.status.capacity.memory] \
+  | @tsv'
+
+Group: Predefined
+Operation: exec
+Description: Simple command description
+Rows: Column1|Column2|Column3|Column4|Column5
+kubectl get pods -A --field-selector=status.phase!=Running | grep -v Complete
+
+Group: Predefined
+Operation: get
+Description: Simple command description
+Rows: Column1|Column2|Column3|Column4|Column5
+kubectl get no -o json | \
+  jq -r '.items | sort_by(.status.capacity.memory)[]|[.metadata.name,.status.capacity.memory]| @tsv'
+
+Group: Predefined
+Operation: get
+Description: Simple command description
+Rows: Column1|Column2|Column3|Column4|Column5
+kubectl get pods -A --field-selector=status.phase!=Running\
+    | grep -v Complete
+
+Group: Predefined
+Operation: get
+Description: Simple command description
+Rows: Column1|Column2|Column3|Column4|Column5
+kubectl get no -o json | \
+  jq -r '.items | sort_by(.status.capacity.memory)[]|[.metadata.name,.status.capacity.memory] \
+  | @tsv'
+
+Group: Predefined
+Operation: get
+Description: Simple command description
+Rows: Column1|Column2|Column3|Column4|Column5
+kubectl get pods -A --field-selector=status.phase!=Running | grep -v Complete
+
+Group: Predefined
+Operation: get
+Description: Simple command description
+Rows: Column1|Column2|Column3|Column4|Column5
+kubectl get no -o json | \
+  jq -r '.items | sort_by(.status.capacity.memory)[]|[.metadata.name,.status.capacity.memory]| @tsv'
+
+Group: Predefined
+Operation: get
+Description: Simple command description
+Rows: Column1|Column2|Column3|Column4|Column5
+kubectl get pods -A --field-selector=status.phase!=Running\
+    | grep -v Complete
+
+Group: Predefined
+Operation: get
+Description: Simple command description
+Rows: Column1|Column2|Column3|Column4|Column5
+kubectl get no -o json | \
+  jq -r '.items | sort_by(.status.capacity.memory)[]|[.metadata.name,.status.capacity.memory] \
+  | @tsv'
+
+Group: Predefined
+Operation: get
+Description: Simple command description
+Rows: Column1|Column2|Column3|Column4|Column5
+kubectl get pods -A --field-selector=status.phase!=Running | grep -v Complete
+
+Group: Predefined
+Operation: get
+Description: Simple command description
+Rows: Column1|Column2|Column3|Column4|Column5
+kubectl get no -o json | \
+  jq -r '.items | sort_by(.status.capacity.memory)[]|[.metadata.name,.status.capacity.memory]| @tsv'
+
+Group: Predefined
+Operation: get
+Description: Simple command description
+Rows: Column1|Column2|Column3|Column4|Column5
+kubectl get pods -A --field-selector=status.phase!=Running\
+    | grep -v Complete
+
+Group: Predefined
+Operation: get
+Description: Simple command description
+Rows: Column1|Column2|Column3|Column4|Column5
+kubectl get no -o json | \
+  jq -r '.items | sort_by(.status.capacity.memory)[]|[.metadata.name,.status.capacity.memory] \
+  | @tsv'

@@ -1,34 +1,48 @@
+/*
+Kube Helper
+Copyright (C) 2021 JDev
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 package com.kubehelper.services;
 
+import com.google.common.io.Files;
+import com.kubehelper.common.KubeAPI;
 import com.kubehelper.common.Resource;
 import com.kubehelper.domain.models.IpsAndPortsModel;
 import com.kubehelper.domain.results.IpsAndPortsResult;
 import io.kubernetes.client.custom.IntOrString;
-import io.kubernetes.client.openapi.ApiException;
-import io.kubernetes.client.openapi.apis.AppsV1Api;
-import io.kubernetes.client.openapi.apis.AppsV1beta1Api;
-import io.kubernetes.client.openapi.apis.AppsV1beta2Api;
-import io.kubernetes.client.openapi.apis.CoreV1Api;
-import io.kubernetes.client.openapi.apis.ExtensionsV1beta1Api;
-import io.kubernetes.client.openapi.models.ExtensionsV1beta1DeploymentList;
-import io.kubernetes.client.openapi.models.ExtensionsV1beta1IngressList;
 import io.kubernetes.client.openapi.models.V1Container;
 import io.kubernetes.client.openapi.models.V1Pod;
-import io.kubernetes.client.openapi.models.V1PodList;
 import io.kubernetes.client.openapi.models.V1Service;
-import io.kubernetes.client.openapi.models.V1ServiceList;
 import io.kubernetes.client.openapi.models.V1ServicePort;
-import io.kubernetes.client.openapi.models.V1beta1DaemonSetList;
-import io.kubernetes.client.openapi.models.V1beta1ReplicaSetList;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.text.StringSubstitutor;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.zkoss.zul.Messagebox;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.charset.Charset;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.StringJoiner;
 import java.util.function.Consumer;
 
@@ -40,44 +54,58 @@ public class IpsAndPortsService {
 
     private final String LS = System.getProperty("line.separator");
 
-    @Autowired
-    private CoreV1Api api;
+    private static Logger logger = LoggerFactory.getLogger(IpsAndPortsService.class);
+
+    private final String podDetailsTemplate;
+    private final String serviceDetailsTemplate;
+    private final String containerDetailsTemplate;
 
     @Autowired
-    private ExtensionsV1beta1Api extensionsV1beta1Api;
+    private KubeAPI kubeAPI;
 
-    @Autowired
-    private AppsV1beta1Api appsV1beta1Api;
-
-    @Autowired
-    private AppsV1Api appsV1Api;
-
-    @Autowired
-    private AppsV1beta2Api appsV1beta2Api;
-
-
-    public void get(String selectedNamespace, IpsAndPortsModel ipsAndPortsModel) {
-        ipsAndPortsModel.getIpsAndPortsResults().clear();
-
-//        getV1DaemonSetsList(selectedNamespace);
-//        getV1DeploymentsList(selectedNamespace);
-//        getV1ReplicaSetsList(selectedNamespace);
-//        getV1IngressesList(selectedNamespace);
-
-        fillModelWithPodsInfo(selectedNamespace, ipsAndPortsModel);
-        fillModelWithServicesInfo(selectedNamespace, ipsAndPortsModel);
+    /**
+     * Constructor initializes templates for the detail view.
+     *
+     * @throws URISyntaxException
+     * @throws IOException
+     */
+    public IpsAndPortsService() throws URISyntaxException, IOException {
+        podDetailsTemplate = Files.asCharSource(new File(this.getClass().getResource("/templates/ips-and-ports/pod-details.html").toURI()), Charset.forName("UTF-8")).read();
+        serviceDetailsTemplate = Files.asCharSource(new File(this.getClass().getResource("/templates/ips-and-ports/service-details.html").toURI()), Charset.forName("UTF-8")).read();
+        containerDetailsTemplate = Files.asCharSource(new File(this.getClass().getResource("/templates/ips-and-ports/container-details.html").toURI()), Charset.forName("UTF-8")).read();
     }
 
-    private void fillModelWithPodsInfo(String selectedNamespace, IpsAndPortsModel ipsAndPortsModel) {
-        for (V1Pod pod : getV1PodList(selectedNamespace).getItems()) {
+
+    /**
+     * Clears active @{@link IpsAndPortsModel} model and fill it with new data from pods and services.
+     *
+     * @param ipsAndPortsModel - model for @{@link com.kubehelper.viewmodels.IpsAndPortsVM}
+     */
+    public void get(IpsAndPortsModel ipsAndPortsModel) {
+        try {
+            ipsAndPortsModel.getIpsAndPortsResults().clear();
+            fillModelWithPodsInfo(ipsAndPortsModel);
+            fillModelWithServicesInfo(ipsAndPortsModel);
+        } catch (RuntimeException e) {
+            ipsAndPortsModel.addSearchException(e);
+            logger.error(e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Fill {@link IpsAndPortsModel} with new data from pods depends on namespace.
+     *
+     * @param ipsAndPortsModel - model for @{@link com.kubehelper.viewmodels.IpsAndPortsVM} view.
+     */
+    private void fillModelWithPodsInfo(IpsAndPortsModel ipsAndPortsModel) {
+        for (V1Pod pod : kubeAPI.getV1PodsList(ipsAndPortsModel.getSelectedNamespace(), ipsAndPortsModel).getItems()) {
             IpsAndPortsResult ipsAndPortsResult = new IpsAndPortsResult(ipsAndPortsModel.getIpsAndPortsResults().size() + 1);
-            StringJoiner portsJoiner = getStringsJoiner();
-            StringJoiner containerNamesJoiner = getStringsJoiner();
+            StringJoiner portsJoiner = getStringsJoiner(), containerNamesJoiner = getStringsJoiner();
             String resourceName = pod.getMetadata().getName() + ": ";
-            StringBuilder servicePortsBuilder = new StringBuilder(), detailsBuilder = new StringBuilder();
+            Map<String, String> detailsMap = new HashMap<>(), containersDetailsMap = new HashMap<>();
 
 //          compose pod ips
-            for (V1Container container : Objects.requireNonNull(pod.getSpec()).getContainers()) {
+            for (V1Container container : pod.getSpec().getContainers()) {
                 if (ObjectUtils.isNotEmpty(container.getPorts())) {
                     container.getPorts().forEach(port -> portsJoiner.add(String.valueOf(port.getContainerPort())));
                 }
@@ -85,41 +113,30 @@ public class IpsAndPortsService {
             }
 
 //          compose service data to details
-            Optional.ofNullable(pod.getMetadata().getName()).ifPresent(s -> detailsBuilder.append(ipsAndPortsResult.getId() + " => " + s + LS));
+            Optional.ofNullable(pod.getMetadata().getName()).ifPresent(p -> detailsMap.put("id", ipsAndPortsResult.getId() + " => " + p));
 
 //          compose service labels
-            StringJoiner labelsJoiner = getStringsJoiner();
-            Optional.ofNullable(pod.getMetadata().getLabels()).ifPresent(labels -> {
-                for (Map.Entry<String, String> entry : labels.entrySet()) {
-                    labelsJoiner.add(entry.getKey() + ": " + entry.getValue());
-                }
-            });
-            detailsBuilder.append("Labels: ").append(labelsJoiner.toString()).append(LS);
+            Optional.ofNullable(pod.getMetadata().getLabels()).ifPresent(labels -> joinKeyValuesFromEntrySet(labels.entrySet(), detailsMap, "labels"));
 
 //          compose pod annotations
-            StringJoiner annotationsJoiner = getStringsJoiner();
-            Optional.ofNullable(pod.getMetadata().getAnnotations()).ifPresent(annotations -> {
-                for (Map.Entry<String, String> entry : annotations.entrySet()) {
-                    annotationsJoiner.add(entry.getKey() + ": " + entry.getValue());
-                }
-            });
-            detailsBuilder.append("Annotations: ").append(annotationsJoiner.toString()).append(LS);
+            Optional.ofNullable(pod.getMetadata().getAnnotations()).ifPresent(annotations -> joinKeyValuesFromEntrySet(annotations.entrySet(), detailsMap, "annotations"));
 
 //          compose other service data into details
-            Optional.ofNullable(pod.getApiVersion()).ifPresent(p -> detailsBuilder.append("ApiVersion: " + p + LS));
-            Optional.ofNullable(pod.getMetadata().getSelfLink()).ifPresent(s -> detailsBuilder.append("SelfLink: " + s + LS));
-            Optional.ofNullable(pod.getMetadata().getUid()).ifPresent(s -> detailsBuilder.append("UID: " + s + LS));
+            Optional.ofNullable(pod.getApiVersion()).ifPresent(p -> detailsMap.put("apiVersion", p));
+            Optional.ofNullable(pod.getMetadata().getSelfLink()).ifPresent(p -> detailsMap.put("selfLink", p));
+            Optional.ofNullable(pod.getMetadata().getUid()).ifPresent(p -> detailsMap.put("uid", p));
 
             Optional.ofNullable(pod.getStatus().getContainerStatuses()).ifPresent(containerStatuses -> containerStatuses.forEach(container -> {
-
-                Optional.ofNullable(container.getName()).ifPresent(c -> detailsBuilder.append("Container: " + c + LS));
-                Optional.ofNullable(container.getImage()).ifPresent(c -> detailsBuilder.append("\tImage: " + c + LS));
-                Optional.ofNullable(container.getImageID()).ifPresent(c -> detailsBuilder.append("\tImageId: " + c + LS));
-                Optional.ofNullable(container.getContainerID()).ifPresent(c -> detailsBuilder.append("\tContainerId: " + c + LS));
-                Optional.ofNullable(container.getStarted()).ifPresent(c -> detailsBuilder.append("\tStarted: " + c + LS));
-                Optional.ofNullable(container.getReady()).ifPresent(c -> detailsBuilder.append("\tReady: " + c + LS));
-                Optional.ofNullable(container.getRestartCount()).ifPresent(c -> detailsBuilder.append("\tRestartCount: " + c + LS));
+                Optional.ofNullable(container.getName()).ifPresent(c -> containersDetailsMap.put("name", c));
+                Optional.ofNullable(container.getImage()).ifPresent(c -> containersDetailsMap.put("image", c));
+                Optional.ofNullable(container.getImageID()).ifPresent(c -> containersDetailsMap.put("imageId", c));
+                Optional.ofNullable(container.getContainerID()).ifPresent(c -> containersDetailsMap.put("containerId", c));
+                Optional.ofNullable(container.getStarted()).ifPresent(c -> containersDetailsMap.put("started", String.valueOf(c)));
+                Optional.ofNullable(container.getReady()).ifPresent(c -> containersDetailsMap.put("ready", String.valueOf(c)));
+                Optional.ofNullable(container.getRestartCount()).ifPresent(c -> containersDetailsMap.put("restartCount", String.valueOf(c)));
             }));
+
+            String podDetailsString = buildHtmlDetails(detailsMap, podDetailsTemplate) + buildHtmlDetails(containersDetailsMap, containerDetailsTemplate);
 
             ipsAndPortsResult
                     .setIp(pod.getStatus().getPodIP())
@@ -130,27 +147,33 @@ public class IpsAndPortsService {
                     .setResourceType(Resource.POD)
                     .setAdditionalInfo("Phase: " + pod.getStatus().getPhase())
                     .setCreationTime(getParsedCreationTime(pod.getMetadata().getCreationTimestamp()))
-                    .setDetails(detailsBuilder.toString());
+                    .setDetails(podDetailsString);
             ipsAndPortsModel.addIpsAndPortsResult(ipsAndPortsResult);
         }
     }
 
-    private void fillModelWithServicesInfo(String selectedNamespace, IpsAndPortsModel ipsAndPortsModel) {
+    /**
+     * Fill {@link IpsAndPortsModel} with new data from services depends on namespace.
+     *
+     * @param ipsAndPortsModel - model for @{@link com.kubehelper.viewmodels.IpsAndPortsVM} view.
+     */
+    private void fillModelWithServicesInfo(IpsAndPortsModel ipsAndPortsModel) {
 
-        for (V1Service service : getV1ServicesList(selectedNamespace).getItems()) {
+        for (V1Service service : kubeAPI.getV1ServicesList(ipsAndPortsModel.getSelectedNamespace(), ipsAndPortsModel).getItems()) {
+            Map<String, String> detailsMap = new HashMap<>();
             IpsAndPortsResult ipsAndPortsResult = new IpsAndPortsResult(ipsAndPortsModel.getIpsAndPortsResults().size() + 1);
-            StringBuilder servicePortsBuilder = new StringBuilder(), detailsBuilder = new StringBuilder();
-            StringJoiner serviceIpsJoiner = new StringJoiner(LS);
+            StringBuilder servicePortsBuilder = new StringBuilder();
+            StringJoiner ipsJoiner = new StringJoiner(LS);
 
 //          compose service ips
-            Optional.ofNullable(service.getSpec().getClusterIP()).ifPresent(clusterIp -> serviceIpsJoiner.add("ClusterIP: " + clusterIp));
-            Optional.ofNullable(service.getSpec().getLoadBalancerIP()).ifPresent(lbIp -> serviceIpsJoiner.add("\nLoadBalancerIP: " + lbIp));
+            Optional.ofNullable(service.getSpec().getClusterIP()).ifPresent(clusterIp -> ipsJoiner.add(clusterIp));
+            Optional.ofNullable(service.getSpec().getLoadBalancerIP()).ifPresent(lbIp -> ipsJoiner.add(lbIp));
             Optional.ofNullable(service.getSpec().getExternalIPs()).ifPresent(externalIps -> {
                 StringJoiner externalIpsJoiner = new StringJoiner(",");
                 for (String externalIp : externalIps) {
                     externalIpsJoiner.add(externalIp);
                 }
-                serviceIpsJoiner.add("\nExternalIPs: " + externalIpsJoiner.toString());
+                ipsJoiner.add("\nExternalIPs: " + externalIpsJoiner.toString());
             });
 
 //          compose service portss
@@ -160,10 +183,10 @@ public class IpsAndPortsService {
                     Optional.ofNullable(port.getNodePort()).ifPresent(concatIntegerWithPort("NodePort: ", portsJoiner));
                     Optional.ofNullable(port.getPort()).ifPresent(concatIntegerWithPort("Port: ", portsJoiner));
                     Optional.ofNullable(port.getTargetPort()).ifPresent(concatIntOrStringWithPort("TargetPort: ", portsJoiner));
-                    StringJoiner portsNamenJoiner = getStringsJoiner();
-                    Optional.ofNullable(port.getName()).ifPresent(concatStringLabelWithPort("name: ", portsNamenJoiner));
-                    Optional.ofNullable(port.getProtocol()).ifPresent(concatStringLabelWithPort("protocol: ", portsNamenJoiner));
-                    servicePortsBuilder.append("[ " + portsJoiner.toString() + " " + portsNamenJoiner.toString() + " ]" + LS);
+                    StringJoiner portsNamesJoiner = getStringsJoiner();
+                    Optional.ofNullable(port.getName()).ifPresent(concatStringLabelWithPort("name: ", portsNamesJoiner));
+                    Optional.ofNullable(port.getProtocol()).ifPresent(concatStringLabelWithPort("protocol: ", portsNamesJoiner));
+                    servicePortsBuilder.append("[ " + portsJoiner.toString() + " " + portsNamesJoiner.toString() + " ]" + LS);
                 }
             });
 
@@ -176,48 +199,66 @@ public class IpsAndPortsService {
             });
 
 //          compose service data to details
-            Optional.ofNullable(service.getMetadata().getName()).ifPresent(s -> detailsBuilder.append(ipsAndPortsResult.getId() + " => " + s + LS));
+            Optional.ofNullable(service.getMetadata().getName()).ifPresent(s -> detailsMap.put("id", ipsAndPortsResult.getId() + " => " + s));
 
 //          compose service labels
-            StringJoiner labelsJoiner = getStringsJoiner();
-            Optional.ofNullable(service.getMetadata().getLabels()).ifPresent(labels -> {
-                for (Map.Entry<String, String> entry : labels.entrySet()) {
-                    labelsJoiner.add(entry.getKey() + ": " + entry.getValue());
-                }
-            });
-            detailsBuilder.append("Labels: ").append(labelsJoiner.toString()).append(LS);
+            Optional.ofNullable(service.getMetadata().getLabels()).ifPresent(labels -> joinKeyValuesFromEntrySet(labels.entrySet(), detailsMap, "labels"));
 
 //          compose service annotations
-            StringJoiner annotationsJoiner = getStringsJoiner();
-            Optional.ofNullable(service.getMetadata().getAnnotations()).ifPresent(annotations -> {
-                for (Map.Entry<String, String> entry : annotations.entrySet()) {
-                    annotationsJoiner.add(entry.getKey() + ": " + entry.getValue());
-                }
-            });
-            detailsBuilder.append("Annotations: ").append(annotationsJoiner.toString()).append(LS);
+            Optional.ofNullable(service.getMetadata().getAnnotations()).ifPresent(annotations -> joinKeyValuesFromEntrySet(annotations.entrySet(), detailsMap, "annotations"));
 
 //          compose other service data into details
-            Optional.ofNullable(service.getApiVersion()).ifPresent(s -> detailsBuilder.append("ApiVersion: " + s + LS));
-            Optional.ofNullable(service.getSpec().getSessionAffinity()).ifPresent(s -> detailsBuilder.append("SessionAffinity: " + s + LS));
-            Optional.ofNullable(service.getMetadata().getSelfLink()).ifPresent(s -> detailsBuilder.append("SelfLink: " + s + LS));
-            Optional.ofNullable(service.getMetadata().getUid()).ifPresent(s -> detailsBuilder.append("UID: " + s + LS));
+            Optional.ofNullable(service.getApiVersion()).ifPresent(s -> detailsMap.put("apiVersion", s));
+            Optional.ofNullable(service.getSpec().getSessionAffinity()).ifPresent(s -> detailsMap.put("sessionAffinity", s));
+            Optional.ofNullable(service.getMetadata().getSelfLink()).ifPresent(s -> detailsMap.put("selfLink", s));
+            Optional.ofNullable(service.getMetadata().getUid()).ifPresent(s -> detailsMap.put("uid", s));
+
+            String additionalInfo = (service.getSpec().getClusterIP() == null ? "Type: LoadBalancerIP" : "Type: ClusterIP" + "\nSelectors: " + selectorsJoiner.toString());
 
             ipsAndPortsResult
-                    .setIp(serviceIpsJoiner.toString())
+                    .setIp(ipsJoiner.toString())
                     .setPorts(servicePortsBuilder.toString())
                     .setNamespace(service.getMetadata().getNamespace())
                     .setHostInfo("")
                     .setResourceName(service.getMetadata().getName())
                     .setResourceType(Resource.SERVICE)
-                    .setAdditionalInfo("Type: ClusterIP\nSelectors: " + selectorsJoiner.toString())
+                    .setAdditionalInfo(additionalInfo)
                     .setCreationTime(getParsedCreationTime(service.getMetadata().getCreationTimestamp()))
-                    .setDetails(detailsBuilder.toString());
+                    .setDetails(buildHtmlDetails(detailsMap, serviceDetailsTemplate));
             ipsAndPortsModel.addIpsAndPortsResult(ipsAndPortsResult);
         }
     }
 
+    /**
+     * Joins key/values from EntrySet into String-Map collector.
+     *
+     * @param entries   - key/values to join.
+     * @param collector - String-Map collector
+     * @param key       - key for save joins into map.
+     */
+    private void joinKeyValuesFromEntrySet(Set<Map.Entry<String, String>> entries, Map<String, String> collector, String key) {
+        StringJoiner joiner = getStringsJoiner();
+        for (Map.Entry<String, String> entry : entries) {
+            joiner.add(entry.getKey() + ": " + entry.getValue());
+        }
+        collector.put(key, joiner.toString());
+    }
+
     private String getParsedCreationTime(DateTime dateTime) {
         return dateTime.toString("dd.MM.yyyy HH:mm:ss");
+    }
+
+    /**
+     * Build html string from template and map with key/values for replace.
+     *
+     * @param detailsMap - key/values for replace values in html template.
+     * @param template   - html template.
+     * @return - html string for render in details section.
+     */
+    private String buildHtmlDetails(Map<String, String> detailsMap, String template) {
+        StringSubstitutor sub = new StringSubstitutor(detailsMap);
+        String html = sub.replace(template);
+        return html.replaceAll("\\$\\{\\w*\\}", "");
     }
 
     private StringJoiner getStringsJoiner() {
@@ -236,108 +277,4 @@ public class IpsAndPortsService {
         return port -> tmpPortsJoiner.add(prefix + port);
     }
 
-    private V1PodList getV1PodList(String selectedNamespace) {
-        try {
-            if ("all".equals(selectedNamespace)) {
-                return api.listPodForAllNamespaces(null, null, null, null, null, null, null, null, null);
-            } else {
-                return api.listNamespacedPod(selectedNamespace, null, null, null, null, null, null, null, null, null);
-            }
-        } catch (ApiException e) {
-            Messagebox.show(e.getMessage(), "Fetch Pods from Namespace Error", Messagebox.OK, Messagebox.ERROR);
-            e.printStackTrace();
-        }
-        return new V1PodList();
-    }
-
-    private V1ServiceList getV1ServicesList(String selectedNamespace) {
-        try {
-            if ("all".equals(selectedNamespace)) {
-                return api.listServiceForAllNamespaces(null, null, null, null, null, null, null, null, null);
-            } else {
-                return api.listNamespacedService(selectedNamespace, null, null, null, null, null, null, null, null, null);
-            }
-        } catch (ApiException e) {
-            Messagebox.show(e.getMessage(), "Fetch Services from Namespace Error", Messagebox.OK, Messagebox.ERROR);
-            e.printStackTrace();
-        }
-        return new V1ServiceList();
-    }
-
-    private V1beta1DaemonSetList getV1DaemonSetsList(String selectedNamespace) {
-
-        try {
-            if ("all".equals(selectedNamespace)) {
-                return extensionsV1beta1Api.listDaemonSetForAllNamespaces(null, null, null, null, null, null, null, null, null);
-            } else {
-                return extensionsV1beta1Api.listNamespacedDaemonSet(selectedNamespace, null, null, null, null, null, null, null, null, null);
-            }
-        } catch (ApiException e) {
-            Messagebox.show(e.getMessage(), "Fetch Services from Namespace Error", Messagebox.OK, Messagebox.ERROR);
-            e.printStackTrace();
-        }
-        return new V1beta1DaemonSetList();
-    }
-
-    private ExtensionsV1beta1DeploymentList getV1DeploymentsList(String selectedNamespace) {
-        try {
-            if ("all".equals(selectedNamespace)) {
-                return extensionsV1beta1Api.listNamespacedDeployment(null, null, null, null, null, null, null, null, null, null);
-            } else {
-                return extensionsV1beta1Api.listNamespacedDeployment(selectedNamespace, null, null, null, null, null, null, null, null, null);
-            }
-        } catch (ApiException e) {
-            Messagebox.show(e.getMessage(), "Fetch Services from Namespace Error", Messagebox.OK, Messagebox.ERROR);
-            e.printStackTrace();
-        }
-        return new ExtensionsV1beta1DeploymentList();
-    }
-
-//    private V1ServiceList getV1StatefulSetsList(String selectedNamespace) {
-//        try {
-//            if ("all".equals(selectedNamespace)) {
-//                return extensionsV1beta1Api.set(null, null, null, null, null, null, null, null, null);
-//            } else {
-//                return extensionsV1beta1Api.listNamespacedService(selectedNamespace, null, null, null, null, null, null, null, null, null);
-//            }
-//        } catch (ApiException e) {
-//            Messagebox.show(e.getMessage(), "Fetch Services from Namespace Error", Messagebox.OK, Messagebox.ERROR);
-//            e.printStackTrace();
-//        }
-//        return new V1ServiceList();
-//    }
-
-    private V1beta1ReplicaSetList getV1ReplicaSetsList(String selectedNamespace) {
-        try {
-            if ("all".equals(selectedNamespace)) {
-                return extensionsV1beta1Api.listReplicaSetForAllNamespaces(null, null, null, null, null, null, null, null, null);
-            } else {
-                return extensionsV1beta1Api.listNamespacedReplicaSet(selectedNamespace, null, null, null, null, null, null, null, null, null);
-            }
-        } catch (ApiException e) {
-            Messagebox.show(e.getMessage(), "Fetch Services from Namespace Error", Messagebox.OK, Messagebox.ERROR);
-            e.printStackTrace();
-        }
-        return new V1beta1ReplicaSetList();
-    }
-
-    private ExtensionsV1beta1IngressList getV1IngressesList(String selectedNamespace) {
-        try {
-            if ("all".equals(selectedNamespace)) {
-                return extensionsV1beta1Api.listIngressForAllNamespaces(null, null, null, null, null, null, null, null, null);
-            } else {
-                return extensionsV1beta1Api.listNamespacedIngress(selectedNamespace, null, null, null, null, null, null, null, null, null);
-            }
-        } catch (ApiException e) {
-            Messagebox.show(e.getMessage(), "Fetch Ingresses from Namespace Error", Messagebox.OK, Messagebox.ERROR);
-            e.printStackTrace();
-        }
-        return new ExtensionsV1beta1IngressList();
-    }
-
-    //            V1NodeList v1NodeList = api.listNode(null, null, null, null, null, null, null, null, null);
-//            V1EndpointsList v1EndpointsList = api.listEndpointsForAllNamespaces(null, null, null, null, null, null, null, null, null);
-//            V1SecretList v1SecretList = api.listSecretForAllNamespaces(null, null, null, null, null, null, null, null, null);
-//            Exec exec = new Exec(api.getApiClient());
-////            exec.exec()
 }

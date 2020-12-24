@@ -1,0 +1,268 @@
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk>
+    <div id="labelsTemplate" viewModel="@id('labelsVM') @init('com.kubehelper.viewmodels.LabelsVM')" width="100%" height="100%">
+        <borderlayout>
+            <north title="Labels Annotations Selectors" collapsible="true" vflex="min">
+                <groupbox id="labelsConfigGroupBox" width="100%">
+                    <caption iconSclass="z-icon-sliders" label="Search Configuration"/>
+                    <vbox height="100%" width="100%">
+                        <hbox height="100%" width="100%" align="stretch">
+                            <cell id="clearAllCell" width="10%" tooltip="clearAllTooltip">
+                                <button id="clearAll" width="100%" iconSclass="z-icon-eraser" label="Clear all" onClick="@command('clearAll')"/>
+                            </cell>
+                            <separator width="15px" orient="vertical" bar="true"/>
+                            <cell width="20%">
+                                <hlayout valign="middle">
+                                    <label value="Namespace: "/>
+                                    <combobox tooltip="namespacesTooltip" id="namespacesCBox" hflex="1" model="@load(labelsVM.namespaces)" selectedItem="@bind(labelsVM.selectedNamespace)"
+                                              readonly="true">
+                                        <template name="model">
+                                            <comboitem label="@load(each)"/>
+                                        </template>
+                                    </combobox>
+                                </hlayout>
+                            </cell>
+                            <separator width="15px" orient="vertical" bar="true"/>
+                            <cell width="10%">
+                                <hlayout valign="middle">
+                                    <checkbox id="skipKubeNamespacesCBox" checked="@bind(labelsVM.skipKubeNamespaces)" tooltip="skipKubeNamespacesTooltip"/>Skip kube* namespaces
+                                </hlayout>
+                            </cell>
+                            <separator width="15px" orient="vertical" bar="true"/>
+                            <cell width="10%">
+                                <hlayout valign="middle">
+                                    <checkbox id="skipHashLabelsCBox" checked="@bind(labelsVM.skipHashLabels)" tooltip="skipHashLabelsTooltip"/>Skip auto generated hash labels
+                                </hlayout>
+                            </cell>
+                            <cell width="37%">
+                            </cell>
+                            <cell id="cellLabelsBtn" width="10%">
+                                <button id="searchBtn" label="Search" iconSclass="z-icon-search" width="100%" onClick="@command('search')"/>
+                            </cell>
+                        </hbox>
+                        <separator width="100%" orient="horizontal"/>
+                        <groupbox id="kubeResourcesGBox" width="100%">
+                            <caption>
+                                <checkbox id="kubeResourcesGBoxCheckAll" checked="true" onCheck="@command('selectAllResources')"/>Resources
+                            </caption>
+                            <vbox id="kubeResourcesVBox" spacing="1" align="center" width="100%">
+                            </vbox>
+                        </groupbox>
+                    </vbox>
+                </groupbox>
+            </north>
+            <center id="centerLayoutLabelsID" vflex="max" margins="0,3,3,3">
+                <tabbox width="100%" sclass="nav_tabs">
+                    <tabs id="tabs">
+                        <tab label="All"/>
+                        <tab label="Grouped"/>
+                    </tabs>
+                    <tabpanels>
+                        <tabpanel>
+                            <grid model="@load(labelsVM.searchResults)" height="@load(labelsVM.mainGridHeight)">
+                                <auxhead id="searchGridAuxHead">
+                                    <auxheader>
+                                        <span sclass="z-icon-hashtag"/>
+                                    </auxheader>
+                                    <auxheader colspan="1">
+                                        <textbox instant="true" hflex="1" value="@bind(labelsVM.filter.name)" onChange="@command('filterSearches')"/>
+                                    </auxheader>
+                                    <auxheader colspan="1">
+                                        <combobox id="filterResourcePropertyCBox" hflex="1" model="@load(labelsVM.filter.resourcePropertiesFilter)"
+                                                  selectedItem="@bind(labelsVM.filter.selectedResourcePropertyFilter)" onChange="@command('filterSearches')">
+                                            <template name="model">
+                                                <comboitem label="@load(each)"/>
+                                            </template>
+                                        </combobox>
+                                    </auxheader>
+                                    <auxheader colspan="1">
+                                        <combobox id="filterResourceTypesCBox" hflex="1" model="@load(labelsVM.filter.resourceTypesFilter)"
+                                                  selectedItem="@bind(labelsVM.filter.selectedResourceTypeFilter)" onChange="@command('filterSearches')">
+                                            <template name="model">
+                                                <comboitem label="@load(each)"/>
+                                            </template>
+                                        </combobox>
+                                    </auxheader>
+                                    <auxheader colspan="1">
+                                        <combobox id="filterResourceNamesCBox" hflex="1" model="@load(labelsVM.filter.resourceNamesFilter)"
+                                                  selectedItem="@bind(labelsVM.filter.selectedResourceNameFilter)" onChange="@command('filterSearches')">
+                                            <template name="model">
+                                                <comboitem label="@load(each)"/>
+                                            </template>
+                                        </combobox>
+                                    </auxheader>
+                                    <auxheader colspan="1">
+                                        <combobox id="filterNamespacesCBox" hflex="1" mold="rounded" model="@load(labelsVM.filter.namespacesFilter)"
+                                                  selectedItem="@bind(labelsVM.filter.selectedNamespaceFilter)" onChange="@command('filterSearches')">
+                                            <template name="model">
+                                                <comboitem label="@load(each)"/>
+                                            </template>
+                                        </combobox>
+                                    </auxheader>
+                                    <auxheader colspan="1">
+                                        <textbox instant="true" hflex="1" value="@bind(labelsVM.filter.additionalInfo)" onChange="@command('filterSearches')"/>
+                                    </auxheader>
+                                </auxhead>
+                                <columns menupopup="auto" sizable="true">
+                                    <column hflex="min" label="Id" sort="auto(id)"/>
+                                    <column hflex="3" label="Name" sort="auto(name)"/>
+                                    <column hflex="1" label="Type" sort="auto(resourceProperty)"/>
+                                    <column hflex="1" label="Resource Type" sort="auto(resourceType)"/>
+                                    <column hflex="2" label="Resource Name" sort="auto(resourceName)"/>
+                                    <column hflex="1" label="Namespace" sort="auto(namespace)"/>
+                                    <column hflex="1" label="Additional Info" sort="auto(additionalInfo)"/>
+                                </columns>
+                                <rows>
+                                    <template name="model" var="item">
+                                        <row style="cursor:pointer">
+                                            <label value="${item.id}"></label>
+                                            <label value="${item.name}" multiline="true" if="${c:length(item.name) lt 150}"></label>
+                                            <hlayout if="${c:length(item.name) ge 150}">
+                                                <label value="${c:substring(item.name, 0, c:indexOf(item.name,'='))}  =" multiline="true"></label>
+                                                <toolbarbutton label="Value ist too long. Click to see full Value" onClick="@command('showFullLabelValue', item=item)"/>
+                                            </hlayout>
+                                            <label value="${item.resourceProperty}"></label>
+                                            <label value="${item.resourceType}"></label>
+                                            <label value="${item.resourceName}"></label>
+                                            <label value="${item.namespace}"></label>
+                                            <label value="${item.additionalInfo}" multiline="true"/>
+                                        </row>
+                                    </template>
+                                </rows>
+                                <foot id="labelsFooter">
+                                    <footer id="labelsGridTotalItemsFooter" span="7" align="right" label="@load(labelsVM.totalItems)"/>
+                                </foot>
+                            </grid>
+                        </tabpanel>
+                        <tabpanel>
+                            <hbox spacing="10px" width="100%" style="padding: 0px 5px 5px 5px;">
+                                <cell width="40%">
+                                    <groupbox id="labelsGroupedListGroupBox">
+                                        <caption iconSclass="z-icon-list" label="Groups"/>
+                                        <grid id="groupedLabelsGrid" model="@load(labelsVM.groupedLabels)" height="@load(labelsVM.mainGridGroupedHeight)">
+                                            <auxhead id="groupedLabelsAuxHead">
+                                                <auxheader>
+                                                    <span sclass="z-icon-hashtag"/>
+                                                </auxheader>
+                                                <auxheader colspan="1">
+                                                    <textbox instant="true" hflex="1" value="@bind(labelsVM.groupedLabelsFilter.name)" onChange="@command('filterGroupedLabels')"/>
+                                                </auxheader>
+                                                <auxheader colspan="1">
+                                                    <textbox instant="true" hflex="1" value="@bind(labelsVM.groupedLabelsFilter.amount)" onChange="@command('filterGroupedLabels')"/>
+                                                </auxheader>
+                                            </auxhead>
+                                            <columns menupopup="auto" sizable="true">
+                                                <column hflex="min" label="Id" sort="auto(id)"/>
+                                                <column hflex="3" label="Name" sort="auto(name)"/>
+                                                <column hflex="min" label="Amount" sort="auto(amount)"/>
+                                            </columns>
+                                            <rows>
+                                                <template name="model" var="item">
+                                                    <row onClick="@command('showGroupedLabelItems', clickedItem=item)" style="cursor:pointer">
+                                                        <label value="${item.id}"></label>
+                                                        <label value="${item.name}" multiline="true" if="${c:length(item.name) lt 150}"></label>
+                                                        <hlayout if="${c:length(item.name) ge 150}">
+                                                            <label value="${c:substring(item.name, 0, c:indexOf(item.name,'='))}  =" multiline="true"></label>
+                                                            <toolbarbutton label="Value ist too long. Click to see full Value" onClick="@command('showFullGroupedLabelValue', item=item)"/>
+                                                        </hlayout>
+                                                        <label value="${item.amount}"></label>
+                                                    </row>
+                                                </template>
+                                            </rows>
+                                            <foot id="groupedLabelsFooter">
+                                                <footer id="labelsGroupedGridTotalItemsFooter" span="3" align="right" label="@load(labelsVM.totalGroupedItems)"/>
+                                            </foot>
+                                        </grid>
+                                    </groupbox>
+                                </cell>
+                                <separator hflex="1" orient="vertical"/>
+                                <cell width="60%">
+                                    <groupbox id="labelsGroupedColumnsGroupBox">
+                                        <caption iconSclass="z-icon-columns" label="@load(labelsVM.clickedLabelsGroup)"/>
+                                        <grid id="groupedLabelsColumnGrid" model="@load(labelsVM.groupedLabelColumns)" height="@load(labelsVM.mainGridGroupedHeight)">
+                                            <auxhead id="groupedLabelsColumnGridAuxHead">
+                                                <auxheader>
+                                                    <span sclass="z-icon-hashtag"/>
+                                                </auxheader>
+                                                <auxheader colspan="1">
+                                                    <combobox id="filterGLCResourcePropertyCBox" hflex="1" model="@load(labelsVM.groupedLabelColumnsFilter.resourcePropertiesFilter)"
+                                                              selectedItem="@bind(labelsVM.groupedLabelColumnsFilter.selectedResourcePropertyFilter)" onChange="@command('filterGroupedLabelsColumns')">
+                                                        <template name="model">
+                                                            <comboitem label="@load(each)"/>
+                                                        </template>
+                                                    </combobox>
+                                                </auxheader>
+                                                <auxheader colspan="1">
+                                                    <combobox id="filterGLCResourceTypesCBox" hflex="1" model="@load(labelsVM.groupedLabelColumnsFilter.resourceTypesFilter)"
+                                                              selectedItem="@bind(labelsVM.groupedLabelColumnsFilter.selectedResourceTypeFilter)" onChange="@command('filterGroupedLabelsColumns')">
+                                                        <template name="model">
+                                                            <comboitem label="@load(each)"/>
+                                                        </template>
+                                                    </combobox>
+                                                </auxheader>
+                                                <auxheader colspan="1">
+                                                    <combobox id="filterGLCResourceNamesCBox" hflex="1" model="@load(labelsVM.groupedLabelColumnsFilter.resourceNamesFilter)"
+                                                              selectedItem="@bind(labelsVM.groupedLabelColumnsFilter.selectedResourceNameFilter)" onChange="@command('filterGroupedLabelsColumns')">
+                                                        <template name="model">
+                                                            <comboitem label="@load(each)"/>
+                                                        </template>
+                                                    </combobox>
+                                                </auxheader>
+                                                <auxheader colspan="1">
+                                                    <combobox id="filterGLCNamespacesCBox" hflex="1" mold="rounded" model="@load(labelsVM.groupedLabelColumnsFilter.namespacesFilter)"
+                                                              selectedItem="@bind(labelsVM.groupedLabelColumnsFilter.selectedNamespaceFilter)" onChange="@command('filterGroupedLabelsColumns')">
+                                                        <template name="model">
+                                                            <comboitem label="@load(each)"/>
+                                                        </template>
+                                                    </combobox>
+                                                </auxheader>
+                                                <auxheader colspan="1">
+                                                    <textbox instant="true" hflex="1" value="@bind(labelsVM.groupedLabelColumnsFilter.additionalInfo)"
+                                                             onChange="@command('filterGroupedLabelsColumns')"/>
+                                                </auxheader>
+                                            </auxhead>
+                                            <columns menupopup="auto" sizable="true">
+                                                <column hflex="min" label="Id" sort="auto(id)"/>
+                                                <column hflex="1" label="Type" sort="auto(resourceProperty)"/>
+                                                <column hflex="1" label="Resource Type" sort="auto(resourceType)"/>
+                                                <column hflex="2" label="Resource Name" sort="auto(resourceName)"/>
+                                                <column hflex="1" label="Namespace" sort="auto(namespace)"/>
+                                                <column hflex="1" label="Additional Info" sort="auto(additionalInfo)"/>
+                                            </columns>
+                                            <rows>
+                                                <template name="model" var="item">
+                                                    <row style="cursor:pointer">
+                                                        <label value="${item.id}"></label>
+                                                        <label value="${item.resourceProperty}"></label>
+                                                        <label value="${item.resourceType}"></label>
+                                                        <label value="${item.resourceName}"></label>
+                                                        <label value="${item.namespace}"></label>
+                                                        <label value="${item.additionalInfo}" multiline="true"/>
+                                                    </row>
+                                                </template>
+                                            </rows>
+                                            <foot id="groupedLabelsColumnsFooter">
+                                                <footer id="groupedLabelsColumnTotalItemsFooter" span="6" align="right" label="@load(labelsVM.totalGroupedLabelsColumnsItems)"/>
+                                            </foot>
+                                        </grid>
+                                    </groupbox>
+                                </cell>
+                            </hbox>
+                        </tabpanel>
+                    </tabpanels>
+                </tabbox>
+            </center>
+        </borderlayout>
+    </div>
+    <popup id="namespacesTooltip">
+        All visible namespaces.
+    </popup>
+    <popup id="skipKubeNamespacesTooltip">
+        Skips search in pods from kube* namespace. Saves execution time.
+    </popup>
+    <popup id="skipHashLabelsTooltip">
+        Not show auto generated hash labels from Kubernetes.
+    </popup>
+
+
+</zk>

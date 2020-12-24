@@ -17,7 +17,8 @@
     <properties>
         <java.version>14</java.version>
         <zkspringboot.version>2.3.1</zkspringboot.version>
-        <zk.version>9.0.0</zk.version>
+        <!--        <zk.version>9.0.0</zk.version>-->
+        <zk.version>9.5.0.2</zk.version>
     </properties>
 
     <dependencies>
@@ -36,13 +37,33 @@
         <dependency>
             <groupId>io.kubernetes</groupId>
             <artifactId>client-java</artifactId>
-            <version>9.0.0</version>
+            <version>10.0.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.kubernetes</groupId>
+            <artifactId>client-java-extended</artifactId>
+            <version>11.0.0</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <version>3.11</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>30.1-jre</version>
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-text</artifactId>
+            <version>1.9</version>
         </dependency>
 
         <dependency>
@@ -63,35 +84,34 @@
             <version>${zk.version}</version>
         </dependency>
 
-
-        <dependency>
-            <groupId>org.zkoss.theme</groupId>
-            <artifactId>sapphire</artifactId>
-            <version>${zk.version}</version>
-        </dependency>
-
         <dependency>
             <groupId>org.zkoss.theme</groupId>
             <artifactId>breeze</artifactId>
             <version>${zk.version}</version>
         </dependency>
 
-        <!--		<dependency>-->
-        <!--			<groupId>org.zkoss.theme</groupId>-->
-        <!--			<artifactId>atlantic</artifactId>-->
-        <!--			<version>${zk.version}</version>-->
-        <!--		</dependency>-->
-        <!--		<dependency>-->
-        <!--			<groupId>org.zkoss.theme</groupId>-->
-        <!--			<artifactId>silvertail</artifactId>-->
-        <!--			<version>${zk.version}</version>-->
-        <!--		</dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.zkoss.theme</groupId>-->
+        <!--            <artifactId>sapphire</artifactId>-->
+        <!--            <version>${zk.version}</version>-->
+        <!--        </dependency>-->
 
-        <!--		<dependency>-->
-        <!--			<groupId>org.zkoss.theme</groupId>-->
-        <!--			<artifactId>iceblue_c</artifactId>-->
-        <!--			<version>${zk.version}</version>-->
-        <!--		</dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.zkoss.theme</groupId>-->
+        <!--            <artifactId>atlantic</artifactId>-->
+        <!--            <version>${zk.version}</version>-->
+        <!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.zkoss.theme</groupId>-->
+        <!--            <artifactId>silvertail</artifactId>-->
+        <!--            <version>${zk.version}</version>-->
+        <!--        </dependency>-->
+
+        <dependency>
+            <groupId>org.zkoss.theme</groupId>
+            <artifactId>iceblue_c</artifactId>
+            <version>${zk.version}</version>
+        </dependency>
 
 
     </dependencies>
@@ -102,11 +122,11 @@
             <name>ZK CE Repository</name>
             <url>http://mavensync.zkoss.org/maven2</url>
         </repository>
-<!--        <repository>-->
-<!--            <id>Maven Central</id>-->
-<!--            <name>Maven Central Repository</name>-->
-<!--            <url>https://repo1.maven.org/maven2/</url>-->
-<!--        </repository>-->
+        <!--        <repository>-->
+        <!--            <id>Maven Central</id>-->
+        <!--            <name>Maven Central Repository</name>-->
+        <!--            <url>https://repo1.maven.org/maven2/</url>-->
+        <!--        </repository>-->
     </repositories>
 
     <build>

@@ -1,0 +1,16 @@
+<window id="errorsDialog" title="Errors" width="600px" position="center,top" closable="true" action="show: slideDown;hide: slideUp">
+    An error has occurred.
+    <separator/>
+    Please send information to the developer and help make the application better. To see the stack trace, click on the error.
+    <separator/>
+    <separator bar="true"/>
+    <listbox id="errorsListbox" mold="paging" pageSize="10">
+        <listitem forEach="${arg.errors}" popup="stack_${each.hash}, position=end_before">
+            <listcell label="${each.message}">
+                <popup id="stack_${each.hash}">
+                    <label id="error_stack_label_${each.hash}" multiline="true" value="${each.stack}"/>
+                </popup>
+            </listcell>
+        </listitem>
+    </listbox>
+</window>

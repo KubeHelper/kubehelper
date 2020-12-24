@@ -1,3 +1,20 @@
+/*
+Kube Helper
+Copyright (C) 2021 JDev
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 package com.kubehelper.domain.results;
 
 import com.kubehelper.common.Resource;
@@ -5,13 +22,22 @@ import com.kubehelper.common.Resource;
 /**
  * @author JDev
  */
-public class SearchResult{
+public class SearchResult {
+    private int id;
     private String namespace = "";
     private Resource resourceType;
     private String resourceName = "";
     private String creationTime = "";
     private String additionalInfo = "";
     private String foundString = "";
+    private String fullDefinition = "";
+
+    public SearchResult() {
+    }
+
+    public SearchResult(int id) {
+        this.id = id;
+    }
 
     public String getNamespace() {
         return namespace;
@@ -64,6 +90,19 @@ public class SearchResult{
 
     public SearchResult setFoundString(String foundString) {
         this.foundString = foundString;
+        return this;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getFullDefinition() {
+        return fullDefinition;
+    }
+
+    public SearchResult setFullDefinition(String fullDefinition) {
+        this.fullDefinition = fullDefinition;
         return this;
     }
 }

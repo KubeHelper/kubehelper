@@ -1,0 +1,7 @@
+<window id="configDisplayPopup" title="${arg.title}" width="1000px" position="center,top" closable="true" action="show: slideDown;hide: slideUp">
+    <div style="overflow-y:auto;overflow-x:auto;height:1000px;font-family: Courier, Monaco, monospace;">
+        <html><![CDATA[
+            <pre><code>${arg.content}</code></pre>
+    ]]></html>
+    </div>
+</window>

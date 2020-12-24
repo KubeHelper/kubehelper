@@ -1,30 +1,64 @@
+/*
+Kube Helper
+Copyright (C) 2021 JDev
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 package com.kubehelper.domain.filters;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.zkoss.zul.ListModelList;
 
 /**
  * @author JDev
  */
 public class IpsAndPortsFilter {
-    private String namespace = "", resourceType = "", resourceName = "", creationTime = "", ip = "", hostInfo = "", ports = "", additionalInfo = "";
+    private String resourceName = "", creationTime = "", ip = "", hostInfo = "", ports = "", additionalInfo = "";
 
-    public String getNamespace() {
-        return namespace;
+    private String selectedNamespaceFilter = "";
+    private String selectedResourceTypeFilter = "";
+
+    private ListModelList<String> namespacesFilter = new ListModelList<>();
+    private ListModelList<String> resourceTypesFilter = new ListModelList<>();
+
+    public void addNamespacesFilter(String namespaceFilter) {
+        if (!namespacesFilter.contains(namespaceFilter)) {
+            namespacesFilter.add(namespaceFilter);
+        }
     }
 
-    public IpsAndPortsFilter setNamespace(String namespace) {
-        this.namespace = namespace == null ? "" : namespace.trim();
+    public void addResourceTypesFilter(String resourceTypeFilter) {
+        if (!resourceTypesFilter.contains(resourceTypeFilter)) {
+            resourceTypesFilter.add(resourceTypeFilter);
+        }
+    }
+
+    public String getSelectedNamespaceFilter() {
+        return selectedNamespaceFilter;
+    }
+
+    public IpsAndPortsFilter setSelectedNamespaceFilter(String selectedNamespaceFilter) {
+        this.selectedNamespaceFilter = selectedNamespaceFilter == null ? "" : selectedNamespaceFilter;
         return this;
     }
 
-    public String getResourceType() {
-        return resourceType;
+    public String getSelectedResourceTypeFilter() {
+        return selectedResourceTypeFilter;
     }
 
-    public IpsAndPortsFilter setResourceType(String resourceType) {
-        this.resourceType = resourceType == null ? "" : resourceType.trim();
+    public IpsAndPortsFilter setSelectedResourceTypeFilter(String selectedResourceTypeFilter) {
+        this.selectedResourceTypeFilter = selectedResourceTypeFilter == null ? "" : selectedResourceTypeFilter;
         return this;
     }
 
@@ -82,41 +116,15 @@ public class IpsAndPortsFilter {
         return this;
     }
 
+    public ListModelList<String> getNamespacesFilter() {
+        return namespacesFilter;
+    }
+
+    public ListModelList<String> getResourceTypesFilter() {
+        return resourceTypesFilter;
+    }
+
     public boolean isFilterActive() {
-        return !StringUtils.isAllBlank(namespace, resourceType, resourceName, creationTime, ip, hostInfo, ports, additionalInfo);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-
-        if (o == null || getClass() != o.getClass()) return false;
-
-        IpsAndPortsFilter that = (IpsAndPortsFilter) o;
-
-        return new EqualsBuilder()
-                .append(namespace, that.namespace)
-                .append(resourceType, that.resourceType)
-                .append(resourceName, that.resourceName)
-                .append(creationTime, that.creationTime)
-                .append(ip, that.ip)
-                .append(hostInfo, that.hostInfo)
-                .append(ports, that.ports)
-                .append(additionalInfo, that.additionalInfo)
-                .isEquals();
-    }
-
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder(17, 37)
-                .append(namespace)
-                .append(resourceType)
-                .append(resourceName)
-                .append(creationTime)
-                .append(ip)
-                .append(hostInfo)
-                .append(ports)
-                .append(additionalInfo)
-                .toHashCode();
+        return StringUtils.isNoneBlank(selectedNamespaceFilter, selectedResourceTypeFilter, resourceName, creationTime, ip, hostInfo, ports, additionalInfo);
     }
 }

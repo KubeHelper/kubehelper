@@ -1,134 +1,81 @@
-<?page id="indexPage"?>
+<?page id="indexPage" title="Kube Helper"?>
 <zk>
-    <zscript>
-        
-    </zscript>
-    <!--    <style>-->
-    <!--        .breeze .complex-layout, .breeze .complex-layout .z-south, .breeze .complex-layout .z-west {-->
-    <!--        background: #F7F7F7;-->
-    <!--        }-->
-    <!--        .z-borderlayout { background: #FFFFFF }-->
-    <!--        .complex-layout .z-north { background: #008BB6; }-->
-    <!--        .complex-layout .z-north > div { padding: 5px; }-->
-    <!--        img.complex-layout-header-img { padding: 0 10px; }-->
-    <!--        .complex-layout-header-label {-->
-    <!--        position: relative; top: -30px;-->
-    <!--        padding-left: 40px; font-size: 24px;-->
-    <!--        color: White; font-weight: bold;-->
-    <!--        }-->
-    <!--        .inner-border, .inner-border .z-north, .inner-border .z-west,-->
-    <!--        .inner-border .z-south, .inner-border .z-east { background: #FFFFFF; }-->
-    <!--        .dl-link { text-decoration: none; cursor: pointer; }-->
-    <!--    </style>-->
-    <div id="indexWindow" viewModel="@id('indexVM') @init('com.kubehelper.viewmodels.IndexVM')" height="100%" width="100%" onClientInfo="onClientInfo(event)">
-        <zscript>
-            void onClientInfo(ClientInfoEvent evt) {
-                indexVM.onClientInfoEvent(evt);
-            }
-        </zscript>
-        <borderlayout sclass="complex-layout">
-            <north size="5%" border="0" style="background: #3498DB">
-                <!--                <panel border="normal" height="100%" width="100%">-->
-                <!--                    <panelchildren>-->
-                <!--                        <image src="~./img/kubehelper-logo-256.png"/>-->
-                <!--                        <hbox height="100%" width="100%">-->
-                <!--                            <button label="Test">-->
-                <!--                            </button>-->
-                <!--                        </hbox>-->
-                <!--                    </panelchildren>-->
-                <!--                </panel>-->
-                <hbox height="100%" width="100%">
-                    <cell hflex="2" align="center" valign="middle">
-                        <label value="LOGO TODO "/>
-                        <!--                        <image style="width: 100%;height: 100%" src="~./img/kubehelper-logo-256.png"/>-->
-                    </cell>
-                    <cell hflex="8" align="center" valign="middle">
-                        <label style="color: White; font-weight: bold; font-size: 2.6em;" value="Kube Helper"/>
-                    </cell>
-                    <cell hflex="2" valign="middle" align="right">
-                        <!--                        <textbox sclass="demo-search-inp" value="@bind(vm.search)"/>-->
-                        <!--                        <button label="Search ZK Resource" onClick="@command('search')"/>-->
-                        <button iconSclass="z-icon-heartbeat" hflex="1" label="Donate" dir="reverse"/>
-                    </cell>
-                </hbox>
-
-                <!--                <div>-->
-                <!--                    <div style="float:right">-->
-                <!--                        <textbox sclass="demo-search-inp" value="@bind(vm.search)"/>-->
-                <!--                        <button label="Search ZK Resource"-->
-                <!--                                onClick="@command('search')"/>-->
-                <!--                    </div>-->
-                <!--                    <div style="float:left">-->
-                <!--                        <image style="width: 100%;max-height: 100%" src="~./img/kubehelper-logo-256.png"/>-->
-                <!--                    </div>-->
-                <!--                    <div style="float:left">-->
-                <!--                        <label sclass="complex-layout-header-label" value="Kube Helper"/>-->
-                <!--                    </div>-->
-
-                <!--                </div>-->
-            </north>
+    <div id="indexWindow" viewModel="@id('indexVM') @init('com.kubehelper.viewmodels.IndexVM')" height="100%" width="100%">
+        <borderlayout>
             <!-- Sidebar -->
-            <west title="Navigation" size="10%" maxsize="200" splittable="true" collapsible="true" autoscroll="true" margins="0,5,0,0">
+            <west title="Kube Helper" size="10%" maxsize="200" splittable="true" collapsible="true" autoscroll="true">
                 <vlayout spacing="0">
                     <panel width="100%">
+                        <panelchildren style="text-align: center;">
+                            <image src="~./img/kubehelper-logo-256.png" height="150px"/>
+                            <label value="Kube Helper" style="font-family: Courier, Monaco, monospace;font-size: 18px;font-weight: bold;color: blue;display: block;"/>
+                            <separator orient="horizontal" bar="true" style="padding: 10px;"/>
+                        </panelchildren>
+                    </panel>
+                    <panel width="100%" title="Menu" collapsible="true">
+                        <panelchildren>
+                            <toolbarbutton id="dashboardMenuBtn" hflex="1" iconSclass="z-icon-dashboard" label="&#160;Dashboard" style="text-align: left; padding-left: 2px;"
+                                           onClick="@command('switchView', modelName='dashboard')"/>
+                            <toolbarbutton id="searchMenuBtn" hflex="1" iconSclass="z-icon-search" label="&#160;Search" style="text-align: left; padding-left: 2px;"
+                                           onClick="@command('switchView', modelName='search')"/>
+                            <toolbarbutton id="ipsAndPortsMenuBtn" hflex="1" iconSclass="z-icon-cubes" label="&#160;Ips Ports" style="text-align: left; padding-left: 2px;"
+                                           onClick="@command('switchView', modelName='ipsAndPorts')"/>
+                            <toolbarbutton id="securityMenuBtn" hflex="1" iconSclass="z-icon-shield" label="&#160;Security" style="text-align: left; padding-left: 2px;"
+                                           onClick="@command('switchView', modelName='security')"/>
+                            <toolbarbutton id="labelsMenuBtn" hflex="1" iconSclass="z-icon-tags" label="&#160;Labels Annotations Selectors" style="text-align: left; padding-left: 2px;"
+                                           onClick="@command('switchView', modelName='labels')"/>
+                            <toolbarbutton id="commandsMenuBtn" hflex="1" iconSclass="z-icon-th" label="&#160;Commands" style="text-align: left; padding-left: 2px;"
+                                           onClick="@command('switchView', modelName='commands')"/>
+                            <!--                            <toolbarbutton id="auditingMenuBtn" hflex="1" iconSclass="z-icon-gears" label="&#160;Auditing" onClick="@command('switchView', modelName='auditing')"/>-->
+                            <!--                            <toolbarbutton id="featureGatesMenuBtn" hflex="1" iconSclass="z-icon-home" label="&#160;Feature Gates" onClick="@command('switchView', modelName='featureGates')"/>-->
+                            <!--                            <toolbarbutton id="customResourcesMenuBtn" hflex="1" iconSclass="z-icon-home" label="&#160;Custom Resources" onClick="@command('switchView', modelName='customResources')"/>-->
+                            <!--                            <toolbarbutton id="deprecatedMenuBtn" hflex="1" iconSclass="z-icon-home" label="&#160;Deprecated" onClick="@command('switchView', modelName='deprecated')"/>-->
+                            <!--                            <toolbarbutton id="eventsMenuBtn" hflex="1" iconSclass="z-icon-flash" label="&#160;Events" onClick="@command('switchView', modelName='events')"/>-->
+                            <!--                            <toolbarbutton id="volumesMenuBtn" hflex="1" iconSclass="z-icon-server" label="&#160;Volumes" onClick="@command('switchView', modelName='volumes')"/>-->
+                        </panelchildren>
+                    </panel>
+                    <panel width="100%" title="Kube Helper" collapsible="true">
                         <panelchildren style="padding:5px;">
-                            <toolbar>
-                                <toolbarbutton id="dashboardMenuBtn" hflex="1" disabled="true" label="Dashboard" onClick="@command('switchView', modelName='dashboard')"/>
-                                <toolbarbutton id="searchMenuBtn" hflex="1" label="Search" onClick="@command('switchView', modelName='search')"/>
-                                <toolbarbutton id="securityMenuBtn" hflex="1" label="Security" onClick="@command('switchView', modelName='security')"/>
-                                <toolbarbutton id="auditingMenuBtn" hflex="1" label="Auditing" onClick="@command('switchView', modelName='auditing')"/>
-                                <toolbarbutton id="customResourcesMenuBtn" hflex="1" label="Custom Resources" onClick="@command('switchView', modelName='customResources')"/>
-                                <toolbarbutton id="deprecatedMenuBtn" hflex="1" label="Deprecated" onClick="@command('switchView', modelName='deprecated')"/>
-                                <toolbarbutton id="eventsMenuBtn" hflex="1" label="Events" onClick="@command('switchView', modelName='events')"/>
-                                <toolbarbutton id="featuresMenuBtn" hflex="1" label="Features" onClick="@command('switchView', modelName='features')"/>
-                                <toolbarbutton id="featureGatesMenuBtn" hflex="1" label="Feature Gates" onClick="@command('switchView', modelName='featureGates')"/>
-                                <toolbarbutton id="ipsAndPortsMenuBtn" hflex="1" label="Ips and Ports" onClick="@command('switchView', modelName='ipsAndPorts')"/>
-                                <toolbarbutton id="volumesMenuBtn" hflex="1" label="Volumes" onClick="@command('switchView', modelName='volumes')"/>
-                            </toolbar>
+                            <toolbarbutton id="projectMenuBtn" hflex="1" iconSclass="z-icon-home" label="&#160;Kube Helper Project" tooltiptext="https://github.com/JWebDev/kubehelper"
+                                           href="https://github.com/JWebDev/kubehelper" target="_blank" style="text-align: left; padding-left: 2px;"/>
+                            <toolbarbutton id="enhancementRequestMenuBtn" hflex="1" iconSclass="z-icon-level-up" label="&#160;Enhancement Request" tooltiptext="https://github.com/JWebDev/kubehelper"
+                                           href="https://github.com/JWebDev/kubehelper" target="_blank" style="text-align: left; padding-left: 2px;"/>
+                            <toolbarbutton id="newFeatureRequestMenuBtn" hflex="1" iconSclass="z-icon-plus" label="&#160;New Feature Request" tooltiptext="https://github.com/JWebDev/kubehelper"
+                                           href="https://github.com/JWebDev/kubehelper" target="_blank" style="text-align: left; padding-left: 2px;"/>
+                            <toolbarbutton id="bugReportMenuBtn" hflex="1" iconSclass="z-icon-bug" label="&#160;Bug Report" tooltiptext="https://github.com/JWebDev/kubehelper"
+                                           href="https://github.com/JWebDev/kubehelper" target="_blank" style="text-align: left; padding-left: 2px;"/>
+                            <toolbarbutton id="supportRequestMenuBtn" hflex="1" iconSclass="z-icon-life-ring" label="&#160;Support Request" tooltiptext="https://github.com/JWebDev/kubehelper"
+                                           href="https://github.com/JWebDev/kubehelper" target="_blank" style="text-align: left; padding-left: 2px;"/>
+                            <toolbarbutton id="beAContributorMenuBtn" hflex="1" iconSclass="z-icon-plus-square" label="&#160;Be a contributor" style="text-align: left; padding-left: 2px;"
+                                           onClick="@command('contactDeveloper')"/>
+                            <toolbarbutton id="writeToTheAuthorMenuBtn" hflex="1" iconSclass="z-icon-envelope" label="&#160;Write to the author" style="text-align: left; padding-left: 2px;"
+                                           onClick="@command('contactDeveloper')"/>
+                            <toolbarbutton id="wikiMenuBtn" hflex="1" iconSclass="z-icon-book" label="&#160;Wiki" tooltiptext="https://github.com/JWebDev/kubehelper"
+                                           href="https://github.com/JWebDev/kubehelper" target="_blank" style="text-align: left; padding-left: 2px;"/>
+                            <toolbarbutton id="donateMenuBtn" hflex="1" iconSclass="z-icon-heartbeat" label="&#160;Donate" tooltiptext="https://github.com/JWebDev/kubehelper"
+                                           href="https://github.com/JWebDev/kubehelper" target="_blank" style="text-align: left; padding-left: 2px;"/>
+                            <toolbarbutton id="helpTheProjectMenuBtn" hflex="1" iconSclass="z-icon-star" label="&#160;Help the project => RATE US" style="text-align: left; padding-left: 2px;"
+                                           tooltiptext="https://github.com/JWebDev/kubehelper/stargazers" href="https://github.com/JWebDev/kubehelper/stargazers" target="_blank"/>
                         </panelchildren>
                     </panel>
-                    <panel width="100%" border="normal"
-                           title="Why ZK ? ">
+                    <panel width="100%">
                         <panelchildren>
-                            <html>
-                                <![CDATA[ <ul> <li>Productivity</li>
-                                <li>Security</li> <li>Performance</li>
-                                <li>Totally Control</li> <li>Auto
-                                Testing</li> <li>Scalability</li>
-                                <li>Flexibility</li> </ul> ]]>
-                            </html>
-                        </panelchildren>
-                    </panel>
-                    <panel width="100%" border="normal"
-                           title="Features">
-                        <panelchildren>
-                            <html>
-                                <![CDATA[ <ul> <li>Server+client
-                                Fusion</li> <li>Ajax-as-a-Service</li>
-                                <li>The Event Queue</li> <li>jQuery
-                                Based</li> <li>SEO Friendly</li>
-                                <li>Auto Testing</li> </ul> ]]>
-                            </html>
+                            <button iconSclass="z-icon-heartbeat" height="50px" width="100%" label="Donate" dir="reverse"
+                                    style="font-family: Courier, Monaco, monospace;font-size: 18px;font-weight: bold;"/>
                         </panelchildren>
                     </panel>
                 </vlayout>
             </west>
-            <!-- Content -->
-            <center style="overflow:auto">
-                <!--                            TODO read about difference instant or defer   - https://www.zkoss.org/wiki/ZK Component Reference/Essential Components/Include-->
+            <center>
                 <include id="templateInclude" src="@load(indexVM.pageModel.templateUrl)"/>
             </center>
-            <south size="3%" maxsize="200" style="background: none repeat scroll 0 0 ;">
-                <toolbar mold="panel" align="center">
-                    <toolbarbutton label="Sign in"/>
-                    <toolbarbutton label="Home"/>
-                    <toolbarbutton label="Sitemap"/>
-                    <toolbarbutton label="Terms"/>
-                    <toolbarbutton label="Report Abuse"/>
-                    <toolbarbutton label="Print"/>
-                    <separator orient="vertical" bar="true"/>
-                    Powered by ZK ${desktop.webApp.version} ZK
-                    Borderlayout
+            <south id="indexGlobalFooter" size="3%">
+                <toolbar align="center">
+                    <toolbarbutton id="copyrightBtn" label="@load(indexVM.footerCopyrightText)" tooltiptext="https://github.com/JWebDev/kubehelper" href="https://github.com/JWebDev/kubehelper"
+                                   target="_blank" style="font-family: Courier, Monaco, monospace;font-size: 14px;font-weight: bold;"/>
+                    <html style="vertical-align: middle">|</html>
+                    <toolbarbutton id="autorBtn" label="JDev" tooltiptext="https://github.com/JWebDev" href="https://github.com/JWebDev" target="_blank"
+                                   style="font-family: Courier, Monaco, monospace;font-size: 14px;font-weight: bold;"/>
                 </toolbar>
             </south>
         </borderlayout>

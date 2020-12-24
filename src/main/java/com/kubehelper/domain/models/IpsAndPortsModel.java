@@ -1,10 +1,26 @@
+/*
+Kube Helper
+Copyright (C) 2021 JDev
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 package com.kubehelper.domain.models;
 
 import com.kubehelper.common.Global;
+import com.kubehelper.common.KubeHelperException;
 import com.kubehelper.domain.filters.IpsAndPortsFilter;
 import com.kubehelper.domain.results.IpsAndPortsResult;
-import org.zkoss.bind.BindUtils;
-import org.zkoss.zul.ListModelList;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,16 +33,17 @@ public class IpsAndPortsModel implements PageModel {
     private String templateUrl = "~./zul/pages/ipsandports.zul";
 
     public static String NAME = Global.IPS_AND_PORTS_MODEL;
-    private int desktopWidth;
-    private int desktopHeight;
     private String selectedNamespace = "all";
     private List<String> namespaces = new ArrayList<>();
-    private ListModelList<IpsAndPortsResult> ipsAndPortsResults = new ListModelList<>();
+    private List<IpsAndPortsResult> ipsAndPortsResults = new ArrayList<>();
     private IpsAndPortsFilter filter = new IpsAndPortsFilter();
+    private List<KubeHelperException> searchExceptions = new ArrayList<>();
 
 
     public void addIpsAndPortsResult(IpsAndPortsResult ipsAndPortsResult) {
         ipsAndPortsResults.add(ipsAndPortsResult);
+        filter.addNamespacesFilter(ipsAndPortsResult.getNamespace());
+        filter.addResourceTypesFilter(ipsAndPortsResult.getResourceType());
     }
 
     public IpsAndPortsModel setNamespaces(List<String> namespaces) {
@@ -34,10 +51,13 @@ public class IpsAndPortsModel implements PageModel {
         return this;
     }
 
+    public void addSearchException(Exception exception) {
+        this.searchExceptions.add(new KubeHelperException(exception));
+    }
+
     @Override
-    public void setDesktopWithAndHeight(int width, int height) {
-        this.desktopWidth = width;
-        this.desktopHeight = height;
+    public void addException(String message, Exception exception) {
+        this.searchExceptions.add(new KubeHelperException(message, exception));
     }
 
     @Override
@@ -54,18 +74,13 @@ public class IpsAndPortsModel implements PageModel {
         return templateUrl;
     }
 
-    @Override
-    public int getDesktopWidth() {
-        return desktopWidth;
-    }
-
-    @Override
-    public int getDesktopHeight() {
-        return desktopHeight;
-    }
-
-    public ListModelList<IpsAndPortsResult> getIpsAndPortsResults() {
+    public List<IpsAndPortsResult> getIpsAndPortsResults() {
         return ipsAndPortsResults;
+    }
+
+    public IpsAndPortsModel setIpsAndPortsResults(List<IpsAndPortsResult> ipsAndPortsResults) {
+        this.ipsAndPortsResults = ipsAndPortsResults;
+        return this;
     }
 
     public IpsAndPortsFilter getFilter() {
@@ -86,8 +101,16 @@ public class IpsAndPortsModel implements PageModel {
         return this;
     }
 
-    public IpsAndPortsModel setIpsAndPortsResults(ListModelList<IpsAndPortsResult> ipsAndPortsResults) {
-        this.ipsAndPortsResults = ipsAndPortsResults;
+    public List<KubeHelperException> getSearchExceptions() {
+        return searchExceptions;
+    }
+
+    public IpsAndPortsModel setSearchExceptions(List<KubeHelperException> searchExceptions) {
+        this.searchExceptions = searchExceptions;
         return this;
+    }
+
+    public boolean hasSearchErrors() {
+        return !searchExceptions.isEmpty();
     }
 }
