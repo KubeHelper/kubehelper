@@ -107,8 +107,8 @@ public class IndexVM {
         Toolbarbutton currentMenuBtn = (Toolbarbutton) Path.getComponent("//indexPage/" + currentModelName + "MenuBtn");
         currentMenuBtn.setDisabled(false);
         clickedMenuBtn.setDisabled(true);
-        currentMenuBtn.setStyle("font-weight: normal;");
-        clickedMenuBtn.setStyle("font-weight: bold;");
+        currentMenuBtn.setStyle("text-align: left; padding-left: 2px;font-weight: normal;");
+        clickedMenuBtn.setStyle("text-align: left; padding-left: 2px;font-weight: bold;");
         currentModelName = modelName;
     }
 }

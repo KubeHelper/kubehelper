@@ -17,7 +17,8 @@
     <properties>
         <java.version>14</java.version>
         <zkspringboot.version>2.3.1</zkspringboot.version>
-        <zk.version>9.0.0</zk.version>
+        <!--        <zk.version>9.0.0</zk.version>-->
+        <zk.version>9.5.0.2</zk.version>
     </properties>
 
     <dependencies>
@@ -51,6 +52,14 @@
             <version>3.11</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>30.1-jre</version>
+        </dependency>
+
+
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-text</artifactId>
@@ -81,22 +90,22 @@
             <version>${zk.version}</version>
         </dependency>
 
-<!--        <dependency>-->
-<!--            <groupId>org.zkoss.theme</groupId>-->
-<!--            <artifactId>sapphire</artifactId>-->
-<!--            <version>${zk.version}</version>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.zkoss.theme</groupId>-->
+        <!--            <artifactId>sapphire</artifactId>-->
+        <!--            <version>${zk.version}</version>-->
+        <!--        </dependency>-->
 
-<!--        <dependency>-->
-<!--            <groupId>org.zkoss.theme</groupId>-->
-<!--            <artifactId>atlantic</artifactId>-->
-<!--            <version>${zk.version}</version>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>org.zkoss.theme</groupId>-->
-<!--            <artifactId>silvertail</artifactId>-->
-<!--            <version>${zk.version}</version>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.zkoss.theme</groupId>-->
+        <!--            <artifactId>atlantic</artifactId>-->
+        <!--            <version>${zk.version}</version>-->
+        <!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.zkoss.theme</groupId>-->
+        <!--            <artifactId>silvertail</artifactId>-->
+        <!--            <version>${zk.version}</version>-->
+        <!--        </dependency>-->
 
         <dependency>
             <groupId>org.zkoss.theme</groupId>

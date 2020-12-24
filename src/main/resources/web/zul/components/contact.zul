@@ -1,4 +1,4 @@
-<window id="contactDialog" title="Contact &quot;Kube Helper&quot; Developer" width="320px" position="center,center" closable="true" action="show: fadeIn;hide: fadeOut">
+<window id="contactDialog" title="Contact &quot;Kube Helper&quot; Developer" width="320px" position="center,center" closable="true" action="show: slideDown;hide: slideUp">
     <vbox align="center" pack="center" hflex="1" vflex="1">
         <image src="~./img/contact.png"/>
         <!--        <toolbarbutton id="contactOkCloseBtn" hflex="1" label="Ok" />-->
