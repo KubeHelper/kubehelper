@@ -30,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.zkoss.lang.Library;
 import org.zkoss.zk.ui.WebApps;
 
@@ -82,6 +83,11 @@ public class CustomConfig {
     @Bean
     public Exec getExec() throws IOException {
         return new Exec(Config.defaultClient());
+    }
+
+    @Bean
+    public BCryptPasswordEncoder passwordEncoder(){
+        return new BCryptPasswordEncoder();
     }
 
 

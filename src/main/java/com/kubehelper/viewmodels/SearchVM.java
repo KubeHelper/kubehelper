@@ -319,7 +319,7 @@ public class SearchVM implements EventListener {
         }
         if (first.isPresent()) {
             Map<String, String> parameters = Map.of("title", first.get().getFoundString(), "content", content);
-            Window window = (Window) Executions.createComponents("~./zul/components/file-display.zul", null, parameters);
+            Window window = (Window) Executions.createComponents("~./zul/kubehelper/components/file-display.zul", null, parameters);
             window.doModal();
         }
     }
@@ -330,7 +330,7 @@ public class SearchVM implements EventListener {
         Optional<SearchResult> first = searchResults.getInnerList().stream().filter(item -> item.getId() == id).findFirst();
         if (first.isPresent()) {
             Map<String, String> parameters = Map.of("title", first.get().getResourceName(), "content", first.get().getFullDefinition());
-            Window window = (Window) Executions.createComponents("~./zul/components/file-display.zul", null, parameters);
+            Window window = (Window) Executions.createComponents("~./zul/kubehelper/components/file-display.zul", null, parameters);
             window.doModal();
         }
     }
@@ -389,7 +389,7 @@ public class SearchVM implements EventListener {
             Notification.show("Found: " + searchResults.size() + " items", "info", searchGridTotalItemsFooter, "before_end", 2000);
         }
         if (isSearchButtonPressed && searchModel.hasSearchErrors()) {
-            Window window = (Window) Executions.createComponents("~./zul/components/errors.zul", null, Map.of("errors", searchModel.getSearchExceptions()));
+            Window window = (Window) Executions.createComponents("~./zul/kubehelper/components/errors.zul", null, Map.of("errors", searchModel.getSearchExceptions()));
             window.doModal();
             searchModel.setSearchExceptions(new ArrayList<>());
         }

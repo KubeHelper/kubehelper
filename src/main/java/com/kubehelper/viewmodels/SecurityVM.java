@@ -367,21 +367,21 @@ public class SecurityVM {
     @Command
     public void showRoleFullDefinition(@BindingParam("item") RoleResult item) {
         Map<String, String> parameters = Map.of("title", item.getResourceName(), "content", item.getFullDefinition());
-        Window window = (Window) Executions.createComponents("~./zul/components/file-display.zul", null, parameters);
+        Window window = (Window) Executions.createComponents("~./zul/kubehelper/components/file-display.zul", null, parameters);
         window.doModal();
     }
 
     @Command
     public void showRoleRuleFullDefinition(@BindingParam("item") RoleRuleResult item) {
         Map<String, String> parameters = Map.of("title", String.valueOf(item.getId()), "content", item.getFullDefinition());
-        Window window = (Window) Executions.createComponents("~./zul/components/file-display.zul", null, parameters);
+        Window window = (Window) Executions.createComponents("~./zul/kubehelper/components/file-display.zul", null, parameters);
         window.doModal();
     }
 
     @Command
     public void showPodSecurityContextFullDefinition(@BindingParam("item") PodSecurityContextResult item) {
         Map<String, String> parameters = Map.of("title", String.valueOf(item.getId()), "content", item.getFullDefinition());
-        Window window = (Window) Executions.createComponents("~./zul/components/file-display.zul", null, parameters);
+        Window window = (Window) Executions.createComponents("~./zul/kubehelper/components/file-display.zul", null, parameters);
         window.doModal();
     }
 
@@ -389,21 +389,21 @@ public class SecurityVM {
     public void showContainerSecurityContextFullDefinition(@BindingParam("item") ContainerSecurityResult item) {
         String title = item.getPodName() + " [ " + item.getResourceName() + " ]";
         Map<String, String> parameters = Map.of("title", title, "content", item.getFullDefinition());
-        Window window = (Window) Executions.createComponents("~./zul/components/file-display.zul", null, parameters);
+        Window window = (Window) Executions.createComponents("~./zul/kubehelper/components/file-display.zul", null, parameters);
         window.doModal();
     }
 
     @Command
     public void showServiceAccountFullDefinition(@BindingParam("item") ServiceAccountResult item) {
         Map<String, String> parameters = Map.of("title", item.getResourceName(), "content", item.getFullDefinition());
-        Window window = (Window) Executions.createComponents("~./zul/components/file-display.zul", null, parameters);
+        Window window = (Window) Executions.createComponents("~./zul/kubehelper/components/file-display.zul", null, parameters);
         window.doModal();
     }
 
     @Command
     public void showPodSecurityPolicyFullDefinition(@BindingParam("item") PodSecurityPoliciesResult item) {
         Map<String, String> parameters = Map.of("title", String.valueOf(item.getResourceName()), "content", item.getFullDefinition());
-        Window window = (Window) Executions.createComponents("~./zul/components/file-display.zul", null, parameters);
+        Window window = (Window) Executions.createComponents("~./zul/kubehelper/components/file-display.zul", null, parameters);
         window.doModal();
     }
 
@@ -425,7 +425,7 @@ public class SecurityVM {
             Notification.show("Found: " + results.size() + " items", "info", footer, "before_end", 2000);
         }
         if (pressedButton && securityModel.hasSearchErrors()) {
-            Window window = (Window) Executions.createComponents("~./zul/components/errors.zul", null, Map.of("errors", securityModel.getSearchExceptions()));
+            Window window = (Window) Executions.createComponents("~./zul/kubehelper/components/errors.zul", null, Map.of("errors", securityModel.getSearchExceptions()));
             window.doModal();
             securityModel.setSearchExceptions(new ArrayList<>());
         }

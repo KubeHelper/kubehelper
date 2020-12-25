@@ -247,7 +247,7 @@ public class CommandsVM implements EventListener<Event> {
             Notification.show("Found: " + commandsResults.size() + " items", "info", commandsGridFooter, "before_end", 2000);
         }
         if (isOnInit && commandsModel.hasBuildErrors()) {
-            Window window = (Window) Executions.createComponents("~./zul/components/errors.zul", null, Map.of("errors", commandsModel.getBuildExceptions()));
+            Window window = (Window) Executions.createComponents("~./zul/kubehelper/components/errors.zul", null, Map.of("errors", commandsModel.getBuildExceptions()));
             window.doModal();
             commandsModel.setBuildExceptions(new ArrayList<>());
         }
@@ -263,7 +263,7 @@ public class CommandsVM implements EventListener<Event> {
 //            Notification.show("Found: " + commandsResults.size() + " items", "info", commandOutputGridFooter, "before_end", 2000);
 //        }
 //        if (isRunButtonPressed && commandsModel.hasBuildErrors()) {
-//            Window window = (Window) Executions.createComponents("~./zul/components/errors.zul", null, Map.of("errors", commandsModel.getBuildExceptions()));
+//            Window window = (Window) Executions.createComponents("~./zul/kubehelper/components/errors.zul", null, Map.of("errors", commandsModel.getBuildExceptions()));
 //            window.doModal();
 //        }
         isRunButtonPressed = false;

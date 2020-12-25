@@ -92,13 +92,13 @@ public class IndexVM {
 
     @Command()
     public void contactDeveloper() {
-        Window window = (Window) Executions.createComponents("~./zul/components/contact.zul", null, null);
+        Window window = (Window) Executions.createComponents("~./zul/kubehelper/components/contact.zul", null, null);
         window.doModal();
     }
 
     public String getFooterCopyrightText() {
         int year = LocalDate.now().getYear();
-        String currentYear = year > 2020 ? "2020-" + String.valueOf(year) : String.valueOf(year);
+        String currentYear = year > 2020 ? "2020-" + year : String.valueOf(year);
         return "Copyright © " + currentYear + ", Kube Helper";
     }
 

@@ -32,7 +32,7 @@ import java.util.Map;
  */
 public class CommandsModel implements PageModel {
 
-    private String templateUrl = "~./zul/pages/commands.zul";
+    private String templateUrl = "~./zul/kubehelper/pages/commands.zul";
 
 //    private String userCommandsPath = "C:\\temp\\kubehelper";
         private String userCommandsPath = "/tmp/kubehelper";

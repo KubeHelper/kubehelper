@@ -37,7 +37,7 @@ import java.util.Map;
  */
 public class LabelsModel implements PageModel {
 
-    private String templateUrl = "~./zul/pages/labels.zul";
+    private String templateUrl = "~./zul/kubehelper/pages/labels.zul";
     public static String NAME = Global.LABELS_MODEL;
     private String selectedNamespace = "all";
     private List<String> namespaces = new ArrayList<>();

@@ -206,7 +206,7 @@ public class IpsAndPortsVM {
             Notification.show("Found: " + ipsAndPortsResults.size() + " items", "info", ipsAndPortsGridFooter, "before_end", 2000);
         }
         if (isGetButtonPressed && ipsAndPortsModel.hasSearchErrors()) {
-            Window window = (Window) Executions.createComponents("~./zul/components/errors.zul", null, Map.of("errors", ipsAndPortsModel.getSearchExceptions()));
+            Window window = (Window) Executions.createComponents("~./zul/kubehelper/components/errors.zul", null, Map.of("errors", ipsAndPortsModel.getSearchExceptions()));
             window.doModal();
             ipsAndPortsModel.setSearchExceptions(new ArrayList<>());
         }

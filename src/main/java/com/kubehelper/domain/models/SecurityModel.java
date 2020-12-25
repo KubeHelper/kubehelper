@@ -41,7 +41,7 @@ import java.util.Optional;
  */
 public class SecurityModel implements PageModel {
 
-    private String templateUrl = "~./zul/pages/security.zul";
+    private String templateUrl = "~./zul/kubehelper/pages/security.zul";
     public static String NAME = Global.SECURITY_MODEL;
 
     private String selectedRolesNamespace = "all";

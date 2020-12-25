@@ -11,6 +11,7 @@
                                     orient="vertical"/>
                             <toolbarbutton
                                     label="Project Calendar"/>
+                            <a href="/logout">logout</a>
                         </div>
                     </row>
                 </rows>

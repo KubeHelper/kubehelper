@@ -31,7 +31,7 @@ import java.util.List;
  */
 public class SearchModel implements PageModel {
 
-    private String templateUrl = "~./zul/pages/search.zul";
+    private String templateUrl = "~./zul/kubehelper/pages/search.zul";
     public static String NAME = Global.SEARCH_MODEL;
     private String selectedNamespace = "all";
     private List<String> namespaces = new ArrayList<>();

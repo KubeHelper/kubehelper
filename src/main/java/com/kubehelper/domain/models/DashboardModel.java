@@ -24,7 +24,7 @@ import com.kubehelper.common.Global;
  */
 public class DashboardModel implements PageModel {
 
-    private String templateUrl = "~./zul/pages/dashboard.zul";
+    private String templateUrl = "~./zul/kubehelper/pages/dashboard.zul";
     public static String NAME = Global.DASHBOARD_MODEL;
 
     @Override

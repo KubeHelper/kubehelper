@@ -395,7 +395,7 @@ public class LabelsVM implements EventListener {
      */
     private void showDetailWindow(String name) {
         Map<String, String> parameters = Map.of("title", name.substring(0, name.indexOf("=")), "content", name.substring(name.indexOf("=") + 1));
-        Window window = (Window) Executions.createComponents("~./zul/components/file-display.zul", null, parameters);
+        Window window = (Window) Executions.createComponents("~./zul/kubehelper/components/file-display.zul", null, parameters);
         window.doModal();
     }
 
@@ -491,7 +491,7 @@ public class LabelsVM implements EventListener {
             Notification.show("Found: " + searchResults.size() + " items", "info", labelsGridTotalItemsFooter, "before_end", 2000);
         }
         if (isSearchButtonPressed && labelsModel.hasSearchErrors()) {
-            Window window = (Window) Executions.createComponents("~./zul/components/errors.zul", null, Map.of("errors", labelsModel.getSearchExceptions()));
+            Window window = (Window) Executions.createComponents("~./zul/kubehelper/components/errors.zul", null, Map.of("errors", labelsModel.getSearchExceptions()));
             window.doModal();
             labelsModel.setSearchExceptions(new ArrayList<>());
         }
