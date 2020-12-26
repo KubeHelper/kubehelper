@@ -1,12 +1,7 @@
 # These are supported funding model platforms https://docs.github.com/en/free-pro-team@latest/github/administering-a-repository/displaying-a-sponsor-button-in-your-repository
 
 github: JWebDev
-patreon: kube-helper
-open_collective: kube-helper
-ko_fi: kube-helper
-tidelift: kubernetes/kube-helper
-community_bridge: kube-helper
+ko_fi: kubehelper
 liberapay: kube-helper
 issuehunt: kube-helper
-otechie: kube-helper
-custom: [developer.paypal.com, other.paypal.com]
+custom: [paypal.me/kubehelper]
