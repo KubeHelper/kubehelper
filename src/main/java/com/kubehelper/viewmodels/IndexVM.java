@@ -102,6 +102,12 @@ public class IndexVM {
         return "Copyright © " + currentYear + ", Kube Helper";
     }
 
+    @Command()
+    public void donate() {
+        Window window = (Window) Executions.createComponents("~./zul/kubehelper/components/donations.zul", null, null);
+        window.doModal();
+    }
+
     private void enableDisableMenuItem(String modelName) {
         Toolbarbutton clickedMenuBtn = (Toolbarbutton) Path.getComponent("//indexPage/" + modelName + "MenuBtn");
         Toolbarbutton currentMenuBtn = (Toolbarbutton) Path.getComponent("//indexPage/" + currentModelName + "MenuBtn");

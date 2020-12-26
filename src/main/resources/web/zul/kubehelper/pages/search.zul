@@ -1,4 +1,27 @@
 <zk>
+    <style>
+        .z-auxheader{
+        background-color:#326ce5;
+        border-left:1px solid #f68f2a;
+        border-bottom:1px solid #f68f2a;
+        padding:0;
+        position:relative;
+        overflow:hidden;
+        white-space:nowrap
+        }
+        .z-column{
+        background: #326ce5;
+        border-left: 1px solid #f68f2a;
+        border-bottom: 1px solid #f68f2a;
+        padding:0;
+        position:relative;
+        overflow:hidden;
+        white-space:nowrap;
+        }
+<!--        .z-column-hover .z-column-content{-->
+<!--        background: #FFFFFF;-->
+<!--        }-->
+    </style>
     <div id="searchTemplate" viewModel="@id('searchVM') @init('com.kubehelper.viewmodels.SearchVM')" width="100%" height="100%">
         <borderlayout>
             <north title="Search" collapsible="true">

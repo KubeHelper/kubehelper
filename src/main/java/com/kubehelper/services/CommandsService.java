@@ -57,17 +57,17 @@ public class CommandsService {
     private String predefinedCommandsPath = "/templates/features/commands.kh";
 
     @Autowired
-    private KubeAPI kubeAPI;
+    private CommonService commonService;
 
     public void parsePredefinedCommands(CommandsModel commandsModel) {
-//        KubectlExec exec = Kubectl.exec();
 
         try {
-            File predefinedCommands = new File(this.getClass().getResource(predefinedCommandsPath).toURI());
+//            TODO add read predefined commands to postConstruct, as in IpsAndModels
+            File predefinedCommands = commonService.getResourcesAsFileByPath(predefinedCommandsPath);
             List<String> lines = Files.readLines(predefinedCommands, Charset.forName("UTF-8"));
             parsePredefinedCommandsFromLines(lines, commandsModel);
             initPredefinedCommands(commandsModel, predefinedCommands);
-        } catch (IOException | URISyntaxException e) {
+        } catch (IOException e) {
             commandsModel.addParseException(e);
             logger.error(e.getMessage(), e);
         }

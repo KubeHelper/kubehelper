@@ -1,0 +1,33 @@
+<window id="donationsPopup" title="Many Thanks for Your Donation!" width="273px" position="center,top" closable="true" action="show: slideDown;hide: slideUp">
+    <div>
+        <vbox>
+            <separator focus="true" orient="horizontal"/>
+            <hlayout>
+                <image src="~./img/kube-helper-512.png" height="50px" width="50px"/>
+                <toolbarbutton width="200px" height="50px" iconSclass="z-icon-heartbeat" label="&#160;Paypal"
+                               style="font-size: 20px;font-family: Courier, Monaco, monospace;" href="https://www.paypal.com/" target="_blank"/>
+            </hlayout>
+            <hlayout>
+                <image src="~./img/kube-helper-512.png" height="50px" width="50px"/>
+                <toolbarbutton width="200px" height="50px" iconSclass="z-icon-heartbeat" label="&#160;Paypal"
+                               style="font-size: 20px;font-family: Courier, Monaco, monospace;" href="https://www.paypal.com/" target="_blank"/>
+            </hlayout>
+            <hlayout>
+                <image src="~./img/kube-helper-512.png" height="50px" width="50px"/>
+                <toolbarbutton width="200px" height="50px" iconSclass="z-icon-heartbeat" label="&#160;Paypal"
+                               style="font-size: 20px;font-family: Courier, Monaco, monospace;" href="https://www.paypal.com/" target="_blank"/>
+            </hlayout>
+            <hlayout>
+                <image src="~./img/kube-helper-512.png" height="50px" width="50px"/>
+                <toolbarbutton width="200px" height="50px" iconSclass="z-icon-heartbeat" label="&#160;Paypal"
+                               style="font-size: 20px;font-family: Courier, Monaco, monospace;" href="https://www.paypal.com/" target="_blank"/>
+            </hlayout>
+            <hlayout>
+                <image src="~./img/kube-helper-512.png" height="50px" width="50px"/>
+                <toolbarbutton width="200px" height="50px" iconSclass="z-icon-heartbeat" label="&#160;Paypal"
+                               style="font-size: 20px;font-family: Courier, Monaco, monospace;" href="https://www.paypal.com/" target="_blank"/>
+            </hlayout>
+            <separator orient="horizontal"/>
+        </vbox>
+    </div>
+</window>

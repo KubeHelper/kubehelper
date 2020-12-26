@@ -21,7 +21,17 @@ import com.kubehelper.common.Global;
 import com.kubehelper.domain.models.DashboardModel;
 import com.kubehelper.services.CommonService;
 import com.kubehelper.services.DashboardService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.zkoss.bind.BindUtils;
+import org.zkoss.bind.annotation.AfterCompose;
+import org.zkoss.bind.annotation.ContextParam;
+import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.Init;
+import org.zkoss.zk.ui.Component;
+import org.zkoss.zk.ui.event.AfterSizeEvent;
+import org.zkoss.zk.ui.select.Selectors;
+import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zkplus.spring.DelegatingVariableResolver;
@@ -31,6 +41,10 @@ import org.zkoss.zkplus.spring.DelegatingVariableResolver;
  */
 @VariableResolver(DelegatingVariableResolver.class)
 public class DashboardVM {
+
+    private static Logger logger = LoggerFactory.getLogger(DashboardVM.class);
+
+    private int centerLayoutHeight = 700;
 
     private DashboardModel dashboardModel;
 
@@ -44,6 +58,19 @@ public class DashboardVM {
     @Init
     public void init() {
         dashboardModel = (DashboardModel) Global.ACTIVE_MODELS.computeIfAbsent(Global.DASHBOARD_MODEL, (k) -> Global.NEW_MODELS.get(Global.DASHBOARD_MODEL));
+        dashboardService.showDashboard();
+    }
+
+    @AfterCompose
+    public void afterCompose(@ContextParam(ContextType.VIEW) Component view) {
+        Selectors.wireComponents(view, this, false);
+        Selectors.wireEventListeners(view, this);
+    }
+
+    @Listen("onAfterSize=#centerLayoutIpsAndPortsID")
+    public void onAfterSizeCenter(AfterSizeEvent event) {
+        centerLayoutHeight = event.getHeight() - 3;
+        BindUtils.postNotifyChange(null, null, this, ".");
     }
 
 }

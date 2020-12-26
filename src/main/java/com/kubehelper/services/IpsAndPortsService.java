@@ -17,7 +17,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package com.kubehelper.services;
 
-import com.google.common.io.Files;
 import com.kubehelper.common.KubeAPI;
 import com.kubehelper.common.Resource;
 import com.kubehelper.domain.models.IpsAndPortsModel;
@@ -35,10 +34,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -56,12 +54,18 @@ public class IpsAndPortsService {
 
     private static Logger logger = LoggerFactory.getLogger(IpsAndPortsService.class);
 
-    private final String podDetailsTemplate;
-    private final String serviceDetailsTemplate;
-    private final String containerDetailsTemplate;
+    private String podDetailsTemplate;
+    private String serviceDetailsTemplate;
+    private String containerDetailsTemplate;
 
     @Autowired
     private KubeAPI kubeAPI;
+
+    @Autowired
+    private CommonService commonService;
+
+    public IpsAndPortsService() {
+    }
 
     /**
      * Constructor initializes templates for the detail view.
@@ -69,10 +73,12 @@ public class IpsAndPortsService {
      * @throws URISyntaxException
      * @throws IOException
      */
-    public IpsAndPortsService() throws URISyntaxException, IOException {
-        podDetailsTemplate = Files.asCharSource(new File(this.getClass().getResource("/templates/ips-and-ports/pod-details.html").toURI()), Charset.forName("UTF-8")).read();
-        serviceDetailsTemplate = Files.asCharSource(new File(this.getClass().getResource("/templates/ips-and-ports/service-details.html").toURI()), Charset.forName("UTF-8")).read();
-        containerDetailsTemplate = Files.asCharSource(new File(this.getClass().getResource("/templates/ips-and-ports/container-details.html").toURI()), Charset.forName("UTF-8")).read();
+    @PostConstruct
+    private void postConstruct() {
+        podDetailsTemplate = commonService.getResourcesAsStringByPath("/templates/ips-and-ports/pod-details.html");
+
+        serviceDetailsTemplate = commonService.getResourcesAsStringByPath("/templates/ips-and-ports/service-details.html");
+        containerDetailsTemplate = commonService.getResourcesAsStringByPath("/templates/ips-and-ports/container-details.html");
     }
 
 

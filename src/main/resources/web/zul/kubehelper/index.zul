@@ -7,7 +7,7 @@
                 <vlayout width="100%" height="100%">
                     <vbox height="80%">
                         <image src="~./img/kube-helper-512.png" style="max-height: 100%;max-width:100%;"/>
-<!--                        <separator orient="horizontal" style="padding: 0 0 5px 0;"/>-->
+                        <!--                        <separator orient="horizontal" style="padding: 0 0 5px 0;"/>-->
                         <panel width="100%" title="Menu" collapsible="true">
                             <panelchildren>
                                 <toolbarbutton id="dashboardMenuBtn" hflex="1" iconSclass="z-icon-dashboard" label="&#160;Dashboard" style="text-align: left; padding-left: 2px;"
@@ -58,7 +58,7 @@
                         <panel width="100%">
                             <panelchildren>
                                 <button iconSclass="z-icon-heartbeat" height="50px" width="100%" label="Donate" dir="reverse"
-                                        style="font-family: Courier, Monaco, monospace;font-size: 18px;font-weight: bold;"/>
+                                        style="font-family: Courier, Monaco, monospace;font-size: 18px;font-weight: bold;" onClick="@command('donate')"/>
                             </panelchildren>
                         </panel>
                     </vbox>
