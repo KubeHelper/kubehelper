@@ -18,6 +18,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package com.kubehelper.domain.models;
 
 import com.kubehelper.common.Global;
+import com.kubehelper.domain.results.ClusterResult;
+import com.kubehelper.domain.results.NodeResult;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author JDev
@@ -26,6 +31,13 @@ public class DashboardModel implements PageModel {
 
     private String templateUrl = "~./zul/kubehelper/pages/dashboard.zul";
     public static String NAME = Global.DASHBOARD_MODEL;
+
+    private ClusterResult clusterResult = new ClusterResult();
+    private List<NodeResult> nodesResults = new ArrayList<>();
+
+    public void addNodeResult(NodeResult nodeResult){
+        this.nodesResults.add(nodeResult);
+    }
 
     @Override
     public String getTemplateUrl() {
@@ -39,5 +51,18 @@ public class DashboardModel implements PageModel {
 
     @Override
     public void addException(String message, Exception exception) {
+    }
+
+    public ClusterResult getClusterResult() {
+        return clusterResult;
+    }
+
+    public DashboardModel setClusterResult(ClusterResult clusterResult) {
+        this.clusterResult = clusterResult;
+        return this;
+    }
+
+    public List<NodeResult> getNodesResults() {
+        return nodesResults;
     }
 }

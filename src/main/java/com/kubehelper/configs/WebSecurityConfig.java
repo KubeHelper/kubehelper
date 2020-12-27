@@ -28,6 +28,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.savedrequest.NullRequestCache;
 
 /**
  * https://github.com/zkoss/zkspringboot/tree/master/zkspringboot-demos/zkspringboot-security-demo
@@ -40,6 +41,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private static final String ZUL_FILES = "/zkau/web/**/*.zul";
     private static final String[] ZK_RESOURCES = {
             "/zkau/web/**/js/**",
+            "/zkau/web/**/css/**",
+            "/zkau/web/**/webfonts/**",
             "/zkau/web/**/zul/css/**",
             "/zkau/web/**/font/**",
             "/zkau/web/**/img/**"
@@ -73,6 +76,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .logout().logoutUrl("/logout").logoutSuccessUrl("/home")
                 .invalidateHttpSession(true)
                 .deleteCookies("JSESSIONID");
+        http.requestCache().requestCache(new NullRequestCache()); //Disable SpringSecurity's SavedRequest
     }
 
     @Override

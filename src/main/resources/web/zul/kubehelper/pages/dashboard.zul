@@ -1,20 +1,80 @@
-<zk>
-    <div id="dashboardTemplate" viewModel="@id('dashboardVM') @init('com.kubehelper.viewmodels.DashboardVM')" width="100%" height="100%">
-        <panel title="Dashboard" height="100%">
-            <panelchildren>
-                <grid style="border:0;">
-                    <rows>
-                        <row>
-                            <div>
-                                <separator
-                                        orient="vertical"/>
-                                <toolbarbutton
-                                        label="Project Calendar"/>
+<zk xmlns:n="native">
+    <div id="dashboardTemplate" viewModel="@id('dashboardVM') @init('com.kubehelper.viewmodels.DashboardVM')" width="100%" height="100%"
+         style="overflow-y:auto;overflow-x:auto;font-family: Courier, Monaco, monospace;">
+        <vlayout id="mainDashboardVLayout">
+            <panel title="Cluster Info" width="100%" collapsible="true">
+                <panelchildren>
+                    <hbox width="100%" spacing="1px" pack="stretch" style="box-shadow: 5px 10px 15px #E4F4FF;padding: 5px">
+                        <cell width="16%">
+                            <div sclass="infobox infobox-green" width="100%">
+                                <span sclass="infobox-icon">
+                                    <span zclass="z-icon-server"/>
+                                </span>
+                                <div sclass="infobox-data">
+                                    <label value="@load(dashboardVM.clusterResult.totalNodes)" sclass="infobox-data-number"/>
+                                    <div sclass="infobox-content">Total cluster nodes</div>
+                                </div>
                             </div>
-                        </row>
-                    </rows>
-                </grid>
-            </panelchildren>
-        </panel>
+                        </cell>
+                        <cell width="16%">
+                            <div class="infobox infobox-blue2" width="100%">
+                                <span sclass="infobox-icon">
+                                    <span zclass="z-icon-flask"/>
+                                </span>
+                                <div class="infobox-data">
+                                    <label value="@load(dashboardVM.clusterResult.totalMemory)" sclass="infobox-data-number"/>
+                                    <div sclass="infobox-content">Total cluster memory</div>
+                                </div>
+                            </div>
+                        </cell>
+                        <cell width="16%">
+                            <div sclass="infobox infobox-pink" width="100%">
+                                <span sclass="infobox-icon">
+                                    <span zclass="z-icon-shopping-cart"/>
+                                </span>
+                                <div sclass="infobox-data">
+                                    <label value="@load(dashboardVM.clusterResult.totalCpus)" sclass="infobox-data-number"/>
+                                    <div sclass="infobox-content">Total cluster cpu-s</div>
+                                </div>
+                            </div>
+                        </cell>
+                        <cell width="16%">
+                            <div class="infobox infobox-red" width="100%">
+                                <span sclass="infobox-icon">
+                                    <span zclass="z-icon-flask"/>
+                                </span>
+                                <div class="infobox-data">
+                                    <label value="@load(dashboardVM.clusterResult.totalCpusTime)" sclass="infobox-data-number"/>
+                                    <div sclass="infobox-content">Total Cpu Time</div>
+                                </div>
+                            </div>
+                        </cell>
+                        <cell width="16%">
+                            <div class="infobox infobox-orange" width="100%">
+                                <span sclass="infobox-icon">
+                                    <span zclass="z-icon-flask"/>
+                                </span>
+                                <div class="infobox-data">
+                                    <label value="@load(dashboardVM.clusterResult.totalHdd)" sclass="infobox-data-number"/>
+                                    <div sclass="infobox-content">Total HDD</div>
+                                </div>
+                            </div>
+                        </cell>
+                        <cell width="16%">
+                            <div class="infobox infobox-blue" width="100%">
+                                <span sclass="infobox-icon">
+                                    <span zclass="z-icon-flask"/>
+                                </span>
+                                <div class="infobox-data">
+                                    <label value="@load(dashboardVM.clusterResult.totalPods)" sclass="infobox-data-number"/>
+                                    <div sclass="infobox-content">Total pods real/possible</div>
+                                </div>
+                            </div>
+                        </cell>
+                    </hbox>
+                    <separator orient="horizontal"/>
+                </panelchildren>
+            </panel>
+        </vlayout>
     </div>
 </zk>
