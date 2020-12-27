@@ -406,13 +406,11 @@ public class KubeAPI {
     }
 
 
-    public V1NodeList getV1NodesList(String selectedNamespace, PageModel model) {
+    public V1NodeList getV1NodesList(PageModel model) {
         try {
-            if ("all".equals(selectedNamespace)) {
-                return apiV1.listNode(null, null, null, null, null, null, null, null, null);
-            }
+            return apiV1.listNode(null, null, null, null, null, null, null, null, null);
         } catch (ApiException e) {
-            String errorMessage = String.format("Error at getV1NodesList: namespace=%s. Message: %s", selectedNamespace, e.getMessage());
+            String errorMessage = String.format("Error at getV1NodesList: Message: %s", e.getMessage());
             model.addException(errorMessage, e);
             logger.error(errorMessage, e);
         }
