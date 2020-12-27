@@ -1,4 +1,6 @@
 <?page id="indexPage" title="Kube Helper"?>
+<?link href="~./css/dashboard.css" rel="stylesheet" type="text/css"?>
+<!--<?link href="~./css/all.css" rel="stylesheet" type="text/css"?>-->
 <zk>
     <div id="indexWindow" viewModel="@id('indexVM') @init('com.kubehelper.viewmodels.IndexVM')" height="100%" width="100%">
         <borderlayout>
