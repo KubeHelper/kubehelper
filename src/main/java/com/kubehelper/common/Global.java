@@ -40,10 +40,8 @@ public class Global {
     public static String COMMANDS_MODEL = "commands";
     public static String IPS_AND_PORTS_MODEL = "ipsAndPorts";
 
-    public static String GIT_URL = "";
-    public static String GIT_USERNAME = "";
-    public static String GIT_PASSWORD = "";
-    public static Boolean MARK_CREDENTIALS = true;
+    public static String AUTH_EXCEPTION_MESSAGE = "";
+    public static String PATH_TO_RAW_RESOURCE_ZUL = "~./zul/kubehelper/components/raw-resource.zul";
 
 
     public static Map<String, PageModel> ACTIVE_MODELS = new HashMap<>() {

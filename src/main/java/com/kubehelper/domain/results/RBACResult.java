@@ -117,7 +117,7 @@ public class RBACResult {
     }
 
     public String getResourceType() {
-        return Resource.getValueByKey(resourceType.name());
+        return resourceType.getKind();
     }
 
     public RBACResult setResourceType(Resource resourceType) {

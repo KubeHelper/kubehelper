@@ -22,7 +22,7 @@ import com.kubehelper.common.Resource;
 /**
  * @author JDev
  */
-public class IpsAndPortsResult{
+public class IpsAndPortsResult {
     private int id;
     private String namespace = "";
     private Resource resourceType;
@@ -60,7 +60,7 @@ public class IpsAndPortsResult{
     }
 
     public String getResourceType() {
-        return Resource.getValueByKey(resourceType.name());
+        return resourceType.getKind();
     }
 
     public IpsAndPortsResult setResourceType(Resource resourceType) {

@@ -17,12 +17,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package com.kubehelper.services;
 
+import bsh.commands.dir;
 import com.google.common.io.Files;
-import com.kubehelper.common.KubeAPI;
 import com.kubehelper.common.KubectlHelper;
 import com.kubehelper.common.Operation;
 import com.kubehelper.domain.models.CommandsModel;
 import com.kubehelper.domain.results.CommandsResult;
+import io.fabric8.kubernetes.client.DefaultKubernetesClient;
+import io.fabric8.kubernetes.client.KubernetesClient;
 import io.kubernetes.client.extended.kubectl.KubectlGet;
 import io.kubernetes.client.extended.kubectl.exception.KubectlException;
 import org.apache.commons.io.FileUtils;
@@ -34,11 +36,11 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
@@ -55,6 +57,8 @@ public class CommandsService {
 
     private static Logger logger = LoggerFactory.getLogger(CommandsService.class);
     private String predefinedCommandsPath = "/templates/features/commands.kh";
+
+    private KubernetesClient fabric8Client = new DefaultKubernetesClient();
 
     @Autowired
     private CommonService commonService;
@@ -74,14 +78,46 @@ public class CommandsService {
     }
 
     public void run(CommandsModel commandsModel) {
-        try {
-            KubectlGet pods = KubectlHelper.getKubectlGet("pods");
-            List name = pods.namespace("spark").execute();
-            name.size();
-        } catch (IOException | KubectlException e) {
-            commandsModel.addException("Error" + e.getMessage(), e);
-            logger.error(e.getMessage(), e);
-        }
+//        try {
+        String commandOutput = commonService.executeCommand(commandsModel.getCommandToExecute());
+        commandsModel.setExecutedCommandOutput(commandOutput);
+        fetchResourcesDependsOnNamespace(commandsModel);
+//            KubectlGet pods = KubectlHelper.getKubectlGet("pods");
+//            List name = pods.namespace("spark").execute();
+//            name.size();
+//        } catch (IOException | KubectlException e) {
+//            commandsModel.addException("Error" + e.getMessage(), e);
+//            logger.error(e.getMessage(), e);
+//        }
+    }
+
+    private Set<String> namespaces = new HashSet<>();
+    private Set<String> namespacedPods = new HashSet<>();
+    private Set<String> namespacedDeployments = new HashSet<>();
+    private Set<String> namespacedStatefulSets = new HashSet<>();
+    private Set<String> namespacedReplicaSets = new HashSet<>();
+    private Set<String> namespacedDaemonSets = new HashSet<>();
+    private Set<String> namespacedConfigMaps = new HashSet<>();
+    private Set<String> namespacedServices = new HashSet<>();
+    private Set<String> namespacedJobs = new HashSet<>();
+
+    public void fetchResourcesDependsOnNamespace(CommandsModel model) {
+        model.setNamespacedPods(fabric8Client.pods().inNamespace(model.getSelectedNamespace())
+                .list().getItems().stream().map(item -> item.getMetadata().getName()).collect(Collectors.toSet()));
+        model.setNamespacedDeployments(fabric8Client.apps().deployments().inNamespace(model.getSelectedNamespace())
+                .list().getItems().stream().map(item -> item.getMetadata().getName()).collect(Collectors.toSet()));
+        model.setNamespacedStatefulSets(fabric8Client.apps().statefulSets().inNamespace(model.getSelectedNamespace())
+                .list().getItems().stream().map(item -> item.getMetadata().getName()).collect(Collectors.toSet()));
+        model.setNamespacedReplicaSets(fabric8Client.apps().replicaSets().inNamespace(model.getSelectedNamespace())
+                .list().getItems().stream().map(item -> item.getMetadata().getName()).collect(Collectors.toSet()));
+        model.setNamespacedDaemonSets(fabric8Client.apps().daemonSets().inNamespace(model.getSelectedNamespace())
+                .list().getItems().stream().map(item -> item.getMetadata().getName()).collect(Collectors.toSet()));
+        model.setNamespacedConfigMaps(fabric8Client.configMaps().inNamespace(model.getSelectedNamespace())
+                .list().getItems().stream().map(item -> item.getMetadata().getName()).collect(Collectors.toSet()));
+        model.setNamespacedServices(fabric8Client.services().inNamespace(model.getSelectedNamespace())
+                .list().getItems().stream().map(item -> item.getMetadata().getName()).collect(Collectors.toSet()));
+        model.setNamespacedJobs(fabric8Client.batch().jobs().inNamespace(model.getSelectedNamespace())
+                .list().getItems().stream().map(item -> item.getMetadata().getName()).collect(Collectors.toSet()));
     }
 
 

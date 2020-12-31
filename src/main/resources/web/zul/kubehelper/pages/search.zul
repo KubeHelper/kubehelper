@@ -129,7 +129,7 @@
                         <column hflex="1" label="Namespace" sort="auto(namespace)"/>
                         <column hflex="1" label="Resource Type" sort="auto(resourceType)"/>
                         <column hflex="1" label="Creation Time" sort="auto(creationTime)"/>
-                        <column hflex="min" label="Full Definition"/>
+                        <column hflex="min" label="Raws"/>
                     </columns>
                     <rows>
                         <template name="model" var="item">
@@ -138,10 +138,10 @@
                                 <label value="${item.foundString}" multiline="true"></label>
                                 <zk switch="${item.resourceType}">
                                     <zk case="ConfigMap">
-                                        <toolbarbutton label="Click to see ConfigMap" onClick="@command('showAdditionalInfo', id=item.id)" hflex="1"/>
+                                        <toolbarbutton label="Click to see ConfigMap" onClick="@command('showAdditionalInfo', item=item)" hflex="1"/>
                                     </zk>
                                     <zk case="Secret">
-                                        <toolbarbutton label="Click to see Secret" onClick="@command('showAdditionalInfo', id=item.id)" hflex="1"/>
+                                        <toolbarbutton label="Click to see Secret" onClick="@command('showAdditionalInfo', item=item)" hflex="1"/>
                                     </zk>
                                     <zk>
                                         <label value="${item.additionalInfo}" multiline="true"/>
@@ -151,7 +151,7 @@
                                 <label value="${item.namespace}"></label>
                                 <label value="${item.resourceType}"></label>
                                 <label value="${item.creationTime}"></label>
-                                <toolbarbutton label="Full definition" onClick="@command('showFullDefinition', id=item.id)" hflex="1"/>
+                                <toolbarbutton label="Raw/Yaml/Json" onClick="@command('showFullDefinition', item=item)" hflex="1"/>
                             </row>
                         </template>
                     </rows>

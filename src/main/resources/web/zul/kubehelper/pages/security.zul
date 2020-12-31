@@ -89,7 +89,7 @@
                                     <column hflex="2" label="Namespace" sort="auto(namespace)"/>
                                     <column hflex="1" label="Resource Type" sort="auto(resourceType)"/>
                                     <column hflex="min" label="Creation Time" sort="auto(creationTime)"/>
-                                    <column hflex="min" label="Full Definition"/>
+                                    <column hflex="min" label="Raws"/>
                                 </columns>
                                 <rows>
                                     <template name="model" var="item">
@@ -99,7 +99,7 @@
                                             <label value="${item.namespace}"/>
                                             <label value="${item.resourceType}"/>
                                             <label value="${item.creationTime}"/>
-                                            <toolbarbutton label="Full Definition" onClick="@command('showRoleFullDefinition', item=item)" hflex="1"/>
+                                            <toolbarbutton label="Raw/Yaml/Json" onClick="@command('showRoleFullDefinition', item=item)" hflex="1"/>
                                         </row>
                                     </template>
                                 </rows>
@@ -138,7 +138,7 @@
                                         <column hflex="1" label="API Groups" sort="auto(apiGroupsAsString)"/>
                                         <column hflex="1.5" label="Resource Names" sort="auto(resourceNamesAsString)"/>
                                         <column hflex="1" label="Non Resource URLs" sort="auto(nonResourceURLsAsString)"/>
-                                        <column hflex="0.5" label="Full Definition"/>
+                                        <column hflex="0.5" label="Raws"/>
                                     </columns>
                                     <rows>
                                         <template name="model" var="item">
@@ -149,7 +149,7 @@
                                                 <label value="${item.apiGroupsAsString}" multiline="true"/>
                                                 <label value="${item.resourceNamesAsString}" multiline="true"/>
                                                 <label value="${item.nonResourceURLsAsString}" multiline="true"/>
-                                                <toolbarbutton label="Full Definition" onClick="@command('showRoleRuleFullDefinition', item=item)" hflex="1"/>
+                                                <toolbarbutton label="Raw/Yaml/Json" onClick="@command('showRoleRuleFullDefinition', item=item)" hflex="1"/>
                                             </row>
                                         </template>
                                     </rows>
@@ -426,7 +426,7 @@
                                     <column hflex="1" label="windowsOptions" tooltiptext="windowsOptions" sort="auto(windowsOptions)"/>
                                     <column hflex="1" label="namespace" tooltiptext="Namespace" sort="auto(namespace)"/>
                                     <column hflex="1" label="Creation Time" tooltiptext="Creation Time" sort="auto(creationTime)"/>
-                                    <column hflex="1" tooltiptext="Full Definition" label="Full Definition"/>
+                                    <column hflex="1" tooltiptext="Raws" label="Raws"/>
                                 </columns>
                                 <rows>
                                     <template name="model" var="item">
@@ -444,7 +444,7 @@
                                             <label value="${item.windowsOptions}" multiline="true"/>
                                             <label value="${item.namespace}" multiline="true"/>
                                             <label value="${item.creationTime}" multiline="true"/>
-                                            <toolbarbutton label="Full Definition" onClick="@command('showPodSecurityContextFullDefinition', item=item)" hflex="1"/>
+                                            <toolbarbutton label="Raw/Yaml/Json" onClick="@command('showPodSecurityContextFullDefinition', item=item)" hflex="1"/>
                                         </row>
                                     </template>
                                 </rows>
@@ -502,7 +502,7 @@
                                     <column hflex="1" label="windowsOptions" tooltiptext="windowsOptions" sort="auto(windowsOptions)"/>
                                     <column hflex="1" label="namespace" tooltiptext="namespace" sort="auto(namespace)"/>
                                     <column hflex="1" label="creationTime" tooltiptext="creationTime" sort="auto(creationTime)"/>
-                                    <column hflex="1" tooltiptext="Full Definition" label="Full Definition"/>
+                                    <column hflex="1" tooltiptext="Raws" label="Raws"/>
                                 </columns>
                                 <rows>
                                     <template name="model" var="item">
@@ -522,7 +522,7 @@
                                             <label value="${item.windowsOptions}" multiline="true"/>
                                             <label value="${item.namespace}" multiline="true"/>
                                             <label value="${item.creationTime}" multiline="true"/>
-                                            <toolbarbutton label="Full Definition" tooltiptext="Full Definition" onClick="@command('showContainerSecurityContextFullDefinition', item=item)"
+                                            <toolbarbutton label="Raw/Yaml/Json" tooltiptext="Raw/Yaml/Json" onClick="@command('showContainerSecurityContextFullDefinition', item=item)"
                                                            hflex="1"/>
                                         </row>
                                     </template>
@@ -572,7 +572,7 @@
                                     <column hflex="2" label="Secrets" tooltiptext="Secrets" sort="auto(secrets)"/>
                                     <column hflex="1" label="Namespace" tooltiptext="Namespace" sort="auto(namespace)"/>
                                     <column hflex="min" label="Creation Time" tooltiptext="Creation Time" sort="auto(creationTime)"/>
-                                    <column hflex="min" tooltiptext="Full Definition" label="Full Definition"/>
+                                    <column hflex="min" tooltiptext="Raws" label="Raws"/>
                                 </columns>
                                 <rows>
                                     <template name="model" var="item">
@@ -583,7 +583,7 @@
                                             <label value="${item.secrets}" multiline="true"/>
                                             <label value="${item.namespace}" multiline="true"/>
                                             <label value="${item.creationTime}"/>
-                                            <toolbarbutton label="Full Definition" tooltiptext="Full Definition" onClick="@command('showServiceAccountFullDefinition', item=item)" hflex="1"/>
+                                            <toolbarbutton label="Raw/Yaml/Json" tooltiptext="Raw/Yaml/Json" onClick="@command('showServiceAccountFullDefinition', item=item)" hflex="1"/>
                                         </row>
                                     </template>
                                 </rows>
@@ -654,7 +654,7 @@
                                     <column hflex="1" label="volumes" sort="auto(volumes)" tooltiptext="volumes"/>
                                     <column hflex="1" label="namespace" sort="auto(namespace)" tooltiptext="namespace"/>
                                     <column hflex="1" label="creationTime" sort="auto(creationTime)" tooltiptext="creationTime"/>
-                                    <column hflex="1" label="fullDefinition" sort="auto(fullDefinition)" tooltiptext="fullDefinition"/>
+                                    <column hflex="1" label="Raws" sort="auto(fullDefinition)" tooltiptext="Raws"/>
                                 </columns>
                                 <rows>
                                     <template name="model" var="item">
@@ -687,7 +687,7 @@
                                             <label value="${item.volumes}" multiline="true"/>
                                             <label value="${item.namespace}" multiline="true"/>
                                             <label value="${item.creationTime}" multiline="true"/>
-                                            <toolbarbutton label="Full Definition" onClick="@command('showPodSecurityPolicyFullDefinition', item=item)" hflex="1"/>
+                                            <toolbarbutton label="Raw/Yaml/Json" onClick="@command('showPodSecurityPolicyFullDefinition', item=item)" hflex="1"/>
                                         </row>
                                     </template>
                                 </rows>

@@ -77,7 +77,11 @@ public class RoleResult {
     }
 
     public String getResourceType() {
-        return Resource.getValueByKey(resourceType.name());
+        return resourceType.getKind();
+    }
+
+    public Resource getRawResourceType() {
+        return resourceType;
     }
 
     public RoleResult setResourceType(Resource resourceType) {

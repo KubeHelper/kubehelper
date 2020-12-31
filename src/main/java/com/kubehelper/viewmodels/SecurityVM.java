@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package com.kubehelper.viewmodels;
 
 import com.kubehelper.common.Global;
+import com.kubehelper.common.Resource;
 import com.kubehelper.domain.filters.RBACFilter;
 import com.kubehelper.domain.filters.RolesSecurityFilter;
 import com.kubehelper.domain.models.SecurityModel;
@@ -63,6 +64,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.kubehelper.common.Resource.KUBE_HELPER_CONTAINER_SECURITY_CONTEXT;
+import static com.kubehelper.common.Resource.KUBE_HELPER_CUSTOM;
+import static com.kubehelper.common.Resource.KUBE_HELPER_POD_SECURITY_CONTEXT;
 
 /**
  * @author JDev
@@ -366,45 +371,49 @@ public class SecurityVM {
 
     @Command
     public void showRoleFullDefinition(@BindingParam("item") RoleResult item) {
-        Map<String, String> parameters = Map.of("title", item.getResourceName(), "content", item.getFullDefinition());
-        Window window = (Window) Executions.createComponents("~./zul/kubehelper/components/file-display.zul", null, parameters);
+        Map<String, Object> parameters = getParametersMap(item.getRawResourceType(), item.getResourceName(), item.getResourceName(), item.getNamespace(), item.getFullDefinition());
+        Window window = (Window) Executions.createComponents(Global.PATH_TO_RAW_RESOURCE_ZUL, null, parameters);
         window.doModal();
     }
 
     @Command
     public void showRoleRuleFullDefinition(@BindingParam("item") RoleRuleResult item) {
-        Map<String, String> parameters = Map.of("title", String.valueOf(item.getId()), "content", item.getFullDefinition());
-        Window window = (Window) Executions.createComponents("~./zul/kubehelper/components/file-display.zul", null, parameters);
+        Map<String, Object> parameters = getParametersMap(KUBE_HELPER_CUSTOM, String.valueOf(item.getId()), String.valueOf(item.getId()), "N/A", item.getFullDefinition());
+        Window window = (Window) Executions.createComponents(Global.PATH_TO_RAW_RESOURCE_ZUL, null, parameters);
         window.doModal();
     }
 
     @Command
     public void showPodSecurityContextFullDefinition(@BindingParam("item") PodSecurityContextResult item) {
-        Map<String, String> parameters = Map.of("title", String.valueOf(item.getId()), "content", item.getFullDefinition());
-        Window window = (Window) Executions.createComponents("~./zul/kubehelper/components/file-display.zul", null, parameters);
+        Map<String, Object> parameters = getParametersMap(KUBE_HELPER_POD_SECURITY_CONTEXT, item.getResourceName(), item.getResourceName(), item.getNamespace(), item.getFullDefinition());
+        Window window = (Window) Executions.createComponents(Global.PATH_TO_RAW_RESOURCE_ZUL, null, parameters);
         window.doModal();
     }
 
     @Command
     public void showContainerSecurityContextFullDefinition(@BindingParam("item") ContainerSecurityResult item) {
         String title = item.getPodName() + " [ " + item.getResourceName() + " ]";
-        Map<String, String> parameters = Map.of("title", title, "content", item.getFullDefinition());
-        Window window = (Window) Executions.createComponents("~./zul/kubehelper/components/file-display.zul", null, parameters);
+        Map<String, Object> parameters = getParametersMap(KUBE_HELPER_CONTAINER_SECURITY_CONTEXT, item.getResourceName(), title, item.getNamespace(), item.getFullDefinition());
+        Window window = (Window) Executions.createComponents(Global.PATH_TO_RAW_RESOURCE_ZUL, null, parameters);
         window.doModal();
     }
 
     @Command
     public void showServiceAccountFullDefinition(@BindingParam("item") ServiceAccountResult item) {
-        Map<String, String> parameters = Map.of("title", item.getResourceName(), "content", item.getFullDefinition());
-        Window window = (Window) Executions.createComponents("~./zul/kubehelper/components/file-display.zul", null, parameters);
+        Map<String, Object> parameters = getParametersMap(item.getRawResourceType(), item.getResourceName(), item.getResourceName(), item.getNamespace(), item.getFullDefinition());
+        Window window = (Window) Executions.createComponents(Global.PATH_TO_RAW_RESOURCE_ZUL, null, parameters);
         window.doModal();
     }
 
     @Command
     public void showPodSecurityPolicyFullDefinition(@BindingParam("item") PodSecurityPoliciesResult item) {
-        Map<String, String> parameters = Map.of("title", String.valueOf(item.getResourceName()), "content", item.getFullDefinition());
-        Window window = (Window) Executions.createComponents("~./zul/kubehelper/components/file-display.zul", null, parameters);
+        Map<String, Object> parameters = getParametersMap(item.getRawResourceType(), item.getResourceName(), item.getResourceName(), item.getNamespace(), item.getFullDefinition());
+        Window window = (Window) Executions.createComponents(Global.PATH_TO_RAW_RESOURCE_ZUL, null, parameters);
         window.doModal();
+    }
+
+    private Map<String, Object> getParametersMap(Resource resource, String name, String title, String namespace, String content) {
+        return Map.of("resource", resource, "name", name, "title", title, "namespace", namespace, "content", content);
     }
 
     @Command

@@ -20,6 +20,7 @@ package com.kubehelper.viewmodels;
 import com.google.common.collect.Iterables;
 import com.kubehelper.common.Global;
 import com.kubehelper.common.Resource;
+import com.kubehelper.configs.Config;
 import com.kubehelper.domain.filters.CommandsFilter;
 import com.kubehelper.domain.models.CommandsModel;
 import com.kubehelper.domain.results.CommandsResult;
@@ -47,15 +48,19 @@ import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
+import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zk.ui.util.Notification;
 import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Auxhead;
 import org.zkoss.zul.Checkbox;
 import org.zkoss.zul.Combobox;
+import org.zkoss.zul.Div;
 import org.zkoss.zul.Footer;
 import org.zkoss.zul.Hbox;
 import org.zkoss.zul.Html;
 import org.zkoss.zul.ListModelList;
+import org.zkoss.zul.Slider;
+import org.zkoss.zul.Tab;
 import org.zkoss.zul.Toolbarbutton;
 import org.zkoss.zul.Vbox;
 import org.zkoss.zul.Window;
@@ -65,6 +70,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.StreamSupport;
 
 /**
@@ -78,6 +84,9 @@ public class CommandsVM implements EventListener<Event> {
     private boolean isRunButtonPressed;
     private boolean isOnInit = true;
 
+    private final String fontSizeCss = "font-size: %spx;";
+    private int fontSize = 14;
+
     private int centerLayoutHeight = 700;
 
     private ListModelList<CommandsResult> commandsResults = new ListModelList<>();
@@ -90,6 +99,9 @@ public class CommandsVM implements EventListener<Event> {
     private CommonService commonService;
 
     @WireVariable
+    private Config config;
+
+    @WireVariable
     private CommandsService commandsService;
 
     @Wire
@@ -97,6 +109,12 @@ public class CommandsVM implements EventListener<Event> {
 
     @Wire
     private Footer commandOutputGridFooter;
+
+    @Wire
+    private Slider fontSizeSlider;
+
+    @Wire
+    private Combobox commandsNamespacesCBox;
 
     @Init
     @NotifyChange("*")
@@ -115,6 +133,8 @@ public class CommandsVM implements EventListener<Event> {
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) {
         Selectors.wireComponents(view, this, false);
         Selectors.wireEventListeners(view, this);
+        fontSizeSlider.addEventListener("onScroll", this);
+        commandsNamespacesCBox.addEventListener("onSelect", this);
         createCommandsToolbarButtons();
 //        TODO call method after refresh, components should be in DOM
 //        enableDisableMenuItem(commandsModel.getSelectedCommandsSource(), true, "bold;");
@@ -127,9 +147,12 @@ public class CommandsVM implements EventListener<Event> {
     }
 
     @Command
-    @NotifyChange({"commandOutputTotalItems", "commandOutputResults"})
+    @NotifyChange({"commandOutputTotalItems", "commandOutputResults", "executedCommandOutput"})
     public void run() {
-          commandsService.run(commandsModel);
+        commandsModel.setCommandToExecute(fullCommand);
+        commandsService.run(commandsModel);
+
+        highlightBlock();
 //        commandsModel.setFilter(new CommandsFilter());
 //        clearAllFilterComboboxes();
 //        isRunButtonPressed = true;
@@ -151,7 +174,7 @@ public class CommandsVM implements EventListener<Event> {
         } else {
             commandsResults = new ListModelList<>(commandsModel.getCommandsResults());
         }
-        commandsModel.setNamespaces(commandsModel.getNamespaces().isEmpty() ? commonService.getAllNamespaces() : commandsModel.getNamespaces());
+        commandsModel.setNamespaces(commandsModel.getNamespaces().isEmpty() ? Set.copyOf(commonService.getAllNamespaces()) : commandsModel.getNamespaces());
         logger.info("Found {} namespaces.", commandsModel.getNamespaces());
     }
 
@@ -205,13 +228,35 @@ public class CommandsVM implements EventListener<Event> {
     }
 
     @Override
+    @NotifyChange({"namespacedPods", "namespacedDeployments", "namespacedStatefulSets", "namespacedReplicaSets", "namespacedDaemonSets", "namespacedConfigMaps", "namespacedServices", "namespacedJobs"})
     public void onEvent(Event event) {
-        String label = ((Toolbarbutton) event.getTarget()).getLabel();
-        String oldToolbarbuttonId = getCommandToolbarButtonId(commandsModel.getSelectedCommandsSourceLabel());
-        String newToolbarbuttonId = getCommandToolbarButtonId(label);
-        enableDisableMenuItem(oldToolbarbuttonId, false, "normal;");
-        enableDisableMenuItem(newToolbarbuttonId, true, "bold;");
-        changePredefinedCommandsRawSource(label);
+        if ("onScroll".equals(event.getName())) {
+            Slider fontSlider = (Slider) event.getTarget();
+            fontSize = fontSlider.getCurpos();
+            BindUtils.postNotifyChange(null, null, this, "fontSizeCss");
+        } else if ("onClick".equals(event.getName())) {
+            String label = ((Toolbarbutton) event.getTarget()).getLabel();
+            String oldToolbarbuttonId = getCommandToolbarButtonId(commandsModel.getSelectedCommandsSourceLabel());
+            String newToolbarbuttonId = getCommandToolbarButtonId(label);
+            enableDisableMenuItem(oldToolbarbuttonId, false, "normal;");
+            enableDisableMenuItem(newToolbarbuttonId, true, "bold;");
+            changePredefinedCommandsRawSource(label);
+        } else if ("onSelect".equals(event.getName())) {
+            commandsService.fetchResourcesDependsOnNamespace(commandsModel);
+            BindUtils.postNotifyChange(null, null, this, "namespacedPods", "namespacedDeployments", "namespacedStatefulSets", "namespacedReplicaSets", "namespacedDaemonSets", "namespacedConfigMaps", "namespacedServices", "namespacedJobs");
+            Notification.show(String.format("New resources for %s namespace, successfully fetched.", commandsModel.getSelectedNamespace()), "info", commandOutputGridFooter, "overlap_after", 2000);
+        }
+    }
+
+    @Command
+    public void commandOutputFullSize() {
+        if (StringUtils.isAnyEmpty(fullCommand, commandsModel.getExecutedCommandOutput())) {
+            Notification.show("Cannot open full screen mode if command is not executed.", "warning", commandOutputGridFooter, "overlap_after", 3000);
+            return;
+        }
+        Map<String, String> params = Map.of("title", "Command Output", "command", fullCommand, "commandOutput", commandsModel.getExecutedCommandOutput());
+        Window window = (Window) Executions.createComponents("~./zul/kubehelper/components/command-output-window.zul", null, params);
+        window.doModal();
     }
 
     //    @NotifyChange({"selectedCommandsSource","selectedCommandsRaw"})
@@ -255,6 +300,16 @@ public class CommandsVM implements EventListener<Event> {
         return commandsResults;
     }
 
+    /**
+     * Highlights div block with command output content.
+     */
+    private void highlightBlock() {
+        Div highlightBlock = (Div) Path.getComponent("//indexPage/templateInclude/commandOutputId");
+        highlightBlock.appendChild(new Html("<pre><code>" + commandsModel.getExecutedCommandOutput() + "</code></pre>"));
+        BindUtils.postNotifyChange(null, null, this, ".");
+//        Clients.evalJavaScript("highlightCommandOutput();");
+    }
+
     public ListModelList<CommandsResult> getCommandOutputResults() {
 //        if (isRunButtonPressed && commandOutputResults.isEmpty()) {
 //            Notification.show("Nothing found.", "info", commandOutputGridFooter, "before_end", 2000);
@@ -268,15 +323,6 @@ public class CommandsVM implements EventListener<Event> {
 //        }
         isRunButtonPressed = false;
         return commandOutputResults;
-    }
-
-    public String getSelectedNamespace() {
-        return commandsModel.getSelectedNamespace();
-    }
-
-    public CommandsVM setSelectedNamespace(String selectedNamespace) {
-        this.commandsModel.setSelectedNamespace(selectedNamespace);
-        return this;
     }
 
     public CommandsFilter getFilter() {
@@ -300,6 +346,10 @@ public class CommandsVM implements EventListener<Event> {
         return fullCommand;
     }
 
+    public void setFullCommand(String fullCommand) {
+        this.fullCommand = fullCommand;
+    }
+
     public String getSelectedCommandsSourceRaw() {
         return commandsModel.getSelectedCommandsSourceRaw();
     }
@@ -312,8 +362,12 @@ public class CommandsVM implements EventListener<Event> {
         commandsModel.setSelectedCommandsSourceLabel(selectedCommandsSource);
     }
 
-    public List<String> getNamespaces() {
-        return commandsModel.getNamespaces();
+    public int getFontSize() {
+        return fontSize;
+    }
+
+    public String getFontSizeCss() {
+        return String.format(fontSizeCss, fontSize);
     }
 
     public String getCommandsGridHeight() {
@@ -321,11 +375,11 @@ public class CommandsVM implements EventListener<Event> {
     }
 
     public String getFullCommandBoxHeight() {
-        return centerLayoutHeight * 0.1 + "px";
+        return centerLayoutHeight * 0.07 + "px";
     }
 
     public String getCommandOutputHeight() {
-        return centerLayoutHeight * 0.4 + "px";
+        return centerLayoutHeight * 0.43 + "px";
     }
 
     public String getCommandsSrcViewHeight() {
@@ -345,35 +399,147 @@ public class CommandsVM implements EventListener<Event> {
     }
 
     public void setGitUrl(String gitUrl) {
-        Global.GIT_URL = gitUrl;
+        config.setGitUrl(gitUrl);
     }
 
     public String getGitUrl() {
-        return Global.GIT_URL;
+        return config.getGitUrl();
     }
 
     public void setGitUsername(String gitUsername) {
-        Global.GIT_USERNAME = gitUsername;
+        config.setGitUsername(gitUsername);
     }
 
     public String getGitUsername() {
-        return Global.GIT_USERNAME;
+        return config.getGitUsername();
     }
 
     public void setGitPassword(String gitPassword) {
-        Global.GIT_PASSWORD = gitPassword;
+        config.setGitPassword(gitPassword);
     }
 
     public String getGitPassword() {
-        return Global.GIT_PASSWORD;
+        return config.getGitPassword();
     }
 
     public boolean isMarkCredentials() {
-        return Global.MARK_CREDENTIALS;
+        return config.getMarkCredentials();
     }
 
     public void setMarkCredentials(@ContextParam(ContextType.COMPONENT) Checkbox markCredentials) {
-        Global.MARK_CREDENTIALS = markCredentials.isChecked();
+        config.setMarkCredentials(markCredentials.isChecked());
+    }
+
+    public String getExecutedCommandOutput() {
+        return commandsModel.getExecutedCommandOutput();
+    }
+
+    public Set<String> getNamespaces() {
+        return commandsModel.getNamespaces();
+    }
+
+    public Set<String> getNamespacedPods() {
+        return commandsModel.getNamespacedPods();
+    }
+
+    public Set<String> getNamespacedDeployments() {
+        return commandsModel.getNamespacedDeployments();
+    }
+
+    public Set<String> getNamespacedStatefulSets() {
+        return commandsModel.getNamespacedStatefulSets();
+    }
+
+    public Set<String> getNamespacedReplicaSets() {
+        return commandsModel.getNamespacedReplicaSets();
+    }
+
+    public Set<String> getNamespacedDaemonSets() {
+        return commandsModel.getNamespacedDaemonSets();
+    }
+
+    public Set<String> getNamespacedConfigMaps() {
+        return commandsModel.getNamespacedConfigMaps();
+    }
+
+    public Set<String> getNamespacedServices() {
+        return commandsModel.getNamespacedServices();
+    }
+
+    public Set<String> getNamespacedJobs() {
+        return commandsModel.getNamespacedJobs();
+    }
+
+    public String getSelectedNamespace() {
+        return commandsModel.getSelectedNamespace();
+    }
+
+    public String getSelectedPod() {
+        return commandsModel.getSelectedPod();
+    }
+
+    public String getSelectedDeployment() {
+        return commandsModel.getSelectedDeployment();
+    }
+
+    public String getSelectedStatefulSet() {
+        return commandsModel.getSelectedStatefulSet();
+    }
+
+    public String getSelectedReplicaSet() {
+        return commandsModel.getSelectedReplicaSet();
+    }
+
+    public String getSelectedDaemonSet() {
+        return commandsModel.getSelectedDaemonSet();
+    }
+
+    public String getSelectedConfigMap() {
+        return commandsModel.getSelectedConfigMap();
+    }
+
+    public String getSelectedService() {
+        return commandsModel.getSelectedService();
+    }
+
+    public String getSelectedJob() {
+        return commandsModel.getSelectedJob();
+    }
+
+    public void setSelectedNamespace(String selectedNamespace) {
+        commandsModel.setSelectedNamespace(selectedNamespace);
+    }
+
+    public void setSelectedPod(String selectedPod) {
+        commandsModel.setSelectedPod(selectedPod);
+    }
+
+    public void setSelectedDeployment(String selectedDeployment) {
+        commandsModel.setSelectedDeployment(selectedDeployment);
+    }
+
+    public void setSelectedStatefulSet(String selectedStatefulSet) {
+        commandsModel.setSelectedStatefulSet(selectedStatefulSet);
+    }
+
+    public void setSelectedReplicaSet(String selectedReplicaSet) {
+        commandsModel.setSelectedReplicaSet(selectedReplicaSet);
+    }
+
+    public void setSelectedDaemonSet(String selectedDaemonSet) {
+        commandsModel.setSelectedDaemonSet(selectedDaemonSet);
+    }
+
+    public void setSelectedConfigMap(String selectedConfigMap) {
+        commandsModel.setSelectedConfigMap(selectedConfigMap);
+    }
+
+    public void setSelectedService(String selectedService) {
+        commandsModel.setSelectedService(selectedService);
+    }
+
+    public void setSelectedJob(String selectedJob) {
+        commandsModel.setSelectedJob(selectedJob);
     }
 
 }

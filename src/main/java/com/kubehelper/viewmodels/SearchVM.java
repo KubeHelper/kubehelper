@@ -65,7 +65,6 @@ import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.StreamSupport;
 
@@ -137,14 +136,9 @@ public class SearchVM implements EventListener {
         onInitPreparations();
     }
 
-    @Command
-    public void onAfterSize(AfterSizeEvent event) {
-        event.getHeight();
-    }
-
     @Listen("onAfterSize=#centerLayoutSearchID")
     public void onAfterSizeCenter(AfterSizeEvent event) {
-        centerLayoutHeight = event.getHeight()-3;
+        centerLayoutHeight = event.getHeight() - 3;
         BindUtils.postNotifyChange(null, null, this, ".");
     }
 
@@ -265,7 +259,7 @@ public class SearchVM implements EventListener {
         StreamSupport.stream(Iterables.partition(searchResources, 10).spliterator(), false).forEach(list -> {
             Hbox hbox = createNewHbox();
             for (Resource resource : list) {
-                Checkbox resourceCheckbox = new Checkbox(Resource.getValueByKey(resource.name()));
+                Checkbox resourceCheckbox = new Checkbox(resource.getKind());
                 resourceCheckbox.setId(resource.name() + "_Checkbox");
                 resourceCheckbox.setStyle("padding: 5px;");
                 resourceCheckbox.addEventListener("onCheck", this);
@@ -308,32 +302,38 @@ public class SearchVM implements EventListener {
     }
 
     @Command
-    public void showAdditionalInfo(@BindingParam("id") int id) {
+    public void showAdditionalInfo(@BindingParam("item") SearchResult item) {
         String content = "";
-        Optional<SearchResult> first = searchResults.getInnerList().stream().filter(item -> item.getId() == id).findFirst();
-        if (CONFIG_MAP.getValue().equals(first.get().getResourceType())) {
+        if (CONFIG_MAP.getKind().equals(item.getResourceType())) {
             //escape XML <> symbols for <pre> tag
-            content = first.get().getAdditionalInfo().replace("<", "&lt;").replace(">", "&gt;");
+            content = item.getAdditionalInfo().replace("<", "&lt;").replace(">", "&gt;");
         } else {
-            content = first.get().getAdditionalInfo();
+            content = item.getAdditionalInfo();
         }
-        if (first.isPresent()) {
-            Map<String, String> parameters = Map.of("title", first.get().getFoundString(), "content", content);
-            Window window = (Window) Executions.createComponents("~./zul/kubehelper/components/file-display.zul", null, parameters);
-            window.doModal();
-        }
+        Map<String, Object> parameters = getParametersMap(item.getRawResourceType(), item.getResourceName(), item.getFoundString(), item.getNamespace(), content);
+        Window window = (Window) Executions.createComponents(Global.PATH_TO_RAW_RESOURCE_ZUL, null, parameters);
+        window.doModal();
     }
 
     @Command
-    public void showFullDefinition(@BindingParam("id") int id) {
-        String content = "";
-        Optional<SearchResult> first = searchResults.getInnerList().stream().filter(item -> item.getId() == id).findFirst();
-        if (first.isPresent()) {
-            Map<String, String> parameters = Map.of("title", first.get().getResourceName(), "content", first.get().getFullDefinition());
-            Window window = (Window) Executions.createComponents("~./zul/kubehelper/components/file-display.zul", null, parameters);
-            window.doModal();
+    public void showFullDefinition(@BindingParam("item") SearchResult item) {
+        Resource resource = item.getRawResourceType() == ENV_VARIABLE ? POD : item.getRawResourceType();
+        String name = item.getResourceName();
+
+        if (item.getRawResourceType() == ENV_VARIABLE) {
+            resource = POD;
+            name = item.getResourceName().indexOf("[") != -1 ? item.getResourceName().substring(0, item.getResourceName().indexOf("[") - 1).trim() : item.getResourceName();
         }
+        Map<String, Object> parameters = getParametersMap(resource, name, item.getResourceName(), item.getNamespace(), item.getFullDefinition());
+        Window window = (Window) Executions.createComponents(Global.PATH_TO_RAW_RESOURCE_ZUL, null, parameters);
+        window.doModal();
     }
+
+
+    private Map<String, Object> getParametersMap(Resource resource, String name, String title, String namespace, String content) {
+        return Map.of("resource", resource, "name", name, "title", title, "namespace", namespace, "content", content);
+    }
+
 
     public boolean isSkipKubeNamespaces() {
         return searchModel.isSkipKubeNamespaces();
@@ -402,7 +402,7 @@ public class SearchVM implements EventListener {
     }
 
     public String getMainGridHeight() {
-        return centerLayoutHeight+ "px";
+        return centerLayoutHeight + "px";
     }
 
 }

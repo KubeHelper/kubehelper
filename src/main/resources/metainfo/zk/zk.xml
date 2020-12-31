@@ -2,6 +2,10 @@
 
 <zk>
     <config-name>kube-helper</config-name>
+<!--    <listener>-->
+<!--        <listener-class>com.kubehelper.controllers.KubeHelperWebAppInit</listener-class>-->
+<!--        <listener-class>com.kubehelper.controllers.KubeHelperDesktopInit</listener-class>-->
+<!--    </listener>-->
 <!--    <device-config>-->
 <!--        <device-type>ajax</device-type>-->
 <!--        <embed><![CDATA[-->

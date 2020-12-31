@@ -23,7 +23,7 @@ metadata:
 spec:
   ports:
     - name: http
-      port: 8888
+      port: 80
       protocol: TCP
       targetPort: 8080
   selector:
@@ -133,7 +133,7 @@ spec:
         ns: default
     spec:
       serviceAccountName: kube-helper-sa
-      automountServiceAccountToken: false #TODO change and test
+      automountServiceAccountToken: true
       containers:
         - name: kube-helper
           image: docker.elastic.co/kibana/kibana-oss:6.2.4

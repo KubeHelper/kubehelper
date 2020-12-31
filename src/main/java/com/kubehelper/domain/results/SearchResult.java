@@ -49,12 +49,16 @@ public class SearchResult {
     }
 
     public String getResourceType() {
-        return Resource.getValueByKey(resourceType.name());
+        return resourceType.getKind();
     }
 
     public SearchResult setResourceType(Resource resourceType) {
         this.resourceType = resourceType;
         return this;
+    }
+
+    public Resource getRawResourceType(){
+        return resourceType;
     }
 
     public String getResourceName() {

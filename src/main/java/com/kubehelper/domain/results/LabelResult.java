@@ -48,8 +48,12 @@ public class LabelResult {
         return this;
     }
 
+    public Resource getRawResourceType(){
+        return resourceType;
+    }
+
     public String getResourceType() {
-        return Resource.getValueByKey(resourceType.name());
+        return resourceType.getKind();
     }
 
     public Resource getEnumResourceType() {

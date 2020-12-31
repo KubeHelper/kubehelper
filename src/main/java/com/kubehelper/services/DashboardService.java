@@ -26,6 +26,7 @@ import io.fabric8.kubernetes.api.model.NodeCondition;
 import io.fabric8.kubernetes.api.model.NodeList;
 import io.fabric8.kubernetes.api.model.Quantity;
 import io.fabric8.kubernetes.api.model.Taint;
+import io.fabric8.kubernetes.api.model.metrics.v1beta1.NodeMetricsList;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientException;
@@ -36,6 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -58,7 +60,12 @@ public class DashboardService {
 
             NodeList nodesList = client.nodes().list();
             clusterResult.setTotalNodes(nodesList.getItems().size());
+
             clusterResult.setTotalPods(client.pods().list().getItems().size());
+
+            client.pods().list().getItems().forEach(pod -> {
+                logger.info(String.format("POD: %s", pod.getMetadata().getName()));
+            });
 
             nodesList.getItems().forEach(node -> {
                 NodeResult nodeResult = new NodeResult(dashboardModel.getNodesResults().size() + 1)
@@ -74,7 +81,6 @@ public class DashboardService {
                         .setConditions(getJoinedConditionsList(node.getStatus().getConditions()))
                         .setImages(getJoinedNodeImagesList(node.getStatus().getImages()))
                         .setTotalImagesSize(calculateImagesTotalSize(node.getStatus().getImages()))
-                        .setPodsCount("podsCount") //TODO
                         .setArchitecture(node.getStatus().getNodeInfo().getArchitecture())
                         .setBootID(node.getStatus().getNodeInfo().getBootID())
                         .setContainerRuntimeVersion(node.getStatus().getNodeInfo().getContainerRuntimeVersion())

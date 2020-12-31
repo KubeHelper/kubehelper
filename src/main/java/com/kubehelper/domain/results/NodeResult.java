@@ -57,9 +57,6 @@ public class NodeResult {
     private String images = "";
     private String totalImagesSize = "";
 
-    private String podsCount = "";
-
-
     public NodeResult(int id) {
         this.id = id;
     }
@@ -218,15 +215,6 @@ public class NodeResult {
 
     public NodeResult setTotalImagesSize(String totalImagesSize) {
         this.totalImagesSize = totalImagesSize;
-        return this;
-    }
-
-    public String getPodsCount() {
-        return podsCount;
-    }
-
-    public NodeResult setPodsCount(String podsCount) {
-        this.podsCount = podsCount;
         return this;
     }
 

@@ -116,7 +116,7 @@ public class SecurityModel implements PageModel {
     }
 
     private Optional<RoleResult> findRole(String name, Resource resource) {
-        return rolesResults.values().stream().filter(item -> item.getResourceName().equals(name) && item.getResourceType().equals(resource.getValue())).findFirst();
+        return rolesResults.values().stream().filter(item -> item.getResourceName().equals(name) && item.getResourceType().equals(resource.getKind())).findFirst();
     }
 
     public void addSearchException(Exception exception) {

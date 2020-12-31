@@ -17,6 +17,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package com.kubehelper.domain.results;
 
+import com.kubehelper.common.Resource;
+
 /**
  * @author JDev
  */
@@ -24,6 +26,7 @@ public class PodSecurityPoliciesResult {
 
     private int id;
     private String resourceName = "";
+    private Resource resourceType = Resource.POD_SECURITY_POLICY;
 
     private String allowPrivilegeEscalation;
     private String defaultAllowPrivilegeEscalation;
@@ -73,6 +76,10 @@ public class PodSecurityPoliciesResult {
     public PodSecurityPoliciesResult setResourceName(String resourceName) {
         this.resourceName = resourceName;
         return this;
+    }
+
+    public Resource getRawResourceType(){
+        return resourceType;
     }
 
     public String getAllowPrivilegeEscalation() {

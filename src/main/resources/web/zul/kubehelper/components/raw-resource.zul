@@ -1,0 +1,35 @@
+<window id="rawResourceWindowID" viewModel="@id('rawResourceVM') @init('com.kubehelper.viewmodels.RawResourceVM')" title="@load(rawResourceVM.title)"
+        mode="highlighted" width="1200px" height="@load(rawResourceVM.mainWindowHeight)" position="center,top" closable="true" maximizable="true" action="show: slideDown;hide: slideUp">
+    <script>
+        function highlightBlock (blockToHighlight) {
+        document.querySelectorAll('div.highlight-'+blockToHighlight).forEach(block => { hljs.highlightBlock(block); });
+        }
+    </script>
+    <tabbox id="rawResourceTabBox" height="100%">
+        <tabs id="tabs">
+            <tab id="java" label="Raw"/>
+            <tab id="yaml" label="Yaml"/>
+            <tab id="json" label="Json"/>
+        </tabs>
+        <toolbar align="start">
+            <hlayout>
+                <label value="Font Size" style="vertical-align: sub;"/>
+                <slider id="fontSizeSlider" curpos="@load(rawResourceVM.fontSize)" minpos="5" maxpos="30" mold="sphere" step="1"/>
+            </hlayout>
+        </toolbar>
+        <tabpanels>
+            <tabpanel style="overflow-y:scroll;overflow-x:auto;font-family: Courier, Monaco, monospace;display: flex;">
+                <div id="rawJavaId" width="100%" height="100%" class='highlight-java' style="@load(rawResourceVM.tabPanelFontSize)">
+                </div>
+            </tabpanel>
+            <tabpanel style="overflow-y:scroll;overflow-x:auto;font-family: Courier, Monaco, monospace;display: flex;">
+                <div id="rawYamlId" width="100%" height="100%" class='highlight-yaml' style="@load(rawResourceVM.tabPanelFontSize)">
+                </div>
+            </tabpanel>
+            <tabpanel style="overflow-y:scroll;overflow-x:auto;font-family: Courier, Monaco, monospace;display: flex;">
+                <div id="rawJsonId" width="100%" height="100%" class='highlight-json' style="@load(rawResourceVM.tabPanelFontSize)">
+                </div>
+            </tabpanel>
+        </tabpanels>
+    </tabbox>
+</window>

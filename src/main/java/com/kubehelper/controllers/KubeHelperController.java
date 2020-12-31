@@ -24,13 +24,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class KubeHelperController {
 
-	@GetMapping("/home")
-	public String home() {
-		return "home";
-	}
+    @GetMapping("/home")
+    public String home() {
+        return "home";
+    }
 
-	@GetMapping("/kubehelper")
-	public String index() {
-		return "kubehelper/index";
-	}
+    @GetMapping("/kubehelper")
+    public String index() {
+        return "kubehelper/index";
+    }
+
 }

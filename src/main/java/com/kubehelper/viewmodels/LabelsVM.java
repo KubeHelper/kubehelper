@@ -326,7 +326,7 @@ public class LabelsVM implements EventListener {
         StreamSupport.stream(Iterables.partition(labelResources, 10).spliterator(), false).forEach(list -> {
             Hbox hbox = createNewHbox();
             for (Resource resource : list) {
-                Checkbox resourceCheckbox = new Checkbox(Resource.getValueByKey(resource.name()));
+                Checkbox resourceCheckbox = new Checkbox(resource.getKind());
                 resourceCheckbox.setId(resource.name() + "_Checkbox");
                 resourceCheckbox.setStyle("padding: 5px;");
                 resourceCheckbox.addEventListener("onCheck", this);
@@ -375,7 +375,7 @@ public class LabelsVM implements EventListener {
      */
     @Command
     public void showFullLabelValue(@BindingParam("item") LabelResult item) {
-        showDetailWindow(item.getName());
+        showDetailWindow(item.getName(), item.getNamespace(), item.getRawResourceType());
     }
 
     /**
@@ -385,7 +385,7 @@ public class LabelsVM implements EventListener {
      */
     @Command
     public void showFullGroupedLabelValue(@BindingParam("item") LabelsModel.GroupedLabel item) {
-        showDetailWindow(item.getName());
+        showDetailWindow(item.getName(), "N/A", Resource.KUBE_HELPER_CUSTOM);
     }
 
     /**
@@ -393,9 +393,9 @@ public class LabelsVM implements EventListener {
      *
      * @param name - key=value string for title and content.
      */
-    private void showDetailWindow(String name) {
-        Map<String, String> parameters = Map.of("title", name.substring(0, name.indexOf("=")), "content", name.substring(name.indexOf("=") + 1));
-        Window window = (Window) Executions.createComponents("~./zul/kubehelper/components/file-display.zul", null, parameters);
+    private void showDetailWindow(String name, String namespace, Resource resource) {
+        Map<String, Object> parameters = Map.of("resource", resource, "namespace", namespace, "title", name.substring(0, name.indexOf("=")), "content", name.substring(name.indexOf("=") + 1));
+        Window window = (Window) Executions.createComponents(Global.PATH_TO_RAW_RESOURCE_ZUL, null, parameters);
         window.doModal();
     }
 

@@ -17,12 +17,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package com.kubehelper.domain.results;
 
+import com.kubehelper.common.Resource;
+
 /**
  * @author JDev
  */
 public class ServiceAccountResult {
     private int id;
     private String resourceName = "";
+    private Resource resourceType = Resource.SERVICE_ACCOUNT;
     private String kind = "";
     private String namespace = "";
     private String secrets = "";
@@ -47,6 +50,10 @@ public class ServiceAccountResult {
     public ServiceAccountResult setResourceName(String resourceName) {
         this.resourceName = resourceName;
         return this;
+    }
+
+    public Resource getRawResourceType(){
+        return resourceType;
     }
 
     public String getKind() {

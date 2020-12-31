@@ -332,12 +332,16 @@ public class LabelsModel implements PageModel {
         }
 
         public String getResourceType() {
-            return Resource.getValueByKey(resourceType.name());
+            return resourceType.getKind();
         }
 
         public GroupedLabelColumn setResourceType(Resource resourceType) {
             this.resourceType = resourceType;
             return this;
+        }
+
+        public Resource getRawResourceType(){
+            return resourceType;
         }
 
         public String getResourceName() {

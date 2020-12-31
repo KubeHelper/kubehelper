@@ -1,5 +1,5 @@
 <zk xmlns:n="native">
-    <borderlayout width="100%" height="100%">
+    <borderlayout width="100%" height="100%" viewModel="@id('homeVM') @init('com.kubehelper.viewmodels.HomeVM')">
         <north border="none">
             <vbox align="center" width="100%" style="box-shadow: 5px 10px 15px #E4F4FF;border-bottom: 1px solid #E4F4FF;padding: 5px;">
                 <separator orient="horizontal"/>
@@ -18,7 +18,7 @@
                             </cell>
                             <cell width="100%" valign="middle">
                                 <label value="User :" width="40%"/>
-                                <textbox width="60%" placeholder="username" name="username" value="user" style="float: right;"/>
+                                <textbox width="60%" placeholder="username" name="username" value="kube" style="float: right;"/>
                             </cell>
                             <cell width="100%">
                                 <html>
@@ -27,7 +27,7 @@
                             </cell>
                             <cell width="100%" valign="middle">
                                 <label value="Password :" width="40%"/>
-                                <textbox width="60%" placeholder="password" type="password" name="password" value="password" style="float: right;"/>
+                                <textbox width="60%" placeholder="password" type="password" name="password" value="helper" style="float: right;"/>
                             </cell>
                             <cell width="100%">
                                 <html>
@@ -37,7 +37,7 @@
                             <cell width="100%" valign="middle" align="right">
                                 <hlayout>
                                     <button type="reset" label="Reset"/>
-                                    <button type="submit" label="Login"/>
+                                    <button type="submit" label="Login" onOK="/login"/>
                                 </hlayout>
                             </cell>
                         </vbox>

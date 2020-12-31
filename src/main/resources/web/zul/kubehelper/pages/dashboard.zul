@@ -8,7 +8,7 @@
                         <cell width="16%">
                             <div sclass="infobox infobox-green" width="100%">
                                 <span sclass="infobox-icon">
-                                    <span zclass="z-icon-server"/>
+                                    <span zclass="fas fa-cubes"/>
                                 </span>
                                 <div sclass="infobox-data">
                                     <label value="@load(dashboardVM.clusterResult.totalNodes)" sclass="infobox-data-number"/>
@@ -19,7 +19,7 @@
                         <cell width="16%">
                             <div class="infobox infobox-blue2" width="100%">
                                 <span sclass="infobox-icon">
-                                    <span zclass="z-icon-flask"/>
+                                    <span zclass="fas fa-memory"/>
                                 </span>
                                 <div class="infobox-data">
                                     <label value="@load(dashboardVM.clusterResult.totalMemory)" sclass="infobox-data-number"/>
@@ -30,7 +30,7 @@
                         <cell width="16%">
                             <div sclass="infobox infobox-pink" width="100%">
                                 <span sclass="infobox-icon">
-                                    <span zclass="z-icon-shopping-cart"/>
+                                    <span zclass="fas fa-server"/>
                                 </span>
                                 <div sclass="infobox-data">
                                     <label value="@load(dashboardVM.clusterResult.totalCpus)" sclass="infobox-data-number"/>
@@ -41,7 +41,7 @@
                         <cell width="16%">
                             <div class="infobox infobox-red" width="100%">
                                 <span sclass="infobox-icon">
-                                    <span zclass="z-icon-flask"/>
+                                    <span zclass="fas fa-microchip"/>
                                 </span>
                                 <div class="infobox-data">
                                     <label value="@load(dashboardVM.clusterResult.totalCpusTime)" sclass="infobox-data-number"/>
@@ -52,7 +52,7 @@
                         <cell width="16%">
                             <div class="infobox infobox-orange" width="100%">
                                 <span sclass="infobox-icon">
-                                    <span zclass="z-icon-flask"/>
+                                    <span class="fas fa-hdd"/>
                                 </span>
                                 <div class="infobox-data">
                                     <label value="@load(dashboardVM.clusterResult.totalHdd)" sclass="infobox-data-number"/>
@@ -63,7 +63,7 @@
                         <cell width="16%">
                             <div class="infobox infobox-blue" width="100%">
                                 <span sclass="infobox-icon">
-                                    <span zclass="z-icon-flask"/>
+                                    <span sclass="fab fa-linode"/>
                                 </span>
                                 <div class="infobox-data">
                                     <label value="@load(dashboardVM.clusterResult.totalPods)" sclass="infobox-data-number"/>

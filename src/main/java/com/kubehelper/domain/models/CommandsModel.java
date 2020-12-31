@@ -24,8 +24,10 @@ import com.kubehelper.domain.results.CommandsResult;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author JDev
@@ -34,20 +36,37 @@ public class CommandsModel implements PageModel {
 
     private String templateUrl = "~./zul/kubehelper/pages/commands.zul";
 
-//    private String userCommandsPath = "C:\\temp\\kubehelper";
-        private String userCommandsPath = "/tmp/kubehelper";
+    //    private String userCommandsPath = "C:\\temp\\kubehelper";
+    private String userCommandsPath = "/tmp/kubehelper";
     public static String NAME = Global.COMMANDS_MODEL;
-    private List<String> namespaces = new ArrayList<>();
+    private Set<String> namespaces = new HashSet<>();
+    private Set<String> namespacedPods = new HashSet<>();
+    private Set<String> namespacedDeployments = new HashSet<>();
+    private Set<String> namespacedStatefulSets = new HashSet<>();
+    private Set<String> namespacedReplicaSets = new HashSet<>();
+    private Set<String> namespacedDaemonSets = new HashSet<>();
+    private Set<String> namespacedConfigMaps = new HashSet<>();
+    private Set<String> namespacedServices = new HashSet<>();
+    private Set<String> namespacedJobs = new HashSet<>();
     private List<CommandsResult> commandsResults = new ArrayList<>();
     private CommandsFilter filter = new CommandsFilter();
     private List<KubeHelperException> buildExceptions = new ArrayList<>();
-    private String selectedNamespace = "all";
+    private String selectedNamespace = "";
+    private String selectedPod = "";
+    private String selectedDeployment = "";
+    private String selectedStatefulSet = "";
+    private String selectedReplicaSet = "";
+    private String selectedDaemonSet = "";
+    private String selectedConfigMap = "";
+    private String selectedService = "";
+    private String selectedJob = "";
     private String selectedCommandsSourceLabel = "";
     private String selectedCommandsSourceRaw = "";
+    private String commandToExecute = "";
+    private String executedCommandOutput = "";
 
     private Map<String, CommandSource> commandsSources = new HashMap<>() {
     };
-
 
     public CommandsModel() {
     }
@@ -86,12 +105,84 @@ public class CommandsModel implements PageModel {
         return templateUrl;
     }
 
-    public List<String> getNamespaces() {
+    public Set<String> getNamespaces() {
         return namespaces;
     }
 
-    public CommandsModel setNamespaces(List<String> namespaces) {
+    public CommandsModel setNamespaces(Set<String> namespaces) {
         this.namespaces = namespaces;
+        return this;
+    }
+
+    public Set<String> getNamespacedPods() {
+        return namespacedPods;
+    }
+
+    public CommandsModel setNamespacedPods(Set<String> namespacedPods) {
+        this.namespacedPods = namespacedPods;
+        return this;
+    }
+
+    public Set<String> getNamespacedDeployments() {
+        return namespacedDeployments;
+    }
+
+    public CommandsModel setNamespacedDeployments(Set<String> namespacedDeployments) {
+        this.namespacedDeployments = namespacedDeployments;
+        return this;
+    }
+
+    public Set<String> getNamespacedStatefulSets() {
+        return namespacedStatefulSets;
+    }
+
+    public CommandsModel setNamespacedStatefulSets(Set<String> namespacedStatefulSets) {
+        this.namespacedStatefulSets = namespacedStatefulSets;
+        return this;
+    }
+
+    public Set<String> getNamespacedReplicaSets() {
+        return namespacedReplicaSets;
+    }
+
+    public CommandsModel setNamespacedReplicaSets(Set<String> namespacedReplicaSets) {
+        this.namespacedReplicaSets = namespacedReplicaSets;
+        return this;
+    }
+
+    public Set<String> getNamespacedDaemonSets() {
+        return namespacedDaemonSets;
+    }
+
+    public CommandsModel setNamespacedDaemonSets(Set<String> namespacedDaemonSets) {
+        this.namespacedDaemonSets = namespacedDaemonSets;
+        return this;
+    }
+
+    public Set<String> getNamespacedConfigMaps() {
+        return namespacedConfigMaps;
+    }
+
+    public CommandsModel setNamespacedConfigMaps(Set<String> namespacedConfigMaps) {
+        this.namespacedConfigMaps = namespacedConfigMaps;
+        return this;
+    }
+
+    public Set<String> getNamespacedServices() {
+        return namespacedServices;
+    }
+
+    public CommandsModel setNamespacedServices(Set<String> namespacedServices) {
+        this.namespacedServices = namespacedServices;
+        return this;
+    }
+
+    public Set<String> getNamespacedJobs() {
+        return namespacedJobs;
+    }
+
+    public CommandsModel setNamespacedJobs(Set<String> namespacedJobs) {
+        this.namespacedJobs = namespacedJobs;
         return this;
     }
 
@@ -135,6 +226,78 @@ public class CommandsModel implements PageModel {
         return this;
     }
 
+    public String getSelectedPod() {
+        return selectedPod;
+    }
+
+    public CommandsModel setSelectedPod(String selectedPod) {
+        this.selectedPod = selectedPod;
+        return this;
+    }
+
+    public String getSelectedDeployment() {
+        return selectedDeployment;
+    }
+
+    public CommandsModel setSelectedDeployment(String selectedDeployment) {
+        this.selectedDeployment = selectedDeployment;
+        return this;
+    }
+
+    public String getSelectedStatefulSet() {
+        return selectedStatefulSet;
+    }
+
+    public CommandsModel setSelectedStatefulSet(String selectedStatefulSet) {
+        this.selectedStatefulSet = selectedStatefulSet;
+        return this;
+    }
+
+    public String getSelectedReplicaSet() {
+        return selectedReplicaSet;
+    }
+
+    public CommandsModel setSelectedReplicaSet(String selectedReplicaSet) {
+        this.selectedReplicaSet = selectedReplicaSet;
+        return this;
+    }
+
+    public String getSelectedDaemonSet() {
+        return selectedDaemonSet;
+    }
+
+    public CommandsModel setSelectedDaemonSet(String selectedDaemonSet) {
+        this.selectedDaemonSet = selectedDaemonSet;
+        return this;
+    }
+
+    public String getSelectedConfigMap() {
+        return selectedConfigMap;
+    }
+
+    public CommandsModel setSelectedConfigMap(String selectedConfigMap) {
+        this.selectedConfigMap = selectedConfigMap;
+        return this;
+    }
+
+    public String getSelectedService() {
+        return selectedService;
+    }
+
+    public CommandsModel setSelectedService(String selectedService) {
+        this.selectedService = selectedService;
+        return this;
+    }
+
+    public String getSelectedJob() {
+        return selectedJob;
+    }
+
+    public CommandsModel setSelectedJob(String selectedJob) {
+        this.selectedJob = selectedJob;
+        return this;
+    }
+
     public String getSelectedCommandsSourceRaw() {
         return selectedCommandsSourceRaw;
     }
@@ -168,6 +331,24 @@ public class CommandsModel implements PageModel {
 
     public CommandsModel setSelectedCommandsSourceLabel(String selectedCommandsSourceLabel) {
         this.selectedCommandsSourceLabel = selectedCommandsSourceLabel;
+        return this;
+    }
+
+    public String getExecutedCommandOutput() {
+        return executedCommandOutput;
+    }
+
+    public CommandsModel setExecutedCommandOutput(String executedCommandOutput) {
+        this.executedCommandOutput = executedCommandOutput;
+        return this;
+    }
+
+    public String getCommandToExecute() {
+        return commandToExecute;
+    }
+
+    public CommandsModel setCommandToExecute(String commandToExecute) {
+        this.commandToExecute = commandToExecute;
         return this;
     }
 

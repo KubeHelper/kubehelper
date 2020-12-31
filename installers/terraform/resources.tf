@@ -20,7 +20,7 @@ resource "kubernetes_service" "kube_helper_svc" {
 
     port {
       name = "http"
-      port = 8888
+      port = 80
       target_port = 8080
       protocol = "TCP"
     }
@@ -43,64 +43,14 @@ resource "kubernetes_cluster_role" "kube_helper_cr" {
   metadata {
     name = "kube-helper-cr"
   }
-
   rule {
     api_groups = [
-      ""]
+      "*"]
     resources = [
-      "apiservices",
-      "bindings",
-      "clusterrolebindings",
-      "clusterroles",
-      "componentstatuses",
-      "configmaps",
-      "controllerrevisions",
-      "cronjobs",
-      "customresourcedefinitions",
-      "csidrivers",
-      "csinodes",
-      "daemonsets",
-      "deployments",
-      "events",
-      "endpoints",
-      "horizontalpodautoscalers",
-      "ingress",
-      "ingressclasses",
-      "jobs",
-      "limitranges",
-      "localsubjectaccessreviews",
-      "mutatingwebhookconfigurations",
-      "namespaces",
-      "networkpolicies",
-      "nodes",
-      "pods",
-      "poddisruptionbudgets",
-      "podsecuritypolicies",
-      "podtemplates",
-      "persistentvolumes",
-      "persistentvolumeclaims",
-      "priorityclasses",
-      "resourcequotas",
-      "replicasets",
-      "replicationcontrollers",
-      "rolebindings",
-      "roles",
-      "runtimeclasses",
-      "secrets",
-      "selfsubjectaccessreviews",
-      "selfsubjectrulesreviews",
-      "subjectaccessreviews",
-      "serviceaccounts",
-      "services",
-      "statefulsets",
-      "storageclasses",
-      "tokenreviews",
-      "validatingwebhookconfigurations"]
+      "*"]
     verbs = [
       "get",
       "list"]
-    non_resource_urls = [
-      "*"]
   }
 }
 
@@ -110,13 +60,13 @@ resource "kubernetes_cluster_role_binding" "kube_helper_crb" {
     name = "kube-helper-crb"
   }
   role_ref {
-    api_group = "rbac.authorization.k8s.io/v1"
+    api_group = "rbac.authorization.k8s.io"
     kind = "ClusterRole"
-    name = "${kubernetes_cluster_role.kube_helper_cr.metadata.0.name}"
+    name = kubernetes_cluster_role.kube_helper_cr.metadata[0].name
   }
   subject {
     kind = "ServiceAccount"
-    name = "${kubernetes_service_account.kube_helper_service_account.metadata.0.name}"
+    name = kubernetes_service_account.kube_helper_service_account.metadata[0].name
     namespace = local.namespace
   }
 }
@@ -142,11 +92,11 @@ resource "kubernetes_deployment" "kube_helper_deployment" {
       }
 
       spec {
-        service_account_name = "${kubernetes_service_account.kube_helper_service_account.metadata.0.name}"
-        automount_service_account_token = false
+        service_account_name = kubernetes_service_account.kube_helper_service_account.metadata[0].name
+        automount_service_account_token = true
         #TODO change and test
         container {
-          image = "kubehelper/kubehelper:1.0"
+          image = "kubehelper/kube-helper:1.0"
           name = "kube-helper"
           image_pull_policy = "Always"
           port {
@@ -169,6 +119,7 @@ resource "kubernetes_deployment" "kube_helper_deployment" {
           //            period_seconds = 20
           //          }
         }
+        node_name = "node1"
       }
     }
   }
