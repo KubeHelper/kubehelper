@@ -103,11 +103,9 @@
                     </foot>
                 </grid>
             </center>
-            <!--            <south size="15%" splittable="true" collapsible="true" margins="0,0,3,3" onOpen="@command('updateGridHeightOnSouthPanelChange')" style="overflow-y:auto;overflow-x: hidden;padding: 7px;">-->
             <south size="20%" splittable="true" collapsible="true" margins="0,0,3,3" style="overflow-y:auto;overflow-x: hidden;padding: 7px;">
                 <html id="detailsLabel" content="@load(ipsAndPortsVM.detailsLabel)" style="font-family: Courier, Monaco, monospace;font-size: 12px;"/>
             </south>
-
         </borderlayout>
     </div>
     <popup id="clearAllTooltip">

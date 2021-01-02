@@ -120,7 +120,7 @@ public class CommandOutputVM implements EventListener<Event> {
      */
     private void highlightBlock() {
         Div highlightBlock = (Div) Path.getComponent("/commandOutputWindowID/commandOutputWindowId");
-        highlightBlock.appendChild(new Html("<pre><code class=shell>" + commandOutput + "</code></pre>"));
+        highlightBlock.appendChild(new Html("<pre><code>" + commandOutput + "</code></pre>"));
         BindUtils.postNotifyChange(null, null, this, ".");
         Clients.evalJavaScript("highlightBlock();");
     }

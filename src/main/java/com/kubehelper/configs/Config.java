@@ -48,12 +48,7 @@ public class Config {
             "dos", "perl", "sql", "moonscript", "css", "vim", "dart", "scala", "java", "livecodeserver", "makefile", "profile", "plaintext", "rust",
             "powershell", "python", "python-repl", "shell", "ini", "javascript", "yaml", "properties", "xquery", "kotlin");
 
-    public static String DASHBOARD_MODEL = "dashboard";
-    public static String SEARCH_MODEL = "search";
-    public static String SECURITY_MODEL = "security";
-    public static String LABELS_MODEL = "labels";
-    public static String COMMANDS_MODEL = "commands";
-    public static String IPS_AND_PORTS_MODEL = "ipsAndPorts";
+    public static Boolean COMMANDS_HOT_REPLACEMENT = false;
 
     public static String GIT_URL = "gitUrl";
     public static String GIT_USERNAME = "gitUsername";
@@ -111,5 +106,16 @@ public class Config {
 
     public void setMarkCredentials(Boolean markCredentials) {
         cacheManager.getCache(CONFIGS_CACHE).put(MARK_CREDENTIALS, markCredentials);
+    }
+
+
+
+    public Boolean getCommandsHotReplacement() {
+        Cache.ValueWrapper value = cacheManager.getCache(CONFIGS_CACHE).get(COMMANDS_HOT_REPLACEMENT);
+        return Objects.isNull(value) ? false : (Boolean) value.get();
+    }
+
+    public void setCommandsHotReplacement(Boolean hotReplacement) {
+        cacheManager.getCache(CONFIGS_CACHE).put(COMMANDS_HOT_REPLACEMENT, hotReplacement);
     }
 }

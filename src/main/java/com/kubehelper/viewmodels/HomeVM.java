@@ -28,20 +28,26 @@ import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.util.Notification;
 
 /**
+ * Class for displaying login form and common help for Kube Helper.
+ * ViewModel initializes ..zul/home.zul
+ *
  * @author JDev
  */
 public class HomeVM {
 
     private static Logger logger = LoggerFactory.getLogger(HomeVM.class);
 
+    /**
+     * Shows the error that occurred during authorization.
+     *
+     * @param view - login view.
+     */
     @AfterCompose
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) {
         if (StringUtils.isNotBlank(Global.AUTH_EXCEPTION_MESSAGE)) {
             logger.error(String.format("Auth Error: %s", Global.AUTH_EXCEPTION_MESSAGE));
             Notification.show(Global.AUTH_EXCEPTION_MESSAGE, "error", view, "top_center", 5000);
-//            Clients.alert(Global.AUTH_EXCEPTION_MESSAGE,"Authentication error","error");
             Global.AUTH_EXCEPTION_MESSAGE = "";
         }
     }
-
 }

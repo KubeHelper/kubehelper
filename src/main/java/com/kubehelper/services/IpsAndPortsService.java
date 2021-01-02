@@ -45,6 +45,8 @@ import java.util.StringJoiner;
 import java.util.function.Consumer;
 
 /**
+ * Service for {@link com.kubehelper.viewmodels.IpsAndPortsVM} View Model.
+ *
  * @author JDev
  */
 @Service
@@ -64,9 +66,6 @@ public class IpsAndPortsService {
     @Autowired
     private CommonService commonService;
 
-    public IpsAndPortsService() {
-    }
-
     /**
      * Constructor initializes templates for the detail view.
      *
@@ -76,16 +75,15 @@ public class IpsAndPortsService {
     @PostConstruct
     private void postConstruct() {
         podDetailsTemplate = commonService.getResourcesAsStringByPath("/templates/ips-and-ports/pod-details.html");
-
         serviceDetailsTemplate = commonService.getResourcesAsStringByPath("/templates/ips-and-ports/service-details.html");
         containerDetailsTemplate = commonService.getResourcesAsStringByPath("/templates/ips-and-ports/container-details.html");
     }
 
 
     /**
-     * Clears active @{@link IpsAndPortsModel} model and fill it with new data from pods and services.
+     * Clears active {@link IpsAndPortsModel} model and fill it with new data from pods and services.
      *
-     * @param ipsAndPortsModel - model for @{@link com.kubehelper.viewmodels.IpsAndPortsVM}
+     * @param ipsAndPortsModel - model for {@link com.kubehelper.viewmodels.IpsAndPortsVM}
      */
     public void get(IpsAndPortsModel ipsAndPortsModel) {
         try {

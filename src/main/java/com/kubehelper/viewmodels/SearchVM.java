@@ -389,7 +389,7 @@ public class SearchVM implements EventListener {
             Notification.show("Found: " + searchResults.size() + " items", "info", searchGridTotalItemsFooter, "before_end", 2000);
         }
         if (isSearchButtonPressed && searchModel.hasSearchErrors()) {
-            Window window = (Window) Executions.createComponents("~./zul/kubehelper/components/errors.zul", null, Map.of("errors", searchModel.getSearchExceptions()));
+            Window window = (Window) Executions.createComponents(Global.PATH_TO_ERROR_RESOURCE_ZUL, null, Map.of("errors", searchModel.getSearchExceptions()));
             window.doModal();
             searchModel.setSearchExceptions(new ArrayList<>());
         }

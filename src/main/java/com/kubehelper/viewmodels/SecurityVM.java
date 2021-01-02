@@ -434,7 +434,7 @@ public class SecurityVM {
             Notification.show("Found: " + results.size() + " items", "info", footer, "before_end", 2000);
         }
         if (pressedButton && securityModel.hasSearchErrors()) {
-            Window window = (Window) Executions.createComponents("~./zul/kubehelper/components/errors.zul", null, Map.of("errors", securityModel.getSearchExceptions()));
+            Window window = (Window) Executions.createComponents(Global.PATH_TO_ERROR_RESOURCE_ZUL, null, Map.of("errors", securityModel.getSearchExceptions()));
             window.doModal();
             securityModel.setSearchExceptions(new ArrayList<>());
         }

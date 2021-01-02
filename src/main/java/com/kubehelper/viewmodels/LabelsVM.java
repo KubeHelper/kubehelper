@@ -491,7 +491,7 @@ public class LabelsVM implements EventListener {
             Notification.show("Found: " + searchResults.size() + " items", "info", labelsGridTotalItemsFooter, "before_end", 2000);
         }
         if (isSearchButtonPressed && labelsModel.hasSearchErrors()) {
-            Window window = (Window) Executions.createComponents("~./zul/kubehelper/components/errors.zul", null, Map.of("errors", labelsModel.getSearchExceptions()));
+            Window window = (Window) Executions.createComponents(Global.PATH_TO_ERROR_RESOURCE_ZUL, null, Map.of("errors", labelsModel.getSearchExceptions()));
             window.doModal();
             labelsModel.setSearchExceptions(new ArrayList<>());
         }

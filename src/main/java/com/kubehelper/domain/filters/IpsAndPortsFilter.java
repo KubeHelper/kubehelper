@@ -21,6 +21,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.zkoss.zul.ListModelList;
 
 /**
+ * Filter for Ips and Ports View Model.
+ *
  * @author JDev
  */
 public class IpsAndPortsFilter {
@@ -49,7 +51,7 @@ public class IpsAndPortsFilter {
     }
 
     public IpsAndPortsFilter setSelectedNamespaceFilter(String selectedNamespaceFilter) {
-        this.selectedNamespaceFilter = selectedNamespaceFilter == null ? "" : selectedNamespaceFilter;
+        this.selectedNamespaceFilter =StringUtils.isBlank(selectedNamespaceFilter) ? "" : selectedNamespaceFilter;
         return this;
     }
 
@@ -58,7 +60,7 @@ public class IpsAndPortsFilter {
     }
 
     public IpsAndPortsFilter setSelectedResourceTypeFilter(String selectedResourceTypeFilter) {
-        this.selectedResourceTypeFilter = selectedResourceTypeFilter == null ? "" : selectedResourceTypeFilter;
+        this.selectedResourceTypeFilter = StringUtils.isBlank(selectedResourceTypeFilter) ? "" : selectedResourceTypeFilter;
         return this;
     }
 
@@ -67,7 +69,7 @@ public class IpsAndPortsFilter {
     }
 
     public IpsAndPortsFilter setResourceName(String resourceName) {
-        this.resourceName = resourceName == null ? "" : resourceName.trim();
+        this.resourceName = StringUtils.isBlank(resourceName) ? "" : resourceName.trim();
         return this;
     }
 
@@ -76,7 +78,7 @@ public class IpsAndPortsFilter {
     }
 
     public IpsAndPortsFilter setCreationTime(String creationTime) {
-        this.creationTime = creationTime == null ? "" : creationTime.trim();
+        this.creationTime = StringUtils.isBlank(creationTime) ? "" : creationTime.trim();
         return this;
     }
 
@@ -85,7 +87,7 @@ public class IpsAndPortsFilter {
     }
 
     public IpsAndPortsFilter setIp(String ip) {
-        this.ip = ip == null ? "" : ip.trim();
+        this.ip = StringUtils.isBlank(ip) ? "" : ip.trim();
         return this;
     }
 
@@ -94,7 +96,7 @@ public class IpsAndPortsFilter {
     }
 
     public IpsAndPortsFilter setHostInfo(String hostInfo) {
-        this.hostInfo = hostInfo;
+        this.hostInfo = StringUtils.isBlank(hostInfo) ? "" : hostInfo.trim();
         return this;
     }
 
@@ -103,7 +105,7 @@ public class IpsAndPortsFilter {
     }
 
     public IpsAndPortsFilter setPorts(String ports) {
-        this.ports = ports == null ? "" : ports.trim();
+        this.ports = StringUtils.isBlank(ports) ? "" : ports.trim();
         return this;
     }
 
@@ -112,7 +114,7 @@ public class IpsAndPortsFilter {
     }
 
     public IpsAndPortsFilter setAdditionalInfo(String additionalInfo) {
-        this.additionalInfo = additionalInfo;
+        this.additionalInfo = StringUtils.isBlank(additionalInfo) ? "" : additionalInfo.trim();
         return this;
     }
 

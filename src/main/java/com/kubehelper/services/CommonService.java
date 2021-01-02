@@ -41,6 +41,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.SequenceInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -62,17 +63,24 @@ public class CommonService {
 
     private static Logger logger = LoggerFactory.getLogger(CommonService.class);
 
-    public List<String> getAllNamespaces() {
-        List<String> namespaces = new ArrayList<String>(Arrays.asList("all"));
+    public List<String> getAllNamespaces(List<String> initNamespaces) {
         V1NamespaceList v1NamespacesList = null;
         try {
             v1NamespacesList = api.listNamespace(null, false, null, null, null, 0, null, 30, false);
-            v1NamespacesList.getItems().forEach(v1Namespace -> namespaces.add(v1Namespace.getMetadata().getName()));
+            v1NamespacesList.getItems().forEach(v1Namespace -> initNamespaces.add(v1Namespace.getMetadata().getName()));
         } catch (ApiException e) {
             Messagebox.show(e.getMessage(), "Fetch Namespaces Error", Messagebox.OK, Messagebox.ERROR);
             e.printStackTrace();
         }
-        return namespaces;
+        return initNamespaces;
+    }
+
+    public List<String> getAllNamespaces() {
+        return getAllNamespaces(new ArrayList<>(Arrays.asList("all")));
+    }
+
+    public List<String> getAllNamespacesWithoutAll() {
+        return getAllNamespaces(new ArrayList<>());
     }
 
 
@@ -166,16 +174,16 @@ public class CommonService {
     public String getJsonResource(Resource resource, String resourceName, String namespace) {
         namespace = (StringUtils.isBlank(namespace) || "N/A".equals(namespace)) ? "" : "--namespace=" + namespace;
         String command = String.format("kubectl get %s %s %s -ojson", resource.getName(), resourceName, namespace);
-        return executeCommand(command);
+        return executeCommand("bash", command);
     }
 
-    public String executeCommand(String command) {
+    public String executeCommand(String shell, String command) {
         String result = "";
-        processBuilder.command("bash", "-c", command);
+        processBuilder.command(shell, "-c", command);
         Process process;
         try {
             process = processBuilder.start();
-            result = readOutput(process.getInputStream());
+            result = readOutput(new SequenceInputStream(process.getInputStream(), process.getErrorStream()));
         } catch (IOException e) {
             if (logger.isDebugEnabled()) {
                 logger.error(String.format("executeCommand: Command=%s", command) + e.getMessage(), e);

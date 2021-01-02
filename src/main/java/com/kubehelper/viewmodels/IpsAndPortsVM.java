@@ -58,6 +58,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * Class for displaying ips, ports and container details for kubernetes pods.
+ * ViewModel initializes ..kubehelper/pages/imagesandports.zul
+ *
  * @author JDev
  */
 @VariableResolver(DelegatingVariableResolver.class)
@@ -90,7 +93,7 @@ public class IpsAndPortsVM {
     }
 
     /**
-     * We need Selectors.wireComponents() in order to be able to @Wire GUI components.
+     * For @Wire GUI components and Event Listeners.
      */
     @AfterCompose
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) {
@@ -104,6 +107,9 @@ public class IpsAndPortsVM {
         BindUtils.postNotifyChange(null, null, this, ".");
     }
 
+    /**
+     * Search for ips and ports in cluster.
+     */
     @Command
     @NotifyChange({"totalItems", "ipsAndPortsResults", "filter"})
     public void search() {
@@ -113,6 +119,11 @@ public class IpsAndPortsVM {
         onInitPreparations();
     }
 
+    /**
+     * Get namespaces if not set by model.
+     * Filter results if filter active and results is not empty.
+     * Sort results by namespace.
+     */
     private void onInitPreparations() {
         ipsAndPortsModel.setNamespaces(ipsAndPortsModel.getNamespaces().isEmpty() ? commonService.getAllNamespaces() : ipsAndPortsModel.getNamespaces());
         if (ipsAndPortsModel.getFilter().isFilterActive() && !ipsAndPortsModel.getIpsAndPortsResults().isEmpty()) {
@@ -124,6 +135,9 @@ public class IpsAndPortsVM {
         logger.info("Found {} namespaces.", ipsAndPortsModel.getNamespaces());
     }
 
+    /**
+     * Filter IPs.
+     */
     @Command
     @NotifyChange({"totalItems", "ipsAndPortsResults"})
     public void filterIps() {
@@ -142,12 +156,19 @@ public class IpsAndPortsVM {
         sortResultsByNamespace();
     }
 
+    /**
+     * Show pod details label.
+     * @param item - {@link IpsAndPortsResult} item
+     */
     @Command
     @NotifyChange("detailsLabel")
     public void getDetails(@BindingParam("clickedItem") IpsAndPortsResult item) {
         detailsLabel = detailsLabel.equals(item.getDetails()) ? "" : item.getDetails();
     }
 
+    /**
+     * Clear model. Clear filters, results, namespaces.
+     */
     @Command
     @NotifyChange({"totalItems", "ipsAndPortsResults", "filter", "selectedNamespace"})
     public void clearAll() {
@@ -173,6 +194,27 @@ public class IpsAndPortsVM {
         }
     }
 
+    /**
+     * Shows different Notifications messages and if exceptions then Windows with errors list.
+     *
+     * @return List with @{@link IpsAndPortsResult}
+     */
+    public ListModelList<IpsAndPortsResult> getIpsAndPortsResults() {
+        if (isGetButtonPressed && ipsAndPortsResults.isEmpty()) {
+            Notification.show("Nothing found.", "info", ipsAndPortsGridFooter, "before_end", 2000);
+        }
+        if (isGetButtonPressed && !ipsAndPortsResults.isEmpty()) {
+            Notification.show("Found: " + ipsAndPortsResults.size() + " items", "info", ipsAndPortsGridFooter, "before_end", 2000);
+        }
+        if (isGetButtonPressed && ipsAndPortsModel.hasSearchErrors()) {
+            Window window = (Window) Executions.createComponents(Global.PATH_TO_ERROR_RESOURCE_ZUL, null, Map.of("errors", ipsAndPortsModel.getSearchExceptions()));
+            window.doModal();
+            ipsAndPortsModel.setSearchExceptions(new ArrayList<>());
+        }
+        isGetButtonPressed = false;
+        return ipsAndPortsResults;
+    }
+
     private void sortResultsByNamespace() {
         ipsAndPortsResults.sort(Comparator.comparing(IpsAndPortsResult::getNamespace));
     }
@@ -185,9 +227,8 @@ public class IpsAndPortsVM {
         return this.ipsAndPortsModel.getSelectedNamespace();
     }
 
-    public IpsAndPortsVM setSelectedNamespace(String selectedNamespace) {
+    public void setSelectedNamespace(String selectedNamespace) {
         this.ipsAndPortsModel.setSelectedNamespace(selectedNamespace);
-        return this;
     }
 
     public String getTotalItems() {
@@ -198,21 +239,6 @@ public class IpsAndPortsVM {
         return ipsAndPortsModel.getNamespaces();
     }
 
-    public ListModelList<IpsAndPortsResult> getIpsAndPortsResults() {
-        if (isGetButtonPressed && ipsAndPortsResults.isEmpty()) {
-            Notification.show("Nothing found.", "info", ipsAndPortsGridFooter, "before_end", 2000);
-        }
-        if (isGetButtonPressed && !ipsAndPortsResults.isEmpty()) {
-            Notification.show("Found: " + ipsAndPortsResults.size() + " items", "info", ipsAndPortsGridFooter, "before_end", 2000);
-        }
-        if (isGetButtonPressed && ipsAndPortsModel.hasSearchErrors()) {
-            Window window = (Window) Executions.createComponents("~./zul/kubehelper/components/errors.zul", null, Map.of("errors", ipsAndPortsModel.getSearchExceptions()));
-            window.doModal();
-            ipsAndPortsModel.setSearchExceptions(new ArrayList<>());
-        }
-        isGetButtonPressed = false;
-        return ipsAndPortsResults;
-    }
 
     public IpsAndPortsFilter getFilter() {
         return ipsAndPortsModel.getFilter();

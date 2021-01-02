@@ -26,18 +26,15 @@ import io.fabric8.kubernetes.api.model.NodeCondition;
 import io.fabric8.kubernetes.api.model.NodeList;
 import io.fabric8.kubernetes.api.model.Quantity;
 import io.fabric8.kubernetes.api.model.Taint;
-import io.fabric8.kubernetes.api.model.metrics.v1beta1.NodeMetricsList;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -51,6 +48,11 @@ public class DashboardService {
 
     private static Logger logger = LoggerFactory.getLogger(DashboardService.class);
 
+    /**
+     * get cluster and nodes info.
+     *
+     * @param dashboardModel - {@link DashboardModel}
+     */
     public void showDashboard(DashboardModel dashboardModel) {
 
         dashboardModel.getNodesResults().clear();
@@ -63,6 +65,7 @@ public class DashboardService {
 
             clusterResult.setTotalPods(client.pods().list().getItems().size());
 
+            //TODO check pods in cluster
             client.pods().list().getItems().forEach(pod -> {
                 logger.info(String.format("POD: %s", pod.getMetadata().getName()));
             });
@@ -186,8 +189,4 @@ public class DashboardService {
                 .append("type=").append(condition.getType()).toString();
     }
 
-
-    private String getParsedCreationTime(DateTime dateTime) {
-        return dateTime == null ? "null" : dateTime.toString("dd.MM.yyyy HH:mm:ss");
-    }
 }

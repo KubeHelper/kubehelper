@@ -42,6 +42,7 @@ public class Global {
 
     public static String AUTH_EXCEPTION_MESSAGE = "";
     public static String PATH_TO_RAW_RESOURCE_ZUL = "~./zul/kubehelper/components/raw-resource.zul";
+    public static String PATH_TO_ERROR_RESOURCE_ZUL = "~./zul/kubehelper/components/errors.zul";
 
 
     public static Map<String, PageModel> ACTIVE_MODELS = new HashMap<>() {

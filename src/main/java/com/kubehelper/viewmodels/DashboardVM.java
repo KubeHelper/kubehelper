@@ -55,12 +55,13 @@ import org.zkoss.zul.Vlayout;
 import java.util.Map;
 
 /**
+ * Class for displaying Kube Helper dashboard Cluster and nodes metrics.
+ * ViewModel initializes ..kubehelper/pages/dashboard.zul
+ *
  * @author JDev
  */
 @VariableResolver(DelegatingVariableResolver.class)
 public class DashboardVM {
-
-    private static Logger logger = LoggerFactory.getLogger(DashboardVM.class);
 
     private int centerLayoutHeight = 700;
 
@@ -96,7 +97,9 @@ public class DashboardVM {
         return dashboardModel.getClusterResult();
     }
 
-
+    /**
+     * Creates dashboard dynamically. Depends of nodes count.
+     */
     private void createDashboard() {
         Vlayout mainDashboardVLayout = (Vlayout) Path.getComponent("//indexPage/templateInclude/mainDashboardVLayout");
         Hbox hbox = buildNewHbox();
@@ -111,10 +114,14 @@ public class DashboardVM {
                 mainDashboardVLayout.appendChild(hbox);
                 hbox = buildNewHbox();
             }
-
         }
     }
 
+    /**
+     * Creates new {@link Hbox}
+     *
+     * @return - new Hbox.
+     */
     private Hbox buildNewHbox() {
         Hbox hbox = new Hbox();
         hbox.setWidth("100%");
@@ -122,6 +129,11 @@ public class DashboardVM {
         return hbox;
     }
 
+    /**
+     * Creates new Cell for Hbox.
+     *
+     * @return - new Cell.
+     */
     private Cell buildNewCell() {
         Cell cell = new Cell();
         cell.setWidth("50%");
@@ -129,6 +141,12 @@ public class DashboardVM {
         return cell;
     }
 
+    /**
+     * Creates new node panel.
+     *
+     * @param node - {@link NodeResult}
+     * @return - cell with node result.
+     */
     private Cell createNodePanel(NodeResult node) {
         Cell cell = buildNewCell();
         Panel panel = buildNewPanel(node.getName(), true);
@@ -142,6 +160,14 @@ public class DashboardVM {
         return cell;
     }
 
+    /**
+     * Creates Listbox for node.
+     *
+     * @param name - name.
+     * @param listBoxData - listbox Data.
+     * @param totalImagesSize - total images size.
+     * @return - {@link Listbox} for node Hbox.
+     */
     private Listbox createListBox(String name, Map<String, String> listBoxData, String totalImagesSize) {
         Listbox listBox = new Listbox();
         Auxhead auxhead = new Auxhead();
@@ -185,6 +211,13 @@ public class DashboardVM {
         return listBox;
     }
 
+    /**
+     * Builds new panel with title and state open/closed.
+     *
+     * @param title - panel title.
+     * @param isOpen - true if panel will be open.
+     * @return - {@link Panel}
+     */
     private Panel buildNewPanel(String title, boolean isOpen) {
         Panel panel = new Panel();
         panel.setCollapsible(true);

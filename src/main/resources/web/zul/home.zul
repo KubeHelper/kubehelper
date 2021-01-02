@@ -57,6 +57,10 @@
         </south>
         <center border="none" style="overflow-y:auto;overflow-x:auto;font-family: Courier, Monaco, monospace;">
             <vbox>
+<!--                <panel width="100%" title="Panel" maximizable="true" border="normal" collapsible="true" height="50%">-->
+<!--                    <panelchildren>-->
+<!--                    </panelchildren>-->
+<!--                </panel>-->
             </vbox>
         </center>
     </borderlayout>

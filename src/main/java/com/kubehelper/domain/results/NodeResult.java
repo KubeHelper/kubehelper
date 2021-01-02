@@ -17,7 +17,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package com.kubehelper.domain.results;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
