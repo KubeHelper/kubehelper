@@ -20,8 +20,8 @@
                                     <span sclass="z-icon-hashtag"/>
                                 </auxheader>
                                 <auxheader colspan="1">
-                                    <combobox id="commandsGroupCBox" hflex="1" mold="rounded" model="@load(commandsVM.commandsFilter.groupsFilter)"
-                                              selectedItem="@bind(commandsVM.commandsFilter.selectedGroupFilter)"
+                                    <combobox id="commandsGroupCBox" hflex="1" mold="rounded" model="@load(commandsVM.filter.groupsFilter)"
+                                              selectedItem="@bind(commandsVM.filter.selectedGroupFilter)"
                                               onChange="@command('filterCommands')">
                                         <template name="model">
                                             <comboitem label="@load(each)"/>
@@ -29,8 +29,8 @@
                                     </combobox>
                                 </auxheader>
                                 <auxheader colspan="1">
-                                    <combobox id="operationsGroupCBox" hflex="1" mold="rounded" model="@load(commandsVM.commandsFilter.operationsFilter)"
-                                              selectedItem="@bind(commandsVM.commandsFilter.selectedOperationFilter)"
+                                    <combobox id="operationsGroupCBox" hflex="1" mold="rounded" model="@load(commandsVM.filter.operationsFilter)"
+                                              selectedItem="@bind(commandsVM.filter.selectedOperationFilter)"
                                               onChange="@command('filterCommands')">
                                         <template name="model">
                                             <comboitem label="@load(each)"/>
@@ -38,10 +38,10 @@
                                     </combobox>
                                 </auxheader>
                                 <auxheader colspan="1">
-                                    <textbox hflex="1" value="@bind(commandsVM.commandsFilter.command)" onChange="@command('filterCommands')"/>
+                                    <textbox hflex="1" value="@bind(commandsVM.filter.command)" onChange="@command('filterCommands')"/>
                                 </auxheader>
                                 <auxheader colspan="1">
-                                    <textbox instant="true" hflex="1" value="@bind(commandsVM.commandsFilter.description)" onChange="@command('filterCommands')"/>
+                                    <textbox instant="true" hflex="1" value="@bind(commandsVM.filter.description)" onChange="@command('filterCommands')"/>
                                 </auxheader>
                             </auxhead>
                             <columns menupopup="auto" sizable="true">
@@ -57,7 +57,7 @@
                                         <label value="${item.id}"/>
                                         <label value="${item.group}"/>
                                         <label value="${item.operation}"/>
-                                        <label value="${item.viewCommand}" multiline="true"/>
+                                        <label value="${item.command}" multiline="true"/>
                                         <label value="${item.description}" multiline="true"/>
                                     </row>
                                 </template>
@@ -67,15 +67,12 @@
                             </foot>
                         </grid>
 
-                        <groupbox>
+                        <groupbox id="commandsHotReplacementGrBox">
                             <caption iconSclass="z-icon-terminal" label="Full Command"/>
                             <hbox style="margin-bottom: 3px">
-                                <!--                                    <combobox tooltip="namespacesTooltip" id="namespacesCBox" hflex="1" model="@load(ipsAndPortsVM.namespaces)"-->
-                                <!--                                              selectedItem="@bind(ipsAndPortsVM.selectedNamespace)" readonly="true">-->
-                                <!--                                        <template name="model">-->
-                                <!--                                            <comboitem label="@load(each)"/>-->
-                                <!--                                        </template>-->
-                                <!--                                    </combobox>-->
+                                <checkbox id="hotReplacementChBox" label="Hot replacement" style="vertical-align: middle;"
+                                          tooltiptext="Enables or disables combo boxes that replace resources in a command on the fly."
+                                          checked="@bind(commandsVM.hotReplacementEnabled)" onCheck="@command(hotReplacementEnabled)"/>
                                 <vlayout>
                                     <label value="Namespaces:"/>
                                     <combobox id="commandsNamespacesCBox" model="@load(commandsVM.namespaces)" selectedItem="@bind(commandsVM.selectedNamespace)" readonly="true">
@@ -86,83 +83,119 @@
                                 </vlayout>
                                 <vlayout>
                                     <label value="Pods:"/>
-                                    <combobox model="@load(commandsVM.namespacedPods)" selectedItem="@bind(commandsVM.selectedPod)" readonly="true">
-                                        <template name="model">
-                                            <comboitem label="@load(each)"/>
-                                        </template>
-                                    </combobox>
+                                    <bandbox readonly="true" iconSclass="z-icon-caret-down" tooltiptext="@load(commandsVM.selectedPods)" disabled="@bind(!commandsVM.hotReplacementEnabled)">
+                                        <bandpopup width="150px">
+                                            <listbox model="@load(commandsVM.namespacedPods)" checkmark="true" multiple="true" style="border: none;font-size: 11px;"
+                                                     selectedItems="@bind(commandsVM.selectedPods)">
+                                            </listbox>
+                                        </bandpopup>
+                                    </bandbox>
                                 </vlayout>
                                 <vlayout>
                                     <label value="Deployments:"/>
-                                    <combobox model="@load(commandsVM.namespacedDeployments)" selectedItem="@bind(commandsVM.selectedDeployment)" readonly="true">
-                                        <template name="model">
-                                            <comboitem label="@load(each)"/>
-                                        </template>
-                                    </combobox>
+                                    <bandbox readonly="true" iconSclass="z-icon-caret-down" tooltiptext="@load(commandsVM.selectedDeployments)" disabled="@bind(!commandsVM.hotReplacementEnabled)">
+                                        <bandpopup width="150px">
+                                            <listbox model="@load(commandsVM.namespacedDeployments)" checkmark="true" multiple="true" style="border: none"
+                                                     selectedItems="@bind(commandsVM.selectedDeployments)">
+                                            </listbox>
+                                        </bandpopup>
+                                    </bandbox>
                                 </vlayout>
                                 <vlayout>
                                     <label value="StatefulSets:"/>
-                                    <combobox model="@load(commandsVM.namespacedStatefulSets)" selectedItem="@bind(commandsVM.selectedStatefulSet)" readonly="true">
-                                        <template name="model">
-                                            <comboitem label="@load(each)"/>
-                                        </template>
-                                    </combobox>
+                                    <bandbox readonly="true" iconSclass="z-icon-caret-down" tooltiptext="@load(commandsVM.selectedStatefulSets)" disabled="@bind(!commandsVM.hotReplacementEnabled)">
+                                        <bandpopup width="150px">
+                                            <listbox model="@load(commandsVM.namespacedStatefulSets)" checkmark="true" multiple="true" style="border: none"
+                                                     selectedItems="@bind(commandsVM.selectedStatefulSets)">
+                                            </listbox>
+                                        </bandpopup>
+                                    </bandbox>
                                 </vlayout>
                                 <vlayout>
                                     <label value="ReplicaSets:"/>
-                                    <combobox model="@load(commandsVM.namespacedReplicaSets)" selectedItem="@bind(commandsVM.selectedReplicaSet)" readonly="true">
-                                        <template name="model">
-                                            <comboitem label="@load(each)"/>
-                                        </template>
-                                    </combobox>
+                                    <bandbox readonly="true" iconSclass="z-icon-caret-down" tooltiptext="@load(commandsVM.selectedReplicaSets)" disabled="@bind(!commandsVM.hotReplacementEnabled)">
+                                        <bandpopup width="150px">
+                                            <listbox model="@load(commandsVM.namespacedReplicaSets)" checkmark="true" multiple="true" style="border: none"
+                                                     selectedItems="@bind(commandsVM.selectedReplicaSets)">
+                                            </listbox>
+                                        </bandpopup>
+                                    </bandbox>
                                 </vlayout>
                                 <vlayout>
                                     <label value="DaemonSets:"/>
-                                    <combobox model="@load(commandsVM.namespacedDaemonSets)" selectedItem="@bind(commandsVM.selectedDaemonSet)" readonly="true">
-                                        <template name="model">
-                                            <comboitem label="@load(each)"/>
-                                        </template>
-                                    </combobox>
+                                    <bandbox readonly="true" iconSclass="z-icon-caret-down" tooltiptext="@load(commandsVM.selectedDaemonSets)" disabled="@bind(!commandsVM.hotReplacementEnabled)">
+                                        <bandpopup width="150px">
+                                            <listbox model="@load(commandsVM.namespacedDaemonSets)" checkmark="true" multiple="true" style="border: none"
+                                                     selectedItems="@bind(commandsVM.selectedDaemonSets)">
+                                            </listbox>
+                                        </bandpopup>
+                                    </bandbox>
                                 </vlayout>
                                 <vlayout>
                                     <label value="ConfigMaps:"/>
-                                    <combobox model="@load(commandsVM.namespacedConfigMaps)" selectedItem="@bind(commandsVM.selectedConfigMap)" readonly="true">
-                                        <template name="model">
-                                            <comboitem label="@load(each)"/>
-                                        </template>
-                                    </combobox>
+                                    <bandbox readonly="true" iconSclass="z-icon-caret-down" tooltiptext="@load(commandsVM.selectedConfigMaps)" disabled="@bind(!commandsVM.hotReplacementEnabled)">
+                                        <bandpopup width="150px">
+                                            <listbox model="@load(commandsVM.namespacedConfigMaps)" checkmark="true" multiple="true" style="border: none"
+                                                     selectedItems="@bind(commandsVM.selectedConfigMaps)">
+                                            </listbox>
+                                        </bandpopup>
+                                    </bandbox>
                                 </vlayout>
                                 <vlayout>
                                     <label value="Services:"/>
-                                    <combobox model="@load(commandsVM.namespacedServices)" selectedItem="@bind(commandsVM.selectedService)" readonly="true">
-                                        <template name="model">
-                                            <comboitem label="@load(each)"/>
-                                        </template>
-                                    </combobox>
+                                    <bandbox readonly="true" iconSclass="z-icon-caret-down" tooltiptext="@load(commandsVM.selectedServices)" disabled="@bind(!commandsVM.hotReplacementEnabled)">
+                                        <bandpopup width="150px">
+                                            <listbox model="@load(commandsVM.namespacedServices)" checkmark="true" multiple="true" style="border: none"
+                                                     selectedItems="@bind(commandsVM.selectedServices)">
+                                            </listbox>
+                                        </bandpopup>
+                                    </bandbox>
                                 </vlayout>
                                 <vlayout>
                                     <label value="Jobs:"/>
-                                    <combobox model="@load(commandsVM.namespacedJobs)" selectedItem="@bind(commandsVM.selectedJob)" readonly="true">
-                                        <template name="model">
-                                            <comboitem label="@load(each)"/>
-                                        </template>
-                                    </combobox>
+                                    <bandbox readonly="true" iconSclass="z-icon-caret-down" tooltiptext="@load(commandsVM.selectedJobs)" disabled="@bind(!commandsVM.hotReplacementEnabled)">
+                                        <bandpopup width="150px">
+                                            <listbox model="@load(commandsVM.namespacedJobs)" checkmark="true" multiple="true" style="border: none" selectedItems="@bind(commandsVM.selectedJobs)">
+                                            </listbox>
+                                        </bandpopup>
+                                    </bandbox>
                                 </vlayout>
                             </hbox>
                             <hbox width="100%" align="start" pack="stretch" height="@load(commandsVM.fullCommandBoxHeight)">
                                 <cell width="89.5%" align="left">
-                                    <textbox value="@bind(commandsVM.fullCommand)" width="100%" rows="3"
+                                    <textbox id="commandToExecuteTBox" value="@bind(commandsVM.commandToExecuteEditable)" width="100%" rows="3"
                                              style="font-family: Courier, Monaco, monospace;color: blue;font-size: 13px;line-height: 1.4;margin-bottom: 2px;"/>
-                                    <textbox value="@bind(commandsVM.fullCommand)" width="100%"
+                                    <textbox value="@bind(commandsVM.commandToExecute)" width="100%"
                                              style="font-family: Courier, Monaco, monospace;color: red;font-size: 12px;" readonly="true"/>
                                 </cell>
                                 <cell width="10%" valign="middle">
-                                    <button id="runCommandBtn" iconSclass="fas fa-terminal" onClick="@command('run')" width="100%"/>
+                                    <hbox width="100%" height="50%" pack="stretch">
+                                        <label value="Shell: "/>
+                                        <combobox model="@load(commandsVM.shells)" selectedItem="@bind(commandsVM.selectedShell)" readonly="true">
+                                            <template name="model">
+                                                <comboitem label="@load(each)"/>
+                                            </template>
+                                        </combobox>
+                                    </hbox>
+                                    <vbox width="100%" height="50%" pack="end">
+                                        <button id="runCommandBtn" iconSclass="fas fa-terminal" onClick="@command('run')" width="100%"/>
+                                    </vbox>
+                                    <!--                                    <vbox width="100%" pack="end">-->
+                                    <!--                                        <hbox width="100%" pack="center">-->
+                                    <!--                                            <label value="Shell: "/>-->
+                                    <!--                                            <combobox model="@load(commandsVM.shells)" selectedItem="@bind(commandsVM.selectedShell)" readonly="true">-->
+                                    <!--                                                <template name="model">-->
+                                    <!--                                                    <comboitem label="@load(each)"/>-->
+                                    <!--                                                </template>-->
+                                    <!--                                            </combobox>-->
+                                    <!--                                        </hbox>-->
+                                    <!--                                        <button id="runCommandBtn" iconSclass="fas fa-terminal" onClick="@command('run')" width="100%"/>-->
+                                    <!--                                    </vbox>-->
                                 </cell>
                             </hbox>
                         </groupbox>
 
-                        <groupbox width="100%" height="@load(commandsVM.commandOutputHeight)">
+                        <groupbox id="commandOutputGrBox" width="100%" height="@load(commandsVM.commandOutputHeight)">
                             <caption iconSclass="z-icon-terminal" label="Command Output"/>
                             <panel width="100%" height="@load(commandsVM.commandOutputHeight)">
                                 <toolbar align="end">
@@ -172,7 +205,8 @@
                                     </hbox>
                                 </toolbar>
                                 <panelchildren>
-                                    <div width="100%" height="90%" style="overflow-y:scroll;overflow-x:auto;font-family: Courier, Monaco, monospace;display: flex;line-height: 1.3;">
+                                    <div width="100%" height="90%"
+                                         style="overflow-y:scroll;overflow-x:auto;font-family: Courier, Monaco, monospace;display: flex;line-height: 1.3;border: 1px solid lightgray;padding-left: 5px">
                                         <div id="commandOutputId" width="100%" height="100%" class='highlightComOutput' style="@load(commandsVM.fontSizeCss)">
                                         </div>
                                     </div>
@@ -196,7 +230,8 @@
                                         <textbox placeholder="Password" width="100%" value="@bind(commandsVM.gitPassword)" type="password"/>
                                     </cell>
                                     <cell width="5%">
-                                        <checkbox label="Mark" tooltiptext="Mark Credentials" checked="@load(commandsVM.markCredentials)" onCheck="markCredentials()"/>
+                                        <checkbox id="markCredentialsChBox" label="Mark" tooltiptext="Mark Credentials" checked="@bind(commandsVM.markCredentials)"
+                                                  onCheck="markCredentials('markCredentialsChBox')"/>
                                     </cell>
                                     <cell width="10%" tooltip="Clone">
                                         <button label="Clone" iconSclass="z-icon-clone" width="100%" onClick="@command('cloneCommands')"/>
@@ -241,12 +276,16 @@
                                     <textbox width="100%" height="100%"/>
                                 </panelchildren>
                             </panel>
-                            <panel width="100%" title="Panel" maximizable="true" border="normal" collapsible="true" height="50%">
-                                <panelchildren>
-                                    <textbox width="100%" height="100%"/>
-                                </panelchildren>
-                            </panel>
-                            <!--                                <html><![CDATA[<pre><code>${commandsVM.selectedCommandsRaw}</code></pre>]]></html>-->
+                            <!--                            <panel width="100%" title="Panel" maximizable="true" border="normal" collapsible="true" height="50%">-->
+                            <!--                                <panelchildren>-->
+                            <!--&lt;!&ndash;                                    <iframe style="width:99%; height:99%;border:1px inset;" src="http://localhost:8080"/>&ndash;&gt;-->
+                            <!--                                </panelchildren>-->
+                            <!--                            </panel>-->
+                            <!--                            <panel width="100%" title="Panel" maximizable="true" border="normal" collapsible="true" height="50%">-->
+                            <!--                                <panelchildren>-->
+
+                            <!--                                </panelchildren>-->
+                            <!--                            </panel>-->
                         </div>
                     </tabpanel>
 

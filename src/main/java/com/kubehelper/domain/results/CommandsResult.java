@@ -29,8 +29,7 @@ public class CommandsResult {
     private String operation = "";
     private String description = "";
     private List<String> rows = new ArrayList<>();
-    private String viewCommand = "";
-    private String runCommand = "";
+    private String command = "";
 
     public CommandsResult() {
     }
@@ -79,21 +78,12 @@ public class CommandsResult {
         return this;
     }
 
-    public String getViewCommand() {
-        return viewCommand;
+    public String getCommand() {
+        return command;
     }
 
-    public CommandsResult setViewCommand(String viewCommand) {
-        this.viewCommand = viewCommand;
-        return this;
-    }
-
-    public String getRunCommand() {
-        return runCommand;
-    }
-
-    public CommandsResult setRunCommand(String runCommand) {
-        this.runCommand = runCommand;
+    public CommandsResult setCommand(String command) {
+        this.command = command;
         return this;
     }
 
@@ -105,8 +95,7 @@ public class CommandsResult {
         sb.append(", operation='").append(operation).append('\'');
         sb.append(", description='").append(description).append('\'');
         sb.append(", rows=").append(rows);
-        sb.append(", viewCommand='").append(viewCommand).append('\'');
-        sb.append(", runCommand='").append(runCommand).append('\'');
+        sb.append(", command='").append(command).append('\'');
         sb.append('}');
         return sb.toString();
     }

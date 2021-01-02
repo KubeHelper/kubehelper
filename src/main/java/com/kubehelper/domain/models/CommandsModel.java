@@ -23,6 +23,7 @@ import com.kubehelper.domain.filters.CommandsFilter;
 import com.kubehelper.domain.results.CommandsResult;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -39,6 +40,11 @@ public class CommandsModel implements PageModel {
     //    private String userCommandsPath = "C:\\temp\\kubehelper";
     private String userCommandsPath = "/tmp/kubehelper";
     public static String NAME = Global.COMMANDS_MODEL;
+    private List<CommandsResult> commandsResults = new ArrayList<>();
+    private CommandsFilter filter = new CommandsFilter();
+    private List<KubeHelperException> buildExceptions = new ArrayList<>();
+
+    private String selectedNamespace = "";
     private Set<String> namespaces = new HashSet<>();
     private Set<String> namespacedPods = new HashSet<>();
     private Set<String> namespacedDeployments = new HashSet<>();
@@ -48,21 +54,22 @@ public class CommandsModel implements PageModel {
     private Set<String> namespacedConfigMaps = new HashSet<>();
     private Set<String> namespacedServices = new HashSet<>();
     private Set<String> namespacedJobs = new HashSet<>();
-    private List<CommandsResult> commandsResults = new ArrayList<>();
-    private CommandsFilter filter = new CommandsFilter();
-    private List<KubeHelperException> buildExceptions = new ArrayList<>();
-    private String selectedNamespace = "";
-    private String selectedPod = "";
-    private String selectedDeployment = "";
-    private String selectedStatefulSet = "";
-    private String selectedReplicaSet = "";
-    private String selectedDaemonSet = "";
-    private String selectedConfigMap = "";
-    private String selectedService = "";
-    private String selectedJob = "";
+    private Set<String> selectedPods = new HashSet<>();
+    private Set<String> selectedDeployments = new HashSet<>();
+    private Set<String> selectedStatefulSets = new HashSet<>();
+    private Set<String> selectedReplicaSets = new HashSet<>();
+    private Set<String> selectedDaemonSets = new HashSet<>();
+    private Set<String> selectedConfigMaps = new HashSet<>();
+    private Set<String> selectedServices = new HashSet<>();
+    private Set<String> selectedJobs = new HashSet<>();
+
+    private String selectedShell = "bash";
+    private List<String> shells = Arrays.asList("bash","sh","fish","zsh","csh","ksh");
+
     private String selectedCommandsSourceLabel = "";
     private String selectedCommandsSourceRaw = "";
     private String commandToExecute = "";
+    private String commandToExecuteEditable = "";
     private String executedCommandOutput = "";
 
     private Map<String, CommandSource> commandsSources = new HashMap<>() {
@@ -226,75 +233,66 @@ public class CommandsModel implements PageModel {
         return this;
     }
 
-    public String getSelectedPod() {
-        return selectedPod;
+    public Set<String> getSelectedDeployments() {
+        return selectedDeployments;
     }
 
-    public CommandsModel setSelectedPod(String selectedPod) {
-        this.selectedPod = selectedPod;
+    public CommandsModel setSelectedDeployments(Set<String> selectedDeployments) {
+        this.selectedDeployments = selectedDeployments;
         return this;
     }
 
-    public String getSelectedDeployment() {
-        return selectedDeployment;
+    public Set<String> getSelectedStatefulSets() {
+        return selectedStatefulSets;
     }
 
-    public CommandsModel setSelectedDeployment(String selectedDeployment) {
-        this.selectedDeployment = selectedDeployment;
+    public CommandsModel setSelectedStatefulSets(Set<String> selectedStatefulSets) {
+        this.selectedStatefulSets = selectedStatefulSets;
         return this;
     }
 
-    public String getSelectedStatefulSet() {
-        return selectedStatefulSet;
+    public Set<String> getSelectedReplicaSets() {
+        return selectedReplicaSets;
     }
 
-    public CommandsModel setSelectedStatefulSet(String selectedStatefulSet) {
-        this.selectedStatefulSet = selectedStatefulSet;
+    public CommandsModel setSelectedReplicaSets(Set<String> selectedReplicaSets) {
+        this.selectedReplicaSets = selectedReplicaSets;
         return this;
     }
 
-    public String getSelectedReplicaSet() {
-        return selectedReplicaSet;
+    public Set<String> getSelectedDaemonSets() {
+        return selectedDaemonSets;
     }
 
-    public CommandsModel setSelectedReplicaSet(String selectedReplicaSet) {
-        this.selectedReplicaSet = selectedReplicaSet;
+    public CommandsModel setSelectedDaemonSets(Set<String> selectedDaemonSets) {
+        this.selectedDaemonSets = selectedDaemonSets;
         return this;
     }
 
-    public String getSelectedDaemonSet() {
-        return selectedDaemonSet;
+    public Set<String> getSelectedConfigMaps() {
+        return selectedConfigMaps;
     }
 
-    public CommandsModel setSelectedDaemonSet(String selectedDaemonSet) {
-        this.selectedDaemonSet = selectedDaemonSet;
+    public CommandsModel setSelectedConfigMaps(Set<String> selectedConfigMaps) {
+        this.selectedConfigMaps = selectedConfigMaps;
         return this;
     }
 
-    public String getSelectedConfigMap() {
-        return selectedConfigMap;
+    public Set<String> getSelectedServices() {
+        return selectedServices;
     }
 
-    public CommandsModel setSelectedConfigMap(String selectedConfigMap) {
-        this.selectedConfigMap = selectedConfigMap;
+    public CommandsModel setSelectedServices(Set<String> selectedServices) {
+        this.selectedServices = selectedServices;
         return this;
     }
 
-    public String getSelectedService() {
-        return selectedService;
+    public Set<String> getSelectedJobs() {
+        return selectedJobs;
     }
 
-    public CommandsModel setSelectedService(String selectedService) {
-        this.selectedService = selectedService;
-        return this;
-    }
-
-    public String getSelectedJob() {
-        return selectedJob;
-    }
-
-    public CommandsModel setSelectedJob(String selectedJob) {
-        this.selectedJob = selectedJob;
+    public CommandsModel setSelectedJobs(Set<String> selectedJobs) {
+        this.selectedJobs = selectedJobs;
         return this;
     }
 
@@ -343,6 +341,15 @@ public class CommandsModel implements PageModel {
         return this;
     }
 
+    public String getCommandToExecuteEditable() {
+        return commandToExecuteEditable;
+    }
+
+    public CommandsModel setCommandToExecuteEditable(String commandToExecuteEditable) {
+        this.commandToExecuteEditable = commandToExecuteEditable;
+        return this;
+    }
+
     public String getCommandToExecute() {
         return commandToExecute;
     }
@@ -350,6 +357,28 @@ public class CommandsModel implements PageModel {
     public CommandsModel setCommandToExecute(String commandToExecute) {
         this.commandToExecute = commandToExecute;
         return this;
+    }
+
+    public Set<String> getSelectedPods() {
+        return selectedPods;
+    }
+
+    public CommandsModel setSelectedPods(Set<String> selectedPods) {
+        this.selectedPods = selectedPods;
+        return this;
+    }
+
+    public String getSelectedShell() {
+        return selectedShell;
+    }
+
+    public CommandsModel setSelectedShell(String selectedShell) {
+        this.selectedShell = selectedShell;
+        return this;
+    }
+
+    public List<String> getShells() {
+        return shells;
     }
 
     public class CommandSource {

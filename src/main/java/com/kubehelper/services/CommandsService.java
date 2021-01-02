@@ -17,17 +17,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package com.kubehelper.services;
 
-import bsh.commands.dir;
 import com.google.common.io.Files;
-import com.kubehelper.common.KubectlHelper;
 import com.kubehelper.common.Operation;
+import com.kubehelper.common.Resource;
 import com.kubehelper.domain.models.CommandsModel;
 import com.kubehelper.domain.results.CommandsResult;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
-import io.kubernetes.client.extended.kubectl.KubectlGet;
-import io.kubernetes.client.extended.kubectl.exception.KubectlException;
-import org.apache.commons.io.FileUtils;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,9 +42,9 @@ import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -64,24 +66,17 @@ public class CommandsService {
     private CommonService commonService;
 
     public void parsePredefinedCommands(CommandsModel commandsModel) {
-
-        try {
-//            TODO add read predefined commands to postConstruct, as in IpsAndModels
-            File predefinedCommands = commonService.getResourcesAsFileByPath(predefinedCommandsPath);
-            List<String> lines = Files.readLines(predefinedCommands, Charset.forName("UTF-8"));
-            parsePredefinedCommandsFromLines(lines, commandsModel);
-            initPredefinedCommands(commandsModel, predefinedCommands);
-        } catch (IOException e) {
-            commandsModel.addParseException(e);
-            logger.error(e.getMessage(), e);
-        }
+        List<String> lines = commonService.getLinesFromResourceByPath(predefinedCommandsPath);
+        String predefinedCommands = commonService.getResourcesAsStringByPath(predefinedCommandsPath);
+        commandsModel.addCommandSource("Predefined Commands", predefinedCommandsPath, predefinedCommands);
+        parsePredefinedCommandsFromLines(lines, commandsModel);
     }
 
     public void run(CommandsModel commandsModel) {
 //        try {
-        String commandOutput = commonService.executeCommand(commandsModel.getCommandToExecute());
+        String commandOutput = commonService.executeCommand(commandsModel.getSelectedShell(), commandsModel.getCommandToExecute());
         commandsModel.setExecutedCommandOutput(commandOutput);
-        fetchResourcesDependsOnNamespace(commandsModel);
+//        fetchResourcesDependsOnNamespace(commandsModel);
 //            KubectlGet pods = KubectlHelper.getKubectlGet("pods");
 //            List name = pods.namespace("spark").execute();
 //            name.size();
@@ -90,16 +85,6 @@ public class CommandsService {
 //            logger.error(e.getMessage(), e);
 //        }
     }
-
-    private Set<String> namespaces = new HashSet<>();
-    private Set<String> namespacedPods = new HashSet<>();
-    private Set<String> namespacedDeployments = new HashSet<>();
-    private Set<String> namespacedStatefulSets = new HashSet<>();
-    private Set<String> namespacedReplicaSets = new HashSet<>();
-    private Set<String> namespacedDaemonSets = new HashSet<>();
-    private Set<String> namespacedConfigMaps = new HashSet<>();
-    private Set<String> namespacedServices = new HashSet<>();
-    private Set<String> namespacedJobs = new HashSet<>();
 
     public void fetchResourcesDependsOnNamespace(CommandsModel model) {
         model.setNamespacedPods(fabric8Client.pods().inNamespace(model.getSelectedNamespace())
@@ -120,11 +105,6 @@ public class CommandsService {
                 .list().getItems().stream().map(item -> item.getMetadata().getName()).collect(Collectors.toSet()));
     }
 
-
-    private void initPredefinedCommands(CommandsModel commandsModel, File file) throws IOException {
-        String commandsRaw = FileUtils.readFileToString(file, "UTF-8");
-        commandsModel.addCommandSource("Predefined Commands", predefinedCommandsPath, commandsRaw);
-    }
 
     public void parseUserCommands(CommandsModel commandsModel) {
         try {
@@ -187,19 +167,16 @@ public class CommandsService {
         }
 
         if (StringUtils.startsWithAny(line, "kubectl") && StringUtils.isNotBlank(line)) {
-            StringBuilder viewBuilder = new StringBuilder(), runBuilder = new StringBuilder();
+            StringBuilder builder = new StringBuilder();
             while (line.trim().endsWith("\\")) {
                 String commandLine = line.substring(0, line.lastIndexOf("\\")).trim();
-                viewBuilder.append(commandLine).append("\n");
-                runBuilder.append(commandLine).append(" ");
+                builder.append(commandLine).append(" \n");
                 line = iterator.next();
             }
             if (StringUtils.isNotBlank(line)) {
-                viewBuilder.append(line.trim());
-                runBuilder.append(line.trim());
+                builder.append(line.trim());
             }
-            commandResult.setViewCommand(viewBuilder.toString());
-            commandResult.setRunCommand(runBuilder.toString());
+            commandResult.setCommand(builder.toString());
         }
         if (StringUtils.isNotBlank(line)) {
             validateAndAddCommandResult(commandResult, commandsModel);
@@ -207,7 +184,7 @@ public class CommandsService {
     }
 
     private void validateAndAddCommandResult(CommandsResult cr, CommandsModel commandsModel) {
-        if (StringUtils.isAnyBlank(cr.getGroup(), cr.getDescription(), cr.getRunCommand()) || Operation.isOperationInvalid(cr.getOperation())) {
+        if (StringUtils.isAnyBlank(cr.getGroup(), cr.getDescription(), cr.getCommand()) || Operation.isOperationInvalid(cr.getOperation())) {
             commandsModel.addParseException(new RuntimeException("Command parse Error. Group, Operation, Description and command itself are mandatory fields. Object: " + cr.toString()));
             logger.error("Command parse Error. Group, Operation Description and command itself are mandatory fields. Object: " + cr.toString());
         } else {
@@ -219,4 +196,44 @@ public class CommandsService {
         return line.substring(line.indexOf(":") + 1).trim();
     }
 
+    public void commandHotReplacement(CommandsModel commandsModel) {
+        CommandLineParser parser = new DefaultParser();
+        Options options = new Options();
+        Option option = new Option("pods", "test");
+        Option option1 = new Option("n", "test1");
+        options.addOption(option);
+        options.addOption(option1);
+//        commandsModel.setCommandToExecute(commandsModel.getEditableCommandToExecute());
+        String command = commandsModel.getCommandToExecute().trim().toLowerCase(Locale.ROOT);
+        CommandLine parse = null;
+        try {
+            parse = parser.parse(options, command.split(" "));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        if (StringUtils.startsWithAny(command, "kubectl get", "kubectl exec")) {
+            Resource resource = detectResourceFromCommand(command);
+
+        }
+    }
+
+    public Resource detectResourceFromCommand(String command) {
+        Resource resource = null;
+
+        int i = StringUtils.lastIndexOfAny(command, "get", "exec");
+        String resourceAsString = command.substring(i, command.indexOf(" ", i));
+        if (StringUtils.isNotBlank(resourceAsString)) {
+            switch (resourceAsString) {
+                case "po", "pod", "pods" -> resource = Resource.POD; //commandsModel.getselectedPods()
+                case "deploy", "deployment", "deployments" -> resource = Resource.DEPLOYMENT;
+                case "sts", "statefulset", "statefulsets" -> resource = Resource.STATEFUL_SET;
+                case "rs", "replicaset", "replicasets" -> resource = Resource.REPLICA_SET;
+                case "ds", "daemonset", "daemonsets" -> resource = Resource.DAEMON_SET;
+                case "cm", "configmap", "configmaps" -> resource = Resource.CONFIG_MAP;
+                case "svc", "service", "services" -> resource = Resource.SERVICE;
+                case "job", "jobs" -> resource = Resource.JOB;
+            }
+        }
+        return resource;
+    }
 }

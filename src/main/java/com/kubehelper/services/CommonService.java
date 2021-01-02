@@ -37,7 +37,6 @@ import org.springframework.util.FileCopyUtils;
 import org.zkoss.zul.Messagebox;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -47,8 +46,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
+ * The common service contains method used by other services and view models.
+ *
  * @author JDev
  */
 @Service
@@ -63,7 +65,26 @@ public class CommonService {
 
     private static Logger logger = LoggerFactory.getLogger(CommonService.class);
 
-    public List<String> getAllNamespaces(List<String> initNamespaces) {
+
+    /**
+     * Gets all namespaces plus all namespaces as choice in namespaces combobox.
+     *
+     * @return - list with namespaces.
+     */
+    public List<String> getAllNamespaces() {
+        return getAllNamespaces(new ArrayList<>(Arrays.asList("all")));
+    }
+
+    /**
+     * Gets all namespaces.
+     *
+     * @return - list with namespaces.
+     */
+    public List<String> getAllNamespacesWithoutAll() {
+        return getAllNamespaces(new ArrayList<>());
+    }
+
+    private List<String> getAllNamespaces(List<String> initNamespaces) {
         V1NamespaceList v1NamespacesList = null;
         try {
             v1NamespacesList = api.listNamespace(null, false, null, null, null, 0, null, 30, false);
@@ -75,15 +96,14 @@ public class CommonService {
         return initNamespaces;
     }
 
-    public List<String> getAllNamespaces() {
-        return getAllNamespaces(new ArrayList<>(Arrays.asList("all")));
-    }
 
-    public List<String> getAllNamespacesWithoutAll() {
-        return getAllNamespaces(new ArrayList<>());
-    }
-
-
+    /**
+     * This method helps to check correct value at commbobox filters.
+     *
+     * @param resource - resource.
+     * @param filter - filter.
+     * @return - true if resource match filter.
+     */
     public boolean checkEqualsFilter(String resource, String filter) {
         if (filter.equals("")) {
             return true;
@@ -94,6 +114,12 @@ public class CommonService {
         return false;
     }
 
+    /**
+     * Reads file to string by path.
+     *
+     * @param path - file path.
+     * @return - file as String.
+     */
     public String getResourcesAsStringByPath(String path) {
         String data = "";
         ClassPathResource cpr = new ClassPathResource(path);
@@ -106,34 +132,32 @@ public class CommonService {
         return data;
     }
 
-    public File getResourcesAsFileByPath(String path) {
-        File file = null;
+    /**
+     * Gets Lines with strings from file by path.
+     *
+     * @param path - file path.
+     * @return - Lines with strings.
+     */
+    public List<String> getLinesFromResourceByPath(String path) {
+        List<String> lines = new ArrayList<>();
+        ClassPathResource cpr = new ClassPathResource(path);
         try {
-            file = new ClassPathResource(path).getFile();
+            lines = new BufferedReader(new InputStreamReader(cpr.getInputStream())).lines().collect(Collectors.toList());
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
         }
-        return file;
+        return lines;
     }
 
-    public String getYamlResource(Resource resource, String resourceName) {
-        KubernetesResource found = getHasMetadata(resource, resourceName);
-        if (Objects.nonNull(found)) {
-            try {
-                return SerializationUtils.dumpAsYaml((HasMetadata) found);
-            } catch (JsonProcessingException e) {
-                logger.error(String.format("getYamlResource: Resource=%s, resourceName=%s", resource.getKind(), resourceName) + e.getMessage(), e);
-            }
-        }
-        return "";
-    }
 
     /**
+     * Gets Kubernetes resource by KubeHelper Resource and resource name.
+     * <p>
      * KUBE_HELPER_POD_SECURITY_CONTEXT, KUBE_HELPER_CONTAINER_SECURITY_CONTEXT and other resources that do not implements Interface @{@link HasMetadata} cannot be converted in Yaml.
      *
-     * @param resource
-     * @param resourceName
-     * @return
+     * @param resource     - {@link Resource}
+     * @param resourceName - resource name.
+     * @return - Found {@link KubernetesResource}
      */
     private KubernetesResource getHasMetadata(Resource resource, String resourceName) {
         KubernetesResource meta = null;
@@ -170,13 +194,47 @@ public class CommonService {
         return meta;
     }
 
-    //    ~ » exec kubectl exec -i -t -n kube-system calico-node-q5jd2 -c calico-node "--" sh -c "clear; (bash || ash || sh)"
+
+    /**
+     * Gets Kubernetes resource as Yaml string by KubeHelper Resource and resource name.
+     *
+     * @param resource     - {@link Resource}
+     * @param resourceName - resource name.
+     * @return - Kubernetes resource as Yaml String.
+     */
+    public String getYamlResource(Resource resource, String resourceName) {
+        KubernetesResource found = getHasMetadata(resource, resourceName);
+        if (Objects.nonNull(found)) {
+            try {
+                return SerializationUtils.dumpAsYaml((HasMetadata) found);
+            } catch (JsonProcessingException e) {
+                logger.error(String.format("getYamlResource: Resource=%s, resourceName=%s", resource.getKind(), resourceName) + e.getMessage(), e);
+            }
+        }
+        return "";
+    }
+
+    /**
+     * Gets Kubernetes resource as Json string by KubeHelper Resource, resource name and namespace.
+     *
+     * @param resource     - {@link Resource}
+     * @param resourceName - resource name.
+     * @param namespace - namespace.
+     * @return - Kubernetes resource as Yaml String.
+     */
     public String getJsonResource(Resource resource, String resourceName, String namespace) {
         namespace = (StringUtils.isBlank(namespace) || "N/A".equals(namespace)) ? "" : "--namespace=" + namespace;
         String command = String.format("kubectl get %s %s %s -ojson", resource.getName(), resourceName, namespace);
         return executeCommand("bash", command);
     }
 
+    /**
+     * Executes kubectl command from shell.
+     *
+     * @param shell - shell type.
+     * @param command - command to execute.
+     * @return - inputStream and errorStream as String.
+     */
     public String executeCommand(String shell, String command) {
         String result = "";
         processBuilder.command(shell, "-c", command);
@@ -192,6 +250,13 @@ public class CommonService {
         return result;
     }
 
+    /**
+     * Reaads data from stream to lines and then to string.
+     *
+     * @param inputStream - inputStream and errorStream
+     * @return - readed string.
+     * @throws IOException
+     */
     private String readOutput(InputStream inputStream) throws IOException {
         try (BufferedReader output = new BufferedReader(new InputStreamReader(inputStream))) {
             return output.lines().map(line -> line = line + "\n").reduce("", String::concat);
