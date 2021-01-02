@@ -5,8 +5,9 @@ EXPOSE 8080
 
 ENV KUBE_HELPER_UI_USERNAME='kube'
 ENV KUBE_HELPER_UI_PASSWORD='helper'
+ENV JAVA_OPTS='--enable-preview'
 
-RUN apt-get update && apt-get install -y --no-install-recommends unzip wget	curl net-tools nano vim procps less jq git
+RUN apt-get update && apt-get install -y --no-install-recommends unzip wget	curl net-tools nano vim procps less jq git fish zsh csh ksh
 
 #Install latest stable kubectl
 RUN curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl" && \
@@ -57,5 +58,4 @@ RUN kubectl krew install \
 COPY .kube/config /root/.kube/config
 
 COPY target/kube-helper.jar /tmp/kube-helper.jar
-
-ENTRYPOINT ["java","-jar","/tmp/kube-helper.jar"]
+ENTRYPOINT ["java","--enable-preview","-jar","/tmp/kube-helper.jar"]
