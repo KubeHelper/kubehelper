@@ -17,9 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package com.kubehelper.viewmodels;
 
-import com.kubehelper.common.Resource;
 import com.kubehelper.services.CommonService;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zkoss.bind.BindUtils;
@@ -37,15 +35,10 @@ import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
-import org.zkoss.zk.ui.util.Notification;
 import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Div;
 import org.zkoss.zul.Html;
 import org.zkoss.zul.Slider;
-import org.zkoss.zul.Tab;
-import org.zkoss.zul.Tabbox;
-
-import static com.kubehelper.common.Resource.KUBE_HELPER_CUSTOM;
 
 /**
  * Class for displaying resource raw sources in java/yaml/json formats.

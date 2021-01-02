@@ -58,16 +58,4 @@ public class Global {
             put(IPS_AND_PORTS_MODEL, new IpsAndPortsModel());
         }
     };
-
-//    public static String AUDITING_MODEL = "auditing";
-//    public static String VOLUMES_MODEL = "volumes";
-//    public static String CUSTOM_RESOURCES_MODEL = "customResources";
-//    public static String DEPRECATED_MODEL = "deprecated";
-//    public static String EVENTS_MODEL = "events";
-//    public static String FEATURE_GATES_MODEL = "featureGates";
-//            put(AUDITING_MODEL, new SearchModel());
-//            put(CUSTOM_RESOURCES_MODEL, new SearchModel());
-//            put(DEPRECATED_MODEL, new SearchModel());
-//            put(VOLUMES_MODEL, new SearchModel());
-//            put(FEATURE_GATES_MODEL, new SearchModel());
 }

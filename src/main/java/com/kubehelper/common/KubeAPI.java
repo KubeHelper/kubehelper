@@ -401,19 +401,4 @@ public class KubeAPI {
         return new V1ConfigMapList();
     }
 
-    public CoreV1Api getApiV1() {
-        return apiV1;
-    }
-
-
-    public V1NodeList getV1NodesList(PageModel model) {
-        try {
-            return apiV1.listNode(null, null, null, null, null, null, null, null, null);
-        } catch (ApiException e) {
-            String errorMessage = String.format("Error at getV1NodesList: Message: %s", e.getMessage());
-            model.addException(errorMessage, e);
-            logger.error(errorMessage, e);
-        }
-        return new V1NodeList();
-    }
 }
