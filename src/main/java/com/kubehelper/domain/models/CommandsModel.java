@@ -65,14 +65,24 @@ public class CommandsModel implements PageModel {
 
     private String selectedShell = "bash";
     private List<String> shells = Arrays.asList("bash","sh","fish","zsh","csh","ksh");
+    private List<String> commandsHistoryRanges = Arrays.asList("Week","Last Week","Last Month","Year","All");
 
     private String selectedCommandsSourceLabel = "";
     private String selectedCommandsSourceRaw = "";
+    private String selectedCommandsHistoryLabel = "";
+    private String selectedCommandsHistoryRaw = "";
+    private String showOnlyCommandsInHistoryRawHistoryBuffer = "";
+    private String selectedCommandsHistoryRange = "";
+    private boolean showOnlyCommandsInHistory;
+
     private String commandToExecute = "";
     private String commandToExecuteEditable = "";
     private String executedCommandOutput = "";
 
-    private Map<String, CommandSource> commandsSources = new HashMap<>() {
+    private Map<String, FileSource> commandsSources = new HashMap<>() {
+    };
+
+    private Map<String, FileSource> commandsHistories = new HashMap<>() {
     };
 
     public CommandsModel() {
@@ -84,14 +94,21 @@ public class CommandsModel implements PageModel {
         filter.addOperationFilter(commandResult.getOperation());
     }
 
-    public void addCommandSource(String label, String filePath, String rawSource) {
-        CommandSource commandSource = new CommandSource();
+    public void addCommandSource(String label, String filePath, String rawSource, boolean readonly) {
+        FileSource commandSource = new FileSource();
         commandSource.setLabel(label);
         commandSource.setFilePath(filePath);
         commandSource.setRawSource(rawSource);
+        commandSource.setReadonly(readonly);
         commandsSources.put(label, commandSource);
     }
 
+    public void addHistorySource(String label, String filePath) {
+        FileSource historySource = new FileSource();
+        historySource.setLabel(label);
+        historySource.setFilePath(filePath);
+        commandsHistories.put(label, historySource);
+    }
 
     public void addParseException(Exception exception) {
         this.buildExceptions.add(new KubeHelperException(exception));
@@ -314,12 +331,12 @@ public class CommandsModel implements PageModel {
         return this;
     }
 
-    public CommandsModel setCommandsSources(Map<String, CommandSource> commandsSources) {
+    public CommandsModel setCommandsSources(Map<String, FileSource> commandsSources) {
         this.commandsSources = commandsSources;
         return this;
     }
 
-    public Map<String, CommandSource> getCommandsSources() {
+    public Map<String, FileSource> getCommandsSources() {
         return commandsSources;
     }
 
@@ -377,20 +394,70 @@ public class CommandsModel implements PageModel {
         return this;
     }
 
+    public String getSelectedCommandsHistoryLabel() {
+        return selectedCommandsHistoryLabel;
+    }
+
+    public CommandsModel setSelectedCommandsHistoryLabel(String selectedCommandsHistoryLabel) {
+        this.selectedCommandsHistoryLabel = selectedCommandsHistoryLabel;
+        return this;
+    }
+
+    public String getSelectedCommandsHistoryRaw() {
+        return selectedCommandsHistoryRaw;
+    }
+
+
+    public Map<String, FileSource> getCommandsHistories() {
+        return commandsHistories;
+    }
+
     public List<String> getShells() {
         return shells;
     }
 
-    public class CommandSource {
+    public String getSelectedCommandsHistoryRange() {
+        return selectedCommandsHistoryRange;
+    }
+
+    public CommandsModel setSelectedCommandsHistoryRange(String selectedCommandsHistoryRange) {
+        this.selectedCommandsHistoryRange = selectedCommandsHistoryRange;
+        return this;
+    }
+
+    public List<String> getCommandsHistoryRanges() {
+        return commandsHistoryRanges;
+    }
+
+    public boolean isShowOnlyCommandsInHistory() {
+        return showOnlyCommandsInHistory;
+    }
+
+    public CommandsModel setShowOnlyCommandsInHistory(boolean showOnlyCommandsInHistory) {
+        this.showOnlyCommandsInHistory = showOnlyCommandsInHistory;
+        return this;
+    }
+
+    public String getShowOnlyCommandsInHistoryRawHistoryBuffer() {
+        return showOnlyCommandsInHistoryRawHistoryBuffer;
+    }
+
+    public CommandsModel setShowOnlyCommandsInHistoryRawHistoryBuffer(String showOnlyCommandsInHistoryRawHistoryBuffer) {
+        this.showOnlyCommandsInHistoryRawHistoryBuffer = showOnlyCommandsInHistoryRawHistoryBuffer;
+        return this;
+    }
+
+    public class FileSource {
         private String label;
         private String filePath;
         private String rawSource;
+        private boolean readonly = true;
 
         public String getLabel() {
             return label;
         }
 
-        public CommandSource setLabel(String label) {
+        public FileSource setLabel(String label) {
             this.label = label;
             return this;
         }
@@ -399,7 +466,7 @@ public class CommandsModel implements PageModel {
             return filePath;
         }
 
-        public CommandSource setFilePath(String filePath) {
+        public FileSource setFilePath(String filePath) {
             this.filePath = filePath;
             return this;
         }
@@ -408,8 +475,17 @@ public class CommandsModel implements PageModel {
             return rawSource;
         }
 
-        public CommandSource setRawSource(String rawSource) {
+        public FileSource setRawSource(String rawSource) {
             this.rawSource = rawSource;
+            return this;
+        }
+
+        public boolean isReadonly() {
+            return readonly;
+        }
+
+        public FileSource setReadonly(boolean readonly) {
+            this.readonly = readonly;
             return this;
         }
     }

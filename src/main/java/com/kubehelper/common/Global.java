@@ -24,6 +24,7 @@ import com.kubehelper.domain.models.LabelsModel;
 import com.kubehelper.domain.models.PageModel;
 import com.kubehelper.domain.models.SearchModel;
 import com.kubehelper.domain.models.SecurityModel;
+import com.kubehelper.domain.models.VersionsModel;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -39,6 +40,7 @@ public class Global {
     public static String LABELS_MODEL = "labels";
     public static String COMMANDS_MODEL = "commands";
     public static String IPS_AND_PORTS_MODEL = "ipsAndPorts";
+    public static String VERSIONS_MODEL = "versions";
 
     public static String AUTH_EXCEPTION_MESSAGE = "";
     public static String PATH_TO_RAW_RESOURCE_ZUL = "~./zul/kubehelper/components/raw-resource.zul";
@@ -56,6 +58,7 @@ public class Global {
             put(LABELS_MODEL, new LabelsModel());
             put(COMMANDS_MODEL, new CommandsModel());
             put(IPS_AND_PORTS_MODEL, new IpsAndPortsModel());
+            put(VERSIONS_MODEL, new VersionsModel());
         }
     };
 }
