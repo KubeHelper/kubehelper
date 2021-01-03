@@ -48,23 +48,20 @@ import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Notification;
 import org.zkoss.zkplus.spring.DelegatingVariableResolver;
-import org.zkoss.zul.Auxhead;
-import org.zkoss.zul.Checkbox;
 import org.zkoss.zul.Combobox;
 import org.zkoss.zul.Div;
 import org.zkoss.zul.Footer;
 import org.zkoss.zul.Groupbox;
 import org.zkoss.zul.Html;
 import org.zkoss.zul.ListModelList;
-import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Slider;
+import org.zkoss.zul.Tabbox;
 import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Toolbarbutton;
 import org.zkoss.zul.Vbox;
 import org.zkoss.zul.Window;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -77,7 +74,7 @@ public class CommandsVM implements EventListener<Event> {
 
     private static Logger logger = LoggerFactory.getLogger(CommandsVM.class);
 
-    private boolean isRunButtonPressed;
+    private String activeTab = "commands";
     private boolean isOnInit = true;
 
     private final String fontSizeCss = "font-size: %spx;";
@@ -133,7 +130,8 @@ public class CommandsVM implements EventListener<Event> {
         fontSizeSlider.addEventListener("onScroll", this);
         commandsNamespacesCBox.addEventListener("onSelect", this);
         commandToExecuteTBox.addEventListener("onChange", this);
-        createCommandsToolbarButtons();
+        createCommandsToolbarButtons("commandsSourcesToolbarID", commandsModel.getCommandsSources().keySet());
+        createCommandsToolbarButtons("commandsHistoriesToolbarID", commandsModel.getCommandsHistories().keySet());
 //        TODO call method after refresh, components should be in DOM
 //        enableDisableMenuItem(commandsModel.getSelectedCommandsSource(), true, "bold;");
     }
@@ -161,10 +159,11 @@ public class CommandsVM implements EventListener<Event> {
      */
     private void onInitPreparations() {
         commandsService.parsePredefinedCommands(commandsModel);
+        commandsService.prepareCommandsHistory(commandsModel);
 //        commandsService.parseUserCommands(commandsModel);
 //        TODO change after
-        commandsModel.setSelectedCommandsSourceLabel("Predefined Commands");
-        commandsModel.setSelectedCommandsSourceRaw(commandsModel.getCommandsSources().get("Predefined Commands").getRawSource());
+//        commandsModel.setSelectedCommandsSourceLabel("commands2");
+//        commandsModel.setSelectedCommandsSourceRaw(commandsModel.getCommandsSources().get("commands2").getRawSource());
         commandsResults = new ListModelList<>(commandsModel.getCommandsResults());
         commandsModel.setNamespaces(commandsModel.getNamespaces().isEmpty() ? Set.copyOf(commonService.getAllNamespacesWithoutAll()) : commandsModel.getNamespaces());
         logger.info("Found {} namespaces.", commandsModel.getNamespaces());
@@ -188,6 +187,11 @@ public class CommandsVM implements EventListener<Event> {
     }
 
 
+    /**
+     * Shows full command by clicking on grid item.
+     *
+     * @param item - commands grid item.
+     */
     @Command
     @NotifyChange({"commandToExecute", "commandToExecuteEditable"})
     public void showFullCommand(@BindingParam("clickedItem") CommandsResult item) {
@@ -195,31 +199,101 @@ public class CommandsVM implements EventListener<Event> {
         commandsModel.setCommandToExecuteEditable(item.getCommand());
     }
 
+
+    /**
+     * Processing of various events
+     *
+     * @param event - event.
+     */
     @Override
     @NotifyChange({"namespacedPods", "namespacedDeployments", "namespacedStatefulSets", "namespacedReplicaSets", "namespacedDaemonSets", "namespacedConfigMaps", "namespacedServices", "namespacedJobs"})
     public void onEvent(Event event) {
-        if ("onScroll".equals(event.getName())) {
-            Slider fontSlider = (Slider) event.getTarget();
-            fontSize = fontSlider.getCurpos();
-            BindUtils.postNotifyChange(null, null, this, "fontSizeCss");
-        } else if ("onClick".equals(event.getName())) {
-            String label = ((Toolbarbutton) event.getTarget()).getLabel();
-            String oldToolbarbuttonId = getCommandToolbarButtonId(commandsModel.getSelectedCommandsSourceLabel());
-            String newToolbarbuttonId = getCommandToolbarButtonId(label);
-            enableDisableMenuItem(oldToolbarbuttonId, false, "normal;");
-            enableDisableMenuItem(newToolbarbuttonId, true, "bold;");
-            changePredefinedCommandsRawSource(label);
-        } else if ("onSelect".equals(event.getName())) {
-            commandsService.fetchResourcesDependsOnNamespace(commandsModel);
-            BindUtils.postNotifyChange(null, null, this, "namespacedPods", "namespacedDeployments", "namespacedStatefulSets", "namespacedReplicaSets", "namespacedDaemonSets", "namespacedConfigMaps", "namespacedServices", "namespacedJobs");
-            Notification.show(String.format("New resources for %s namespace, successfully fetched.", commandsModel.getSelectedNamespace()), "info", commandOutputGrBox, "bottom_right", 2000);
-        } else if ("onChange".equals(event.getName())) {
-            commandsModel.setCommandToExecute(getCommandWithoutBreaks(commandsModel.getCommandToExecuteEditable()));
-            //TODO commandHotReplacement
-//            commandsService.commandHotReplacement(commandsModel);
-            BindUtils.postNotifyChange(null, null, this, "commandToExecute", "commandToExecuteEditable");
+        if ("onScroll".equals(event.getName())) { //font size slider event
+            changeFontSize(event);
+        } else if ("onClick".equals(event.getName())) { //Changes raw source in management,history and toolbarbutton state.
+            selectAndChangeCommandsSource(event);
+        } else if ("onSelect".equals(event.getName()) && event.getTarget() instanceof Toolbarbutton) {  //change resources in comboxex depend on namespace in commands window
+            changeResourcesInComboxexDependOnNamespace();
+        } else if ("onChange".equals(event.getName())) {  // synchronize command to execute and hot replacement on full command textbox onChange Event
+            synchronizeCommandToExecuteAndHotReplacement();
         }
     }
+
+    /**
+     * loads last command history file into view.
+     */
+    @Command
+    public void onSelectMainCommandsTabs(@ContextParam(ContextType.COMPONENT) Tabbox tabbox) {
+        activeTab = tabbox.getSelectedTab().getId();
+        if ("commandsHistory".equals(tabbox.getSelectedTab().getId()) && StringUtils.isBlank(commandsModel.getSelectedCommandsHistoryRaw())) {
+            commandsService.setStartHistoryRaw(commandsModel);
+        } else if ("commandsManagement".equals(tabbox.getSelectedTab().getId()) && StringUtils.isBlank(commandsModel.getSelectedCommandsSourceRaw())) {
+            commandsService.setStartCommandsRaw(commandsModel);
+        }
+    }
+
+    @Command
+    public void showOnlyCommandsInHistory() {
+        commandsService.showOnlyCommandsInHistory(commandsModel);
+        BindUtils.postNotifyChange(this, ".");
+    }
+
+    /**
+     * Synchronizes command to execute and hot replacement on full command textbox onChange event.
+     */
+    private void synchronizeCommandToExecuteAndHotReplacement() {
+        commandsModel.setCommandToExecute(getCommandWithoutBreaks(commandsModel.getCommandToExecuteEditable()));
+        if (isHotReplacementEnabled()) {
+            //TODO
+//            commandsService.commandHotReplacement(commandsModel);
+        }
+        BindUtils.postNotifyChange(this, "commandToExecute", "commandToExecuteEditable");
+    }
+
+    /**
+     * Changes resources in comboxex depend on namespace in commands window.
+     */
+    private void changeResourcesInComboxexDependOnNamespace() {
+        commandsService.fetchResourcesDependsOnNamespace(commandsModel);
+        BindUtils.postNotifyChange(this, "namespacedPods", "namespacedDeployments", "namespacedStatefulSets", "namespacedReplicaSets", "namespacedDaemonSets", "namespacedConfigMaps", "namespacedServices", "namespacedJobs");
+        Notification.show(String.format("New resources for %s namespace, successfully fetched.", commandsModel.getSelectedNamespace()), "info", commandOutputGrBox, "bottom_right", 2000);
+    }
+
+    /**
+     * Changes raw source and toolbarbutton state.
+     *
+     * @param event - event.
+     */
+    private void selectAndChangeCommandsSource(Event event) {
+        String label = ((Toolbarbutton) event.getTarget()).getLabel();
+        String oldToolbarbuttonId = getCommandToolbarButtonId(commandsModel.getSelectedCommandsSourceLabel());
+        String newToolbarbuttonId = getCommandToolbarButtonId(label);
+        enableDisableMenuItem(oldToolbarbuttonId, false, "normal;");
+        enableDisableMenuItem(newToolbarbuttonId, true, "bold;");
+        changeRawSource(label);
+    }
+
+    /**
+     * Changes history raw depends on selected Range in commandsModel.
+     */
+    @Command
+    public void changeHistoryRaw() {
+        commandsModel.setSelectedCommandsHistoryLabel(commandsModel.getSelectedCommandsHistoryRange());
+        commandsService.setStartHistoryRaw(commandsModel);
+        BindUtils.postNotifyChange(this, ".");
+    }
+
+    /**
+     * Changes font size in command output panel.
+     *
+     * @param event - event.
+     */
+    private void changeFontSize(Event event) {
+        Slider fontSlider = (Slider) event.getTarget();
+        fontSize = fontSlider.getCurpos();
+        BindUtils.postNotifyChange(this, "fontSizeCss");
+    }
+
 
     /**
      * Shows popup window with executed command output.
@@ -268,7 +342,7 @@ public class CommandsVM implements EventListener<Event> {
         }
 
         highlightBlock.appendChild(new Html("<pre><code>" + commandsModel.getExecutedCommandOutput() + "</code></pre>"));
-        BindUtils.postNotifyChange(null, null, this, ".");
+        BindUtils.postNotifyChange(this, ".");
     }
 
 
@@ -276,11 +350,11 @@ public class CommandsVM implements EventListener<Event> {
 
 
     /**
-     * Creates toolbarbuttons on the commands management tabs for commands sources/files.
+     * Creates toolbarbuttons on the commands management and commands history tabs for view sources/files.
      */
-    private void createCommandsToolbarButtons() {
-        Vbox commandsSourcesToolbarID = (Vbox) Path.getComponent("//indexPage/templateInclude/commandsSourcesToolbarID");
-        commandsModel.getCommandsSources().keySet().forEach(key -> {
+    private void createCommandsToolbarButtons(String toolbarId, Set<String> sources) {
+        Vbox commandsSourcesToolbarID = (Vbox) Path.getComponent("//indexPage/templateInclude/" + toolbarId);
+        sources.forEach(key -> {
             Toolbarbutton toolbarbutton = new Toolbarbutton(key);
             toolbarbutton.setId(getCommandToolbarButtonId(key));
             toolbarbutton.setIconSclass("z-icon-file");
@@ -290,18 +364,50 @@ public class CommandsVM implements EventListener<Event> {
         });
     }
 
-
-    private void changePredefinedCommandsRawSource(String label) {
-        commandsModel.setSelectedCommandsSourceLabel(label);
-        commandsModel.setSelectedCommandsSourceRaw("<![CDATA[<pre><code>" + commandsModel.getCommandsSources().get(label).getRawSource() + "</code></pre>]]>");
-        BindUtils.postNotifyChange(null, null, this, "selectedCommandsSource", "selectedCommandsRaw");
+    @Listen("onSelect = toolbarbutton")
+    public void onOK() {
+        BindUtils.postNotifyChange(null, null, this, ".");
     }
+
+//    /**
+//     * Highlights div block with command output content.
+//     */
+//    private void highlightBlock() {
+//
+//
+//        rawSourceBlock.appendChild(new Html("<pre><code>" + commandsModel.getExecutedCommandOutput() + "</code></pre>"));
+//        BindUtils.postNotifyChange(null, null, this, ".");
+//    }
+//
+//    private void changeRawSource(String htmlBlockId, String label, String source) {
+//        Div rawSourceBlock = (Div) Path.getComponent("//indexPage/templateInclude/"+htmlBlockId);
+//        rawSourceBlock.getChildren().clear();
+//        commandsModel.setSelectedCommandsSourceLabel(label);
+//        commandsModel.setSelectedCommandsSourceRaw("<pre><code>" + commandsModel.getCommandsSources().get(label).getRawSource() + "</code></pre>");
+//        BindUtils.postNotifyChange(null, null, this, "selectedCommandsSource", "selectedCommandsRaw");
+//    }
+
+    private void changeRawSource(String label) {
+        if ("commandsHistory".equals(activeTab)) {
+
+        }
+        commandsModel.setSelectedCommandsSourceLabel(label);
+        commandsModel.setSelectedCommandsSourceRaw("<pre><code>" + commandsModel.getCommandsSources().get(label).getRawSource() + "</code></pre>");
+        BindUtils.postNotifyChange(this, "selectedCommandsSource", "selectedCommandsRaw");
+    }
+
 
     private String getCommandToolbarButtonId(String label) {
         return label.replaceAll("[^a-zA-Z0-9]", "") + "Id";
     }
 
-
+    /**
+     * Make active or inactive menu item for commands management and history.
+     *
+     * @param toolbarbuttonId - toolbarbutton id.
+     * @param disabled        - disable or enable button.
+     * @param fontWeight      - font weight bold/normal.
+     */
     private void enableDisableMenuItem(String toolbarbuttonId, boolean disabled, String fontWeight) {
         Toolbarbutton toolbarbutton = (Toolbarbutton) Path.getComponent("//indexPage/templateInclude/" + toolbarbuttonId);
         toolbarbutton.setDisabled(disabled);
@@ -516,20 +622,12 @@ public class CommandsVM implements EventListener<Event> {
         commandsModel.setSelectedCommandsSourceLabel(selectedCommandsSource);
     }
 
-    public String getCommandsSrcViewHeight() {
-        return centerLayoutHeight - 50 + "px";
-    }
-
     public String getCommandsManagementHeight() {
         return centerLayoutHeight - 50 + "px";
     }
 
     public String getCommandsManagementSrcPanelHeight() {
         return centerLayoutHeight - 95 + "px";
-    }
-
-    public String getCommandsHistoryHeight() {
-        return centerLayoutHeight - 50 + "px";
     }
 
     public void setGitUrl(String gitUrl) {
@@ -562,6 +660,49 @@ public class CommandsVM implements EventListener<Event> {
 
     public void setMarkCredentials(boolean markCredentials) {
         config.setMarkCredentials(markCredentials);
+    }
+
+
+    //  COMMANDS HISTORY GETTERS AND SETTERS ================
+
+    public String getSelectedCommandsHistoryRaw() {
+        return commandsModel.getSelectedCommandsSourceRaw();
+    }
+
+    public String getSelectedCommandsHistoryLabel() {
+        return commandsModel.getSelectedCommandsSourceLabel();
+    }
+
+    public void setSelectedCommandsHistoryLabel(String selectedCommandsHistory) {
+        commandsModel.setSelectedCommandsHistoryLabel(selectedCommandsHistory);
+    }
+
+    public String getCommandsHistorySrcPanelHeight() {
+        return centerLayoutHeight - 95 + "px";
+    }
+
+    public String getCommandsHistoryHeight() {
+        return centerLayoutHeight - 50 + "px";
+    }
+
+    public String getSelectedCommandsHistoryRange() {
+        return commandsModel.getSelectedCommandsHistoryRange();
+    }
+
+    public void setSelectedCommandsHistoryRange(String selectedCommandsHistoryRange) {
+        commandsModel.setSelectedCommandsHistoryRange(selectedCommandsHistoryRange);
+    }
+
+    public List<String> getCommandsHistoryRanges() {
+        return commandsModel.getCommandsHistoryRanges();
+    }
+
+    public boolean isShowOnlyCommandsInHistory() {
+        return commandsModel.isShowOnlyCommandsInHistory();
+    }
+
+    public void setShowOnlyCommandsInHistory(boolean showOnlyCommandsInHistory) {
+        commandsModel.setShowOnlyCommandsInHistory(showOnlyCommandsInHistory);
     }
 
 }

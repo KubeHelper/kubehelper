@@ -30,21 +30,30 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.StringSubstitutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.WeekFields;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -58,34 +67,86 @@ import java.util.stream.Stream;
 public class CommandsService {
 
     private static Logger logger = LoggerFactory.getLogger(CommandsService.class);
-    private String predefinedCommandsPath = "/templates/features/commands.kh";
+    private String predefinedCommandsPath = "/templates/features/";
+    private List<String> predefinedCommands = Arrays.asList("commands.kh", "commands2.kh");
+
+    private String commandsHistoryPath = "/tmp/history/";
+    private String historyEntryTemplate;
 
     private KubernetesClient fabric8Client = new DefaultKubernetesClient();
 
     @Autowired
     private CommonService commonService;
 
+    @PostConstruct
+    private void postConstruct() {
+        historyEntryTemplate = commonService.getResourcesAsStringByPath("/templates/commands/history-entry.template");
+    }
+
+    public void prepareCommandsHistory(CommandsModel commandsModel) {
+        try {
+            Set<String> filesPathsByDirAndExtension = getFilesPathsByDirAndExtension(commandsHistoryPath, 2, ".txt");
+            filesPathsByDirAndExtension.forEach(file -> {
+                commandsModel.addHistorySource(Files.getNameWithoutExtension(file), file);
+            });
+
+        } catch (IOException e) {
+//            TODO to think about notification
+//            commandsModel.addParseException(e);
+            logger.debug(e.getMessage(), e);
+        }
+    }
+
     public void parsePredefinedCommands(CommandsModel commandsModel) {
-        List<String> lines = commonService.getLinesFromResourceByPath(predefinedCommandsPath);
-        String predefinedCommands = commonService.getResourcesAsStringByPath(predefinedCommandsPath);
-        commandsModel.addCommandSource("Predefined Commands", predefinedCommandsPath, predefinedCommands);
-        parsePredefinedCommandsFromLines(lines, commandsModel);
+        predefinedCommands.forEach(f -> {
+            List<String> lines = commonService.getLinesFromResourceByPath(predefinedCommandsPath + f);
+            parsePredefinedCommandsFromLines(lines, commandsModel);
+            String predefinedCommands = commonService.getResourcesAsStringByPath(predefinedCommandsPath);
+            commandsModel.addCommandSource(Files.getNameWithoutExtension(f), predefinedCommandsPath, predefinedCommands, true);
+        });
     }
 
     public void run(CommandsModel commandsModel) {
-//        try {
         String commandOutput = commonService.executeCommand(commandsModel.getSelectedShell(), commandsModel.getCommandToExecute());
         commandsModel.setExecutedCommandOutput(commandOutput);
-//        fetchResourcesDependsOnNamespace(commandsModel);
-//            KubectlGet pods = KubectlHelper.getKubectlGet("pods");
-//            List name = pods.namespace("spark").execute();
-//            name.size();
-//        } catch (IOException | KubectlException e) {
-//            commandsModel.addException("Error" + e.getMessage(), e);
-//            logger.error(e.getMessage(), e);
-//        }
+        writeCommandExecutionToHistory(commandsModel);
     }
 
+    /**
+     * Writes execution result output to file.
+     *
+     * @param commandsModel - commands model.
+     */
+    private void writeCommandExecutionToHistory(CommandsModel commandsModel) {
+        String today = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE);
+        File file = new File(commandsHistoryPath + today + ".txt");
+        try {
+            file.createNewFile();
+            String composedHistoryEntry = new StringSubstitutor(getHistoryEntry(commandsModel)).replace(historyEntryTemplate);
+            FileUtils.writeStringToFile(file, composedHistoryEntry, StandardCharsets.UTF_8.toString(), true);
+        } catch (IOException e) {
+//            TODO to think about notification
+//            commandsModel.addParseException(e);
+            logger.debug(e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Builds history entry from commands model for replacement in template.
+     *
+     * @param model - commands model.
+     * @return - map with history entry
+     */
+    private Map<String, String> getHistoryEntry(CommandsModel model) {
+        String time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss yyyy-MM-dd"));
+        return Map.of("time", time, "command", model.getCommandToExecute(), "output", model.getExecutedCommandOutput());
+    }
+
+    /**
+     * Fehches resources(resource names) depends on namespace for commands hot replacement comboboxes.
+     *
+     * @param model - commands model
+     */
     public void fetchResourcesDependsOnNamespace(CommandsModel model) {
         model.setNamespacedPods(fabric8Client.pods().inNamespace(model.getSelectedNamespace())
                 .list().getItems().stream().map(item -> item.getMetadata().getName()).collect(Collectors.toSet()));
@@ -108,7 +169,7 @@ public class CommandsService {
 
     public void parseUserCommands(CommandsModel commandsModel) {
         try {
-            Set<String> userCommandFiles = getUserCommandFilesPaths(commandsModel.getUserCommandsPath(), 5);
+            Set<String> userCommandFiles = getFilesPathsByDirAndExtension(commandsModel.getUserCommandsPath(), 5, ".kh");
             for (String filePath : userCommandFiles) {
                 List<String> lines = Files.readLines(new File(filePath), Charset.forName("UTF-8"));
 //                TODO
@@ -121,10 +182,10 @@ public class CommandsService {
         }
     }
 
-    public Set<String> getUserCommandFilesPaths(String dir, int depth) throws IOException {
+    public Set<String> getFilesPathsByDirAndExtension(String dir, int depth, String extension) throws IOException {
         try (Stream<Path> stream = java.nio.file.Files.walk(Paths.get(dir), depth)) {
             return stream
-                    .map(path -> path.toString()).filter(f -> f.endsWith(".kh"))
+                    .map(path -> path.toString()).filter(f -> f.endsWith(extension))
                     .collect(Collectors.toSet());
         }
     }
@@ -235,5 +296,28 @@ public class CommandsService {
             }
         }
         return resource;
+    }
+
+    public void setStartHistoryRaw(CommandsModel commandsModel) {
+//        String today = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE);
+        LocalDate today = LocalDate.now();
+
+        WeekFields.of(Locale.getDefault());
+        switch (commandsModel.getSelectedCommandsHistoryRange()) {
+            case "Week" -> showHistoryFor(today, today);
+        }
+    }
+
+    private void showHistoryFor(LocalDate from, LocalDate to) {
+
+    }
+
+    public void showOnlyCommandsInHistory(CommandsModel commandsModel) {
+        commandsModel.setShowOnlyCommandsInHistoryRawHistoryBuffer(commandsModel.getSelectedCommandsHistoryRaw());
+
+    }
+
+    public void setStartCommandsRaw(CommandsModel commandsModel) {
+
     }
 }

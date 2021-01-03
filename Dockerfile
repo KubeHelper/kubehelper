@@ -54,8 +54,10 @@ RUN kubectl krew install \
     view-webhook \
     who-can
 
+RUN mkdir -p /kubehelper/{history,git,reports}
+
 #TODO ReMOVE AFTER
 COPY .kube/config /root/.kube/config
 
 COPY target/kube-helper.jar /tmp/kube-helper.jar
-ENTRYPOINT ["java","--enable-preview","-jar","/tmp/kube-helper.jar"]
+ENTRYPOINT ["java","--enable-preview","-jar","/kubehelper/kube-helper.jar"]

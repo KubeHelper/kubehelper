@@ -4,13 +4,13 @@
         document.querySelectorAll('div.highlightComOutput').forEach(block => { hljs.highlightBlock(block); });
         }
     </script>
-    <borderlayout id="securityTemplate" viewModel="@id('commandsVM') @init('com.kubehelper.viewmodels.CommandsVM')" width="100%" height="100%">
+    <borderlayout id="commandsTemplate" viewModel="@id('commandsVM') @init('com.kubehelper.viewmodels.CommandsVM')" width="100%" height="100%">
         <center id="centerLayoutCommandsID" margins="0,3,3,3" title="Commands" border="none">
-            <tabbox width="100%" sclass="nav_tabs" style="border: none">
+            <tabbox width="100%" sclass="nav_tabs" style="border: none" onSelect="@command('onSelectMainCommandsTabs')">
                 <tabs id="tabs">
-                    <tab label="Commands"/>
-                    <tab label="Commands Management"/>
-                    <tab label="Commands History"/>
+                    <tab label="Commands" id="commands"/>
+                    <tab label="Commands Management" id="commandsManagement"/>
+                    <tab label="Commands History" id="commandsHistory"/>
                 </tabs>
                 <tabpanels>
                     <tabpanel>
@@ -268,27 +268,46 @@
                     </tabpanel>
 
                     <tabpanel>
-                        <div style="overflow-y:auto;overflow-x:auto;font-family: Courier, Monaco, monospace;font-size: 14px;line-height: 1.5;" height="@load(commandsVM.commandsSrcViewHeight)"
-                             width="100%">
-                            <!--                            height="@load(commandsVM.commandsSrcViewHeight)"-->
-                            <panel width="100%" title="Panel" maximizable="true" border="normal" collapsible="true" height="50%">
-                                <panelchildren>
-                                    <textbox width="100%" height="100%"/>
-                                </panelchildren>
-                            </panel>
-                            <!--                            <panel width="100%" title="Panel" maximizable="true" border="normal" collapsible="true" height="50%">-->
-                            <!--                                <panelchildren>-->
-                            <!--&lt;!&ndash;                                    <iframe style="width:99%; height:99%;border:1px inset;" src="http://localhost:8080"/>&ndash;&gt;-->
-                            <!--                                </panelchildren>-->
-                            <!--                            </panel>-->
-                            <!--                            <panel width="100%" title="Panel" maximizable="true" border="normal" collapsible="true" height="50%">-->
-                            <!--                                <panelchildren>-->
-
-                            <!--                                </panelchildren>-->
-                            <!--                            </panel>-->
-                        </div>
+                        <borderlayout width="100%" height="@load(commandsVM.commandsHistoryHeight)">
+                            <north collapsible="true" splittable="true">
+                                <hbox width="100%" spacing="10" align="end" pack="end">
+                                    <cell width="100%">
+                                        <hbox width="100%" align="end" pack="end" spacing="20">
+                                            <combobox model="@load(commandsVM.commandsHistoryRanges)" selectedItem="@bind(commandsVM.selectedCommandsHistoryRange)" readonly="true"
+                                                      onSelect="@command('changeHistoryRaw')">
+                                                <template name="model">
+                                                    <comboitem label="@load(each)"/>
+                                                </template>
+                                            </combobox>
+                                            <checkbox label="Only commands" mold="switch" checked="@bind(commandsVM.showOnlyCommandsInHistory)"/>
+                                            <button iconSclass="fas fa-sync-alt" onClick="@command('refreshHistory')"/>
+                                        </hbox>
+                                    </cell>
+                                </hbox>
+                            </north>
+                            <center>
+                                <div>
+                                    <panel title="@load(commandsVM.selectedCommandsHistoryLabel)" width="100%" height="@load(commandsVM.commandsHistorySrcPanelHeight)">
+                                        <caption iconSclass="z-icon-list"/>
+                                        <panelchildren>
+                                            <div width="100%" height="100%"
+                                                 style="overflow-y:scroll;overflow-x:auto;font-family: Courier, Monaco, monospace;display: flex;line-height: 1.3;border: 1px solid lightgray;padding-left: 5px">
+                                                <!--                                                TODO  style="@load(commandsVM.fontSizeCss)" and for management slider-->
+                                                <div id="historyOutputId" width="100%" height="100%">
+                                                </div>
+                                            </div>
+                                        </panelchildren>
+                                    </panel>
+                                </div>
+                            </center>
+                            <west title="Commands History" collapsible="true" splittable="true" autoscroll="true" size="7%" maxsize="200">
+                                <div vflex="1">
+                                    <vbox id="commandsHistoriesToolbarID">
+                                    </vbox>
+                                </div>
+                            </west>
+                        </borderlayout>
                     </tabpanel>
-
                 </tabpanels>
             </tabbox>
         </center>
