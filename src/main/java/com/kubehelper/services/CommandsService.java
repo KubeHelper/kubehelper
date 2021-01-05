@@ -54,14 +54,15 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.WeekFields;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Search service.
@@ -75,7 +76,7 @@ public class CommandsService {
     private String predefinedCommandsPath = "/init/commands/";
     private List<String> predefinedCommands = Arrays.asList("commands.kh", "commands2.kh");
 
-    private String commandsHistoryPath = "/tmp/history/";
+    private String commandsHistoryPath = "/Volumes/MAC_WORK/tmp/history";
     private String historyEntryTemplate;
 
     private KubernetesClient fabric8Client = new DefaultKubernetesClient();
@@ -85,37 +86,34 @@ public class CommandsService {
 
     @PostConstruct
     private void postConstruct() {
-        historyEntryTemplate = commonService.getResourcesAsStringByPath("/templates/history/history-entry.template");
+        historyEntryTemplate = commonService.getClasspathResourceAsStringByPath("/templates/history/history-entry.template");
     }
 
-    public void prepareCommandsHistory(CommandsModel commandsModel) {
-        try {
-            Set<String> filesPathsByDirAndExtension = getFilesPathsByDirAndExtension(commandsHistoryPath, 2, ".txt");
-            filesPathsByDirAndExtension.forEach(file -> {
-                commandsModel.addHistorySource(Files.getNameWithoutExtension(file), file);
-            });
 
-        } catch (IOException e) {
-//            TODO to think about notification
-//            commandsModel.addParseException(e);
-            logger.debug(e.getMessage(), e);
-        }
-    }
+    //  COMMANDS ================
 
-    public void parsePredefinedCommands(CommandsModel commandsModel) {
-        predefinedCommands.forEach(f -> {
-            List<String> lines = commonService.getLinesFromResourceByPath(predefinedCommandsPath + f);
-            parsePredefinedCommandsFromLines(lines, commandsModel);
-            String predefinedCommands = commonService.getResourcesAsStringByPath(predefinedCommandsPath);
-            commandsModel.addCommandSource(Files.getNameWithoutExtension(f), predefinedCommandsPath, predefinedCommands, true);
-        });
-    }
 
+    /**
+     * Executes command and writes output to history file.
+     *
+     * @param commandsModel - commands model.
+     */
     public void run(CommandsModel commandsModel) {
         String commandOutput = commonService.executeCommand(commandsModel.getSelectedShell(), commandsModel.getCommandToExecute());
         commandsModel.setExecutedCommandOutput(commandOutput);
         writeCommandExecutionToHistory(commandsModel);
     }
+
+
+    public void parsePredefinedCommands(CommandsModel commandsModel) {
+        predefinedCommands.forEach(f -> {
+            List<String> lines = commonService.getLinesFromResourceByPath(predefinedCommandsPath + f);
+            parsePredefinedCommandsFromLines(lines, commandsModel);
+            String predefinedCommands = commonService.getClasspathResourceAsStringByPath(predefinedCommandsPath);
+            commandsModel.addCommandSource(Files.getNameWithoutExtension(f), predefinedCommandsPath, predefinedCommands, true);
+        });
+    }
+
 
     /**
      * Writes execution result output to file.
@@ -127,7 +125,7 @@ public class CommandsService {
         File file = new File(commandsHistoryPath + today + ".txt");
         try {
             file.createNewFile();
-            String composedHistoryEntry = new StringSubstitutor(getHistoryEntry(commandsModel)).replace(historyEntryTemplate);
+            String composedHistoryEntry = new StringSubstitutor(buildHistoryEntry(commandsModel)).replace(historyEntryTemplate);
             FileUtils.writeStringToFile(file, composedHistoryEntry, StandardCharsets.UTF_8.toString(), true);
         } catch (IOException e) {
 //            TODO to think about notification
@@ -142,10 +140,39 @@ public class CommandsService {
      * @param model - commands model.
      * @return - map with history entry
      */
-    private Map<String, String> getHistoryEntry(CommandsModel model) {
+    private Map<String, String> buildHistoryEntry(CommandsModel model) {
         String time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss yyyy-MM-dd"));
         return Map.of("time", time, "command", model.getCommandToExecute(), "output", model.getExecutedCommandOutput());
     }
+
+
+    public void parseUserCommands(CommandsModel commandsModel) {
+        try {
+            Set<String> userCommandFiles = commonService.getFilesPathsByDirAndExtension(commandsModel.getUserCommandsPath(), 5, ".kh");
+            for (String filePath : userCommandFiles) {
+                List<String> lines = Files.readLines(new File(filePath), Charset.forName("UTF-8"));
+//                TODO
+//                commandsModel.addCommandSource("Predefined Commands", predefinedCommandsPath, commandsRaw);
+                parsePredefinedCommandsFromLines(lines, commandsModel);
+            }
+        } catch (IOException e) {
+            commandsModel.addParseException(e);
+            logger.error(e.getMessage(), e);
+        }
+    }
+
+    public void parsePredefinedCommandsFromLines(List<String> lines, CommandsModel commandsModel) {
+        ListIterator<String> iterator = lines.listIterator();
+        while (iterator.hasNext()) {
+            try {
+                buildCommandResult(iterator, commandsModel);
+            } catch (RuntimeException e) {
+                commandsModel.addParseException(e);
+                logger.error(e.getMessage(), e);
+            }
+        }
+    }
+
 
     /**
      * Fehches resources(resource names) depends on namespace for commands hot replacement comboboxes.
@@ -172,41 +199,145 @@ public class CommandsService {
     }
 
 
-    public void parseUserCommands(CommandsModel commandsModel) {
+    public void commandHotReplacement(CommandsModel commandsModel) {
+        CommandLineParser parser = new DefaultParser();
+        Options options = new Options();
+        Option option = new Option("pods", "test");
+        Option option1 = new Option("n", "test1");
+        options.addOption(option);
+        options.addOption(option1);
+//        commandsModel.setCommandToExecute(commandsModel.getEditableCommandToExecute());
+        String command = commandsModel.getCommandToExecute().trim().toLowerCase(Locale.ROOT);
+        CommandLine parse = null;
         try {
-            Set<String> userCommandFiles = getFilesPathsByDirAndExtension(commandsModel.getUserCommandsPath(), 5, ".kh");
-            for (String filePath : userCommandFiles) {
-                List<String> lines = Files.readLines(new File(filePath), Charset.forName("UTF-8"));
-//                TODO
-//                commandsModel.addCommandSource("Predefined Commands", predefinedCommandsPath, commandsRaw);
-                parsePredefinedCommandsFromLines(lines, commandsModel);
+            parse = parser.parse(options, command.split(" "));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        if (StringUtils.startsWithAny(command, "kubectl get", "kubectl exec")) {
+            Resource resource = detectResourceFromCommand(command);
+
+        }
+    }
+
+    public Resource detectResourceFromCommand(String command) {
+        Resource resource = null;
+
+        int i = StringUtils.lastIndexOfAny(command, "get", "exec");
+        String resourceAsString = command.substring(i, command.indexOf(" ", i));
+        if (StringUtils.isNotBlank(resourceAsString)) {
+            switch (resourceAsString) {
+                case "po", "pod", "pods" -> resource = Resource.POD; //commandsModel.getselectedPods()
+                case "deploy", "deployment", "deployments" -> resource = Resource.DEPLOYMENT;
+                case "sts", "statefulset", "statefulsets" -> resource = Resource.STATEFUL_SET;
+                case "rs", "replicaset", "replicasets" -> resource = Resource.REPLICA_SET;
+                case "ds", "daemonset", "daemonsets" -> resource = Resource.DAEMON_SET;
+                case "cm", "configmap", "configmaps" -> resource = Resource.CONFIG_MAP;
+                case "svc", "service", "services" -> resource = Resource.SERVICE;
+                case "job", "jobs" -> resource = Resource.JOB;
+            }
+        }
+        return resource;
+    }
+
+
+    //  COMMANDS HISTORY ================
+
+
+    public void prepareCommandsHistory(CommandsModel commandsModel) {
+        try {
+            Set<String> filesPathsByDirAndExtension = commonService.getFilesPathsByDirAndExtension(commandsHistoryPath, 2, ".txt");
+            commandsModel.setCommandsHistories(new HashMap<>());
+            filesPathsByDirAndExtension.forEach(file -> {
+                commandsModel.addHistorySource(Files.getNameWithoutExtension(file), file);
+            });
+            commandsModel.sortMapByDateDesc();
+            Optional<Map.Entry<String, CommandsModel.FileSource>> first = commandsModel.getCommandsHistories().entrySet().stream().findFirst();
+            if (first.isPresent()) {
+                commandsModel.setSelectedCommandsHistoryRaw(commonService.getResourceAsStringByPath(first.get().getValue().getFilePath()));
+                commandsModel.setSelectedCommandsHistoryLabel(first.get().getKey());
             }
         } catch (IOException e) {
-            commandsModel.addParseException(e);
-            logger.error(e.getMessage(), e);
-        }
-    }
-
-    public Set<String> getFilesPathsByDirAndExtension(String dir, int depth, String extension) throws IOException {
-        try (Stream<Path> stream = java.nio.file.Files.walk(Paths.get(dir), depth)) {
-            return stream
-                    .map(path -> path.toString()).filter(f -> f.endsWith(extension))
-                    .collect(Collectors.toSet());
+//            TODO to think about notification
+//            commandsModel.addParseException(e);
+            logger.debug(e.getMessage(), e);
         }
     }
 
 
-    public void parsePredefinedCommandsFromLines(List<String> lines, CommandsModel commandsModel) {
-        ListIterator<String> iterator = lines.listIterator();
-        while (iterator.hasNext()) {
-            try {
-                buildCommandResult(iterator, commandsModel);
-            } catch (RuntimeException e) {
-                commandsModel.addParseException(e);
-                logger.error(e.getMessage(), e);
+    public void changeHistoryRaw(CommandsModel commandsModel) {
+//        String today = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE);
+        LocalDate today = LocalDate.now();
+
+//        TODO
+//          get history files/strings from folder -> sort DESC -> set last elem to raw histroy
+        WeekFields.of(Locale.getDefault());
+        switch (commandsModel.getSelectedCommandsHistoryRange()) {
+            case "Week" -> showHistoryFor(today, today);
+        }
+    }
+
+    public void setStartCommandsRaw(CommandsModel commandsModel) {
+
+    }
+
+    private void showHistoryFor(LocalDate from, LocalDate to) {
+
+        if (from.equals(to)) {
+            to = from;
+        }
+        try {
+            Set<String> filesPathsByDirAndExtension = commonService.getFilesPathsByDirAndExtension(commandsHistoryPath, 2, ".txt");
+            for (String filePath : filesPathsByDirAndExtension) {
+//                File file = new File(filePath);
+//                BasicFileAttributes attr = java.nio.file.Files.readAttributes(Paths.get(new URI(new File(filePath).getAbsolutePath())), BasicFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
+                FileTime creationTime = (FileTime) java.nio.file.Files.getAttribute(Paths.get(new URI(new File(filePath).getAbsolutePath())), "creationTime");
+                LocalDate localDate = LocalDate.ofInstant(creationTime.toInstant(), ZoneId.systemDefault());
+                if (!localDate.isBefore(from) && !localDate.isAfter(to)) {
+//                   TODO
+//                   read files to commands content
+//                   copy actual content to buffer
+//                   disable toolbarbuttons
+                }
             }
+        } catch (IOException | URISyntaxException e) {
+            e.printStackTrace();
+        }
+
+//        Calendar c = Calendar.getInstance();
+//        c.setTime(yourdate); // yourdate is an object of type Date
+//
+//        int dayOfWeek = c.get(Calendar.DAY_OF_WEEK);
+    }
+
+    /**
+     * Filters only commands from file for history output. Or vice versa.
+     *
+     * @param commandsModel - commands model.
+     * @param show          - state. If true then only commands will be shown.
+     */
+    public void showOnlyCommandsInHistory(CommandsModel commandsModel, boolean show) {
+        if (show) {
+            commandsModel.setCommandsRawHistoryBuffer(commandsModel.getSelectedCommandsHistoryRaw());
+            List<String> lines = Arrays.asList(commandsModel.getSelectedCommandsHistoryRaw().split("\n"));
+            Iterator<String> iterator = lines.iterator();
+            boolean lineToRemove = false;
+            while (iterator.hasNext()) {
+                String next = iterator.next();
+                if (next.contains("===========")) {
+                    lineToRemove = false;
+                }
+                if (next.equals("************************************************************************************************************") || lineToRemove) {
+                    iterator.remove();
+                    lineToRemove = true;
+                }
+            }
+            commandsModel.setSelectedCommandsHistoryRaw(lines.stream().collect(Collectors.joining("\n")));
+        } else {
+            commandsModel.setSelectedCommandsHistoryRaw(commandsModel.getCommandsRawHistoryBuffer());
         }
     }
+
 
     private void buildCommandResult(ListIterator<String> iterator, CommandsModel commandsModel) {
         CommandsResult commandResult = new CommandsResult(commandsModel.getCommandsResults().size() + 1);
@@ -262,115 +393,4 @@ public class CommandsService {
         return line.substring(line.indexOf(":") + 1).trim();
     }
 
-    public void commandHotReplacement(CommandsModel commandsModel) {
-        CommandLineParser parser = new DefaultParser();
-        Options options = new Options();
-        Option option = new Option("pods", "test");
-        Option option1 = new Option("n", "test1");
-        options.addOption(option);
-        options.addOption(option1);
-//        commandsModel.setCommandToExecute(commandsModel.getEditableCommandToExecute());
-        String command = commandsModel.getCommandToExecute().trim().toLowerCase(Locale.ROOT);
-        CommandLine parse = null;
-        try {
-            parse = parser.parse(options, command.split(" "));
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        if (StringUtils.startsWithAny(command, "kubectl get", "kubectl exec")) {
-            Resource resource = detectResourceFromCommand(command);
-
-        }
-    }
-
-    public Resource detectResourceFromCommand(String command) {
-        Resource resource = null;
-
-        int i = StringUtils.lastIndexOfAny(command, "get", "exec");
-        String resourceAsString = command.substring(i, command.indexOf(" ", i));
-        if (StringUtils.isNotBlank(resourceAsString)) {
-            switch (resourceAsString) {
-                case "po", "pod", "pods" -> resource = Resource.POD; //commandsModel.getselectedPods()
-                case "deploy", "deployment", "deployments" -> resource = Resource.DEPLOYMENT;
-                case "sts", "statefulset", "statefulsets" -> resource = Resource.STATEFUL_SET;
-                case "rs", "replicaset", "replicasets" -> resource = Resource.REPLICA_SET;
-                case "ds", "daemonset", "daemonsets" -> resource = Resource.DAEMON_SET;
-                case "cm", "configmap", "configmaps" -> resource = Resource.CONFIG_MAP;
-                case "svc", "service", "services" -> resource = Resource.SERVICE;
-                case "job", "jobs" -> resource = Resource.JOB;
-            }
-        }
-        return resource;
-    }
-
-    public void setStartHistoryRaw(CommandsModel commandsModel) {
-//        String today = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE);
-        LocalDate today = LocalDate.now();
-
-        WeekFields.of(Locale.getDefault());
-        switch (commandsModel.getSelectedCommandsHistoryRange()) {
-            case "Week" -> showHistoryFor(today, today);
-        }
-    }
-
-    private void showHistoryFor(LocalDate from, LocalDate to) {
-
-        if (from.equals(to)) {
-            to = from;
-        }
-        try {
-            Set<String> filesPathsByDirAndExtension = getFilesPathsByDirAndExtension(commandsHistoryPath, 2, ".txt");
-            for (String filePath : filesPathsByDirAndExtension) {
-//                File file = new File(filePath);
-//                BasicFileAttributes attr = java.nio.file.Files.readAttributes(Paths.get(new URI(new File(filePath).getAbsolutePath())), BasicFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
-                FileTime creationTime = (FileTime) java.nio.file.Files.getAttribute(Paths.get(new URI(new File(filePath).getAbsolutePath())), "creationTime");
-                LocalDate localDate = LocalDate.ofInstant(creationTime.toInstant(), ZoneId.systemDefault());
-                if (!localDate.isBefore(from) && !localDate.isAfter(to)) {
-//                   TODO
-//                   read files to commands content
-//                   copy actual content to buffer
-//                   disable toolbarbuttons
-                }
-            }
-        } catch (IOException | URISyntaxException e) {
-            e.printStackTrace();
-        }
-
-//        Calendar c = Calendar.getInstance();
-//        c.setTime(yourdate); // yourdate is an object of type Date
-//
-//        int dayOfWeek = c.get(Calendar.DAY_OF_WEEK);
-    }
-
-    /**
-     * Filters only commands from file for history output. Or vice versa.
-     *
-     * @param commandsModel - commands model.
-     * @param show          - state. If true then only commands will be shown.
-     */
-    public void showOnlyCommandsInHistory(CommandsModel commandsModel, boolean show) {
-        if (show) {
-            commandsModel.setCommandsRawHistoryBuffer(commandsModel.getSelectedCommandsHistoryRaw());
-            List<String> lines = Arrays.asList(commandsModel.getSelectedCommandsHistoryRaw().split("\n"));
-            Iterator<String> iterator = lines.iterator();
-            boolean lineToRemove = false;
-            while (iterator.hasNext()) {
-                String next = iterator.next();
-                if (next.contains("===========")) {
-                    lineToRemove = false;
-                }
-                if (next.equals("************************************************************************************************************") || lineToRemove) {
-                    iterator.remove();
-                    lineToRemove = true;
-                }
-            }
-            commandsModel.setSelectedCommandsHistoryRaw(lines.stream().collect(Collectors.joining("\n")));
-        } else {
-            commandsModel.setSelectedCommandsHistoryRaw(commandsModel.getCommandsRawHistoryBuffer());
-        }
-    }
-
-    public void setStartCommandsRaw(CommandsModel commandsModel) {
-
-    }
 }

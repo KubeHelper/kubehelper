@@ -17,6 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package com.kubehelper.services;
 
+import bsh.commands.dir;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.kubehelper.common.Resource;
 import io.fabric8.kubernetes.api.model.HasMetadata;
@@ -27,6 +28,8 @@ import io.fabric8.kubernetes.client.internal.SerializationUtils;
 import io.kubernetes.client.openapi.ApiException;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
 import io.kubernetes.client.openapi.models.V1NamespaceList;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,19 +37,27 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
+import org.springframework.util.ResourceUtils;
 import org.zkoss.zul.Messagebox;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.SequenceInputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * The common service contains method used by other services and view models.
@@ -101,7 +112,7 @@ public class CommonService {
      * This method helps to check correct value at commbobox filters.
      *
      * @param resource - resource.
-     * @param filter - filter.
+     * @param filter   - filter.
      * @return - true if resource match filter.
      */
     public boolean checkEqualsFilter(String resource, String filter) {
@@ -120,16 +131,28 @@ public class CommonService {
      * @param path - file path.
      * @return - file as String.
      */
-    public String getResourcesAsStringByPath(String path) {
-        String data = "";
-        ClassPathResource cpr = new ClassPathResource(path);
+    public String getClasspathResourceAsStringByPath(String path) {
         try {
-            byte[] bdata = FileCopyUtils.copyToByteArray(cpr.getInputStream());
-            data = new String(bdata, StandardCharsets.UTF_8);
+            return new String(FileCopyUtils.copyToByteArray(new ClassPathResource(path).getInputStream()), StandardCharsets.UTF_8);
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
         }
-        return data;
+        return "";
+    }
+
+    /**
+     * Reads file to string by path.
+     *
+     * @param path - file path.
+     * @return - file as String.
+     */
+    public String getResourceAsStringByPath(String path) {
+        try {
+            return IOUtils.toString(new FileInputStream(path));
+        } catch (IOException e) {
+            logger.error(e.getMessage(), e);
+        }
+        return "";
     }
 
     /**
@@ -148,6 +171,30 @@ public class CommonService {
         }
         return lines;
     }
+
+    /**
+     * Gets sets of Strings with paths to files from folder.
+     *
+     * @param dir       - folder to search files.
+     * @param depth     - recursive look depth to folder.
+     * @param extension - file extension
+     * @return sets of Strings(paths) with paths to files
+     * @throws IOException - exception.
+     */
+    public Set<String> getFilesPathsByDirAndExtension(String dir, int depth, String extension) throws IOException {
+        try (Stream<Path> stream = java.nio.file.Files.walk(Paths.get(dir), depth)) {
+            return stream
+                    .map(path -> path.toString()).filter(f -> f.endsWith(extension))
+                    .collect(Collectors.toSet());
+        }
+    }
+
+//    public Set<Path> getFilesPathsByDirAndExtension1(String dir, int depth, String extension) throws IOException {
+//        try (Stream<Path> stream = java.nio.file.Files.walk(Paths.get(dir), depth)) {
+//            return stream.filter(Files::isRegularFile)   // is a file
+//                    .filter(p -> p.getFileName().toString().endsWith(extension)).collect(Collectors.toSet());
+//        }
+//    }
 
 
     /**
@@ -219,7 +266,7 @@ public class CommonService {
      *
      * @param resource     - {@link Resource}
      * @param resourceName - resource name.
-     * @param namespace - namespace.
+     * @param namespace    - namespace.
      * @return - Kubernetes resource as Yaml String.
      */
     public String getJsonResource(Resource resource, String resourceName, String namespace) {
@@ -231,7 +278,7 @@ public class CommonService {
     /**
      * Executes kubectl command from shell.
      *
-     * @param shell - shell type.
+     * @param shell   - shell type.
      * @param command - command to execute.
      * @return - inputStream and errorStream as String.
      */

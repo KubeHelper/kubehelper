@@ -74,9 +74,9 @@ public class IpsAndPortsService {
      */
     @PostConstruct
     private void postConstruct() {
-        podDetailsTemplate = commonService.getResourcesAsStringByPath("/templates/ips-and-ports/pod-details.html");
-        serviceDetailsTemplate = commonService.getResourcesAsStringByPath("/templates/ips-and-ports/service-details.html");
-        containerDetailsTemplate = commonService.getResourcesAsStringByPath("/templates/ips-and-ports/container-details.html");
+        podDetailsTemplate = commonService.getClasspathResourceAsStringByPath("/templates/ips-and-ports/pod-details.html");
+        serviceDetailsTemplate = commonService.getClasspathResourceAsStringByPath("/templates/ips-and-ports/service-details.html");
+        containerDetailsTemplate = commonService.getClasspathResourceAsStringByPath("/templates/ips-and-ports/container-details.html");
     }
 
 

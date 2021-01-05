@@ -17,13 +17,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package com.kubehelper.domain.models;
 
+import com.google.common.collect.ImmutableSortedMap;
 import com.kubehelper.common.Global;
 import com.kubehelper.common.KubeHelperException;
 import com.kubehelper.domain.filters.CommandsFilter;
 import com.kubehelper.domain.results.CommandsResult;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -64,8 +68,8 @@ public class CommandsModel implements PageModel {
     private Set<String> selectedJobs = new HashSet<>();
 
     private String selectedShell = "bash";
-    private List<String> shells = Arrays.asList("bash","sh","fish","zsh","csh","ksh");
-    private List<String> commandsHistoryRanges = Arrays.asList("Week","Last Week","Last Month","Year","All");
+    private List<String> shells = Arrays.asList("bash", "sh", "fish", "zsh", "csh", "ksh");
+    private List<String> commandsHistoryRanges = Arrays.asList("Week", "Last Week", "Last Month", "Year", "All");
 
     private String selectedCommandsSourceLabel = "";
     private String selectedCommandsSourceRaw = "";
@@ -108,6 +112,10 @@ public class CommandsModel implements PageModel {
         historySource.setLabel(label);
         historySource.setFilePath(filePath);
         commandsHistories.put(label, historySource);
+    }
+
+    public void sortMapByDateDesc() {
+        commandsHistories = ImmutableSortedMap.copyOf(commandsHistories, Comparator.comparing(date -> LocalDate.parse(date, DateTimeFormatter.ISO_LOCAL_DATE), Comparator.reverseOrder()));
     }
 
     public void addParseException(Exception exception) {
@@ -414,6 +422,11 @@ public class CommandsModel implements PageModel {
 
     public Map<String, FileSource> getCommandsHistories() {
         return commandsHistories;
+    }
+
+    public CommandsModel setCommandsHistories(Map<String, FileSource> commandsHistories) {
+        this.commandsHistories = commandsHistories;
+        return this;
     }
 
     public List<String> getShells() {

@@ -131,8 +131,7 @@ public class CommandsVM implements EventListener<Event> {
         fontSizeSlider.addEventListener("onScroll", this);
         commandsNamespacesCBox.addEventListener("onSelect", this);
         commandToExecuteTBox.addEventListener("onChange", this);
-        createCommandsToolbarButtons("commandsSourcesToolbarID", commandsModel.getCommandsSources().keySet());
-        createCommandsToolbarButtons("commandsHistoriesToolbarID", commandsModel.getCommandsHistories().keySet());
+
 //        TODO call method after refresh, components should be in DOM
 //        enableDisableMenuItem(commandsModel.getSelectedCommandsSource(), true, "bold;");
     }
@@ -160,7 +159,7 @@ public class CommandsVM implements EventListener<Event> {
      */
     private void onInitPreparations() {
         commandsService.parsePredefinedCommands(commandsModel);
-        commandsService.prepareCommandsHistory(commandsModel);
+//        commandsService.prepareCommandsHistory(commandsModel);
 //        commandsService.parseUserCommands(commandsModel);
 //        TODO change after
 //        commandsModel.setSelectedCommandsSourceLabel("commands2");
@@ -212,6 +211,7 @@ public class CommandsVM implements EventListener<Event> {
         if ("onScroll".equals(event.getName())) { //font size slider event
             changeFontSize(event);
         } else if ("onClick".equals(event.getName())) { //Changes raw source in management,history and toolbarbutton state.
+//            TODO from HERE!!!
             selectAndChangeCommandsSource(event);
         } else if ("onSelect".equals(event.getName()) && event.getTarget() instanceof Toolbarbutton) {  //change resources in comboxex depend on namespace in commands window
             changeResourcesInComboxexDependOnNamespace();
@@ -227,21 +227,30 @@ public class CommandsVM implements EventListener<Event> {
     public void onSelectMainCommandsTabs(@ContextParam(ContextType.COMPONENT) Tabbox tabbox) {
         activeTab = tabbox.getSelectedTab().getId();
         if ("commandsHistory".equals(tabbox.getSelectedTab().getId()) && StringUtils.isBlank(commandsModel.getSelectedCommandsHistoryRaw())) {
-            commandsService.setStartHistoryRaw(commandsModel);
+            commandsService.prepareCommandsHistory(commandsModel);
+            createCommandsToolbarButtons("commandsHistoriesToolbarID", commandsModel.getCommandsHistories().keySet());
+            enableDisableMenuItem(getCommandToolbarButtonId(commandsModel.getSelectedCommandsHistoryLabel()), true, "bold;");
         } else if ("commandsManagement".equals(tabbox.getSelectedTab().getId()) && StringUtils.isBlank(commandsModel.getSelectedCommandsSourceRaw())) {
             commandsService.setStartCommandsRaw(commandsModel);
+            createCommandsToolbarButtons("commandsSourcesToolbarID", commandsModel.getCommandsSources().keySet());
+            enableDisableMenuItem(commandsModel.getSelectedCommandsSourceLabel(), true, "bold;");
         }
+        refreshHistoryOutput();
     }
 
     @Command
     public void showOnlyCommandsInHistory(@ContextParam(ContextType.COMPONENT) Checkbox checkbox) {
         commandsService.showOnlyCommandsInHistory(commandsModel, checkbox.isChecked());
+        refreshHistoryOutput();
+    }
 
+    public void refreshHistoryOutput() {
         Div historyOutputBlock = (Div) Path.getComponent("//indexPage/templateInclude/historyOutputId");
         historyOutputBlock.getChildren().clear();
         historyOutputBlock.appendChild(new Html("<pre><code>" + commandsModel.getSelectedCommandsHistoryRaw() + "</code></pre>"));
         BindUtils.postNotifyChange(this, ".");
     }
+
 
     /**
      * Synchronizes command to execute and hot replacement on full command textbox onChange event.
@@ -284,7 +293,7 @@ public class CommandsVM implements EventListener<Event> {
     @Command
     public void changeHistoryRaw() {
         commandsModel.setSelectedCommandsHistoryLabel(commandsModel.getSelectedCommandsHistoryRange());
-        commandsService.setStartHistoryRaw(commandsModel);
+        commandsService.changeHistoryRaw(commandsModel);
         BindUtils.postNotifyChange(this, ".");
     }
 
@@ -397,8 +406,8 @@ public class CommandsVM implements EventListener<Event> {
 //    private void changeRawSource(String htmlBlockId, String label, String source) {
 //        Div rawSourceBlock = (Div) Path.getComponent("//indexPage/templateInclude/"+htmlBlockId);
 //        rawSourceBlock.getChildren().clear();
-//        commandsModel.setSelectedCommandsSourceLabel(label);
 //        commandsModel.setSelectedCommandsSourceRaw("<pre><code>" + commandsModel.getCommandsSources().get(label).getRawSource() + "</code></pre>");
+//        commandsModel.setSelectedCommandsSourceLabel(label);
 //        BindUtils.postNotifyChange(null, null, this, "selectedCommandsSource", "selectedCommandsRaw");
 //    }
 
