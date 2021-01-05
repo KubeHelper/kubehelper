@@ -131,6 +131,9 @@ public class VersionsModel implements PageModel {
     private final String UTIL_WGET_DESCR = "Wget is a free software package for retrieving files using HTTP, HTTPS, FTP and FTPS, the most widely used Internet protocols.";
     private final List<String> UTIL_WGET_LINKS = Arrays.asList("https://www.gnu.org/software/wget/");
 
+    private final String UTIL_JAVA_DESCR = "Java. Open JDK.";
+    private final List<String> UTIL_JAVA_LINKS = Arrays.asList("https://hub.docker.com/_/openjdk");
+
     private final String SHELL_BASH_DESCR = "Bash is the GNU Project's shell—the Bourne Again SHell. This is an sh-compatible shell that incorporates useful features from the Korn shell (ksh) and the C shell (csh).";
     private final List<String> SHELL_BASH_LINKS = Arrays.asList("https://www.gnu.org/software/bash/");
 
@@ -186,10 +189,11 @@ public class VersionsModel implements PageModel {
         addUtil("view-utilization", "kubectl view-utilization", "kubectl view-utilization version", KCTL_PLUGIN_CATEGORY, KREW_VIEW_UTIL_DESCR, KREW_VIEW_UTIL_LINKS);
         addUtil("view-webhook", "kubectl view-webhook", "kubectl view-webhook version", KCTL_PLUGIN_CATEGORY, KREW_VIEW_WEBH_DESCR, KREW_VIEW_WEBH_LINKS);
         addUtil("who-can", "kubectl who-can", "kubectl who-can version", KCTL_PLUGIN_CATEGORY, KREW_WHO_CAN_DESCR, KREW_WHO_CAN_LINKS);
-        addUtil("jq", "jq", "jq --version", UTIL_PLUGIN_CATEGORY, UTIL_JQ_DESCR, UTIL_JQ_LINKS);
-        addUtil("Git", "git", "git --version", UTIL_PLUGIN_CATEGORY, UTIL_GIT_DESCR, UTIL_GIT_LINKS);
-        addUtil("curl", "curl", "curl --version", UTIL_PLUGIN_CATEGORY, UTIL_CURL_DESCR, UTIL_CURL_LINKS);
-        addUtil("wget", "wget", "wget --version", UTIL_PLUGIN_CATEGORY, UTIL_WGET_DESCR, UTIL_WGET_LINKS);
+        addUtil("jq", "jq", "jq --version", SHELL_CATEGORY, UTIL_JQ_DESCR, UTIL_JQ_LINKS);
+        addUtil("Git", "git", "git --version", SHELL_CATEGORY, UTIL_GIT_DESCR, UTIL_GIT_LINKS);
+        addUtil("curl", "curl", "curl --version", SHELL_CATEGORY, UTIL_CURL_DESCR, UTIL_CURL_LINKS);
+        addUtil("wget", "wget", "wget --version", SHELL_CATEGORY, UTIL_WGET_DESCR, UTIL_WGET_LINKS);
+        addUtil("java", "java", "java --version", SHELL_CATEGORY, UTIL_JAVA_DESCR, UTIL_JAVA_LINKS);
         addUtil("bash", "bash", "bash --version", SHELL_CATEGORY, SHELL_BASH_DESCR, SHELL_BASH_LINKS);
         addUtil("fish", "fish", "fish --version", SHELL_CATEGORY, SHELL_FISH_DESCR, SHELL_FISH_LINKS);
         addUtil("zsh", "zsh", "zsh --version", SHELL_CATEGORY, SHELL_ZSH_DESCR, SHELL_ZSH_LINKS);
