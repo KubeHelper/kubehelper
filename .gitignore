@@ -10,3 +10,4 @@ out/
 .kube/
 /src/main/resources/web/bootstrap/
 /src/main/resources/web/less/
+/.project

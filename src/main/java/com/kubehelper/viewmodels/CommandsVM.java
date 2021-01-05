@@ -48,6 +48,7 @@ import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Notification;
 import org.zkoss.zkplus.spring.DelegatingVariableResolver;
+import org.zkoss.zul.Checkbox;
 import org.zkoss.zul.Combobox;
 import org.zkoss.zul.Div;
 import org.zkoss.zul.Footer;
@@ -233,8 +234,12 @@ public class CommandsVM implements EventListener<Event> {
     }
 
     @Command
-    public void showOnlyCommandsInHistory() {
-        commandsService.showOnlyCommandsInHistory(commandsModel);
+    public void showOnlyCommandsInHistory(@ContextParam(ContextType.COMPONENT) Checkbox checkbox) {
+        commandsService.showOnlyCommandsInHistory(commandsModel, checkbox.isChecked());
+
+        Div historyOutputBlock = (Div) Path.getComponent("//indexPage/templateInclude/historyOutputId");
+        historyOutputBlock.getChildren().clear();
+        historyOutputBlock.appendChild(new Html("<pre><code>" + commandsModel.getSelectedCommandsHistoryRaw() + "</code></pre>"));
         BindUtils.postNotifyChange(this, ".");
     }
 
@@ -280,6 +285,16 @@ public class CommandsVM implements EventListener<Event> {
     public void changeHistoryRaw() {
         commandsModel.setSelectedCommandsHistoryLabel(commandsModel.getSelectedCommandsHistoryRange());
         commandsService.setStartHistoryRaw(commandsModel);
+        BindUtils.postNotifyChange(this, ".");
+    }
+
+    /**
+     * Refresh history files and content.
+     */
+    @Command
+    public void refreshHistory() {
+        commandsModel.getCommandsHistories().clear();
+        commandsService.prepareCommandsHistory(commandsModel);
         BindUtils.postNotifyChange(this, ".");
     }
 

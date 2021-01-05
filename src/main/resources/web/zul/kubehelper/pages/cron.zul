@@ -1,0 +1,179 @@
+<zk>
+    <borderlayout id="cronTemplate" viewModel="@id('cronVM') @init('com.kubehelper.viewmodels.cronVM')" width="100%" height="100%">
+        <center id="cronsCenterLayoutID" margins="0,3,3,3" title="Crons" border="none">
+            <tabbox width="100%" sclass="nav_tabs" style="border: none" onSelect="@command('onSelectMainCronsTabs')">
+                <tabs id="tabs">
+                    <tab label="Crons" id="Crons"/>
+                    <tab label="Crons History" id="commandsHistory"/>
+                </tabs>
+                <tabpanels>
+                    <tabpanel>
+                        <grid id="commandsGridID" model="@load(cronVM.commandsResults)" height="@load(cronVM.commandsGridHeight)">
+                            <auxhead id="commandsGridAuxHead">
+                                <auxheader>
+                                    <span sclass="z-icon-hashtag"/>
+                                </auxheader>
+                                <auxheader colspan="1">
+                                    <combobox id="commandsGroupCBox" hflex="1" mold="rounded" model="@load(cronVM.filter.groupsFilter)"
+                                              selectedItem="@bind(cronVM.filter.selectedGroupFilter)"
+                                              onChange="@command('filterCrons')">
+                                        <template name="model">
+                                            <comboitem label="@load(each)"/>
+                                        </template>
+                                    </combobox>
+                                </auxheader>
+                                <auxheader colspan="1">
+                                    <combobox id="operationsGroupCBox" hflex="1" mold="rounded" model="@load(cronVM.filter.operationsFilter)"
+                                              selectedItem="@bind(cronVM.filter.selectedOperationFilter)"
+                                              onChange="@command('filterCommands')">
+                                        <template name="model">
+                                            <comboitem label="@load(each)"/>
+                                        </template>
+                                    </combobox>
+                                </auxheader>
+                                <auxheader colspan="1">
+                                    <textbox hflex="1" value="@bind(cronVM.filter.command)" onChange="@command('filterCommands')"/>
+                                </auxheader>
+                                <auxheader colspan="1">
+                                    <textbox instant="true" hflex="1" value="@bind(cronVM.filter.description)" onChange="@command('filterCommands')"/>
+                                </auxheader>
+                            </auxhead>
+                            <columns menupopup="auto" sizable="true">
+                                <column hflex="min" label="Id" sort="auto(id)"/>
+                                <column hflex="1" label="Group" sort="auto(group)"/>
+                                <column hflex="1" label="Operation" sort="auto(operation)"/>
+                                <column hflex="5" label="Command" sort="auto(command)"/>
+                                <column hflex="2" label="Description" sort="auto(description)"/>
+                            </columns>
+                            <rows>
+                                <template name="model" var="item">
+                                    <row onClick="@command('showFullCommand', clickedItem=item)" style="cursor:pointer">
+                                        <label value="${item.id}"/>
+                                        <label value="${item.group}"/>
+                                        <label value="${item.operation}"/>
+                                        <label value="${item.command}" multiline="true"/>
+                                        <label value="${item.description}" multiline="true"/>
+                                    </row>
+                                </template>
+                            </rows>
+                            <foot>
+                                <footer id="commandsGridFooter" span="5" align="right" label="@load(cronVM.commandsTotalItems)"/>
+                            </foot>
+                        </grid>
+
+                        <groupbox id="cronCommandGrBox">
+                            <caption iconSclass="z-icon-terminal" label="Full Command"/>
+                            <hbox width="100%" align="start" pack="stretch" height="@load(cronVM.fullCommandBoxHeight)">
+                                <cell width="89.5%" align="left">
+                                    <textbox value="@bind(cronVM.cronCommand)" width="100%" rows="3"
+                                             style="font-family: Courier, Monaco, monospace;color: blue;font-size: 13px;line-height: 1.4;margin-bottom: 2px;"/>
+                                </cell>
+                                <cell width="10%" valign="middle">
+                                    <hbox width="100%" height="50%" pack="stretch">
+                                        <label value="Shell: "/>
+                                        <combobox model="@load(cronVM.shells)" selectedItem="@bind(cronVM.selectedShell)" readonly="true">
+                                            <template name="model">
+                                                <comboitem label="@load(each)"/>
+                                            </template>
+                                        </combobox>
+                                    </hbox>
+                                    <vbox width="100%" height="50%" pack="end">
+                                        <button iconSclass="fas fa-terminal" onClick="@command('createCronJob')" width="100%"/>
+                                    </vbox>
+                                </cell>
+                            </hbox>
+                        </groupbox>
+
+ 						<grid id="cronJobsGridID" model="@load(cronVM.cronJobsResults)" height="@load(cronVM.cronJobsGridHeight)">
+                            <auxhead id="cronJobsGridAuxHead">
+                                <auxheader>
+                                    <span sclass="z-icon-hashtag"/>
+                                </auxheader>
+                                <auxheader colspan="1">
+                                    <combobox id="commandsGroupCBox" hflex="1" mold="rounded" model="@load(cronVM.filter.groupsFilter)"
+                                              selectedItem="@bind(cronVM.filter.selectedGroupFilter)"
+                                              onChange="@command('filterCrons')">
+                                        <template name="model">
+                                            <comboitem label="@load(each)"/>
+                                        </template>
+                                    </combobox>
+                                </auxheader>
+                                <auxheader colspan="1">
+                                    <combobox id="operationsGroupCBox" hflex="1" mold="rounded" model="@load(cronVM.filter.operationsFilter)"
+                                              selectedItem="@bind(cronVM.filter.selectedOperationFilter)"
+                                              onChange="@command('filterCommands')">
+                                        <template name="model">
+                                            <comboitem label="@load(each)"/>
+                                        </template>
+                                    </combobox>
+                                </auxheader>
+                                <auxheader colspan="1">
+                                    <textbox hflex="1" value="@bind(cronVM.filter.command)" onChange="@command('filterCommands')"/>
+                                </auxheader>
+                                <auxheader colspan="1">
+                                    <textbox instant="true" hflex="1" value="@bind(cronVM.filter.description)" onChange="@command('filterCommands')"/>
+                                </auxheader>
+                            </auxhead>
+                            <columns menupopup="auto" sizable="true">
+                                <column hflex="min" label="Id" sort="auto(id)"/>
+                                <column hflex="1" label="Group" sort="auto(group)"/>
+                                <column hflex="1" label="Operation" sort="auto(operation)"/>
+                                <column hflex="5" label="Command" sort="auto(command)"/>
+                                <column hflex="2" label="Description" sort="auto(description)"/>
+                            </columns>
+                            <rows>
+                                <template name="model" var="item">
+                                    <row onClick="@command('showFullCommand', clickedItem=item)" style="cursor:pointer">
+                                        <label value="${item.id}"/>
+                                        <label value="${item.group}"/>
+                                        <label value="${item.operation}"/>
+                                        <label value="${item.command}" multiline="true"/>
+                                        <label value="${item.description}" multiline="true"/>
+                                    </row>
+                                </template>
+                            </rows>
+                        </grid>
+                    </tabpanel>
+
+                    <tabpanel>
+                        <borderlayout width="100%" height="@load(cronVM.commandsHistoryHeight)">
+                            <north collapsible="true" splittable="true">
+                               <hbox width="100%" align="end" pack="end" spacing="20">
+                                   <combobox model="@load(cronVM.commandsHistoryRanges)" selectedItem="@bind(cronVM.selectedCommandsHistoryRange)" readonly="true"
+                                             onSelect="@command('changeHistoryRaw')">
+                                       <template name="model">
+                                           <comboitem label="@load(each)"/>
+                                       </template>
+                                   </combobox>
+                                   <checkbox label="Only commands" mold="switch" checked="@bind(cronVM.showOnlyCommandsInHistory)"/>
+                                   <button iconSclass="fas fa-sync-alt" onClick="@command('refreshHistory')"/>
+                               </hbox>
+                            </north>
+                            <center>
+                                <div>
+                                    <panel title="@load(cronVM.selectedCommandsHistoryLabel)" width="100%" height="@load(cronVM.commandsHistorySrcPanelHeight)">
+                                        <caption iconSclass="z-icon-list"/>
+                                        <panelchildren>
+                                            <div width="100%" height="100%"
+                                                 style="overflow-y:scroll;overflow-x:auto;font-family: Courier, Monaco, monospace;display: flex;line-height: 1.3;border: 1px solid lightgray;padding-left: 5px">
+                                                <!--                                                TODO  style="@load(cronVM.fontSizeCss)" and for management slider-->
+                                                <div id="historyOutputId" width="100%" height="100%">
+                                                </div>
+                                            </div>
+                                        </panelchildren>
+                                    </panel>
+                                </div>
+                            </center>
+                            <west title="Commands History" collapsible="true" splittable="true" autoscroll="true" size="7%" maxsize="200">
+                                <div vflex="1">
+                                    <vbox id="commandsHistoriesToolbarID">
+                                    </vbox>
+                                </div>
+                            </west>
+                        </borderlayout>
+                    </tabpanel>
+                </tabpanels>
+            </tabbox>
+        </center>
+    </borderlayout>
+</zk>

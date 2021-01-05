@@ -30,9 +30,9 @@
                                 <toolbarbutton id="commandsMenuBtn" hflex="1" iconSclass="fas fa-terminal" label="&#160;Commands" style="text-align: left; padding-left: 2px;"
                                                onClick="@command('switchView', modelName='commands')"/>
                                 <toolbarbutton id="krewMenuBtn" hflex="1" iconSclass="fas fa-dharmachakra" label="&#160;Krew" style="text-align: left; padding-left: 2px;"
-                                               onClick="@command('switchView', modelName='krew')"/>
+                                               onClick="@command('switchView', modelName='crons')"/>
                                 <toolbarbutton id="preferencesMenuBtn" hflex="1" iconSclass="fas fa-cogs" label="&#160;Preferences" style="text-align: left; padding-left: 2px;"
-                                               onClick="@command('switchView', modelName='preferences')"/>
+                                               onClick="@command('switchView', modelName='configs')"/>
                                 <toolbarbutton id="versionsMenuBtn" hflex="1" iconSclass="fas fa-link" label="&#160;Versions" style="text-align: left; padding-left: 2px;"
                                                onClick="@command('switchView', modelName='versions')"/>
                                 <!--                            <toolbarbutton id="auditingMenuBtn" hflex="1" iconSclass="z-icon-gears" label="&#160;Auditing" onClick="@command('switchView', modelName='auditing')"/>-->

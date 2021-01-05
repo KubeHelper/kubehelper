@@ -17,8 +17,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package com.kubehelper.common;
 
-import com.kubehelper.domain.models.DashboardModel;
 import com.kubehelper.domain.models.CommandsModel;
+import com.kubehelper.domain.models.ConfigsModel;
+import com.kubehelper.domain.models.CronsModel;
+import com.kubehelper.domain.models.DashboardModel;
 import com.kubehelper.domain.models.IpsAndPortsModel;
 import com.kubehelper.domain.models.LabelsModel;
 import com.kubehelper.domain.models.PageModel;
@@ -40,6 +42,8 @@ public class Global {
     public static String LABELS_MODEL = "labels";
     public static String COMMANDS_MODEL = "commands";
     public static String IPS_AND_PORTS_MODEL = "ipsAndPorts";
+    public static String CRONS_MODEL = "crons";
+    public static String CONFIGS_MODEL = "configs";
     public static String VERSIONS_MODEL = "versions";
 
     public static String AUTH_EXCEPTION_MESSAGE = "";
@@ -58,6 +62,8 @@ public class Global {
             put(LABELS_MODEL, new LabelsModel());
             put(COMMANDS_MODEL, new CommandsModel());
             put(IPS_AND_PORTS_MODEL, new IpsAndPortsModel());
+            put(CRONS_MODEL, new CronsModel());
+            put(CONFIGS_MODEL, new ConfigsModel());
             put(VERSIONS_MODEL, new VersionsModel());
         }
     };

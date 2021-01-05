@@ -41,15 +41,20 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.FileTime;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.WeekFields;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
@@ -67,7 +72,7 @@ import java.util.stream.Stream;
 public class CommandsService {
 
     private static Logger logger = LoggerFactory.getLogger(CommandsService.class);
-    private String predefinedCommandsPath = "/templates/features/";
+    private String predefinedCommandsPath = "/init/commands/";
     private List<String> predefinedCommands = Arrays.asList("commands.kh", "commands2.kh");
 
     private String commandsHistoryPath = "/tmp/history/";
@@ -80,7 +85,7 @@ public class CommandsService {
 
     @PostConstruct
     private void postConstruct() {
-        historyEntryTemplate = commonService.getResourcesAsStringByPath("/templates/commands/history-entry.template");
+        historyEntryTemplate = commonService.getResourcesAsStringByPath("/templates/history/history-entry.template");
     }
 
     public void prepareCommandsHistory(CommandsModel commandsModel) {
@@ -310,11 +315,59 @@ public class CommandsService {
 
     private void showHistoryFor(LocalDate from, LocalDate to) {
 
+        if (from.equals(to)) {
+            to = from;
+        }
+        try {
+            Set<String> filesPathsByDirAndExtension = getFilesPathsByDirAndExtension(commandsHistoryPath, 2, ".txt");
+            for (String filePath : filesPathsByDirAndExtension) {
+//                File file = new File(filePath);
+//                BasicFileAttributes attr = java.nio.file.Files.readAttributes(Paths.get(new URI(new File(filePath).getAbsolutePath())), BasicFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
+                FileTime creationTime = (FileTime) java.nio.file.Files.getAttribute(Paths.get(new URI(new File(filePath).getAbsolutePath())), "creationTime");
+                LocalDate localDate = LocalDate.ofInstant(creationTime.toInstant(), ZoneId.systemDefault());
+                if (!localDate.isBefore(from) && !localDate.isAfter(to)) {
+//                   TODO
+//                   read files to commands content
+//                   copy actual content to buffer
+//                   disable toolbarbuttons
+                }
+            }
+        } catch (IOException | URISyntaxException e) {
+            e.printStackTrace();
+        }
+
+//        Calendar c = Calendar.getInstance();
+//        c.setTime(yourdate); // yourdate is an object of type Date
+//
+//        int dayOfWeek = c.get(Calendar.DAY_OF_WEEK);
     }
 
-    public void showOnlyCommandsInHistory(CommandsModel commandsModel) {
-        commandsModel.setShowOnlyCommandsInHistoryRawHistoryBuffer(commandsModel.getSelectedCommandsHistoryRaw());
-
+    /**
+     * Filters only commands from file for history output. Or vice versa.
+     *
+     * @param commandsModel - commands model.
+     * @param show          - state. If true then only commands will be shown.
+     */
+    public void showOnlyCommandsInHistory(CommandsModel commandsModel, boolean show) {
+        if (show) {
+            commandsModel.setCommandsRawHistoryBuffer(commandsModel.getSelectedCommandsHistoryRaw());
+            List<String> lines = Arrays.asList(commandsModel.getSelectedCommandsHistoryRaw().split("\n"));
+            Iterator<String> iterator = lines.iterator();
+            boolean lineToRemove = false;
+            while (iterator.hasNext()) {
+                String next = iterator.next();
+                if (next.contains("===========")) {
+                    lineToRemove = false;
+                }
+                if (next.equals("************************************************************************************************************") || lineToRemove) {
+                    iterator.remove();
+                    lineToRemove = true;
+                }
+            }
+            commandsModel.setSelectedCommandsHistoryRaw(lines.stream().collect(Collectors.joining("\n")));
+        } else {
+            commandsModel.setSelectedCommandsHistoryRaw(commandsModel.getCommandsRawHistoryBuffer());
+        }
     }
 
     public void setStartCommandsRaw(CommandsModel commandsModel) {

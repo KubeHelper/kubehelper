@@ -71,7 +71,7 @@ public class CommandsModel implements PageModel {
     private String selectedCommandsSourceRaw = "";
     private String selectedCommandsHistoryLabel = "";
     private String selectedCommandsHistoryRaw = "";
-    private String showOnlyCommandsInHistoryRawHistoryBuffer = "";
+    private String commandsRawHistoryBuffer = "";
     private String selectedCommandsHistoryRange = "";
     private boolean showOnlyCommandsInHistory;
 
@@ -407,6 +407,10 @@ public class CommandsModel implements PageModel {
         return selectedCommandsHistoryRaw;
     }
 
+    public CommandsModel setSelectedCommandsHistoryRaw(String selectedCommandsHistoryRaw) {
+        this.selectedCommandsHistoryRaw = selectedCommandsHistoryRaw;
+        return this;
+    }
 
     public Map<String, FileSource> getCommandsHistories() {
         return commandsHistories;
@@ -438,12 +442,12 @@ public class CommandsModel implements PageModel {
         return this;
     }
 
-    public String getShowOnlyCommandsInHistoryRawHistoryBuffer() {
-        return showOnlyCommandsInHistoryRawHistoryBuffer;
+    public String getCommandsRawHistoryBuffer() {
+        return commandsRawHistoryBuffer;
     }
 
-    public CommandsModel setShowOnlyCommandsInHistoryRawHistoryBuffer(String showOnlyCommandsInHistoryRawHistoryBuffer) {
-        this.showOnlyCommandsInHistoryRawHistoryBuffer = showOnlyCommandsInHistoryRawHistoryBuffer;
+    public CommandsModel setCommandsRawHistoryBuffer(String commandsRawHistoryBuffer) {
+        this.commandsRawHistoryBuffer = commandsRawHistoryBuffer;
         return this;
     }
 

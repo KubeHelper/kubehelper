@@ -1,0 +1,23 @@
+<zk>
+    <script>
+        function highlightConfig () {
+        document.querySelectorAll('div.highlightConfig').forEach(block => { hljs.highlightBlock(block); });
+        }
+    </script>
+	<panel title="Configuration">
+		<toolbar align="end">
+			<checkbox label="Auto Synchronize"
+				onCheck="@bind(configVM.autoSynchEnabled)" " />
+			<toolbarbutton label="" />
+			<toolbarbutton label="Save"
+				onClick="@command('saveConfig')" />
+		</toolbar>
+		<panelchildren>
+			<scrollview height="100%" width="100%">
+				<div id="configMainDivId" class='highlightConfig' contenteditable="true">
+					This text can be edited by the user.
+				</div>
+			</scrollview>
+		</panelchildren>
+	</panel>
+</zk>
