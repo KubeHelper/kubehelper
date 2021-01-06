@@ -18,10 +18,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package com.kubehelper.services;
 
 import com.google.common.io.Files;
-import com.kubehelper.common.Operation;
 import com.kubehelper.common.Resource;
 import com.kubehelper.domain.models.CommandsModel;
 import com.kubehelper.domain.results.CommandsResult;
+import com.moandjiezana.toml.Toml;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import org.apache.commons.cli.CommandLine;
@@ -55,9 +55,9 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.WeekFields;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
@@ -85,6 +85,9 @@ public class CommandsService {
     @Autowired
     private Environment env;
 
+//    @Value("zul.raw.resource.path")
+//    private String zulRawResourcePath;
+
     @Autowired
     private CommonService commonService;
 
@@ -110,11 +113,12 @@ public class CommandsService {
 
 
     public void parsePredefinedCommands(CommandsModel commandsModel) {
-        predefinedCommands.forEach(f -> {
-            List<String> lines = commonService.getLinesFromResourceByPath(predefinedCommandsPath + f);
-            parsePredefinedCommandsFromLines(lines, commandsModel);
-            commandsModel.addCommandSource(Files.getNameWithoutExtension(f), predefinedCommandsPath, true);
-        });
+        parsePredefinedCommandsFromInit(commandsModel);
+//        predefinedCommands.forEach(f -> {
+//            List<String> lines = commonService.getLinesFromResourceByPath(predefinedCommandsPath + f);
+//            parsePredefinedCommandsFromInit(lines, commandsModel);
+//            commandsModel.addCommandSource(Files.getNameWithoutExtension(f), predefinedCommandsPath, true);
+//        });
     }
 
 
@@ -156,7 +160,7 @@ public class CommandsService {
                 List<String> lines = Files.readLines(new File(filePath), Charset.forName("UTF-8"));
 //                TODO
 //                commandsModel.addCommandSource("Predefined Commands", predefinedCommandsPath, commandsRaw);
-                parsePredefinedCommandsFromLines(lines, commandsModel);
+                parsePredefinedCommandsFromInit(commandsModel);
             }
         } catch (IOException e) {
             commandsModel.addParseException(e);
@@ -164,16 +168,46 @@ public class CommandsService {
         }
     }
 
-    public void parsePredefinedCommandsFromLines(List<String> lines, CommandsModel commandsModel) {
-        ListIterator<String> iterator = lines.listIterator();
-        while (iterator.hasNext()) {
+    public void parsePredefinedCommandsFromInit(CommandsModel commandsModel) {
+
+//        Set<String> commands = getCommandsFilesPathsSet(commandsModel, "/init/commands", 1, ".toml");
+//        TODO dynamically read from classpath
+//        https://www.logicbig.com/how-to/java/find-classpath-files-under-folder-and-sub-folder.html
+
+//        for (String file : commands) {
+//        Toml commandsToml = new Toml().read(commonService.getClasspathResourceAsStringByPath(file));
+        String tomlString = commonService.getClasspathResourceAsStringByPath("init/commands/commands.toml");
+        Toml commandsToml = new Toml().read(tomlString);
+        String file = "commands.toml";
+        for (Map.Entry<String, Object> entry : commandsToml.entrySet()) {
+            CommandsResult cr = new CommandsResult(commandsModel.getCommandsResults().size() + 1);
             try {
-                buildCommandResult(iterator, commandsModel);
+                Toml command = (Toml) entry.getValue();
+                cr.setFile(Files.getNameWithoutExtension(file))
+                        .setName(entry.getKey())
+                        .setGroup(command.getString("group"))
+                        .setDescription(command.getString("description"))
+                        .setCommand(command.getString("command"));
+                commandsModel.addCommandResult(cr);
             } catch (RuntimeException e) {
-                commandsModel.addParseException(e);
-                logger.error(e.getMessage(), e);
+                commandsModel.addParseException(new RuntimeException("Command parse Error. Name, Group, Description and Command itself are mandatory fields. Object: " + cr.toString()));
+                logger.error("Command parse Error. Group, Operation Description and command itself are mandatory fields. Object: " + cr.toString());
             }
         }
+
+//        }
+
+    }
+
+    private Set<String> getCommandsFilesPathsSet(CommandsModel commandsModel, String filesPath, int depth, String extension) {
+        Set<String> commands = new HashSet<>();
+        try {
+            commands = commonService.getFilesPathsByDirAndExtension(filesPath, depth, extension);
+        } catch (IOException e) {
+            commandsModel.addParseException(e);
+            logger.error(e.getMessage(), e);
+        }
+        return commands;
     }
 
 
@@ -338,64 +372,6 @@ public class CommandsService {
         } else {
             commandsModel.setSelectedCommandsHistoryRaw(commandsModel.getCommandsRawHistoryBuffer());
         }
-    }
-
-
-    //  TODO TO REPLACE ================
-
-
-    private void buildCommandResult(ListIterator<String> iterator, CommandsModel commandsModel) {
-        CommandsResult commandResult = new CommandsResult(commandsModel.getCommandsResults().size() + 1);
-        String line = iterator.next();
-        if (line.startsWith("Group:")) {
-            commandResult.setGroup(getLineContent(line));
-            line = iterator.next();
-        }
-
-        if (line.startsWith("Operation:")) {
-            commandResult.setOperation(getLineContent(line));
-            line = iterator.next();
-        }
-
-        if (line.startsWith("Description:")) {
-            commandResult.setDescription(getLineContent(line));
-            line = iterator.next();
-        }
-
-        if (line.startsWith("Rows:")) {
-            String[] split = getLineContent(line).split("\\|");
-            commandResult.setRows(Arrays.asList(split));
-            line = iterator.next();
-        }
-
-        if (StringUtils.startsWithAny(line, "kubectl") && StringUtils.isNotBlank(line)) {
-            StringBuilder builder = new StringBuilder();
-            while (line.trim().endsWith("\\")) {
-                String commandLine = line.substring(0, line.lastIndexOf("\\")).trim();
-                builder.append(commandLine).append(" \n");
-                line = iterator.next();
-            }
-            if (StringUtils.isNotBlank(line)) {
-                builder.append(line.trim());
-            }
-            commandResult.setCommand(builder.toString());
-        }
-        if (StringUtils.isNotBlank(line)) {
-            validateAndAddCommandResult(commandResult, commandsModel);
-        }
-    }
-
-    private void validateAndAddCommandResult(CommandsResult cr, CommandsModel commandsModel) {
-        if (StringUtils.isAnyBlank(cr.getGroup(), cr.getDescription(), cr.getCommand()) || Operation.isOperationInvalid(cr.getOperation())) {
-            commandsModel.addParseException(new RuntimeException("Command parse Error. Group, Operation, Description and command itself are mandatory fields. Object: " + cr.toString()));
-            logger.error("Command parse Error. Group, Operation Description and command itself are mandatory fields. Object: " + cr.toString());
-        } else {
-            commandsModel.addCommandResult(cr);
-        }
-    }
-
-    private String getLineContent(String line) {
-        return line.substring(line.indexOf(":") + 1).trim();
     }
 
 }

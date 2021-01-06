@@ -11,16 +11,25 @@ command = "kubectl get pods -A --field-selector = status.phase = Running | grep 
 [Command3]
 group = "Predefined3"
 description = "Simple command description3"
-command = """ kubectl get no -o json | \
-              jq -r '.items | sort_by(.status.capacity.memory)[]|[.metadata.name,.status.capacity.memory]| @tsv' """
+command = ''' kubectl get no -o json |
+              jq -r '.items | sort_by(.status.capacity.memory)[]|
+              [.metadata.name,.status.capacity.memory]| @tsv' '''
+
+[Command33]
+group = "Predefined33"
+description = "Simple command description33"
+command = '''
+kubectl get no -o json | 
+jq -r '.items | sort_by(.status.capacity.memory)[]|
+[.metadata.name,.status.capacity.memory]| @tsv' '''
 
 [Command4]
 group = "Predefined4"
 description = "Simple command description4"
-command = """ kubectl get pods -A --field-selector = status.phase! = Running\
-              | grep -v Complete \
-              | grep -v Complete \
-              | grep -v Complete \
+command = """ kubectl get pods -A --field-selector = status.phase! = Running
+              | grep -v Complete
+              | grep -v Complete
+              | grep -v Complete
               | grep -v Complete """
 
 [Command5]

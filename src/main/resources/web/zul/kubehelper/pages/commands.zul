@@ -29,36 +29,41 @@
                                     </combobox>
                                 </auxheader>
                                 <auxheader colspan="1">
-                                    <combobox id="operationsGroupCBox" hflex="1" mold="rounded" model="@load(commandsVM.filter.operationsFilter)"
-                                              selectedItem="@bind(commandsVM.filter.selectedOperationFilter)"
+                                    <textbox hflex="1" value="@bind(commandsVM.filter.command)" onChange="@command('filterCommands')"/>
+                                </auxheader>
+                                <auxheader colspan="1">
+                                    <textbox instant="true" hflex="1" value="@bind(commandsVM.filter.name)" onChange="@command('filterCommands')"/>
+                                </auxheader>
+                                <auxheader colspan="1">
+                                    <textbox instant="true" hflex="1" value="@bind(commandsVM.filter.description)" onChange="@command('filterCommands')"/>
+                                </auxheader>
+                                <auxheader colspan="1">
+                                    <combobox id="filesGroupCBox" hflex="1" mold="rounded" model="@load(commandsVM.filter.filesFilter)"
+                                              selectedItem="@bind(commandsVM.filter.selectedFileFilter)"
                                               onChange="@command('filterCommands')">
                                         <template name="model">
                                             <comboitem label="@load(each)"/>
                                         </template>
                                     </combobox>
                                 </auxheader>
-                                <auxheader colspan="1">
-                                    <textbox hflex="1" value="@bind(commandsVM.filter.command)" onChange="@command('filterCommands')"/>
-                                </auxheader>
-                                <auxheader colspan="1">
-                                    <textbox instant="true" hflex="1" value="@bind(commandsVM.filter.description)" onChange="@command('filterCommands')"/>
-                                </auxheader>
                             </auxhead>
                             <columns menupopup="auto" sizable="true">
                                 <column hflex="min" label="Id" sort="auto(id)"/>
                                 <column hflex="1" label="Group" sort="auto(group)"/>
-                                <column hflex="1" label="Operation" sort="auto(operation)"/>
                                 <column hflex="5" label="Command" sort="auto(command)"/>
-                                <column hflex="2" label="Description" sort="auto(description)"/>
+                                <column hflex="1" label="Name" sort="auto(name)"/>
+                                <column hflex="4" label="Description" sort="auto(description)"/>
+                                <column hflex="1" label="File" sort="auto(file)"/>
                             </columns>
                             <rows>
                                 <template name="model" var="item">
                                     <row onClick="@command('showFullCommand', clickedItem=item)" style="cursor:pointer">
                                         <label value="${item.id}"/>
                                         <label value="${item.group}"/>
-                                        <label value="${item.operation}"/>
                                         <label value="${item.command}" multiline="true"/>
+                                        <label value="${item.name}" multiline="true"/>
                                         <label value="${item.description}" multiline="true"/>
+                                        <label value="${item.file}" multiline="true"/>
                                     </row>
                                 </template>
                             </rows>

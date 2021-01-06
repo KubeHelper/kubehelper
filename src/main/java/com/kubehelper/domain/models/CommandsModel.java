@@ -99,7 +99,7 @@ public class CommandsModel implements PageModel {
     public void addCommandResult(CommandsResult commandResult) {
         commandsResults.add(commandResult);
         filter.addGroupFilter(commandResult.getGroup());
-        filter.addOperationFilter(commandResult.getOperation());
+        filter.addOperationFilter(commandResult.getFile());
     }
 
     public void addCommandSource(String label, String filePath, boolean readonly) {

@@ -17,22 +17,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package com.kubehelper.domain.results;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * @author JDev
  */
 public class CommandsResult {
     private int id;
     private String group = "";
-    private String operation = "";
-    private String description = "";
-    private List<String> rows = new ArrayList<>();
     private String command = "";
-
-    public CommandsResult() {
-    }
+    private String name = "";
+    private String description = "";
+    private String file = "";
 
     public CommandsResult(int id) {
         this.id = id;
@@ -51,30 +45,12 @@ public class CommandsResult {
         return this;
     }
 
-    public String getOperation() {
-        return operation;
-    }
-
-    public CommandsResult setOperation(String operation) {
-        this.operation = operation;
-        return this;
-    }
-
     public String getDescription() {
         return description;
     }
 
     public CommandsResult setDescription(String description) {
         this.description = description;
-        return this;
-    }
-
-    public List<String> getRows() {
-        return rows;
-    }
-
-    public CommandsResult setRows(List<String> rows) {
-        this.rows = rows;
         return this;
     }
 
@@ -87,15 +63,33 @@ public class CommandsResult {
         return this;
     }
 
+    public String getFile() {
+        return file;
+    }
+
+    public CommandsResult setFile(String file) {
+        this.file = file;
+        return this;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public CommandsResult setName(String name) {
+        this.name = name;
+        return this;
+    }
+
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("CommandsResult{");
         sb.append("id=").append(id);
         sb.append(", group='").append(group).append('\'');
-        sb.append(", operation='").append(operation).append('\'');
-        sb.append(", description='").append(description).append('\'');
-        sb.append(", rows=").append(rows);
         sb.append(", command='").append(command).append('\'');
+        sb.append(", name='").append(name).append('\'');
+        sb.append(", description='").append(description).append('\'');
+        sb.append(", file='").append(file).append('\'');
         sb.append('}');
         return sb.toString();
     }

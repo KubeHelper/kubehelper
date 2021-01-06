@@ -214,7 +214,7 @@ public class CommandsVM implements EventListener<Event> {
         commandsResults.clear();
         for (CommandsResult commandeResult : commandsModel.getCommandsResults()) {
             if (commonService.checkEqualsFilter(commandeResult.getGroup(), getFilter().getSelectedGroupFilter()) &&
-                    commonService.checkEqualsFilter(commandeResult.getOperation(), getFilter().getSelectedOperationFilter()) &&
+                    commonService.checkEqualsFilter(commandeResult.getFile(), getFilter().getSelectedFileFilter()) &&
                     StringUtils.containsIgnoreCase(commandeResult.getCommand(), getFilter().getCommand()) &&
                     StringUtils.containsIgnoreCase(commandeResult.getDescription(), getFilter().getDescription())) {
                 commandsResults.add(commandeResult);
@@ -231,7 +231,7 @@ public class CommandsVM implements EventListener<Event> {
     @Command
     @NotifyChange({"commandToExecute", "commandToExecuteEditable"})
     public void showFullCommand(@BindingParam("clickedItem") CommandsResult item) {
-        commandsModel.setCommandToExecute(getCommandWithoutBreaks(item.getCommand()));
+        commandsModel.setCommandToExecute(getCommandWithoutUnnecessaryWhitespaces(item.getCommand()));
         commandsModel.setCommandToExecuteEditable(item.getCommand());
     }
 
@@ -240,7 +240,7 @@ public class CommandsVM implements EventListener<Event> {
      * Synchronizes command to execute and hot replacement on full command textbox onChange event.
      */
     private void synchronizeCommandToExecuteAndHotReplacement() {
-        commandsModel.setCommandToExecute(getCommandWithoutBreaks(commandsModel.getCommandToExecuteEditable()));
+        commandsModel.setCommandToExecute(getCommandWithoutUnnecessaryWhitespaces(commandsModel.getCommandToExecuteEditable()));
         if (isHotReplacementEnabled()) {
             //TODO
 //            commandsService.commandHotReplacement(commandsModel);
@@ -252,10 +252,12 @@ public class CommandsVM implements EventListener<Event> {
      * Replaces \n with spaces in commad.
      *
      * @param commandToExecuteEditable - editable command to execute.
-     * @return - replaced string without new lines
+     * @return - replaced string without Unnecessary whitespaces.
      */
-    private String getCommandWithoutBreaks(String commandToExecuteEditable) {
-        return commandToExecuteEditable.replaceAll("\\n", " ");
+    private String getCommandWithoutUnnecessaryWhitespaces(String commandToExecuteEditable) {
+//        return commandToExecuteEditable.replaceAll("\\n", " ");
+//        TODO correct replacement
+        return commandToExecuteEditable.replaceAll("\\n", " ").replaceAll(" +", " ");
     }
 
 

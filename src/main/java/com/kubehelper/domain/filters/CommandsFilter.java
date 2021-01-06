@@ -26,13 +26,13 @@ import java.util.List;
  * @author JDev
  */
 public class CommandsFilter {
-    private String description = "", group = "", command = "";
+    private String description = "", group = "", command = "", name = "";
 
     private String selectedGroupFilter = "";
-    private String selectedOperationFilter = "";
+    private String selectedFileFilter = "";
 
     private List<String> groupsFilter = new ArrayList<>();
-    private List<String> operationsFilter = new ArrayList<>();
+    private List<String> filesFilter = new ArrayList<>();
 
     public CommandsFilter() {
     }
@@ -44,13 +44,13 @@ public class CommandsFilter {
     }
 
     public void addOperationFilter(String operationFilter) {
-        if (!operationsFilter.contains(operationFilter)) {
-            operationsFilter.add(operationFilter);
+        if (!filesFilter.contains(operationFilter)) {
+            filesFilter.add(operationFilter);
         }
     }
 
     public boolean isFilterActive() {
-        return StringUtils.isNoneBlank(description, group, command, selectedGroupFilter, selectedOperationFilter);
+        return StringUtils.isNoneBlank(description, group, command, name, selectedGroupFilter, selectedFileFilter);
     }
 
     public String getDescription() {
@@ -72,7 +72,6 @@ public class CommandsFilter {
     }
 
 
-
     public String getSelectedGroupFilter() {
         return selectedGroupFilter;
     }
@@ -82,20 +81,28 @@ public class CommandsFilter {
         return this;
     }
 
-    public String getSelectedOperationFilter() {
-        return selectedOperationFilter;
+    public String getSelectedFileFilter() {
+        return selectedFileFilter;
     }
 
-    public CommandsFilter setSelectedOperationFilter(String selectedOperationFilter) {
-        this.selectedOperationFilter = selectedOperationFilter == null ? "" : selectedOperationFilter;
+    public CommandsFilter setSelectedFileFilter(String selectedFileFilter) {
+        this.selectedFileFilter = selectedFileFilter == null ? "" : selectedFileFilter;
         return this;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name == null ? "" : name;
     }
 
     public List<String> getGroupsFilter() {
         return groupsFilter;
     }
 
-    public List<String> getOperationsFilter() {
-        return operationsFilter;
+    public List<String> getFilesFilter() {
+        return filesFilter;
     }
 }
