@@ -36,6 +36,7 @@ import org.apache.commons.text.StringSubstitutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -80,6 +81,9 @@ public class CommandsService {
     private String historyEntryTemplate;
 
     private KubernetesClient fabric8Client = new DefaultKubernetesClient();
+
+    @Autowired
+    private Environment env;
 
     @Autowired
     private CommonService commonService;
