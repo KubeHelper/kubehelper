@@ -45,7 +45,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
 import java.time.LocalDate;
@@ -76,7 +75,8 @@ public class CommandsService {
     private String predefinedCommandsPath = "/init/commands/";
     private List<String> predefinedCommands = Arrays.asList("commands.kh", "commands2.kh");
 
-    private String commandsHistoryPath = "/Volumes/MAC_WORK/tmp/history";
+    //    private String commandsHistoryPath = "/Volumes/MAC_WORK/tmp/history";
+    private String commandsHistoryPath = "C:\\temp\\history";
     private String historyEntryTemplate;
 
     private KubernetesClient fabric8Client = new DefaultKubernetesClient();
@@ -109,8 +109,7 @@ public class CommandsService {
         predefinedCommands.forEach(f -> {
             List<String> lines = commonService.getLinesFromResourceByPath(predefinedCommandsPath + f);
             parsePredefinedCommandsFromLines(lines, commandsModel);
-            String predefinedCommands = commonService.getClasspathResourceAsStringByPath(predefinedCommandsPath);
-            commandsModel.addCommandSource(Files.getNameWithoutExtension(f), predefinedCommandsPath, predefinedCommands, true);
+            commandsModel.addCommandSource(Files.getNameWithoutExtension(f), predefinedCommandsPath, true);
         });
     }
 
@@ -265,21 +264,20 @@ public class CommandsService {
     }
 
 
-    public void changeHistoryRaw(CommandsModel commandsModel) {
+    public void changeHistoryRaw(CommandsModel cm) {
 //        String today = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE);
         LocalDate today = LocalDate.now();
 
 //        TODO
 //          get history files/strings from folder -> sort DESC -> set last elem to raw histroy
         WeekFields.of(Locale.getDefault());
-        switch (commandsModel.getSelectedCommandsHistoryRange()) {
+        switch (cm.getSelectedCommandsHistoryRange()) {
             case "Week" -> showHistoryFor(today, today);
+            default -> cm.setSelectedCommandsHistoryRaw(commonService.getResourceAsStringByPath(cm.getCommandsHistories().get(cm.getSelectedCommandsHistoryLabel()).getFilePath()));
         }
-    }
-
-    public void setStartCommandsRaw(CommandsModel commandsModel) {
 
     }
+
 
     private void showHistoryFor(LocalDate from, LocalDate to) {
 
@@ -337,6 +335,9 @@ public class CommandsService {
             commandsModel.setSelectedCommandsHistoryRaw(commandsModel.getCommandsRawHistoryBuffer());
         }
     }
+
+
+    //  TODO TO REPLACE ================
 
 
     private void buildCommandResult(ListIterator<String> iterator, CommandsModel commandsModel) {

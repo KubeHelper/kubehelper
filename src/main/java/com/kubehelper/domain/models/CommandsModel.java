@@ -44,9 +44,11 @@ public class CommandsModel implements PageModel {
     //    private String userCommandsPath = "C:\\temp\\kubehelper";
     private String userCommandsPath = "/tmp/kubehelper";
     public static String NAME = Global.COMMANDS_MODEL;
+    private List<KubeHelperException> buildExceptions = new ArrayList<>();
+
+    //  COMMANDS ================
     private List<CommandsResult> commandsResults = new ArrayList<>();
     private CommandsFilter filter = new CommandsFilter();
-    private List<KubeHelperException> buildExceptions = new ArrayList<>();
 
     private String selectedNamespace = "";
     private Set<String> namespaces = new HashSet<>();
@@ -69,25 +71,27 @@ public class CommandsModel implements PageModel {
 
     private String selectedShell = "bash";
     private List<String> shells = Arrays.asList("bash", "sh", "fish", "zsh", "csh", "ksh");
-    private List<String> commandsHistoryRanges = Arrays.asList("Week", "Last Week", "Last Month", "Year", "All");
 
+    private String commandToExecute = "";
+    private String commandToExecuteEditable = "";
+    private String executedCommandOutput = "";
+
+    //  COMMANDS MANAGEMENT ================
+    private Map<String, FileSource> commandsSources = new HashMap<>();
     private String selectedCommandsSourceLabel = "";
     private String selectedCommandsSourceRaw = "";
+
+    //  COMMANDS HISTORY ================
+    private Map<String, FileSource> commandsHistories = new HashMap<>();
+
+    private List<String> commandsHistoryRanges = Arrays.asList("Week", "Last Week", "Last Month", "Year", "All");
+
     private String selectedCommandsHistoryLabel = "";
     private String selectedCommandsHistoryRaw = "";
     private String commandsRawHistoryBuffer = "";
     private String selectedCommandsHistoryRange = "";
     private boolean showOnlyCommandsInHistory;
 
-    private String commandToExecute = "";
-    private String commandToExecuteEditable = "";
-    private String executedCommandOutput = "";
-
-    private Map<String, FileSource> commandsSources = new HashMap<>() {
-    };
-
-    private Map<String, FileSource> commandsHistories = new HashMap<>() {
-    };
 
     public CommandsModel() {
     }
@@ -98,11 +102,10 @@ public class CommandsModel implements PageModel {
         filter.addOperationFilter(commandResult.getOperation());
     }
 
-    public void addCommandSource(String label, String filePath, String rawSource, boolean readonly) {
+    public void addCommandSource(String label, String filePath, boolean readonly) {
         FileSource commandSource = new FileSource();
         commandSource.setLabel(label);
         commandSource.setFilePath(filePath);
-        commandSource.setRawSource(rawSource);
         commandSource.setReadonly(readonly);
         commandsSources.put(label, commandSource);
     }
@@ -467,7 +470,6 @@ public class CommandsModel implements PageModel {
     public class FileSource {
         private String label;
         private String filePath;
-        private String rawSource;
         private boolean readonly = true;
 
         public String getLabel() {
@@ -485,15 +487,6 @@ public class CommandsModel implements PageModel {
 
         public FileSource setFilePath(String filePath) {
             this.filePath = filePath;
-            return this;
-        }
-
-        public String getRawSource() {
-            return rawSource;
-        }
-
-        public FileSource setRawSource(String rawSource) {
-            this.rawSource = rawSource;
             return this;
         }
 
