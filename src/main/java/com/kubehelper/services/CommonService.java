@@ -17,7 +17,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package com.kubehelper.services;
 
-import bsh.commands.dir;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.kubehelper.common.Resource;
 import io.fabric8.kubernetes.api.model.HasMetadata;
@@ -28,27 +27,24 @@ import io.fabric8.kubernetes.client.internal.SerializationUtils;
 import io.kubernetes.client.openapi.ApiException;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
 import io.kubernetes.client.openapi.models.V1NamespaceList;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
-import org.springframework.util.ResourceUtils;
 import org.zkoss.zul.Messagebox;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.SequenceInputStream;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -189,12 +185,9 @@ public class CommonService {
         }
     }
 
-//    public Set<Path> getFilesPathsByDirAndExtension1(String dir, int depth, String extension) throws IOException {
-//        try (Stream<Path> stream = java.nio.file.Files.walk(Paths.get(dir), depth)) {
-//            return stream.filter(Files::isRegularFile)   // is a file
-//                    .filter(p -> p.getFileName().toString().endsWith(extension)).collect(Collectors.toSet());
-//        }
-//    }
+    public org.springframework.core.io.Resource[] getFilesPathsFromClasspathByDirAndExtension(String dir, String extension) throws IOException {
+        return new PathMatchingResourcePatternResolver().getResources("classpath:" + dir + "/*" + extension);
+    }
 
 
     /**

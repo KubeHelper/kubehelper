@@ -36,7 +36,7 @@ import org.apache.commons.text.StringSubstitutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -55,7 +55,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.WeekFields;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -73,27 +72,25 @@ import java.util.stream.Collectors;
 public class CommandsService {
 
     private static Logger logger = LoggerFactory.getLogger(CommandsService.class);
-    private String predefinedCommandsPath = "/init/commands/";
-    private List<String> predefinedCommands = Arrays.asList("commands.kh", "commands2.kh");
-
-    //    private String commandsHistoryPath = "/Volumes/MAC_WORK/tmp/history";
-    private String commandsHistoryPath = "C:\\temp\\history";
     private String historyEntryTemplate;
 
     private KubernetesClient fabric8Client = new DefaultKubernetesClient();
 
-    @Autowired
-    private Environment env;
+    @Value("${predefined.commanmds.path}")
+    private String predefinedCommandsPath;
 
-//    @Value("zul.raw.resource.path")
-//    private String zulRawResourcePath;
+    @Value("${commanmds.history.path}")
+    private String commandsHistoryPath;
+
+    @Value("${history.entry.template.src.path}")
+    private String historyEntryTemplateSrcPath;
 
     @Autowired
     private CommonService commonService;
 
     @PostConstruct
     private void postConstruct() {
-        historyEntryTemplate = commonService.getClasspathResourceAsStringByPath("/templates/history/history-entry.template");
+        historyEntryTemplate = commonService.getClasspathResourceAsStringByPath(historyEntryTemplateSrcPath);
     }
 
 
@@ -111,14 +108,23 @@ public class CommandsService {
         writeCommandExecutionToHistory(commandsModel);
     }
 
-
+    /**
+     * Reads toml commands resources from init/commands and parse commands.
+     *
+     * @param commandsModel
+     */
     public void parsePredefinedCommands(CommandsModel commandsModel) {
-        parsePredefinedCommandsFromInit(commandsModel);
-//        predefinedCommands.forEach(f -> {
-//            List<String> lines = commonService.getLinesFromResourceByPath(predefinedCommandsPath + f);
-//            parsePredefinedCommandsFromInit(lines, commandsModel);
-//            commandsModel.addCommandSource(Files.getNameWithoutExtension(f), predefinedCommandsPath, true);
-//        });
+        HashMap<String, Toml> commands = new HashMap<>();
+        try {
+            org.springframework.core.io.Resource[] resources = commonService.getFilesPathsFromClasspathByDirAndExtension(predefinedCommandsPath, ".toml");
+            for (org.springframework.core.io.Resource resource : resources) {
+                commands.put(Files.getNameWithoutExtension(resource.getFilename()), new Toml().read(resource.getInputStream()));
+            }
+        } catch (IOException e) {
+            commandsModel.addParseException(e);
+            logger.error(e.getMessage(), e);
+        }
+        parseCommands(commandsModel, commands);
     }
 
 
@@ -135,8 +141,7 @@ public class CommandsService {
             String composedHistoryEntry = new StringSubstitutor(buildHistoryEntry(commandsModel)).replace(historyEntryTemplate);
             FileUtils.writeStringToFile(file, composedHistoryEntry, StandardCharsets.UTF_8.toString(), true);
         } catch (IOException e) {
-//            TODO to think about notification
-//            commandsModel.addParseException(e);
+            commandsModel.addNotificationException("Cannot write command to execution: Error." + e.getMessage());
             logger.debug(e.getMessage(), e);
         }
     }
@@ -160,7 +165,7 @@ public class CommandsService {
                 List<String> lines = Files.readLines(new File(filePath), Charset.forName("UTF-8"));
 //                TODO
 //                commandsModel.addCommandSource("Predefined Commands", predefinedCommandsPath, commandsRaw);
-                parsePredefinedCommandsFromInit(commandsModel);
+                parseCommands(commandsModel, null);
             }
         } catch (IOException e) {
             commandsModel.addParseException(e);
@@ -168,46 +173,29 @@ public class CommandsService {
         }
     }
 
-    public void parsePredefinedCommandsFromInit(CommandsModel commandsModel) {
-
-//        Set<String> commands = getCommandsFilesPathsSet(commandsModel, "/init/commands", 1, ".toml");
-//        TODO dynamically read from classpath
-//        https://www.logicbig.com/how-to/java/find-classpath-files-under-folder-and-sub-folder.html
-
-//        for (String file : commands) {
-//        Toml commandsToml = new Toml().read(commonService.getClasspathResourceAsStringByPath(file));
-        String tomlString = commonService.getClasspathResourceAsStringByPath("init/commands/commands.toml");
-        Toml commandsToml = new Toml().read(tomlString);
-        String file = "commands.toml";
-        for (Map.Entry<String, Object> entry : commandsToml.entrySet()) {
-            CommandsResult cr = new CommandsResult(commandsModel.getCommandsResults().size() + 1);
-            try {
-                Toml command = (Toml) entry.getValue();
-                cr.setFile(Files.getNameWithoutExtension(file))
-                        .setName(entry.getKey())
-                        .setGroup(command.getString("group"))
-                        .setDescription(command.getString("description"))
-                        .setCommand(command.getString("command"));
-                commandsModel.addCommandResult(cr);
-            } catch (RuntimeException e) {
-                commandsModel.addParseException(new RuntimeException("Command parse Error. Name, Group, Description and Command itself are mandatory fields. Object: " + cr.toString()));
-                logger.error("Command parse Error. Group, Operation Description and command itself are mandatory fields. Object: " + cr.toString());
+    /**
+     * Parse predefined commands from commands map..
+     *
+     * @param commandsModel - commands Model.
+     */
+    public void parseCommands(CommandsModel commandsModel, HashMap<String, Toml> commands) {
+        for (Map.Entry<String, Toml> commandsMap : commands.entrySet()) {
+            for (Map.Entry<String, Object> commandEntry : commandsMap.getValue().entrySet()) {
+                CommandsResult cr = new CommandsResult(commandsModel.getCommandsResults().size() + 1);
+                try {
+                    Toml command = (Toml) commandEntry.getValue();
+                    cr.setFile(commandsMap.getKey())
+                            .setName(commandEntry.getKey())
+                            .setGroup(command.getString("group"))
+                            .setDescription(command.getString("description"))
+                            .setCommand(command.getString("command"));
+                    commandsModel.addCommandResult(cr);
+                } catch (RuntimeException e) {
+                    commandsModel.addParseException(new RuntimeException("Command parse Error. Name, Group, Description and Command itself are mandatory fields. Object: " + cr.toString()));
+                    logger.error("Command parse Error. Group, Operation Description and command itself are mandatory fields. Object: " + cr.toString());
+                }
             }
         }
-
-//        }
-
-    }
-
-    private Set<String> getCommandsFilesPathsSet(CommandsModel commandsModel, String filesPath, int depth, String extension) {
-        Set<String> commands = new HashSet<>();
-        try {
-            commands = commonService.getFilesPathsByDirAndExtension(filesPath, depth, extension);
-        } catch (IOException e) {
-            commandsModel.addParseException(e);
-            logger.error(e.getMessage(), e);
-        }
-        return commands;
     }
 
 
@@ -280,7 +268,11 @@ public class CommandsService {
 
     //  COMMANDS HISTORY ================
 
-
+    /**
+     * Prepares commands history view. Finds all history files and set active newest.
+     *
+     * @param commandsModel - commands model.
+     */
     public void prepareCommandsHistory(CommandsModel commandsModel) {
         try {
             Set<String> filesPathsByDirAndExtension = commonService.getFilesPathsByDirAndExtension(commandsHistoryPath, 2, ".txt");
@@ -295,8 +287,7 @@ public class CommandsService {
                 commandsModel.setSelectedCommandsHistoryLabel(first.get().getKey());
             }
         } catch (IOException e) {
-//            TODO to think about notification
-//            commandsModel.addParseException(e);
+            commandsModel.addNotificationException("Cannot Prepare Commands for History: Error." + e.getMessage());
             logger.debug(e.getMessage(), e);
         }
     }

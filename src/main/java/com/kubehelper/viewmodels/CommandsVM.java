@@ -144,6 +144,7 @@ public class CommandsVM implements EventListener<Event> {
         commandsResults = new ListModelList<>(commandsModel.getCommandsResults());
         commandsModel.setNamespaces(commandsModel.getNamespaces().isEmpty() ? Set.copyOf(commonService.getAllNamespacesWithoutAll()) : commandsModel.getNamespaces());
         logger.info("Found {} namespaces.", commandsModel.getNamespaces());
+        checkRuntimeNotificationExceptions();
     }
 
 
@@ -173,6 +174,16 @@ public class CommandsVM implements EventListener<Event> {
             redrawCommandsToolbarbuttons("commandsSourcesToolbarID", commandsModel.getCommandsSources().keySet(), commandsModel.getSelectedCommandsSourceLabel());
         }
         refreshHistoryOutput();
+        checkRuntimeNotificationExceptions();
+    }
+
+    /**
+     * Checks if in commands model exists runtime exceptions and shows notification.
+     */
+    private void checkRuntimeNotificationExceptions() {
+        if (StringUtils.isNotBlank(commandsModel.getRuntimeNotificationExceptions())) {
+            Notification.show(commandsModel.getRuntimeNotificationExceptions(), "error", null, "bottom_right", 5000);
+        }
     }
 
     /**

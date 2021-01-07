@@ -45,6 +45,7 @@ public class CommandsModel implements PageModel {
     private String userCommandsPath = "/tmp/kubehelper";
     public static String NAME = Global.COMMANDS_MODEL;
     private List<KubeHelperException> buildExceptions = new ArrayList<>();
+    private String runtimeNotificationExceptions = "";
 
     //  COMMANDS ================
     private List<CommandsResult> commandsResults = new ArrayList<>();
@@ -115,6 +116,10 @@ public class CommandsModel implements PageModel {
         historySource.setLabel(label);
         historySource.setFilePath(filePath);
         commandsHistories.put(label, historySource);
+    }
+
+    public void addNotificationException(String ruuntimeEx) {
+        runtimeNotificationExceptions += ruuntimeEx + "\n";
     }
 
     public void sortMapByDateDesc() {
@@ -465,6 +470,10 @@ public class CommandsModel implements PageModel {
     public CommandsModel setCommandsRawHistoryBuffer(String commandsRawHistoryBuffer) {
         this.commandsRawHistoryBuffer = commandsRawHistoryBuffer;
         return this;
+    }
+
+    public String getRuntimeNotificationExceptions() {
+        return runtimeNotificationExceptions;
     }
 
     public class FileSource {
