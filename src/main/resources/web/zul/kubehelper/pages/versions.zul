@@ -1,33 +1,38 @@
 <zk>
-
-    <listbox id="versionsListbox"  width="100%" height="150px">
-        <listhead>
-            <listheader label="Name" sort="auto"/>
-            <listheader label="Version"/>
-            <listheader label="Category"/>
-            <listheader label="Description"/>
-            <listheader label="Links"/>
-        </listhead>
-        <listitem id="a" value="A">
-            <listcell label="A. Graduate"/>
-            <listcell label="20%"/>
-            <listcell label="20%"/>
-            <listcell label="20%"/>
-            <listcell label="20%"/>
-        </listitem>
-        <listitem id="b" value="B">
-            <listcell label="B. College"/>
-            <listcell label="23%"/>
-            <listcell label="23%"/>
-            <listcell label="23%"/>
-            <listcell label="23%"/>
-        </listitem>
-<!--        <listitem forEach="${versionsVM.utilsList}">-->
-<!--            <listcell label="${each.message}">-->
-<!--                <popup id="stack_${each.hash}">-->
-<!--                    <label id="error_stack_label_${each.hash}" multiline="true" value="${each.stack}"/>-->
-<!--                </popup>-->
-<!--            </listcell>-->
-<!--        </listitem>-->
-    </listbox>
+    <panel id="versionsPanelId" title="Versions" viewModel="@id('versionsVM') @init('com.kubehelper.viewmodels.VersionsVM')" width="100%" height="100%" border="none">
+        <panelchildren>
+            <listbox model="@load(versionsVM.versionsResults)" height="@load(versionsVM.mainGridHeight)">
+                <listhead menupopup="auto">
+                    <listheader label="Name" hflex="1" sort="auto(name)"/>
+                    <listheader label="Version" hflex="4" sort="auto(version)"/>
+                    <listheader label="Shell Command" hflex="1" sort="auto(shellCommand)"/>
+                    <listheader label="Description" hflex="4" sort="auto(description)"/>
+                    <listheader label="Category" hflex="min" sort="auto(category)"/>
+                    <listheader label="Links" hflex="2"/>
+                </listhead>
+                <template name="model" var="util">
+                    <listitem>
+                        <listcell>
+                            <label value="${util.name}" style="font-weight: bold;font-size: 120%;cursor: auto;"></label>
+                        </listcell>
+                        <listcell>
+                            <label value="${util.version}" style="cursor: auto;"></label>
+                        </listcell>
+                        <listcell>
+                            <label value="${util.shellCommand}" style="font-weight: bold;cursor: auto;"></label>
+                        </listcell>
+                        <listcell>
+                            <label value="${util.description}" style="cursor: auto;"></label>
+                        </listcell>
+                        <listcell>
+                            <label value="${util.category}" style="cursor: auto;"></label>
+                        </listcell>
+                        <listcell>
+                            <toolbarbutton label="${each}" target="_blank" href="${each}" hflex="1" forEach="${util.links}" style="text-align: left; padding-left: 2px;"/>
+                        </listcell>
+                    </listitem>
+                </template>
+            </listbox>
+        </panelchildren>
+    </panel>
 </zk>

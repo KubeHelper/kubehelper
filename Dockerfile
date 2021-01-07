@@ -7,7 +7,7 @@ ENV KUBE_HELPER_UI_USERNAME='kube'
 ENV KUBE_HELPER_UI_PASSWORD='helper'
 ENV JAVA_OPTS='--enable-preview'
 
-RUN apt-get update && apt-get install -y --no-install-recommends unzip wget	curl net-tools nano vim procps less jq git fish zsh csh ksh
+RUN apt-get update && apt-get install -y --no-install-recommends unzip wget	curl net-tools nano vim procps less jq git fish zsh ksh
 
 #Install latest stable kubectl
 RUN curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl" && \
@@ -59,5 +59,5 @@ RUN mkdir -p /kubehelper/{history,git,reports}
 #TODO ReMOVE AFTER
 COPY .kube/config /root/.kube/config
 
-COPY target/kube-helper.jar /tmp/kube-helper.jar
-ENTRYPOINT ["java","--enable-preview","-jar","/kubehelper/kube-helper.jar"]
+COPY target/kube-helper.jar /kubehelper/kube-helper.jar
+ENTRYPOINT ["java","-Dspring.profiles.active=prod","--enable-preview","-jar","/kubehelper/kube-helper.jar"]
