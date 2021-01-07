@@ -85,7 +85,7 @@ public class CommandsModel implements PageModel {
     //  COMMANDS HISTORY ================
     private Map<String, FileSource> commandsHistories = new HashMap<>();
 
-    private List<String> commandsHistoryRanges = Arrays.asList("Week", "Last Week", "Last Month", "Year", "All");
+    private List<String> commandsHistoryRanges = Arrays.asList("This Week", "This Month", "This Year", "All");
 
     private String selectedCommandsHistoryLabel = "";
     private String selectedCommandsHistoryRaw = "";

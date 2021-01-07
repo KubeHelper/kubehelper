@@ -42,19 +42,20 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.WeekFields;
+import java.time.temporal.TemporalAdjusters;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -294,47 +295,47 @@ public class CommandsService {
 
 
     public void changeHistoryRaw(CommandsModel cm) {
-//        String today = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE);
         LocalDate today = LocalDate.now();
-
 //        TODO
 //          get history files/strings from folder -> sort DESC -> set last elem to raw histroy
-        WeekFields.of(Locale.getDefault());
         switch (cm.getSelectedCommandsHistoryRange()) {
-            case "Week" -> showHistoryFor(today, today);
+            case "This Week" -> showHistoryFor(cm, today, today.with(TemporalAdjusters.previous(DayOfWeek.MONDAY)));
+            case "This Month" -> showHistoryFor(cm, today, today.with(TemporalAdjusters.firstDayOfMonth()));
+            case "This Year" -> showHistoryFor(cm, today, today.with(TemporalAdjusters.firstDayOfYear()));
+            case "All" -> showHistoryFor(cm, today, today);
             default -> cm.setSelectedCommandsHistoryRaw(commonService.getResourceAsStringByPath(cm.getCommandsHistories().get(cm.getSelectedCommandsHistoryLabel()).getFilePath()));
         }
-
     }
 
 
-    private void showHistoryFor(LocalDate from, LocalDate to) {
+    private void showHistoryFor(CommandsModel cm, LocalDate from, LocalDate to) {
+        StringBuilder history = new StringBuilder();
+        Set<String> filesPathsByDirAndExtension = new HashSet<>();
 
         if (from.equals(to)) {
             to = from;
         }
         try {
-            Set<String> filesPathsByDirAndExtension = commonService.getFilesPathsByDirAndExtension(commandsHistoryPath, 2, ".txt");
-            for (String filePath : filesPathsByDirAndExtension) {
-//                File file = new File(filePath);
-//                BasicFileAttributes attr = java.nio.file.Files.readAttributes(Paths.get(new URI(new File(filePath).getAbsolutePath())), BasicFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
-                FileTime creationTime = (FileTime) java.nio.file.Files.getAttribute(Paths.get(new URI(new File(filePath).getAbsolutePath())), "creationTime");
+            filesPathsByDirAndExtension = commonService.getFilesPathsByDirAndExtension(commandsHistoryPath, 2, ".txt");
+        } catch (IOException e) {
+            logger.debug(e.getMessage(), e);
+        }
+        for (String filePath : filesPathsByDirAndExtension) {
+            try {
+                FileTime creationTime = (FileTime) java.nio.file.Files.getAttribute(Paths.get(filePath), "creationTime");
                 LocalDate localDate = LocalDate.ofInstant(creationTime.toInstant(), ZoneId.systemDefault());
                 if (!localDate.isBefore(from) && !localDate.isAfter(to)) {
+                    history.append(commonService.getResourceAsStringByPath(filePath)).append("\n");
 //                   TODO
 //                   read files to commands content
 //                   copy actual content to buffer
 //                   disable toolbarbuttons
                 }
+            } catch (IOException e) {
+                cm.addParseException(new RuntimeException("Show history for period. Cannot read file" + filePath));
             }
-        } catch (IOException | URISyntaxException e) {
-            e.printStackTrace();
         }
-
-//        Calendar c = Calendar.getInstance();
-//        c.setTime(yourdate); // yourdate is an object of type Date
-//
-//        int dayOfWeek = c.get(Calendar.DAY_OF_WEEK);
+        cm.setSelectedCommandsHistoryRaw(history.toString());
     }
 
     /**
@@ -346,7 +347,7 @@ public class CommandsService {
     public void showOnlyCommandsInHistory(CommandsModel commandsModel, boolean show) {
         if (show) {
             commandsModel.setCommandsRawHistoryBuffer(commandsModel.getSelectedCommandsHistoryRaw());
-            List<String> lines = Arrays.asList(commandsModel.getSelectedCommandsHistoryRaw().split("\n"));
+            List<String> lines = new ArrayList<>(Arrays.asList(commandsModel.getSelectedCommandsHistoryRaw().split("\n")));
             Iterator<String> iterator = lines.iterator();
             boolean lineToRemove = false;
             while (iterator.hasNext()) {

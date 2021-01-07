@@ -68,7 +68,7 @@
                                 </template>
                             </rows>
                             <foot>
-                                <footer id="commandsGridFooter" span="5" align="right" label="@load(commandsVM.commandsTotalItems)"/>
+                                <footer id="commandsGridFooter" span="6" align="right" label="@load(commandsVM.commandsTotalItems)"/>
                             </foot>
                         </grid>
 
@@ -281,8 +281,8 @@
                                 <hbox width="100%" align="center" pack="end" spacing="1em" style="vertical-align: middle;">
                                     <slider id="commandsHistoryFontSizeSlider" curpos="@load(commandsVM.commandsHistoryFontSize)" minpos="5" maxpos="30" mold="sphere" step="1"
                                             onScroll="@command('commandsHistoryChangeFontSize')"/>
-                                    <combobox model="@load(commandsVM.commandsHistoryRanges)" selectedItem="@bind(commandsVM.selectedCommandsHistoryRange)" readonly="true"
-                                              onSelect="@command('changeHistoryRaw')">
+                                    <combobox id="commandsHistoryRangesCbox" model="@load(commandsVM.commandsHistoryRanges)" selectedItem="@bind(commandsVM.selectedCommandsHistoryRange)"
+                                              readonly="true" onSelect="@command('changeHistoryRaw')">
                                         <template name="model">
                                             <comboitem label="@load(each)"/>
                                         </template>

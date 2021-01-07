@@ -51,6 +51,7 @@ import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Notification;
 import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Checkbox;
+import org.zkoss.zul.Combobox;
 import org.zkoss.zul.Div;
 import org.zkoss.zul.Footer;
 import org.zkoss.zul.Groupbox;
@@ -108,6 +109,9 @@ public class CommandsVM implements EventListener<Event> {
 
     @Wire
     private Groupbox commandOutputGrBox;
+
+    @Wire
+    private Combobox commandsHistoryRangesCbox;
 
 
     @Init
@@ -250,7 +254,8 @@ public class CommandsVM implements EventListener<Event> {
     /**
      * Synchronizes command to execute and hot replacement on full command textbox onChange event.
      */
-    private void synchronizeCommandToExecuteAndHotReplacement() {
+    @Command
+    public void synchronizeCommandToExecuteAndHotReplacement() {
         commandsModel.setCommandToExecute(getCommandWithoutUnnecessaryWhitespaces(commandsModel.getCommandToExecuteEditable()));
         if (isHotReplacementEnabled()) {
             //TODO
@@ -390,10 +395,10 @@ public class CommandsVM implements EventListener<Event> {
      */
     @Command
     public void changeHistoryRaw() {
-        commandsModel.setSelectedCommandsHistoryLabel(commandsModel.getSelectedCommandsHistoryRange());
         commandsService.changeHistoryRaw(commandsModel);
         BindUtils.postNotifyChange(this, ".");
     }
+
 
     /**
      * Refreshes commands history files and content.
@@ -434,6 +439,7 @@ public class CommandsVM implements EventListener<Event> {
         if ("commandsHistory".equals(activeTab)) {
             oldToolbarbuttonId = getCommandToolbarButtonId(commandsModel.getSelectedCommandsHistoryLabel());
             commandsModel.setSelectedCommandsHistoryLabel(label);
+            refreshHistoryRangeCombobox();
             commandsService.changeHistoryRaw(commandsModel);
             refreshHistoryOutput();
         } else if ("commandsManagement".equals(activeTab)) {
@@ -443,6 +449,11 @@ public class CommandsVM implements EventListener<Event> {
         String newToolbarbuttonId = getCommandToolbarButtonId(label);
         enableDisableMenuItem(oldToolbarbuttonId, false, "normal;");
         enableDisableMenuItem(newToolbarbuttonId, true, "bold;");
+    }
+
+    private void refreshHistoryRangeCombobox() {
+        commandsHistoryRangesCbox.setValue("");
+        commandsModel.setSelectedCommandsHistoryRange("");
     }
 
 
