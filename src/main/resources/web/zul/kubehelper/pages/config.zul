@@ -1,23 +1,24 @@
-<zk>
+<zk xmlns:n="native">
     <script>
         function highlightConfig () {
         document.querySelectorAll('div.highlightConfig').forEach(block => { hljs.highlightBlock(block); });
         }
     </script>
-	<panel title="Configuration">
-		<toolbar align="end">
-			<checkbox label="Auto Synchronize"
-				onCheck="@bind(configVM.autoSynchEnabled)" " />
-			<toolbarbutton label="" />
-			<toolbarbutton label="Save"
-				onClick="@command('saveConfig')" />
-		</toolbar>
-		<panelchildren>
-			<scrollview height="100%" width="100%">
-				<div id="configMainDivId" class='highlightConfig' contenteditable="true">
-					This text can be edited by the user.
-				</div>
-			</scrollview>
-		</panelchildren>
-	</panel>
+    <panel title="Configuration" viewModel="@id('configsVM') @init('com.kubehelper.viewmodels.ConfigsVM')" width="100%" height="100%" border="none">
+        <toolbar align="end">
+            <checkbox label="Auto Synchronize" onCheck="@bind(configVM.autoSyncEnabled)"/>
+            <button label="Save" onClick="@command('saveConfig')"/>
+        </toolbar>
+        <panelchildren>
+            <div id="configBlockId" width="100%" height="100%" class="highlightConfig"
+                 style="overflow: auto;font-family: Courier, Monaco, monospace;display: flex;line-height: 1.3; font-size: 14px;;cursor: text">
+                <!--                    <textbox id="configMainDivId" class='highlightConfig' rows="1000" width="100%" value="@bind(configsVM.config)"/>-->
+                <n:div width="100%" height="100%" class="input" contenteditable="true">
+                    <n:pre>
+                        <n:code class="toml">${configsVM.config}</n:code>
+                    </n:pre>
+                </n:div>
+            </div>
+        </panelchildren>
+    </panel>
 </zk>

@@ -27,6 +27,8 @@ public class ConfigsModel implements PageModel {
     private String templateUrl = "~./zul/kubehelper/pages/config.zul";
     public static String NAME = Global.DASHBOARD_MODEL;
 
+    private String config = "";
+
     @Override
     public String getTemplateUrl() {
         return templateUrl;
@@ -41,4 +43,12 @@ public class ConfigsModel implements PageModel {
     public void addException(String message, Exception exception) {
     }
 
+    public String getConfig() {
+        return config;
+    }
+
+    public ConfigsModel setConfig(String config) {
+        this.config = config;
+        return this;
+    }
 }

@@ -71,7 +71,7 @@ public class CommandsModel implements PageModel {
     private Set<String> selectedJobs = new HashSet<>();
 
     private String selectedShell = "bash";
-    private List<String> shells = Arrays.asList("bash", "sh", "fish", "zsh", "csh", "ksh");
+    private List<String> shells = Arrays.asList("bash", "sh", "fish", "zsh", "ksh");
 
     private String commandToExecute = "";
     private String commandToExecuteEditable = "";
