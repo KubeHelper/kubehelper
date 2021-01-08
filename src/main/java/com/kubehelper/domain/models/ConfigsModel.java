@@ -18,6 +18,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package com.kubehelper.domain.models;
 
 import com.kubehelper.common.Global;
+import com.kubehelper.common.KubeHelperException;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author JDev
@@ -26,6 +30,7 @@ public class ConfigsModel implements PageModel {
 
     private String templateUrl = "~./zul/kubehelper/pages/config.zul";
     public static String NAME = Global.DASHBOARD_MODEL;
+    private List<KubeHelperException> validationExceptions = new ArrayList<>();
 
     private String config = "";
 
@@ -49,6 +54,19 @@ public class ConfigsModel implements PageModel {
 
     public ConfigsModel setConfig(String config) {
         this.config = config;
+        return this;
+    }
+
+    public boolean hasValidationErrors() {
+        return !validationExceptions.isEmpty();
+    }
+
+    public List<KubeHelperException> getValidationExceptions() {
+        return validationExceptions;
+    }
+
+    public ConfigsModel setValidationExceptions(List<KubeHelperException> validationExceptions) {
+        this.validationExceptions = validationExceptions;
         return this;
     }
 }

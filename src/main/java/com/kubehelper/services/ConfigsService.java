@@ -32,6 +32,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
+ *The config service contains method to validate and store configuration.
+ *
  * @author JDev
  */
 @Service
@@ -85,6 +87,12 @@ public class ConfigsService {
         }
     }
 
+    /**
+     * Search for custom kubehelper config.
+     *
+     * @param configsModel - config model.
+     * @return - found set with path to custom config.
+     */
     private Set<String> checkCustomKubeHelperConfig(ConfigsModel configsModel) {
         Set<String> customConfig = new HashSet<>();
         try {
@@ -96,17 +104,26 @@ public class ConfigsService {
         return customConfig;
     }
 
+    /**
+     * Updates config after user input.
+     * 1. Validate
+     * 2. Search for custom config, if exist, than overwrite.
+     * 2. If custom config does not exists than overwrite default config. overwrite.
+     *
+     * @param configsModel - configs model.
+     */
     public void updateConfig(ConfigsModel configsModel) {
 
+        //validate
         try {
-            new Toml().read("a=1");
-        } catch (RuntimeException e) {
+            new Toml().read(configsModel.getConfig());
+        } catch (IllegalStateException e) {
             configsModel.addException("Configuration file is not valid. Error" + e.getMessage(), e);
             logger.error("Configuration file is not valid. Error" + e.getMessage());
+            return;
         }
 
-        Toml toml = new Toml().read("a=1");
-
+        //search custom config
         Set<String> customConfigPath = checkCustomKubeHelperConfig(configsModel);
         if (!customConfigPath.isEmpty()) {
             try {
@@ -118,6 +135,7 @@ public class ConfigsService {
             }
         }
 
+        //overwrite default config
         try {
             FileUtils.writeStringToFile(new File(defaultConfigFilePath), configsModel.getConfig());
         } catch (IOException e) {

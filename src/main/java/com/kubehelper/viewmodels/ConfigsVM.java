@@ -21,6 +21,7 @@ import com.kubehelper.common.Global;
 import com.kubehelper.domain.models.ConfigsModel;
 import com.kubehelper.services.CommonService;
 import com.kubehelper.services.ConfigsService;
+import org.apache.commons.lang3.StringUtils;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.AfterCompose;
 import org.zkoss.bind.annotation.Command;
@@ -28,9 +29,11 @@ import org.zkoss.bind.annotation.ContextParam;
 import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.zk.ui.Component;
+import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.HtmlNativeComponent;
 import org.zkoss.zk.ui.Path;
 import org.zkoss.zk.ui.event.AfterSizeEvent;
+import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
@@ -38,6 +41,10 @@ import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Div;
+import org.zkoss.zul.Window;
+
+import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * Class for displaying Kube Helper dashboard Cluster and nodes metrics.
@@ -72,23 +79,29 @@ public class ConfigsVM {
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) {
         Selectors.wireComponents(view, this, false);
         Selectors.wireEventListeners(view, this);
-        BindUtils.postNotifyChange(null, null, this, ".");
         Clients.evalJavaScript("highlightConfig();");
     }
 
     @Listen("onAfterSize=#centerLayoutIpsAndPortsID")
     public void onAfterSizeCenter(AfterSizeEvent event) {
         centerLayoutHeight = event.getHeight() - 3;
-        BindUtils.postNotifyChange(null, null, this, ".");
+        BindUtils.postNotifyChange(this, ".");
     }
+
+    @Listen("onKeyPress=#historyDivId")
+    public void test(AfterSizeEvent event) {
+        BindUtils.postNotifyChange(this, ".");
+    }
+
 
     @Command
     public void saveConfig() {
         Div configBlock = (Div) Path.getComponent("//indexPage/templateInclude/configBlockId");
         HtmlNativeComponent nativeConfig = (HtmlNativeComponent) configBlock.getChildren().get(0);
-//        TODO
-//        configsModel.setConfig(configBlock.toString());
+        String configContext = StringUtils.substringBetween(nativeConfig.getPrologContent(), "<code class=\"toml\">", "</code>");
+        configsModel.setConfig(configContext);
         configsService.updateConfig(configsModel);
+        BindUtils.postNotifyChange(this, ".");
     }
 
     public boolean isAutoSyncEnabled() {
@@ -101,10 +114,17 @@ public class ConfigsVM {
     }
 
     public String getConfig() {
+        if (configsModel.hasValidationErrors()) {
+            Window window = (Window) Executions.createComponents(Global.PATH_TO_ERROR_RESOURCE_ZUL, null, Map.of("errors", configsModel.getValidationExceptions()));
+            window.doModal();
+            configsModel.setValidationExceptions(new ArrayList<>());
+        }
         return configsModel.getConfig();
     }
 
-    public void setConfig(String config) {
-        configsModel.setConfig(config);
+    public void setConfig(Event config) {
+        config.getTarget();
+//        configsModel.setConfig(config);
     }
+
 }

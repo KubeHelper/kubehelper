@@ -2,7 +2,8 @@
 <?link href="~./css/dashboard.css" rel="stylesheet" type="text/css"?>
 <?script type="text/javascript" src="~./js/highlight-10.5.0/highlight.pack.js"?>
 <!--<?script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"?>-->
-<?link href="~./js/highlight-10.5.0/styles/agate.css" rel="stylesheet" type="text/css"?>
+<!--<?link href="~./js/highlight-10.5.0/styles/agate.css" rel="stylesheet" type="text/css"?>-->
+<?link href="~./js/highlight-10.5.0/styles/atom-one-light.css" rel="stylesheet" type="text/css"?>
 <!--<?link href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/atom-one-dark.min.css" rel="stylesheet" type="text/css"?>-->
 <?link href="~./css/all.css" rel="stylesheet" type="text/css"?>
 <zk>

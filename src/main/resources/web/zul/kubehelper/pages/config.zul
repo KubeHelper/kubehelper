@@ -3,6 +3,12 @@
         function highlightConfig () {
         document.querySelectorAll('div.highlightConfig').forEach(block => { hljs.highlightBlock(block); });
         }
+        $('body').on('DOMSubtreeModified', '#historyDivId', function(){
+        console.log('changed');
+        {'test':{'config' : "test"}}
+        console.log($('#historyDivId').text());
+        zAu.send(new zk.Event(zk.Widget.$(this), 'setConfig', {'test':{'config' : "test"}}));
+        });
     </script>
     <panel title="Configuration" viewModel="@id('configsVM') @init('com.kubehelper.viewmodels.ConfigsVM')" width="100%" height="100%" border="none">
         <toolbar align="end">
@@ -13,7 +19,7 @@
             <div id="configBlockId" width="100%" height="100%" class="highlightConfig"
                  style="overflow: auto;font-family: Courier, Monaco, monospace;display: flex;line-height: 1.3; font-size: 14px;;cursor: text">
                 <!--                    <textbox id="configMainDivId" class='highlightConfig' rows="1000" width="100%" value="@bind(configsVM.config)"/>-->
-                <n:div width="100%" height="100%" class="input" contenteditable="true">
+                <n:div id="historyDivId" width="100%" height="100%" class="input" contenteditable="true">
                     <n:pre>
                         <n:code class="toml">${configsVM.config}</n:code>
                     </n:pre>
