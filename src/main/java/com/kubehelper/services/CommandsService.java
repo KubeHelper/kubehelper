@@ -77,13 +77,13 @@ public class CommandsService {
 
     private KubernetesClient fabric8Client = new DefaultKubernetesClient();
 
-    @Value("${predefined.commanmds.path}")
+    @Value("${kubehelper.predefined.commanmds.path}")
     private String predefinedCommandsPath;
 
-    @Value("${commanmds.history.path}")
+    @Value("${kubehelper.commanmds.history.path}")
     private String commandsHistoryPath;
 
-    @Value("${history.entry.template.src.path}")
+    @Value("${kubehelper.history.entry.template.src.path}")
     private String historyEntryTemplateSrcPath;
 
     @Autowired

@@ -39,13 +39,13 @@ public class ConfigsService {
 
     private static Logger logger = LoggerFactory.getLogger(ConfigsService.class);
 
-    @Value("${predefined.config.path}")
+    @Value("${kubehelper.predefined.config.path}")
     private String predefinedConfigPath;
 
-    @Value("${default.config.file.path}")
+    @Value("${kubehelper.default.config.file.path}")
     private String defaultConfigFilePath;
 
-    @Value("${custom.config.location.search.path}")
+    @Value("${kubehelper.custom.config.location.search.path}")
     private String customConfigLocationSearchPath;
 
     @Autowired
