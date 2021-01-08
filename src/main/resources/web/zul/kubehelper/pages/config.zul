@@ -3,12 +3,12 @@
         function highlightConfig () {
         document.querySelectorAll('div.highlightConfig').forEach(block => { hljs.highlightBlock(block); });
         }
-        $('body').on('DOMSubtreeModified', '#historyDivId', function(){
-        console.log('changed');
-        {'test':{'config' : "test"}}
-        console.log($('#historyDivId').text());
-        zAu.send(new zk.Event(zk.Widget.$(this), 'setConfig', {'test':{'config' : "test"}}));
-        });
+<!--        $('body').on('DOMSubtreeModified', '#historyDivId', function(){-->
+<!--        console.log('changed');-->
+<!--        {'test':{'config' : "test"}}-->
+<!--        console.log($('#historyDivId').text());-->
+<!--        zAu.send(new zk.Event(zk.Widget.$(this), 'setConfig', {'test':{'config' : "test"}}));-->
+<!--        });-->
     </script>
     <panel title="Configuration" viewModel="@id('configsVM') @init('com.kubehelper.viewmodels.ConfigsVM')" width="100%" height="100%" border="none">
         <toolbar align="end">

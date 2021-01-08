@@ -396,7 +396,7 @@ public class CommandsVM implements EventListener<Event> {
     @Command
     public void changeHistoryRaw() {
         commandsService.changeHistoryRaw(commandsModel);
-        BindUtils.postNotifyChange(this, ".");
+        refreshHistoryOutput();
     }
 
 

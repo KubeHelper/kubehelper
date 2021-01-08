@@ -17,6 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package com.kubehelper.services;
 
+import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.io.Files;
 import com.kubehelper.common.Resource;
 import com.kubehelper.domain.models.CommandsModel;
@@ -44,16 +45,14 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Paths;
-import java.nio.file.attribute.FileTime;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -293,47 +292,54 @@ public class CommandsService {
         }
     }
 
-
+    /**
+     * Shows history for ranges. From Week/Month/Year to today. Default case for single day.
+     *
+     * @param cm - commands model.
+     */
     public void changeHistoryRaw(CommandsModel cm) {
         LocalDate today = LocalDate.now();
-//        TODO
-//          get history files/strings from folder -> sort DESC -> set last elem to raw histroy
         switch (cm.getSelectedCommandsHistoryRange()) {
-            case "This Week" -> showHistoryFor(cm, today, today.with(TemporalAdjusters.previous(DayOfWeek.MONDAY)));
-            case "This Month" -> showHistoryFor(cm, today, today.with(TemporalAdjusters.firstDayOfMonth()));
-            case "This Year" -> showHistoryFor(cm, today, today.with(TemporalAdjusters.firstDayOfYear()));
-            case "All" -> showHistoryFor(cm, today, today);
+            case "This Week" -> showHistoryFor(cm, today.with(TemporalAdjusters.previous(DayOfWeek.MONDAY)), today);
+            case "This Month" -> showHistoryFor(cm, today.with(TemporalAdjusters.firstDayOfMonth()), today);
+            case "This Year" -> showHistoryFor(cm, today.with(TemporalAdjusters.firstDayOfYear()), today);
+            case "All" -> showHistoryFor(cm, LocalDate.now().minusMonths(200), today);
             default -> cm.setSelectedCommandsHistoryRaw(commonService.getResourceAsStringByPath(cm.getCommandsHistories().get(cm.getSelectedCommandsHistoryLabel()).getFilePath()));
         }
     }
 
-
+    /**
+     * Calculates, which history to show depending on the selected period.
+     *
+     * @param cm   - commands model.
+     * @param from - from date.
+     * @param to   - to date.
+     */
     private void showHistoryFor(CommandsModel cm, LocalDate from, LocalDate to) {
         StringBuilder history = new StringBuilder();
+        String historyDayHeader = "++++++++++++++++++++++++++++++++++++++++=== %s ===++++++++++++++++++++++++++++++++++++++++\n\n\n";
         Set<String> filesPathsByDirAndExtension = new HashSet<>();
 
-        if (from.equals(to)) {
-            to = from;
-        }
+        //get all history files
         try {
             filesPathsByDirAndExtension = commonService.getFilesPathsByDirAndExtension(commandsHistoryPath, 2, ".txt");
         } catch (IOException e) {
             logger.debug(e.getMessage(), e);
         }
-        for (String filePath : filesPathsByDirAndExtension) {
-            try {
-                FileTime creationTime = (FileTime) java.nio.file.Files.getAttribute(Paths.get(filePath), "creationTime");
-                LocalDate localDate = LocalDate.ofInstant(creationTime.toInstant(), ZoneId.systemDefault());
-                if (!localDate.isBefore(from) && !localDate.isAfter(to)) {
-                    history.append(commonService.getResourceAsStringByPath(filePath)).append("\n");
-//                   TODO
-//                   read files to commands content
-//                   copy actual content to buffer
-//                   disable toolbarbuttons
-                }
-            } catch (IOException e) {
-                cm.addParseException(new RuntimeException("Show history for period. Cannot read file" + filePath));
-            }
+
+        //get dates range and filter files paths depends of range
+        List<LocalDate> datesRange = from.datesUntil(to.plusDays(1)).collect(Collectors.toList());
+        Set<String> datesInRange = filesPathsByDirAndExtension.stream()
+                .filter(filePath -> datesRange.contains(LocalDate.parse(Files.getNameWithoutExtension(filePath))))
+                .collect(Collectors.toSet());
+
+        //sort history DESC
+        ImmutableSortedSet<String> sortedDatesInRangeFilePaths = ImmutableSortedSet.copyOf(
+                Comparator.comparing(filePath -> LocalDate.parse(Files.getNameWithoutExtension(filePath), DateTimeFormatter.ISO_LOCAL_DATE), Comparator.reverseOrder()), datesInRange);
+
+        //add filtered history to history string builder
+        for (String filePath : sortedDatesInRangeFilePaths) {
+            history.append(String.format(historyDayHeader, Files.getNameWithoutExtension(filePath))).append(commonService.getResourceAsStringByPath(filePath)).append("\n");
         }
         cm.setSelectedCommandsHistoryRaw(history.toString());
     }
@@ -356,6 +362,9 @@ public class CommandsService {
                     lineToRemove = false;
                 }
                 if (next.equals("************************************************************************************************************") || lineToRemove) {
+                    if (next.contains("++++++++++++++++++++++++++++++++++++++++===")) {
+                        continue;
+                    }
                     iterator.remove();
                     lineToRemove = true;
                 }
