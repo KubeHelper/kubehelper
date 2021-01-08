@@ -303,4 +303,14 @@ public class CommonService {
         }
     }
 
+    public void cloneGitRepo() {
+
+    }
+
+    public void pullGitRepo() {
+    }
+
+    public void pushGitRepo() {
+
+    }
 }

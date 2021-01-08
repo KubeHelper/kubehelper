@@ -48,6 +48,7 @@ import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
+import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zk.ui.util.Notification;
 import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Checkbox;
@@ -86,6 +87,9 @@ public class CommandsVM implements EventListener<Event> {
 
     private final String commandsHistoryCss = "font-size: %spx;";
     private int commandsHistoryFontSize = 14;
+
+    private final String commandsManagementCss = "font-size: %spx;";
+    private int commandsManagementFontSize = 14;
 
     private boolean wordWrapCommandsInHistory;
 
@@ -145,6 +149,7 @@ public class CommandsVM implements EventListener<Event> {
      */
     private void onInitPreparations() {
         commandsService.parsePredefinedCommands(commandsModel);
+        commandsService.parseUserCommands(commandsModel);
         commandsResults = new ListModelList<>(commandsModel.getCommandsResults());
         commandsModel.setNamespaces(commandsModel.getNamespaces().isEmpty() ? Set.copyOf(commonService.getAllNamespacesWithoutAll()) : commandsModel.getNamespaces());
         logger.info("Found {} namespaces.", commandsModel.getNamespaces());
@@ -173,11 +178,12 @@ public class CommandsVM implements EventListener<Event> {
         if ("commandsHistory".equals(tabbox.getSelectedTab().getId()) && StringUtils.isBlank(commandsModel.getSelectedCommandsHistoryRaw())) {
             commandsService.prepareCommandsHistory(commandsModel);
             redrawCommandsToolbarbuttons("commandsHistoriesToolbarID", commandsModel.getCommandsHistories().keySet(), getCommandToolbarButtonId(commandsModel.getSelectedCommandsHistoryLabel()));
+            refreshHistoryOutput();
         } else if ("commandsManagement".equals(tabbox.getSelectedTab().getId()) && StringUtils.isBlank(commandsModel.getSelectedCommandsSourceRaw())) {
-//            commandsService.setStartCommandsRaw(commandsModel);
-            redrawCommandsToolbarbuttons("commandsSourcesToolbarID", commandsModel.getCommandsSources().keySet(), commandsModel.getSelectedCommandsSourceLabel());
+            commandsService.prepareCommandsManagement(commandsModel);
+            redrawCommandsToolbarbuttons("commandsSourcesToolbarID", commandsModel.getCommandsSources().keySet(), getCommandToolbarButtonId(commandsModel.getSelectedCommandsSourceLabel()));
+            refreshCommandsManagementOutput(commandsModel.getSelectedCommandsSourceLabel());
         }
-        refreshHistoryOutput();
         checkRuntimeNotificationExceptions();
     }
 
@@ -352,6 +358,40 @@ public class CommandsVM implements EventListener<Event> {
 
     //  COMMANDS MANAGEMENT METHODS ================
 
+    @Command
+    public void cloneGitRepo() {
+      commonService.cloneGitRepo();
+    }
+
+    @Command
+    public void pullGitRepo() {
+        commonService.pullGitRepo();
+    }
+
+    @Command
+    public void pushGitRepo() {
+        commonService.pushGitRepo();
+    }
+
+    @Command
+    public void saveConfig() {
+
+    }
+
+    /**
+     * Refreshes commands history output div.
+     */
+    public void refreshCommandsManagementOutput(String label) {
+        Div historyOutputBlock = (Div) Path.getComponent("//indexPage/templateInclude/commandsManagementOutputId");
+        historyOutputBlock.getChildren().clear();
+        boolean isReadonly = !commandsModel.getCommandsSources().get(label).isReadonly();
+        String preDiv = "<div width=\"100%\" height=\"100%\" class=\"input\" contenteditable=\"" + isReadonly + "\">" +
+                "<pre><code class=\"toml\">" + commandsModel.getSelectedCommandsSourceRaw() + "</code></pre></div>";
+        historyOutputBlock.appendChild(new Html(preDiv));
+        Clients.evalJavaScript("highlightCommandManagement();");
+        BindUtils.postNotifyChange(this, ".");
+    }
+
 
     //  COMMANDS HISTORY METHODS ================
 
@@ -445,6 +485,8 @@ public class CommandsVM implements EventListener<Event> {
         } else if ("commandsManagement".equals(activeTab)) {
             oldToolbarbuttonId = getCommandToolbarButtonId(commandsModel.getSelectedCommandsSourceLabel());
             commandsModel.setSelectedCommandsSourceLabel(label);
+            commandsService.changeCommandsManagementRaw(commandsModel);
+            refreshCommandsManagementOutput(label);
         }
         String newToolbarbuttonId = getCommandToolbarButtonId(label);
         enableDisableMenuItem(oldToolbarbuttonId, false, "normal;");
@@ -467,6 +509,7 @@ public class CommandsVM implements EventListener<Event> {
             Toolbarbutton toolbarbutton = new Toolbarbutton(key);
             toolbarbutton.setId(getCommandToolbarButtonId(key));
             toolbarbutton.setIconSclass("z-icon-file");
+            toolbarbutton.setStyle("text-align: left;");
             toolbarbutton.addEventListener("onClick", this);
             toolbarbutton.setHflex("1");
             commandsSourcesToolbar.appendChild(toolbarbutton);
@@ -488,7 +531,7 @@ public class CommandsVM implements EventListener<Event> {
     private void enableDisableMenuItem(String toolbarbuttonId, boolean disabled, String fontWeight) {
         Toolbarbutton toolbarbutton = (Toolbarbutton) Path.getComponent("//indexPage/templateInclude/" + toolbarbuttonId);
         toolbarbutton.setDisabled(disabled);
-        toolbarbutton.setStyle("font-weight: " + fontWeight);
+        toolbarbutton.setStyle("text-align: left;font-weight: " + fontWeight);
     }
 
 
@@ -789,6 +832,10 @@ public class CommandsVM implements EventListener<Event> {
 
     public String getCommandsHistoryCss() {
         return String.format(commandsHistoryCss, commandsHistoryFontSize);
+    }
+
+    public String getCommandsManagementCss() {
+        return String.format(commandsManagementCss, commandsManagementFontSize);
     }
 
 }

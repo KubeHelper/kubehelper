@@ -23,6 +23,7 @@ import com.kubehelper.common.KubeHelperException;
 import com.kubehelper.domain.filters.CommandsFilter;
 import com.kubehelper.domain.results.CommandsResult;
 
+import java.net.URI;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -103,11 +104,19 @@ public class CommandsModel implements PageModel {
         filter.addOperationFilter(commandResult.getFile());
     }
 
-    public void addCommandSource(String label, String filePath, boolean readonly) {
+    public void addCommandSource(String label, String filePath) {
         FileSource commandSource = new FileSource();
         commandSource.setLabel(label);
         commandSource.setFilePath(filePath);
-        commandSource.setReadonly(readonly);
+        commandSource.setReadonly(false);
+        commandsSources.put(label, commandSource);
+    }
+
+    public void addReadonlyCommandSource(String label, URI uri) {
+        FileSource commandSource = new FileSource();
+        commandSource.setLabel(label);
+        commandSource.setUri(uri);
+        commandSource.setReadonly(true);
         commandsSources.put(label, commandSource);
     }
 
@@ -124,6 +133,10 @@ public class CommandsModel implements PageModel {
 
     public void sortMapByDateDesc() {
         commandsHistories = ImmutableSortedMap.copyOf(commandsHistories, Comparator.comparing(date -> LocalDate.parse(date, DateTimeFormatter.ISO_LOCAL_DATE), Comparator.reverseOrder()));
+    }
+
+    public void sortCommandSourcesAlphabeticallyAsc() {
+        commandsSources = ImmutableSortedMap.copyOf(commandsSources, Comparator.comparing(label -> label));
     }
 
     public void addParseException(Exception exception) {
@@ -479,6 +492,7 @@ public class CommandsModel implements PageModel {
     public class FileSource {
         private String label;
         private String filePath;
+        private URI uri;
         private boolean readonly = true;
 
         public String getLabel() {
@@ -505,6 +519,15 @@ public class CommandsModel implements PageModel {
 
         public FileSource setReadonly(boolean readonly) {
             this.readonly = readonly;
+            return this;
+        }
+
+        public URI getUri() {
+            return uri;
+        }
+
+        public FileSource setUri(URI uri) {
+            this.uri = uri;
             return this;
         }
     }

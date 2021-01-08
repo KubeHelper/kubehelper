@@ -32,6 +32,7 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.slf4j.Logger;
@@ -39,11 +40,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.zkoss.bind.annotation.Command;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -79,6 +80,9 @@ public class CommandsService {
     @Value("${kubehelper.predefined.commanmds.path}")
     private String predefinedCommandsPath;
 
+    @Value("${kubehelper.user.commands.location.search.path}")
+    private String userCommandsLocationSearchPath;
+
     @Value("${kubehelper.commanmds.history.path}")
     private String commandsHistoryPath;
 
@@ -111,7 +115,7 @@ public class CommandsService {
     /**
      * Reads toml commands resources from init/commands and parse commands.
      *
-     * @param commandsModel
+     * @param commandsModel - commands model.
      */
     public void parsePredefinedCommands(CommandsModel commandsModel) {
         HashMap<String, Toml> commands = new HashMap<>();
@@ -119,6 +123,25 @@ public class CommandsService {
             org.springframework.core.io.Resource[] resources = commonService.getFilesPathsFromClasspathByDirAndExtension(predefinedCommandsPath, ".toml");
             for (org.springframework.core.io.Resource resource : resources) {
                 commands.put(Files.getNameWithoutExtension(resource.getFilename()), new Toml().read(resource.getInputStream()));
+            }
+        } catch (IOException e) {
+            commandsModel.addParseException(e);
+            logger.error(e.getMessage(), e);
+        }
+        parseCommands(commandsModel, commands);
+    }
+
+    /**
+     * Reads toml commands resources from git folder and parse commands.
+     *
+     * @param commandsModel- commands model.
+     */
+    public void parseUserCommands(CommandsModel commandsModel) {
+        HashMap<String, Toml> commands = new HashMap<>();
+        try {
+            Set<String> userCommandFiles = commonService.getFilesPathsByDirAndExtension(userCommandsLocationSearchPath, 10, ".toml");
+            for (String filePath : userCommandFiles) {
+                commands.put(Files.getNameWithoutExtension(filePath), new Toml().read(commonService.getResourceAsStringByPath(filePath)));
             }
         } catch (IOException e) {
             commandsModel.addParseException(e);
@@ -139,7 +162,9 @@ public class CommandsService {
         try {
             file.createNewFile();
             String composedHistoryEntry = new StringSubstitutor(buildHistoryEntry(commandsModel)).replace(historyEntryTemplate);
-            FileUtils.writeStringToFile(file, composedHistoryEntry, StandardCharsets.UTF_8.toString(), true);
+            String fileContent = commonService.getResourceAsStringByPath(file.getPath());
+            fileContent = composedHistoryEntry + fileContent;
+            FileUtils.writeStringToFile(file, fileContent, StandardCharsets.UTF_8.toString());
         } catch (IOException e) {
             commandsModel.addNotificationException("Cannot write command to execution: Error." + e.getMessage());
             logger.debug(e.getMessage(), e);
@@ -157,21 +182,6 @@ public class CommandsService {
         return Map.of("time", time, "command", model.getCommandToExecute(), "output", model.getExecutedCommandOutput());
     }
 
-
-    public void parseUserCommands(CommandsModel commandsModel) {
-        try {
-            Set<String> userCommandFiles = commonService.getFilesPathsByDirAndExtension(commandsModel.getUserCommandsPath(), 5, ".kh");
-            for (String filePath : userCommandFiles) {
-                List<String> lines = Files.readLines(new File(filePath), Charset.forName("UTF-8"));
-//                TODO
-//                commandsModel.addCommandSource("Predefined Commands", predefinedCommandsPath, commandsRaw);
-                parseCommands(commandsModel, null);
-            }
-        } catch (IOException e) {
-            commandsModel.addParseException(e);
-            logger.error(e.getMessage(), e);
-        }
-    }
 
     /**
      * Parse predefined commands from commands map..
@@ -263,6 +273,67 @@ public class CommandsService {
             }
         }
         return resource;
+    }
+
+    //  COMMANDS MANAGEMENT ================
+
+
+    public void prepareCommandsManagement(CommandsModel commandsModel) {
+        try {
+            //search for user commands
+            Set<String> filesPathsByDirAndExtension = commonService.getFilesPathsByDirAndExtension(userCommandsLocationSearchPath, 10, ".toml");
+            commandsModel.setCommandsSources(new HashMap<>());
+            filesPathsByDirAndExtension.forEach(filePath -> {
+                commandsModel.addCommandSource(Files.getNameWithoutExtension(filePath), filePath);
+            });
+
+            //get predefined commands
+            org.springframework.core.io.Resource[] resources = commonService.getFilesPathsFromClasspathByDirAndExtension(predefinedCommandsPath, ".toml");
+            for (org.springframework.core.io.Resource resource : resources) {
+                commandsModel.addReadonlyCommandSource(Files.getNameWithoutExtension(resource.getFilename()), resource.getURI());
+            }
+
+            //sort and set first
+            commandsModel.sortCommandSourcesAlphabeticallyAsc();
+            Optional<Map.Entry<String, CommandsModel.FileSource>> first = commandsModel.getCommandsSources().entrySet().stream().findFirst();
+            if (first.isPresent()) {
+                if (first.get().getValue().isReadonly()) {
+                    commandsModel.setSelectedCommandsSourceRaw(IOUtils.toString(first.get().getValue().getUri()));
+                } else {
+                    commandsModel.setSelectedCommandsSourceRaw(commonService.getResourceAsStringByPath(first.get().getValue().getFilePath()));
+                }
+                commandsModel.setSelectedCommandsSourceLabel(first.get().getKey());
+            }
+        } catch (IOException e) {
+            commandsModel.addNotificationException("Cannot Prepare Commands for Management: Error." + e.getMessage());
+            logger.debug(e.getMessage(), e);
+        }
+    }
+
+    public void changeCommandsManagementRaw(CommandsModel cm) {
+        CommandsModel.FileSource fileSource = cm.getCommandsSources().get(cm.getSelectedCommandsSourceLabel());
+        String rawSource = "";
+        try {
+            rawSource = fileSource.isReadonly() ? IOUtils.toString(fileSource.getUri()) : commonService.getResourceAsStringByPath(fileSource.getFilePath());
+        } catch (IOException e) {
+            cm.addNotificationException("Cannot Prepare Commands for Management: Error." + e.getMessage());
+            logger.debug(e.getMessage(), e);
+        }
+        cm.setSelectedCommandsSourceRaw(rawSource);
+    }
+
+    @Command
+    public void pullGitRepo() {
+        commonService.pullGitRepo();
+    }
+
+    @Command
+    public void pushGitRepo() {
+        commonService.pushGitRepo();
+    }
+
+    @Command
+    public void saveCommands() {
     }
 
 

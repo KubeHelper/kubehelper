@@ -3,17 +3,41 @@
         function highlightConfig () {
         document.querySelectorAll('div.highlightConfig').forEach(block => { hljs.highlightBlock(block); });
         }
-<!--        $('body').on('DOMSubtreeModified', '#historyDivId', function(){-->
-<!--        console.log('changed');-->
-<!--        {'test':{'config' : "test"}}-->
-<!--        console.log($('#historyDivId').text());-->
-<!--        zAu.send(new zk.Event(zk.Widget.$(this), 'setConfig', {'test':{'config' : "test"}}));-->
-<!--        });-->
+        <!--        $('body').on('DOMSubtreeModified', '#historyDivId', function(){-->
+        <!--        console.log('changed');-->
+        <!--        {'test':{'config' : "test"}}-->
+        <!--        console.log($('#historyDivId').text());-->
+        <!--        zAu.send(new zk.Event(zk.Widget.$(this), 'setConfig', {'test':{'config' : "test"}}));-->
+        <!--        });-->
     </script>
     <panel title="Configuration" viewModel="@id('configsVM') @init('com.kubehelper.viewmodels.ConfigsVM')" width="100%" height="100%" border="none">
-        <toolbar align="end">
-            <checkbox label="Auto Synchronize" onCheck="@bind(configVM.autoSyncEnabled)"/>
-            <button label="Save" onClick="@command('saveConfig')"/>
+        <toolbar height="100%" width="100%">
+            <hbox height="100%" width="100%" align="stretch" spacing="10">
+                <cell width="20%" tooltip="Git URL">
+                    <textbox width="100%" placeholder="Git URL" value="@bind(commandsVM.gitUrl)" onOK="@command('cloneCommands')" type="url"/>
+                </cell>
+                <separator></separator>
+                <cell width="10%" tooltip="Username">
+                    <textbox width="100%" placeholder="Username" value="@bind(commandsVM.gitUsername)"/>
+                </cell>
+                <cell width="10%" tooltip="Password">
+                    <textbox placeholder="Password" width="100%" value="@bind(commandsVM.gitPassword)" type="password"/>
+                </cell>
+                <cell width="5%">
+                    <checkbox id="markCredentialsChBox" label="Mark" tooltiptext="Mark Credentials" checked="@bind(commandsVM.markCredentials)"
+                              onCheck="markCredentials('markCredentialsChBox')"/>
+                </cell>
+                <cell width="25%" tooltip="Clone">
+                    <button label="Clone" iconSclass="z-icon-clone" onClick="@command('cloneGitRepo')"/>
+                    <button label="Pull" iconSclass="z-icon-cloud-download" onClick="@command('pullGitRepo')"/>
+                    <button label="Push" iconSclass="z-icon-cloud-upload" onClick="@command('pushGitRepo')"/>
+                </cell>
+                <cell width="30%">
+                    <hbox height="100%" width="100%" align="end" pack="end">
+                        <button label="Save" iconSclass="fas fa-save" onClick="@command('saveConfig')"/>
+                    </hbox>
+                </cell>
+            </hbox>
         </toolbar>
         <panelchildren>
             <div id="configBlockId" width="100%" height="100%" class="highlightConfig"
@@ -27,4 +51,55 @@
             </div>
         </panelchildren>
     </panel>
+
+    <!--    <borderlayout viewModel="@id('configsVM') @init('com.kubehelper.viewmodels.ConfigsVM')" width="100%" height="100%">-->
+    <!--        <north title="Configuration" border="none">-->
+    <!--            <hbox height="100%" width="100%" align="stretch" spacing="10">-->
+    <!--                <cell width="20%" tooltip="Git URL">-->
+    <!--                    <textbox width="100%" placeholder="Git URL" value="@bind(commandsVM.gitUrl)" onOK="@command('cloneCommands')" type="url"/>-->
+    <!--                </cell>-->
+    <!--                <separator></separator>-->
+    <!--                <cell width="10%" tooltip="Username">-->
+    <!--                    <textbox width="100%" placeholder="Username" value="@bind(commandsVM.gitUsername)"/>-->
+    <!--                </cell>-->
+    <!--                <cell width="10%" tooltip="Password">-->
+    <!--                    <textbox placeholder="Password" width="100%" value="@bind(commandsVM.gitPassword)" type="password"/>-->
+    <!--                </cell>-->
+    <!--                <cell width="5%">-->
+    <!--                    <checkbox id="markCredentialsChBox" label="Mark" tooltiptext="Mark Credentials" checked="@bind(commandsVM.markCredentials)"-->
+    <!--                              onCheck="markCredentials('markCredentialsChBox')"/>-->
+    <!--                </cell>-->
+    <!--                <cell width="25%" tooltip="Clone">-->
+    <!--                    <button label="Clone" iconSclass="z-icon-clone" onClick="@command('cloneGitRepo')"/>-->
+    <!--                    <button label="Pull" iconSclass="z-icon-cloud-download" onClick="@command('pullGitRepo')"/>-->
+    <!--                    <button label="Push" iconSclass="z-icon-cloud-upload" onClick="@command('pushGitRepo')"/>-->
+    <!--                </cell>-->
+    <!--                <cell width="30%">-->
+    <!--                    <hbox height="100%" width="100%" align="end" pack="end">-->
+    <!--                        <button label="Save" iconSclass="fas fa-save" onClick="@command('saveConfig')"/>-->
+    <!--                    </hbox>-->
+    <!--                </cell>-->
+    <!--            </hbox>-->
+    <!--        </north>-->
+    <!--        &lt;!&ndash;                                <south collapsible="true" splittable="true">&ndash;&gt;-->
+    <!--        &lt;!&ndash;                                    <div style="background:#112f37;color:white;">S</div>&ndash;&gt;-->
+    <!--        &lt;!&ndash;                                </south>&ndash;&gt;-->
+    <!--        <center>-->
+    <!--            <panel width="100%" height="@load(commandsVM.commandsManagementSrcPanelHeight)">-->
+    <!--                &lt;!&ndash;                    <caption iconSclass="z-icon-list" label="@load(commandsVM.selectedCommandsSourceLabel)"/>&ndash;&gt;-->
+    <!--                        <panelchildren>-->
+    <!--                            <div id="configBlockId" width="100%" height="100%" class="highlightConfig"-->
+    <!--                                 style="overflow: auto;font-family: Courier, Monaco, monospace;display: flex;line-height: 1.3; font-size: 14px;;cursor: text">-->
+    <!--                                &lt;!&ndash;                    <textbox id="configMainDivId" class='highlightConfig' rows="1000" width="100%" value="@bind(configsVM.config)"/>&ndash;&gt;-->
+    <!--                                <n:div id="historyDivId" width="100%" height="100%" class="input" contenteditable="true">-->
+    <!--                                    <n:pre>-->
+    <!--                                        <n:code class="toml">${configsVM.config}</n:code>-->
+    <!--                                    </n:pre>-->
+    <!--                                </n:div>-->
+    <!--                            </div>-->
+    <!--                        </panelchildren>-->
+    <!--            </panel>-->
+    <!--        </center>-->
+    <!--    </borderlayout>-->
+
 </zk>

@@ -3,6 +3,9 @@
         function highlightCommandOutput () {
         document.querySelectorAll('div.highlightComOutput').forEach(block => { hljs.highlightBlock(block); });
         }
+        function highlightCommandManagement () {
+        document.querySelectorAll('div.highlightComManagement').forEach(block => { hljs.highlightBlock(block); });
+        }
     </script>
     <borderlayout id="commandsTemplate" viewModel="@id('commandsVM') @init('com.kubehelper.viewmodels.CommandsVM')" width="100%" height="100%">
         <center id="centerLayoutCommandsID" margins="0,3,3,3" title="Commands" border="none">
@@ -226,30 +229,11 @@
                     <tabpanel>
                         <borderlayout width="100%" height="@load(commandsVM.commandsManagementHeight)">
                             <north collapsible="true" splittable="true">
-                                <hbox height="100%" width="100%" align="stretch" spacing="10">
-                                    <cell width="20%" tooltip="Git URL">
-                                        <textbox width="100%" placeholder="Git URL" value="@bind(commandsVM.gitUrl)" onOK="@command('cloneCommands')" type="url"/>
-                                    </cell>
-                                    <separator></separator>
-                                    <cell width="10%" tooltip="Username">
-                                        <textbox width="100%" placeholder="Username" value="@bind(commandsVM.gitUsername)"/>
-                                    </cell>
-                                    <cell width="10%" tooltip="Password">
-                                        <textbox placeholder="Password" width="100%" value="@bind(commandsVM.gitPassword)" type="password"/>
-                                    </cell>
-                                    <cell width="5%">
-                                        <checkbox id="markCredentialsChBox" label="Mark" tooltiptext="Mark Credentials" checked="@bind(commandsVM.markCredentials)"
-                                                  onCheck="markCredentials('markCredentialsChBox')"/>
-                                    </cell>
-                                    <cell width="10%" tooltip="Clone">
-                                        <button label="Clone" iconSclass="z-icon-clone" width="100%" onClick="@command('cloneCommands')"/>
-                                    </cell>
-                                    <cell width="45%">
-                                        <hbox height="100%" width="100%" align="end" pack="end">
-                                            <button label="Pull" iconSclass="z-icon-cloud-download" onClick="@command('cloneCommands')"/>
-                                            <button label="Push" iconSclass="z-icon-cloud-upload" onClick="@command('cloneCommands')"/>
-                                        </hbox>
-                                    </cell>
+
+                                <hbox height="100%" width="100%" align="center" pack="end">
+                                    <button label="Pull" iconSclass="z-icon-cloud-download" onClick="@command('pullGitRepo')"/>
+                                    <button label="Push" iconSclass="z-icon-cloud-upload" onClick="@command('pushGitRepo')"/>
+                                    <button label="Save" iconSclass="fas fa-save" onClick="@command('saveCommands')"/>
                                 </hbox>
                             </north>
                             <!--                                <south collapsible="true" splittable="true">-->
@@ -257,11 +241,22 @@
                             <!--                                </south>-->
                             <center>
                                 <div>
-                                    <panel title="@load(commandsVM.selectedCommandsSourceLabel)" width="100%" height="@load(commandsVM.commandsManagementSrcPanelHeight)">
-                                        <caption iconSclass="z-icon-list"/>
+                                    <panel width="100%" height="@load(commandsVM.commandsManagementSrcPanelHeight)">
+                                        <caption iconSclass="z-icon-list" label="@load(commandsVM.selectedCommandsSourceLabel)"/>
                                         <panelchildren style="overflow: auto;font-family: Courier, Monaco, monospace;font-size: 14px;line-height: 1.5;">
-                                            <!--                                                <html id="selectedCommandsRawId"></html>-->
-                                            <html id="selectedCommandsRawId">"<![CDATA[<pre><code>${commandsVM.selectedCommandsSourceRaw}</code></pre>]]>"</html>
+                                            <div width="100%" height="100%" style="overflow:auto;font-family: Courier, Monaco, monospace;line-height: 1.3;padding-left: 0.2em">
+                                                <!--                                                TODO     contenteditable="${commandsVM.contentEditable}"       -->
+                                                <!--                                                class='highlightComManagement'-->
+                                                <!--                                                <n:div width="100%" height="100%" class="input" contenteditable="true">-->
+                                                <!--                                                    <n:pre>-->
+                                                <!--                                                        <n:code class="toml">${commandsVM.selectedCommandsSourceRaw}</n:code>-->
+                                                <!--                                                    </n:pre>-->
+                                                <!--                                                </n:div>-->
+                                                <div id="commandsManagementOutputId" width="100%" height="100%" class='highlightComManagement' style="@load(commandsVM.commandsManagementCss)">
+
+                                                </div>
+                                            </div>
+                                            <!--                                            <html id="selectedCommandsRawId">"<![CDATA[<pre><code>${commandsVM.selectedCommandsSourceRaw}</code></pre>]]>"</html>-->
                                         </panelchildren>
                                     </panel>
                                 </div>
