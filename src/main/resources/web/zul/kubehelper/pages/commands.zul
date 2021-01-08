@@ -228,8 +228,7 @@
 
                     <tabpanel>
                         <borderlayout width="100%" height="@load(commandsVM.commandsManagementHeight)">
-                            <north collapsible="true" splittable="true">
-
+                            <north>
                                 <hbox height="100%" width="100%" align="center" pack="end">
                                     <button label="Pull" iconSclass="z-icon-cloud-download" onClick="@command('pullGitRepo')"/>
                                     <button label="Push" iconSclass="z-icon-cloud-upload" onClick="@command('pushGitRepo')"/>
