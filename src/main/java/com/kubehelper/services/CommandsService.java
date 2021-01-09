@@ -22,6 +22,7 @@ import com.google.common.io.Files;
 import com.kubehelper.common.Resource;
 import com.kubehelper.domain.models.CommandsModel;
 import com.kubehelper.domain.results.CommandsResult;
+import com.kubehelper.domain.results.FileSourceResult;
 import com.moandjiezana.toml.Toml;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
@@ -40,7 +41,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.zkoss.bind.annotation.Command;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
@@ -295,7 +295,7 @@ public class CommandsService {
 
             //sort and set first
             commandsModel.sortCommandSourcesAlphabeticallyAsc();
-            Optional<Map.Entry<String, CommandsModel.FileSource>> first = commandsModel.getCommandsSources().entrySet().stream().findFirst();
+            Optional<Map.Entry<String, FileSourceResult>> first = commandsModel.getCommandsSources().entrySet().stream().findFirst();
             if (first.isPresent()) {
                 if (first.get().getValue().isReadonly()) {
                     commandsModel.setSelectedCommandsSourceRaw(IOUtils.toString(first.get().getValue().getUri()));
@@ -311,7 +311,7 @@ public class CommandsService {
     }
 
     public void changeCommandsManagementRaw(CommandsModel cm) {
-        CommandsModel.FileSource fileSource = cm.getCommandsSources().get(cm.getSelectedCommandsSourceLabel());
+        FileSourceResult fileSource = cm.getCommandsSources().get(cm.getSelectedCommandsSourceLabel());
         String rawSource = "";
         try {
             rawSource = fileSource.isReadonly() ? IOUtils.toString(fileSource.getUri()) : commonService.getResourceAsStringByPath(fileSource.getFilePath());
@@ -320,20 +320,6 @@ public class CommandsService {
             logger.debug(e.getMessage(), e);
         }
         cm.setSelectedCommandsSourceRaw(rawSource);
-    }
-
-    @Command
-    public void pullGitRepo() {
-        commonService.pullGitRepo();
-    }
-
-    @Command
-    public void pushGitRepo() {
-        commonService.pushGitRepo();
-    }
-
-    @Command
-    public void saveCommands() {
     }
 
 
@@ -352,7 +338,7 @@ public class CommandsService {
                 commandsModel.addHistorySource(Files.getNameWithoutExtension(file), file);
             });
             commandsModel.sortMapByDateDesc();
-            Optional<Map.Entry<String, CommandsModel.FileSource>> first = commandsModel.getCommandsHistories().entrySet().stream().findFirst();
+            Optional<Map.Entry<String, FileSourceResult>> first = commandsModel.getCommandsHistories().entrySet().stream().findFirst();
             if (first.isPresent()) {
                 commandsModel.setSelectedCommandsHistoryRaw(commonService.getResourceAsStringByPath(first.get().getValue().getFilePath()));
                 commandsModel.setSelectedCommandsHistoryLabel(first.get().getKey());

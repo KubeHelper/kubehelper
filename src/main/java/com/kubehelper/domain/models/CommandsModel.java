@@ -22,6 +22,7 @@ import com.kubehelper.common.Global;
 import com.kubehelper.common.KubeHelperException;
 import com.kubehelper.domain.filters.CommandsFilter;
 import com.kubehelper.domain.results.CommandsResult;
+import com.kubehelper.domain.results.FileSourceResult;
 
 import java.net.URI;
 import java.time.LocalDate;
@@ -79,12 +80,12 @@ public class CommandsModel implements PageModel {
     private String executedCommandOutput = "";
 
     //  COMMANDS MANAGEMENT ================
-    private Map<String, FileSource> commandsSources = new HashMap<>();
+    private Map<String, FileSourceResult> commandsSources = new HashMap<>();
     private String selectedCommandsSourceLabel = "";
     private String selectedCommandsSourceRaw = "";
 
     //  COMMANDS HISTORY ================
-    private Map<String, FileSource> commandsHistories = new HashMap<>();
+    private Map<String, FileSourceResult> commandsHistories = new HashMap<>();
 
     private List<String> commandsHistoryRanges = Arrays.asList("This Week", "This Month", "This Year", "All");
 
@@ -105,7 +106,7 @@ public class CommandsModel implements PageModel {
     }
 
     public void addCommandSource(String label, String filePath) {
-        FileSource commandSource = new FileSource();
+        FileSourceResult commandSource = new FileSourceResult();
         commandSource.setLabel(label);
         commandSource.setFilePath(filePath);
         commandSource.setReadonly(false);
@@ -113,7 +114,7 @@ public class CommandsModel implements PageModel {
     }
 
     public void addReadonlyCommandSource(String label, URI uri) {
-        FileSource commandSource = new FileSource();
+        FileSourceResult commandSource = new FileSourceResult();
         commandSource.setLabel(label);
         commandSource.setUri(uri);
         commandSource.setReadonly(true);
@@ -121,7 +122,7 @@ public class CommandsModel implements PageModel {
     }
 
     public void addHistorySource(String label, String filePath) {
-        FileSource historySource = new FileSource();
+        FileSourceResult historySource = new FileSourceResult();
         historySource.setLabel(label);
         historySource.setFilePath(filePath);
         commandsHistories.put(label, historySource);
@@ -360,12 +361,12 @@ public class CommandsModel implements PageModel {
         return this;
     }
 
-    public CommandsModel setCommandsSources(Map<String, FileSource> commandsSources) {
+    public CommandsModel setCommandsSources(Map<String, FileSourceResult> commandsSources) {
         this.commandsSources = commandsSources;
         return this;
     }
 
-    public Map<String, FileSource> getCommandsSources() {
+    public Map<String, FileSourceResult> getCommandsSources() {
         return commandsSources;
     }
 
@@ -441,11 +442,11 @@ public class CommandsModel implements PageModel {
         return this;
     }
 
-    public Map<String, FileSource> getCommandsHistories() {
+    public Map<String, FileSourceResult> getCommandsHistories() {
         return commandsHistories;
     }
 
-    public CommandsModel setCommandsHistories(Map<String, FileSource> commandsHistories) {
+    public CommandsModel setCommandsHistories(Map<String, FileSourceResult> commandsHistories) {
         this.commandsHistories = commandsHistories;
         return this;
     }
@@ -489,46 +490,4 @@ public class CommandsModel implements PageModel {
         return runtimeNotificationExceptions;
     }
 
-    public class FileSource {
-        private String label;
-        private String filePath;
-        private URI uri;
-        private boolean readonly = true;
-
-        public String getLabel() {
-            return label;
-        }
-
-        public FileSource setLabel(String label) {
-            this.label = label;
-            return this;
-        }
-
-        public String getFilePath() {
-            return filePath;
-        }
-
-        public FileSource setFilePath(String filePath) {
-            this.filePath = filePath;
-            return this;
-        }
-
-        public boolean isReadonly() {
-            return readonly;
-        }
-
-        public FileSource setReadonly(boolean readonly) {
-            this.readonly = readonly;
-            return this;
-        }
-
-        public URI getUri() {
-            return uri;
-        }
-
-        public FileSource setUri(URI uri) {
-            this.uri = uri;
-            return this;
-        }
-    }
 }

@@ -18,15 +18,15 @@
             </hlayout>
         </toolbar>
         <tabpanels>
-            <tabpanel style="overflow-y:scroll;overflow-x:auto;font-family: Courier, Monaco, monospace;display: flex;">
+            <tabpanel style="overflow:auto;font-family: Courier, Monaco, monospace;display: flex;">
                 <div id="rawJavaId" width="100%" height="100%" class='highlight-java' style="@load(rawResourceVM.tabPanelFontSize)">
                 </div>
             </tabpanel>
-            <tabpanel style="overflow-y:scroll;overflow-x:auto;font-family: Courier, Monaco, monospace;display: flex;">
+            <tabpanel style="overflow:auto;font-family: Courier, Monaco, monospace;display: flex;">
                 <div id="rawYamlId" width="100%" height="100%" class='highlight-yaml' style="@load(rawResourceVM.tabPanelFontSize)">
                 </div>
             </tabpanel>
-            <tabpanel style="overflow-y:scroll;overflow-x:auto;font-family: Courier, Monaco, monospace;display: flex;">
+            <tabpanel style="overflow:auto;font-family: Courier, Monaco, monospace;display: flex;">
                 <div id="rawJsonId" width="100%" height="100%" class='highlight-json' style="@load(rawResourceVM.tabPanelFontSize)">
                 </div>
             </tabpanel>

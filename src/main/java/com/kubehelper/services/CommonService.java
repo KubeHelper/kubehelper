@@ -19,6 +19,8 @@ package com.kubehelper.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.kubehelper.common.Resource;
+import com.kubehelper.configs.Config;
+import com.kubehelper.domain.models.ConfigsModel;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.KubernetesResource;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
@@ -29,16 +31,21 @@ import io.kubernetes.client.openapi.apis.CoreV1Api;
 import io.kubernetes.client.openapi.models.V1NamespaceList;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
+import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zul.Messagebox;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -68,9 +75,15 @@ public class CommonService {
     @Autowired
     private CoreV1Api api;
 
+    @Autowired
+    private Config config;
+
     private KubernetesClient fabric8Client = new DefaultKubernetesClient();
 
     private static Logger logger = LoggerFactory.getLogger(CommonService.class);
+
+    @Value("${kubehelper.git.repo.location.path}")
+    private String gitRepoLocationPath;
 
 
     /**
@@ -303,9 +316,6 @@ public class CommonService {
         }
     }
 
-    public void cloneGitRepo() {
-
-    }
 
     public void pullGitRepo() {
     }

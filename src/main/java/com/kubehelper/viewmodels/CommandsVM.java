@@ -205,7 +205,7 @@ public class CommandsVM implements EventListener<Event> {
      */
     private void redrawCommandsToolbarbuttons(String toolbarId, Set<String> entries, String activeToolbarButtonId) {
         createCommandsToolbarButtons(toolbarId, entries);
-        if (Objects.nonNull(commandsModel.getSelectedCommandsHistoryLabel())) {
+        if (StringUtils.isNotBlank(commandsModel.getSelectedCommandsHistoryLabel())) {
             enableDisableMenuItem(activeToolbarButtonId, true, "bold;");
         }
     }
@@ -359,11 +359,6 @@ public class CommandsVM implements EventListener<Event> {
     //  COMMANDS MANAGEMENT METHODS ================
 
     @Command
-    public void cloneGitRepo() {
-      commonService.cloneGitRepo();
-    }
-
-    @Command
     public void pullGitRepo() {
         commonService.pullGitRepo();
     }
@@ -374,7 +369,7 @@ public class CommandsVM implements EventListener<Event> {
     }
 
     @Command
-    public void saveConfig() {
+    public void saveCommands() {
 
     }
 
@@ -540,10 +535,6 @@ public class CommandsVM implements EventListener<Event> {
 
     public CommandsFilter getFilter() {
         return commandsModel.getFilter();
-    }
-
-    public String getCommandOutputTotalItems() {
-        return String.format("Total Items: %d", commandsResults.size());
     }
 
     public String getCommandsTotalItems() {
@@ -740,38 +731,6 @@ public class CommandsVM implements EventListener<Event> {
 
     public String getCommandsManagementSrcPanelHeight() {
         return centerLayoutHeight - 95 + "px";
-    }
-
-    public void setGitUrl(String gitUrl) {
-        config.setGitUrl(gitUrl);
-    }
-
-    public String getGitUrl() {
-        return config.getGitUrl();
-    }
-
-    public void setGitUsername(String gitUsername) {
-        config.setGitUsername(gitUsername);
-    }
-
-    public String getGitUsername() {
-        return config.getGitUsername();
-    }
-
-    public void setGitPassword(String gitPassword) {
-        config.setGitPassword(gitPassword);
-    }
-
-    public String getGitPassword() {
-        return config.getGitPassword();
-    }
-
-    public boolean isMarkCredentials() {
-        return config.getMarkCredentials();
-    }
-
-    public void setMarkCredentials(boolean markCredentials) {
-        config.setMarkCredentials(markCredentials);
     }
 
 
