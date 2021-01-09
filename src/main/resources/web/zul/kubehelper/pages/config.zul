@@ -3,12 +3,13 @@
         function highlightConfig () {
         document.querySelectorAll('div.highlightConfig').forEach(block => { hljs.highlightBlock(block); });
         }
-        <!--        $('body').on('DOMSubtreeModified', '#historyDivId', function(){-->
-        <!--        console.log('changed');-->
-        <!--        {'test':{'config' : "test"}}-->
-        <!--        console.log($('#historyDivId').text());-->
-        <!--        zAu.send(new zk.Event(zk.Widget.$(this), 'setConfig', {'test':{'config' : "test"}}));-->
-        <!--        });-->
+
+        function saveConfig(){
+        // Get ZK widget
+        var widget = zk('$configBlockId').$();
+        // widget fires SELF-DEFINED event
+        widget.fire('onSaveConfigEvent', { config : $("#configContentDivId").text() }, {toServer : true })
+        }
     </script>
     <panel title="Configuration" viewModel="@id('configsVM') @init('com.kubehelper.viewmodels.ConfigsVM')" width="100%" height="100%" border="none">
         <toolbar height="100%" width="100%">
@@ -19,7 +20,7 @@
                 <cell width="10%" tooltip="Branch">
                     <textbox placeholder="develop" width="100%" value="@bind(configsVM.gitBranch)"/>
                 </cell>
-<!--                <separator></separator>-->
+                <!--                <separator></separator>-->
                 <cell width="10%" tooltip="Username">
                     <textbox width="100%" placeholder="Username" value="@bind(configsVM.gitUsername)"/>
                 </cell>
@@ -38,16 +39,17 @@
                 </cell>
                 <cell width="10%">
                     <hbox height="100%" width="100%" align="end" pack="end">
-                        <button label="Save" iconSclass="fas fa-save" onClick="@command('saveCommands')"/>
+                        <button id="saveConfigButtonId" xmlns:w="client" label="Save" iconSclass="fas fa-save" w:onClick='saveConfig();'/>
                     </hbox>
                 </cell>
             </hbox>
         </toolbar>
         <panelchildren>
             <div id="configBlockId" width="100%" height="100%" class="highlightConfig"
-                 style="overflow: auto;font-family: Courier, Monaco, monospace;display: flex;line-height: 1.3; font-size: 14px;;cursor: text">
+                 style="overflow: auto;font-family: Courier, Monaco, monospace;display: flex;line-height: 1.3; font-size: 14px;;cursor: text"
+                 onSaveConfigEvent="@command('saveConfig', config=event.data.config)">
                 <!--                    <textbox id="configMainDivId" class='highlightConfig' rows="1000" width="100%" value="@bind(configsVM.config)"/>-->
-                <n:div id="historyDivId" width="100%" height="100%" class="input" contenteditable="true">
+                <n:div id="configContentDivId" width="100%" height="100%" class="input" contenteditable="true">
                     <n:pre>
                         <n:code class="toml">${configsVM.config}</n:code>
                     </n:pre>

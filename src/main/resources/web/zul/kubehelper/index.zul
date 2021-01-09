@@ -11,10 +11,10 @@
     <div id="indexWindow" viewModel="@id('indexVM') @init('com.kubehelper.viewmodels.IndexVM')" height="100%" width="100%">
         <borderlayout>
             <!-- Sidebar -->
-            <west title="Kube Helper" size="12%" maxsize="230" splittable="true" collapsible="true" autoscroll="true" border="none">
-                <vlayout width="100%" height="100%">
-                    <vbox height="80%">
-                        <image src="~./img/kube-helper-512.png" style="max-height: 100%;max-width:100%;"/>
+            <west id="mainMenuId" title="Kube Helper" size="13%" collapsible="true" autoscroll="true" border="none">
+                <vbox>
+                    <vbox id="mainMenuVBoxId">
+                        <image id="mainLogoId" src="~./img/kube-helper-512.png" width="@load(indexVM.logoSize)" height="@load(indexVM.logoSize)"/>
                         <!--                        <separator orient="horizontal" style="padding: 0 0 5px 0;"/>-->
                         <panel width="100%" title="Menu" collapsible="true">
                             <panelchildren>
@@ -36,12 +36,6 @@
                                                onClick="@command('switchView', modelName='configs')"/>
                                 <toolbarbutton id="versionsMenuBtn" hflex="1" iconSclass="fas fa-link" label="&#160;Versions" style="text-align: left; padding-left: 2px;"
                                                onClick="@command('switchView', modelName='versions')"/>
-                                <!--                            <toolbarbutton id="auditingMenuBtn" hflex="1" iconSclass="z-icon-gears" label="&#160;Auditing" onClick="@command('switchView', modelName='auditing')"/>-->
-                                <!--                            <toolbarbutton id="featureGatesMenuBtn" hflex="1" iconSclass="z-icon-home" label="&#160;Feature Gates" onClick="@command('switchView', modelName='featureGates')"/>-->
-                                <!--                            <toolbarbutton id="customResourcesMenuBtn" hflex="1" iconSclass="z-icon-home" label="&#160;Custom Resources" onClick="@command('switchView', modelName='customResources')"/>-->
-                                <!--                            <toolbarbutton id="deprecatedMenuBtn" hflex="1" iconSclass="z-icon-home" label="&#160;Deprecated" onClick="@command('switchView', modelName='deprecated')"/>-->
-                                <!--                            <toolbarbutton id="eventsMenuBtn" hflex="1" iconSclass="z-icon-flash" label="&#160;Events" onClick="@command('switchView', modelName='events')"/>-->
-                                <!--                            <toolbarbutton id="volumesMenuBtn" hflex="1" iconSclass="z-icon-server" label="&#160;Volumes" onClick="@command('switchView', modelName='volumes')"/>-->
                             </panelchildren>
                         </panel>
                         <panel width="100%" title="Kube Helper" collapsible="true">
@@ -69,24 +63,20 @@
                                                onClick="@command('contactDeveloper')"/>
                                 <toolbarbutton id="helpTheProjectMenuBtn" hflex="1" iconSclass="z-icon-star" label="&#160;Help the project => RATE US" style="text-align: left; padding-left: 2px;"
                                                tooltiptext="https://github.com/JWebDev/kubehelper/stargazers" href="https://github.com/JWebDev/kubehelper/stargazers" target="_blank"/>
-                            </panelchildren>
-                        </panel>
-                        <panel width="100%">
-                            <panelchildren>
+                                <separator orient="horizontal"/>
                                 <button iconSclass="z-icon-heartbeat" height="50px" width="100%" label="Donate" dir="reverse"
-                                        style="font-family: Courier, Monaco, monospace;font-size: 18px;font-weight: bold;" onClick="@command('donate')"/>
+                                        style="font-size: 18px;font-weight: bold;" onClick="@command('donate')"/>
                             </panelchildren>
                         </panel>
                     </vbox>
-                    <vbox height="300px" width="100%" pack="end">
+                    <vbox id="logoutPanelId" height="@load(indexVM.logoutVBoxHeight)" width="100%" pack="end">
                         <panel>
                             <panelchildren>
-                                <toolbarbutton iconSclass="z-icon-sign-out" height="100%" width="100%" label="Logout"
-                                               style="font-family: Courier, Monaco, monospace;font-size: 18px;font-weight: bold;background-color: #088ADE;" href="/logout"/>
+                                <button iconSclass="z-icon-sign-out" width="100%" label="Logout" style="font-size: 16px;" href="/logout"/>
                             </panelchildren>
                         </panel>
                     </vbox>
-                </vlayout>
+                </vbox>
             </west>
             <center>
                 <include id="templateInclude" src="@load(indexVM.pageModel.templateUrl)"/>

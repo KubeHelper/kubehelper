@@ -32,7 +32,9 @@ import org.zkoss.bind.annotation.Init;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Path;
+import org.zkoss.zk.ui.event.AfterSizeEvent;
 import org.zkoss.zk.ui.select.Selectors;
+import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
@@ -51,6 +53,12 @@ public class IndexVM {
 
     private PageModel pageModel;
     private String currentModelName;
+
+    private int logoutVBoxHeight = 300;
+    private int mainMenuHeight = 1200;
+    private int mainMenuVBoxHeight = 600;
+    private int logoSize = 200;
+
 
     @Wire
     private Footer indexGlobalFooter;
@@ -78,6 +86,25 @@ public class IndexVM {
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) {
         Selectors.wireEventListeners(view, this);
         enableDisableMenuItem(pageModel.getName());
+    }
+
+    @Listen("onAfterSize=#mainMenuId")
+    public void onAfterSizeMainMenuId(AfterSizeEvent event) {
+        mainMenuHeight = event.getHeight();
+        logoSize = event.getWidth() - 5;
+        BindUtils.postNotifyChange(this, "logoutVBoxHeight", "logoSize");
+    }
+
+    @Listen("onAfterSize=#logoutPanelId")
+    public void onAfterSizeMainLogoId(AfterSizeEvent event) {
+        BindUtils.postNotifyChange(this, "logoutVBoxHeight", "logoSize");
+    }
+
+    @Listen("onAfterSize=#mainMenuVBoxId")
+    public void onAfterSizeMainMenuVBoxId(AfterSizeEvent event) {
+        mainMenuVBoxHeight = event.getHeight();
+        logoutVBoxHeight = mainMenuHeight - mainMenuVBoxHeight - 150;
+        BindUtils.postNotifyChange(this, "logoutVBoxHeight", "logoSize");
     }
 
     public PageModel getPageModel() {
@@ -117,5 +144,13 @@ public class IndexVM {
         currentMenuBtn.setStyle("text-align: left; padding-left: 2px;font-weight: normal;");
         clickedMenuBtn.setStyle("text-align: left; padding-left: 2px;font-weight: bold;");
         currentModelName = modelName;
+    }
+
+    public String getLogoutVBoxHeight() {
+        return logoutVBoxHeight + "px";
+    }
+
+    public String getLogoSize() {
+        return logoSize + "px";
     }
 }

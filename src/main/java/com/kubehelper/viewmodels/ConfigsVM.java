@@ -29,27 +29,26 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.AfterCompose;
+import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
 import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
-import org.zkoss.zk.ui.HtmlNativeComponent;
-import org.zkoss.zk.ui.Path;
 import org.zkoss.zk.ui.event.AfterSizeEvent;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
+import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zk.ui.util.Notification;
 import org.zkoss.zkplus.spring.DelegatingVariableResolver;
-import org.zkoss.zul.Div;
+import org.zkoss.zul.Button;
 import org.zkoss.zul.Window;
 
 import java.io.File;
@@ -92,7 +91,6 @@ public class ConfigsVM {
     public void init() {
         configsModel = new ConfigsModel();
         configsService.checkConfigLocation(configsModel);
-//        configsService.showDashboard(dashboardModel);
     }
 
     @AfterCompose
@@ -108,18 +106,9 @@ public class ConfigsVM {
         BindUtils.postNotifyChange(this, ".");
     }
 
-    @Listen("onKeyPress=#historyDivId")
-    public void test(AfterSizeEvent event) {
-        BindUtils.postNotifyChange(this, ".");
-    }
-
-
-    @Command
-    public void saveConfig() {
-        Div configBlock = (Div) Path.getComponent("//indexPage/templateInclude/configBlockId");
-        HtmlNativeComponent nativeConfig = (HtmlNativeComponent) configBlock.getChildren().get(0);
-        String configContext = StringUtils.substringBetween(nativeConfig.getPrologContent(), "<code class=\"toml\">", "</code>");
-        configsModel.setConfig(configContext);
+    @Command("saveConfig")
+    public void saveConfig(@BindingParam("config") String config) {
+        configsModel.setConfig(config);
         configsService.updateConfig(configsModel);
         BindUtils.postNotifyChange(this, ".");
     }
