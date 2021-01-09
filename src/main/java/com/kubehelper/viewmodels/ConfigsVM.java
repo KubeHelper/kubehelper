@@ -18,10 +18,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package com.kubehelper.viewmodels;
 
 import com.kubehelper.common.Global;
+import com.kubehelper.configs.Config;
 import com.kubehelper.domain.models.ConfigsModel;
 import com.kubehelper.services.CommonService;
 import com.kubehelper.services.ConfigsService;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.jgit.api.CloneCommand;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.AfterCompose;
 import org.zkoss.bind.annotation.Command;
@@ -39,11 +47,14 @@ import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
+import org.zkoss.zk.ui.util.Notification;
 import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Div;
 import org.zkoss.zul.Window;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map;
 
 /**
@@ -55,6 +66,8 @@ import java.util.Map;
 @VariableResolver(DelegatingVariableResolver.class)
 public class ConfigsVM {
 
+    private static Logger logger = LoggerFactory.getLogger(ConfigsVM.class);
+
     private int centerLayoutHeight = 700;
 
     private ConfigsModel configsModel;
@@ -65,12 +78,19 @@ public class ConfigsVM {
     @WireVariable
     private CommonService commonService;
 
+    @WireVariable
+    private Config config;
+
+    //TODO fix value
+//    @Value("${kubehelper.git.repo.location.path}")
+    private String gitRepoLocationPath = "/Volumes/MAC_WORK/tmp/kubehelper/git";
+
     private boolean autoSyncEnabled;
 
 
     @Init
     public void init() {
-        configsModel = (ConfigsModel) Global.ACTIVE_MODELS.computeIfAbsent(Global.CONFIGS_MODEL, (k) -> Global.NEW_MODELS.get(Global.CONFIGS_MODEL));
+        configsModel = new ConfigsModel();
         configsService.checkConfigLocation(configsModel);
 //        configsService.showDashboard(dashboardModel);
     }
@@ -104,6 +124,53 @@ public class ConfigsVM {
         BindUtils.postNotifyChange(this, ".");
     }
 
+
+    @Command
+    public void cloneGitRepo() {
+        if (StringUtils.isBlank(getGitUrl())) {
+            Notification.show("Please enter a valid git url in order to clone the repository.", "error", null, "before_end", 5000);
+            return;
+        }
+        try {
+            if (StringUtils.isAllEmpty(config.getGitUsername(), config.getGitPassword(), config.getGitBranch())) {
+                Git.cloneRepository().setURI(config.getGitUrl())
+                        .setDirectory(new File(gitRepoLocationPath))
+                        .call();
+                return;
+            } else if (StringUtils.isAllEmpty(config.getGitUsername(), config.getGitPassword())) {
+                Git.cloneRepository().setURI(config.getGitUrl())
+                        .setDirectory(new File(gitRepoLocationPath))
+                        .setBranchesToClone(Arrays.asList("refs/heads/" + config.getGitBranch()))
+                        .setBranch(config.getGitBranch())
+                        .call();
+                return;
+            }
+
+            CloneCommand cloneCommand = Git.cloneRepository().setURI(config.getGitUrl());
+            if (!StringUtils.isBlank(getGitBranch())) {
+                cloneCommand.setBranchesToClone(Arrays.asList("refs/heads/" + config.getGitBranch())).setBranch(config.getGitBranch());
+            }
+            cloneCommand.setCredentialsProvider(new UsernamePasswordCredentialsProvider(config.getGitUsername(), config.getGitPassword())).call();
+        } catch (GitAPIException e) {
+            configsModel.addException("Git clone Error. Error:" + e.getMessage(), e);
+            logger.error(e.getMessage(), e);
+        }
+        if (checkExceptions()) {
+            Notification.show(String.format("The repository %s was successfully cloned.", config.getGitUrl()), "info", null, "before_end", 4000);
+        }
+    }
+
+    @Command
+    public void pullGitRepo() {
+        commonService.pullGitRepo();
+    }
+
+    @Command
+    public void pushGitRepo() {
+        commonService.pushGitRepo();
+    }
+
+
     public boolean isAutoSyncEnabled() {
         return autoSyncEnabled;
     }
@@ -114,17 +181,64 @@ public class ConfigsVM {
     }
 
     public String getConfig() {
+        checkExceptions();
+        return configsModel.getConfig();
+    }
+
+    private boolean checkExceptions() {
         if (configsModel.hasValidationErrors()) {
             Window window = (Window) Executions.createComponents(Global.PATH_TO_ERROR_RESOURCE_ZUL, null, Map.of("errors", configsModel.getValidationExceptions()));
             window.doModal();
             configsModel.setValidationExceptions(new ArrayList<>());
+            return false;
         }
-        return configsModel.getConfig();
+        return true;
     }
 
     public void setConfig(Event config) {
         config.getTarget();
 //        configsModel.setConfig(config);
+    }
+
+
+    public void setGitUrl(String gitUrl) {
+        config.setGitUrl(gitUrl);
+    }
+
+    public String getGitUrl() {
+        return config.getGitUrl();
+    }
+
+    public void setGitBranch(String gitBranch) {
+        config.setGitBranch(gitBranch);
+    }
+
+    public String getGitBranch() {
+        return config.getGitBranch();
+    }
+
+    public void setGitUsername(String gitUsername) {
+        config.setGitUsername(gitUsername);
+    }
+
+    public String getGitUsername() {
+        return config.getGitUsername();
+    }
+
+    public void setGitPassword(String gitPassword) {
+        config.setGitPassword(gitPassword);
+    }
+
+    public String getGitPassword() {
+        return config.getGitPassword();
+    }
+
+    public boolean isMarkCredentials() {
+        return config.getMarkCredentials();
+    }
+
+    public void setMarkCredentials(boolean markCredentials) {
+        config.setMarkCredentials(markCredentials);
     }
 
 }

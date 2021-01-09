@@ -29,7 +29,7 @@ import java.util.List;
 public class ConfigsModel implements PageModel {
 
     private String templateUrl = "~./zul/kubehelper/pages/config.zul";
-    public static String NAME = Global.DASHBOARD_MODEL;
+    public static String NAME = Global.CONFIGS_MODEL;
     private List<KubeHelperException> validationExceptions = new ArrayList<>();
 
     private String config = "";
@@ -46,6 +46,7 @@ public class ConfigsModel implements PageModel {
 
     @Override
     public void addException(String message, Exception exception) {
+        this.validationExceptions.add(new KubeHelperException(message, exception));
     }
 
     public String getConfig() {

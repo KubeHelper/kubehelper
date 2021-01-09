@@ -13,18 +13,22 @@
     <panel title="Configuration" viewModel="@id('configsVM') @init('com.kubehelper.viewmodels.ConfigsVM')" width="100%" height="100%" border="none">
         <toolbar height="100%" width="100%">
             <hbox height="100%" width="100%" align="stretch" spacing="10">
-                <cell width="20%" tooltip="Git URL">
-                    <textbox width="100%" placeholder="Git URL" value="@bind(commandsVM.gitUrl)" onOK="@command('cloneCommands')" type="url"/>
+                <cell width="30%" tooltip="Git URL">
+                    <textbox width="100%" placeholder="https://github.com/JWebDev/kubehelper.git" value="@bind(configsVM.gitUrl)" onOK="@command('cloneCommands')" type="url"/>
                 </cell>
-                <separator></separator>
+                <cell width="10%" tooltip="Branch">
+                    <textbox placeholder="develop" width="100%" value="@bind(configsVM.gitBranch)"/>
+                </cell>
+<!--                <separator></separator>-->
                 <cell width="10%" tooltip="Username">
-                    <textbox width="100%" placeholder="Username" value="@bind(commandsVM.gitUsername)"/>
+                    <textbox width="100%" placeholder="Username" value="@bind(configsVM.gitUsername)"/>
                 </cell>
                 <cell width="10%" tooltip="Password">
-                    <textbox placeholder="Password" width="100%" value="@bind(commandsVM.gitPassword)" type="password"/>
+                    <textbox placeholder="Password" width="100%" value="@bind(configsVM.gitPassword)" type="password"/>
                 </cell>
+
                 <cell width="5%">
-                    <checkbox id="markCredentialsChBox" label="Mark" tooltiptext="Mark Credentials" checked="@bind(commandsVM.markCredentials)"
+                    <checkbox id="markCredentialsChBox" label="Mark" tooltiptext="Mark Credentials" checked="@bind(configsVM.markCredentials)"
                               onCheck="markCredentials('markCredentialsChBox')"/>
                 </cell>
                 <cell width="25%" tooltip="Clone">
@@ -32,9 +36,9 @@
                     <button label="Pull" iconSclass="z-icon-cloud-download" onClick="@command('pullGitRepo')"/>
                     <button label="Push" iconSclass="z-icon-cloud-upload" onClick="@command('pushGitRepo')"/>
                 </cell>
-                <cell width="30%">
+                <cell width="10%">
                     <hbox height="100%" width="100%" align="end" pack="end">
-                        <button label="Save" iconSclass="fas fa-save" onClick="@command('saveConfig')"/>
+                        <button label="Save" iconSclass="fas fa-save" onClick="@command('saveCommands')"/>
                     </hbox>
                 </cell>
             </hbox>

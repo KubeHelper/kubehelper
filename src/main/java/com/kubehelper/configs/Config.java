@@ -51,6 +51,7 @@ public class Config {
     public static Boolean COMMANDS_HOT_REPLACEMENT = false;
 
     public static String GIT_URL = "gitUrl";
+    public static String GIT_BRANCH = "gitBranch";
     public static String GIT_USERNAME = "gitUsername";
     public static String GIT_PASSWORD = "gitPassword";
     public static Boolean MARK_CREDENTIALS = true;
@@ -109,7 +110,6 @@ public class Config {
     }
 
 
-
     public Boolean getCommandsHotReplacement() {
         Cache.ValueWrapper value = cacheManager.getCache(CONFIGS_CACHE).get(COMMANDS_HOT_REPLACEMENT);
         return Objects.isNull(value) ? false : (Boolean) value.get();
@@ -117,5 +117,14 @@ public class Config {
 
     public void setCommandsHotReplacement(Boolean hotReplacement) {
         cacheManager.getCache(CONFIGS_CACHE).put(COMMANDS_HOT_REPLACEMENT, hotReplacement);
+    }
+
+    public String getGitBranch() {
+        Cache.ValueWrapper value = cacheManager.getCache(CONFIGS_CACHE).get(GIT_BRANCH);
+        return Objects.isNull(value) ? "" : (String) value.get();
+    }
+
+    public void setGitBranch(String gitBranch) {
+        cacheManager.getCache(CONFIGS_CACHE).put(GIT_BRANCH, gitBranch);
     }
 }
