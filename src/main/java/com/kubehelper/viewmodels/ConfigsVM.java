@@ -106,10 +106,14 @@ public class ConfigsVM {
         BindUtils.postNotifyChange(this, ".");
     }
 
-    @Command("saveConfig")
+    @Command
     public void saveConfig(@BindingParam("config") String config) {
         configsModel.setConfig(config);
+        //TODO parse config to toml and do what in changed commands is
         configsService.updateConfig(configsModel);
+        if (checkExceptions()) {
+            Notification.show("The configurations was successfully saved.", "info", null, "before_end", 4000);
+        }
         BindUtils.postNotifyChange(this, ".");
     }
 

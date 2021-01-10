@@ -6,6 +6,10 @@
         function highlightCommandManagement () {
         document.querySelectorAll('div.highlightComManagement').forEach(block => { hljs.highlightBlock(block); });
         }
+        function saveCommands(){
+        var widget = zk('$commandsManagementOutputId').$();
+        widget.fire('onSaveCommandsEvent', { commands : $("#editableCommandsManagementOutputId").text() }, {toServer : true })
+        }
     </script>
     <borderlayout id="commandsTemplate" viewModel="@id('commandsVM') @init('com.kubehelper.viewmodels.CommandsVM')" width="100%" height="100%">
         <center id="centerLayoutCommandsID" margins="0,3,3,3" title="Commands" border="none">
@@ -230,9 +234,18 @@
                         <borderlayout width="100%" height="@load(commandsVM.commandsManagementHeight)">
                             <north>
                                 <hbox height="100%" width="100%" align="center" pack="end">
-                                    <button label="Pull" iconSclass="z-icon-cloud-download" onClick="@command('pullGitRepo')"/>
-                                    <button label="Push" iconSclass="z-icon-cloud-upload" onClick="@command('pushGitRepo')"/>
-                                    <button label="Save" iconSclass="fas fa-save" onClick="@command('saveCommands')"/>
+                                    <button id="pullBtn" label="Pull" iconSclass="z-icon-cloud-download" onClick="@command('pullGitRepo')"/>
+                                    <button id="pushBtn" label="Push" iconSclass="z-icon-cloud-upload" onClick="@command('pushGitRepo')"/>
+                                    <separator orient="horizontal"/>
+                                    <separator orient="horizontal"/>
+                                    <separator orient="horizontal"/>
+                                    <button id="plusBtn" iconSclass="fas plus" onClick="@command('addNewCommandsFile')"/>
+                                    <separator orient="horizontal"/>
+                                    <button id="minusBtn" iconSclass="fas minus" onClick="@command('deleteCommandsFile')"/>
+                                    <separator orient="horizontal"/>
+                                    <button id="refreshBtn" iconSclass="fas fa-sync-alt" onClick="@command('refreshCommandsManagement')"/>
+                                    <!--                                    <button id="saveBtn" label="Save" iconSclass="fas fa-save" onClick="@command('saveCommands')"/>-->
+                                    <button id="saveBtn" xmlns:w="client" label="Save" iconSclass="fas fa-save" w:onClick='saveCommands();'/>
                                 </hbox>
                             </north>
                             <!--                                <south collapsible="true" splittable="true">-->
@@ -251,7 +264,8 @@
                                                 <!--                                                        <n:code class="toml">${commandsVM.selectedCommandsSourceRaw}</n:code>-->
                                                 <!--                                                    </n:pre>-->
                                                 <!--                                                </n:div>-->
-                                                <div id="commandsManagementOutputId" width="100%" height="100%" class='highlightComManagement' style="@load(commandsVM.commandsManagementCss)">
+                                                <div id="commandsManagementOutputId" width="100%" height="100%" class='highlightComManagement' style="@load(commandsVM.commandsManagementCss)"
+                                                     onSaveCommandsEvent="@command('saveCommands', commands=event.data.commands)">
 
                                                 </div>
                                             </div>

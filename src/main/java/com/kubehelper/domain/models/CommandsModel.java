@@ -43,8 +43,6 @@ public class CommandsModel implements PageModel {
 
     private String templateUrl = "~./zul/kubehelper/pages/commands.zul";
 
-    //    private String userCommandsPath = "C:\\temp\\kubehelper";
-    private String userCommandsPath = "/tmp/kubehelper";
     public static String NAME = Global.COMMANDS_MODEL;
     private List<KubeHelperException> buildExceptions = new ArrayList<>();
     private String runtimeNotificationExceptions = "";
@@ -126,6 +124,14 @@ public class CommandsModel implements PageModel {
         historySource.setLabel(label);
         historySource.setFilePath(filePath);
         commandsHistories.put(label, historySource);
+    }
+
+    public FileSourceResult getSelectedSourceFileResult(){
+        return commandsSources.get(selectedCommandsSourceLabel);
+    }
+
+    public FileSourceResult getSelectedHistoryFileResult(){
+        return commandsHistories.get(selectedCommandsHistoryLabel);
     }
 
     public void addNotificationException(String ruuntimeEx) {
@@ -349,15 +355,6 @@ public class CommandsModel implements PageModel {
 
     public CommandsModel setSelectedCommandsSourceRaw(String selectedCommandsSourceRaw) {
         this.selectedCommandsSourceRaw = selectedCommandsSourceRaw;
-        return this;
-    }
-
-    public String getUserCommandsPath() {
-        return userCommandsPath;
-    }
-
-    public CommandsModel setUserCommandsPath(String userCommandsPath) {
-        this.userCommandsPath = userCommandsPath;
         return this;
     }
 

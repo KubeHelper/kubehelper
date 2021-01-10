@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.io.Files;
 import com.kubehelper.common.Resource;
 import com.kubehelper.domain.models.CommandsModel;
+import com.kubehelper.domain.models.ConfigsModel;
 import com.kubehelper.domain.results.CommandsResult;
 import com.kubehelper.domain.results.FileSourceResult;
 import com.moandjiezana.toml.Toml;
@@ -322,6 +323,29 @@ public class CommandsService {
         cm.setSelectedCommandsSourceRaw(rawSource);
     }
 
+    public void updateCommands(CommandsModel cm, String commandsForUpdate) {
+
+        //validate
+        try {
+            new Toml().read(commandsForUpdate);
+            cm.setSelectedCommandsSourceRaw(commandsForUpdate);
+        } catch (IllegalStateException e) {
+            cm.addException(String.format("Commands file %s is not valid. Error ", cm.getSelectedCommandsSourceLabel()) + e.getMessage(), e);
+            logger.error(String.format("Commands file %s is not valid. Error ", cm.getSelectedCommandsSourceLabel()) + e.getMessage());
+            return;
+        }
+
+        String commandsFilePath = cm.getSelectedSourceFileResult().getFilePath();
+
+        //overwrite commands
+        try {
+            FileUtils.writeStringToFile(new File(commandsFilePath), commandsForUpdate);
+        } catch (IOException e) {
+            cm.addException(String.format("Commands file %s is not valid. Error ", cm.getSelectedCommandsSourceLabel()) + e.getMessage(), e);
+            logger.error(String.format("Commands file %s is not valid. Error ", cm.getSelectedCommandsSourceLabel()) + e.getMessage());
+        }
+    }
+
 
     //  COMMANDS HISTORY ================
 
@@ -431,5 +455,4 @@ public class CommandsService {
             commandsModel.setSelectedCommandsHistoryRaw(commandsModel.getCommandsRawHistoryBuffer());
         }
     }
-
 }

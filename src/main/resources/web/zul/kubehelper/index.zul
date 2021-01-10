@@ -65,11 +65,12 @@
                                                tooltiptext="https://github.com/JWebDev/kubehelper/stargazers" href="https://github.com/JWebDev/kubehelper/stargazers" target="_blank"/>
                                 <separator orient="horizontal"/>
                                 <button iconSclass="z-icon-heartbeat" height="50px" width="100%" label="Donate" dir="reverse"
-                                        style="font-size: 18px;font-weight: bold;" onClick="@command('donate')"/>
+                                style="font-size: 18px;font-weight: bold;" onClick="@command('donate')"/>
+                                <separator orient="horizontal"/>
                             </panelchildren>
                         </panel>
                     </vbox>
-                    <vbox id="logoutPanelId" height="@load(indexVM.logoutVBoxHeight)" width="100%" pack="end">
+                    <vbox id="logoutPanelId" width="100%" pack="end">
                         <panel>
                             <panelchildren>
                                 <button iconSclass="z-icon-sign-out" width="100%" label="Logout" style="font-size: 16px;" href="/logout"/>

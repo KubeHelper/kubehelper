@@ -54,9 +54,6 @@ public class IndexVM {
     private PageModel pageModel;
     private String currentModelName;
 
-    private int logoutVBoxHeight = 300;
-    private int mainMenuHeight = 1200;
-    private int mainMenuVBoxHeight = 600;
     private int logoSize = 200;
 
 
@@ -76,8 +73,8 @@ public class IndexVM {
 //        pageModel = Global.ACTIVE_MODELS.computeIfAbsent(Global.IPS_AND_PORTS_MODEL, (k) -> Global.NEW_MODELS.get(Global.IPS_AND_PORTS_MODEL));
 //        pageModel = Global.ACTIVE_MODELS.computeIfAbsent(Global.SEARCH_MODEL, (k) -> Global.NEW_MODELS.get(Global.SEARCH_MODEL));
 //        pageModel = Global.ACTIVE_MODELS.computeIfAbsent(Global.SECURITY_MODEL, (k) -> Global.NEW_MODELS.get(Global.SECURITY_MODEL));
-//        pageModel = Global.ACTIVE_MODELS.computeIfAbsent(Global.COMMANDS_MODEL, (k) -> Global.NEW_MODELS.get(Global.COMMANDS_MODEL));
-        pageModel = Global.ACTIVE_MODELS.computeIfAbsent(Global.CONFIGS_MODEL, (k) -> Global.NEW_MODELS.get(Global.CONFIGS_MODEL));
+        pageModel = Global.ACTIVE_MODELS.computeIfAbsent(Global.COMMANDS_MODEL, (k) -> Global.NEW_MODELS.get(Global.COMMANDS_MODEL));
+//        pageModel = Global.ACTIVE_MODELS.computeIfAbsent(Global.CONFIGS_MODEL, (k) -> Global.NEW_MODELS.get(Global.CONFIGS_MODEL));
 //        pageModel = Global.ACTIVE_MODELS.computeIfAbsent(Global.LABELS_MODEL, (k) -> Global.NEW_MODELS.get(Global.LABELS_MODEL));
         currentModelName = pageModel.getName();
     }
@@ -90,21 +87,8 @@ public class IndexVM {
 
     @Listen("onAfterSize=#mainMenuId")
     public void onAfterSizeMainMenuId(AfterSizeEvent event) {
-        mainMenuHeight = event.getHeight();
         logoSize = event.getWidth() - 5;
-        BindUtils.postNotifyChange(this, "logoutVBoxHeight", "logoSize");
-    }
-
-    @Listen("onAfterSize=#logoutPanelId")
-    public void onAfterSizeMainLogoId(AfterSizeEvent event) {
-        BindUtils.postNotifyChange(this, "logoutVBoxHeight", "logoSize");
-    }
-
-    @Listen("onAfterSize=#mainMenuVBoxId")
-    public void onAfterSizeMainMenuVBoxId(AfterSizeEvent event) {
-        mainMenuVBoxHeight = event.getHeight();
-        logoutVBoxHeight = mainMenuHeight - mainMenuVBoxHeight - 150;
-        BindUtils.postNotifyChange(this, "logoutVBoxHeight", "logoSize");
+        BindUtils.postNotifyChange(this, "logoSize");
     }
 
     public PageModel getPageModel() {
@@ -144,10 +128,6 @@ public class IndexVM {
         currentMenuBtn.setStyle("text-align: left; padding-left: 2px;font-weight: normal;");
         clickedMenuBtn.setStyle("text-align: left; padding-left: 2px;font-weight: bold;");
         currentModelName = modelName;
-    }
-
-    public String getLogoutVBoxHeight() {
-        return logoutVBoxHeight + "px";
     }
 
     public String getLogoSize() {

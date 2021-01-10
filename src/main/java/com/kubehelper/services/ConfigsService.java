@@ -82,8 +82,8 @@ public class ConfigsService {
             FileUtils.writeStringToFile(new File(defaultConfigFilePath), predefinedConfig);
             configsModel.setConfig(predefinedConfig);
         } catch (IOException e) {
-            configsModel.addException("An error occurred while creating of default config file. Error" + e.getMessage(), e);
-            logger.error("An error occurred while creating of default config file. Error" + e.getMessage());
+            configsModel.addException("An error occurred while creating of default config file. Error " + e.getMessage(), e);
+            logger.error("An error occurred while creating of default config file. Error " + e.getMessage());
         }
     }
 
@@ -98,8 +98,8 @@ public class ConfigsService {
         try {
             customConfig = commonService.getFilesPathsByDirAndExtension(customConfigLocationSearchPath, 10, "kubehelper-config.toml");
         } catch (IOException e) {
-            configsModel.addException("An error occurred while searching for custom configuration. Error" + e.getMessage(), e);
-            logger.error("An error occurred while searching for custom configuration. Error" + e.getMessage());
+            configsModel.addException("An error occurred while searching for custom configuration. Error " + e.getMessage(), e);
+            logger.error("An error occurred while searching for custom configuration. Error " + e.getMessage());
         }
         return customConfig;
     }
@@ -118,8 +118,8 @@ public class ConfigsService {
         try {
             new Toml().read(configsModel.getConfig());
         } catch (IllegalStateException e) {
-            configsModel.addException("Configuration file is not valid. Error" + e.getMessage(), e);
-            logger.error("Configuration file is not valid. Error" + e.getMessage());
+            configsModel.addException("Configuration file is not valid. Error " + e.getMessage(), e);
+            logger.error("Configuration file is not valid. Error " + e.getMessage());
             return;
         }
 
@@ -130,8 +130,8 @@ public class ConfigsService {
                 FileUtils.writeStringToFile(new File(customConfigPath.stream().findFirst().get()), configsModel.getConfig());
                 return;
             } catch (IOException e) {
-                configsModel.addException("An error occurred while updating config file. Error" + e.getMessage(), e);
-                logger.error("An error occurred while updating config file. Error" + e.getMessage());
+                configsModel.addException("An error occurred while updating config file. Error " + e.getMessage(), e);
+                logger.error("An error occurred while updating config file. Error " + e.getMessage());
             }
         }
 
@@ -139,8 +139,8 @@ public class ConfigsService {
         try {
             FileUtils.writeStringToFile(new File(defaultConfigFilePath), configsModel.getConfig());
         } catch (IOException e) {
-            configsModel.addException("An error occurred while updating default config file. Error" + e.getMessage(), e);
-            logger.error("An error occurred while updating default config file. Error" + e.getMessage());
+            configsModel.addException("An error occurred while updating default config file. Error " + e.getMessage(), e);
+            logger.error("An error occurred while updating default config file. Error " + e.getMessage());
         }
     }
 }

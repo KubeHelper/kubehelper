@@ -51,6 +51,7 @@ import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zk.ui.util.Notification;
 import org.zkoss.zkplus.spring.DelegatingVariableResolver;
+import org.zkoss.zul.Button;
 import org.zkoss.zul.Checkbox;
 import org.zkoss.zul.Combobox;
 import org.zkoss.zul.Div;
@@ -68,7 +69,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -117,6 +117,11 @@ public class CommandsVM implements EventListener<Event> {
     @Wire
     private Combobox commandsHistoryRangesCbox;
 
+    @Wire
+    private Button pushBtn;
+
+    @Wire
+    private Button saveBtn;
 
     @Init
     @NotifyChange("*")
@@ -175,14 +180,15 @@ public class CommandsVM implements EventListener<Event> {
     @Command
     public void onSelectMainCommandsTabs(@ContextParam(ContextType.COMPONENT) Tabbox tabbox) {
         activeTab = tabbox.getSelectedTab().getId();
-        if ("commandsHistory".equals(tabbox.getSelectedTab().getId()) && StringUtils.isBlank(commandsModel.getSelectedCommandsHistoryRaw())) {
+        if ("commandsHistory".equals(activeTab) && StringUtils.isBlank(commandsModel.getSelectedCommandsHistoryRaw())) {
             commandsService.prepareCommandsHistory(commandsModel);
             redrawCommandsToolbarbuttons("commandsHistoriesToolbarID", commandsModel.getCommandsHistories().keySet(), getCommandToolbarButtonId(commandsModel.getSelectedCommandsHistoryLabel()));
             refreshHistoryOutput();
-        } else if ("commandsManagement".equals(tabbox.getSelectedTab().getId()) && StringUtils.isBlank(commandsModel.getSelectedCommandsSourceRaw())) {
+        } else if ("commandsManagement".equals(activeTab) && StringUtils.isBlank(commandsModel.getSelectedCommandsSourceRaw())) {
             commandsService.prepareCommandsManagement(commandsModel);
             redrawCommandsToolbarbuttons("commandsSourcesToolbarID", commandsModel.getCommandsSources().keySet(), getCommandToolbarButtonId(commandsModel.getSelectedCommandsSourceLabel()));
             refreshCommandsManagementOutput(commandsModel.getSelectedCommandsSourceLabel());
+            disableEnableMainControlButtons();
         }
         checkRuntimeNotificationExceptions();
     }
@@ -205,7 +211,7 @@ public class CommandsVM implements EventListener<Event> {
      */
     private void redrawCommandsToolbarbuttons(String toolbarId, Set<String> entries, String activeToolbarButtonId) {
         createCommandsToolbarButtons(toolbarId, entries);
-        if (StringUtils.isNotBlank(commandsModel.getSelectedCommandsHistoryLabel())) {
+        if (StringUtils.isNotBlank(commandsModel.getSelectedCommandsHistoryLabel()) || StringUtils.isNotBlank(commandsModel.getSelectedCommandsSourceLabel())) {
             enableDisableMenuItem(activeToolbarButtonId, true, "bold;");
         }
     }
@@ -369,8 +375,12 @@ public class CommandsVM implements EventListener<Event> {
     }
 
     @Command
-    public void saveCommands() {
-
+    public void saveCommands(@BindingParam("commands") String commands) {
+        commandsService.updateCommands(commandsModel, commands);
+        if (checkExceptions()) {
+            Notification.show(String.format("The Commands %s was successfully saved.", commandsModel.getSelectedCommandsSourceLabel()), "info", null, "before_end", 4000);
+        }
+        BindUtils.postNotifyChange(this, ".");
     }
 
     /**
@@ -380,11 +390,29 @@ public class CommandsVM implements EventListener<Event> {
         Div historyOutputBlock = (Div) Path.getComponent("//indexPage/templateInclude/commandsManagementOutputId");
         historyOutputBlock.getChildren().clear();
         boolean isReadonly = !commandsModel.getCommandsSources().get(label).isReadonly();
-        String preDiv = "<div width=\"100%\" height=\"100%\" class=\"input\" contenteditable=\"" + isReadonly + "\">" +
+        String preDiv = "<div id = \"editableCommandsManagementOutputId\" width=\"100%\" height=\"100%\" class=\"input\" contenteditable=\"" + isReadonly + "\">" +
                 "<pre><code class=\"toml\">" + commandsModel.getSelectedCommandsSourceRaw() + "</code></pre></div>";
         historyOutputBlock.appendChild(new Html(preDiv));
         Clients.evalJavaScript("highlightCommandManagement();");
         BindUtils.postNotifyChange(this, ".");
+    }
+
+    @Command
+    public void addNewCommandsFile(@BindingParam("commands") String commands) {
+//        commandsService.updateCommands(commandsModel, commands);
+//        if (checkExceptions()) {
+//            Notification.show(String.format("The Commands %s was successfully saved.", commandsModel.getSelectedCommandsSourceLabel()), "info", null, "before_end", 4000);
+//        }
+//        BindUtils.postNotifyChange(this, ".");
+    }
+
+    @Command
+    public void deleteCommandsFile() {
+//        commandsService.updateCommands();
+//        if (checkExceptions()) {
+//            Notification.show(String.format("The Commands %s was successfully saved.", commandsModel.getSelectedCommandsSourceLabel()), "info", null, "before_end", 4000);
+//        }
+//        BindUtils.postNotifyChange(this, ".");
     }
 
 
@@ -482,10 +510,17 @@ public class CommandsVM implements EventListener<Event> {
             commandsModel.setSelectedCommandsSourceLabel(label);
             commandsService.changeCommandsManagementRaw(commandsModel);
             refreshCommandsManagementOutput(label);
+            disableEnableMainControlButtons();
         }
         String newToolbarbuttonId = getCommandToolbarButtonId(label);
         enableDisableMenuItem(oldToolbarbuttonId, false, "normal;");
         enableDisableMenuItem(newToolbarbuttonId, true, "bold;");
+    }
+
+    public void disableEnableMainControlButtons() {
+        boolean isDisable = commandsModel.getCommandsSources().get(commandsModel.getSelectedCommandsSourceLabel()).isReadonly();
+        pushBtn.setDisabled(isDisable);
+        saveBtn.setDisabled(isDisable);
     }
 
     private void refreshHistoryRangeCombobox() {
@@ -527,6 +562,16 @@ public class CommandsVM implements EventListener<Event> {
         Toolbarbutton toolbarbutton = (Toolbarbutton) Path.getComponent("//indexPage/templateInclude/" + toolbarbuttonId);
         toolbarbutton.setDisabled(disabled);
         toolbarbutton.setStyle("text-align: left;font-weight: " + fontWeight);
+    }
+
+    private boolean checkExceptions() {
+        if (commandsModel.hasBuildErrors()) {
+            Window window = (Window) Executions.createComponents(Global.PATH_TO_ERROR_RESOURCE_ZUL, null, Map.of("errors", commandsModel.getBuildExceptions()));
+            window.doModal();
+            commandsModel.setBuildExceptions(new ArrayList<>());
+            return false;
+        }
+        return true;
     }
 
 
