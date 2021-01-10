@@ -239,18 +239,14 @@
                                     <separator orient="horizontal"/>
                                     <separator orient="horizontal"/>
                                     <separator orient="horizontal"/>
-                                    <button id="plusBtn" iconSclass="fas plus" onClick="@command('addNewCommandsFile')"/>
+                                    <button id="plusBtn" iconSclass="fas fa-plus" onClick="@command('addNewCommandsFileWindow')"/>
                                     <separator orient="horizontal"/>
-                                    <button id="minusBtn" iconSclass="fas minus" onClick="@command('deleteCommandsFile')"/>
+                                    <button id="minusBtn" iconSclass="fas fa-minus" onClick="@command('deleteCommandsFile')"></button>
                                     <separator orient="horizontal"/>
                                     <button id="refreshBtn" iconSclass="fas fa-sync-alt" onClick="@command('refreshCommandsManagement')"/>
-                                    <!--                                    <button id="saveBtn" label="Save" iconSclass="fas fa-save" onClick="@command('saveCommands')"/>-->
                                     <button id="saveBtn" xmlns:w="client" label="Save" iconSclass="fas fa-save" w:onClick='saveCommands();'/>
                                 </hbox>
                             </north>
-                            <!--                                <south collapsible="true" splittable="true">-->
-                            <!--                                    <div style="background:#112f37;color:white;">S</div>-->
-                            <!--                                </south>-->
                             <center>
                                 <div>
                                     <panel width="100%" height="@load(commandsVM.commandsManagementSrcPanelHeight)">

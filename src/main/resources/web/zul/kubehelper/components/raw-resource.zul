@@ -1,4 +1,4 @@
-<window id="rawResourceWindowID" viewModel="@id('rawResourceVM') @init('com.kubehelper.viewmodels.RawResourceVM')" title="@load(rawResourceVM.title)"
+<window id="rawResourceWindowID" viewModel="@id('rawResourceVM') @init('com.kubehelper.viewmodels.popups.RawResourceVM')" title="@load(rawResourceVM.title)"
         mode="highlighted" width="1200px" height="@load(rawResourceVM.mainWindowHeight)" position="center,top" closable="true" maximizable="true" action="show: slideDown;hide: slideUp">
     <script>
         function highlightBlock (blockToHighlight) {

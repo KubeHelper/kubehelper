@@ -1,0 +1,13 @@
+<window id="newCommandsWindow" viewModel="@id('newCommandsVM') @init('com.kubehelper.viewmodels.popups.NewCommandsVM')" title="Add New Commands File"
+        mode="highlighted" width="400px" position="center,top" closable="true" action="show: slideDown;hide: slideUp">
+    <vlayout>
+        <hbox width="100%" height="100%" pack="start" align="center">
+            <label value="kubehelper/git/"></label>
+            <textbox hflex="1" value="@bind(newCommandsVM.newCommandsFileName)"/>
+        </hbox>
+        <separator orient="horizontal"/>
+        <hbox width="100%" height="100%" pack="center" align="center">
+            <button id="createBtn" label="Create" iconSclass="fas fa-plus" onClick="@command('createNewCommandsFile')"/>
+        </hbox>
+    </vlayout>
+</window>

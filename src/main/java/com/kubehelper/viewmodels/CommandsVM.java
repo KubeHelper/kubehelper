@@ -34,6 +34,7 @@ import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
 import org.zkoss.bind.annotation.ContextType;
+import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.zk.ui.Component;
@@ -59,12 +60,15 @@ import org.zkoss.zul.Footer;
 import org.zkoss.zul.Groupbox;
 import org.zkoss.zul.Html;
 import org.zkoss.zul.ListModelList;
+import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.Slider;
 import org.zkoss.zul.Tabbox;
 import org.zkoss.zul.Toolbarbutton;
 import org.zkoss.zul.Vbox;
 import org.zkoss.zul.Window;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -118,10 +122,10 @@ public class CommandsVM implements EventListener<Event> {
     private Combobox commandsHistoryRangesCbox;
 
     @Wire
-    private Button pushBtn;
+    private Button saveBtn;
 
     @Wire
-    private Button saveBtn;
+    private Button minusBtn;
 
     @Init
     @NotifyChange("*")
@@ -242,6 +246,7 @@ public class CommandsVM implements EventListener<Event> {
         for (CommandsResult commandeResult : commandsModel.getCommandsResults()) {
             if (commonService.checkEqualsFilter(commandeResult.getGroup(), getFilter().getSelectedGroupFilter()) &&
                     commonService.checkEqualsFilter(commandeResult.getFile(), getFilter().getSelectedFileFilter()) &&
+                    StringUtils.containsIgnoreCase(commandeResult.getName(), getFilter().getName()) &&
                     StringUtils.containsIgnoreCase(commandeResult.getCommand(), getFilter().getCommand()) &&
                     StringUtils.containsIgnoreCase(commandeResult.getDescription(), getFilter().getDescription())) {
                 commandsResults.add(commandeResult);
@@ -398,21 +403,37 @@ public class CommandsVM implements EventListener<Event> {
     }
 
     @Command
-    public void addNewCommandsFile(@BindingParam("commands") String commands) {
-//        commandsService.updateCommands(commandsModel, commands);
-//        if (checkExceptions()) {
-//            Notification.show(String.format("The Commands %s was successfully saved.", commandsModel.getSelectedCommandsSourceLabel()), "info", null, "before_end", 4000);
-//        }
-//        BindUtils.postNotifyChange(this, ".");
+    public void addNewCommandsFileWindow() {
+        Window window = (Window) Executions.createComponents("~./zul/kubehelper/components/new-commands-modal.zul", null, null);
+        window.doModal();
+    }
+
+    @GlobalCommand
+    public void addNewCommandsFile(@BindingParam("newCommandsFilePath") String newCommandsFilePath) {
+        commandsService.addNewCommandsFile(commandsModel, newCommandsFilePath);
+        if (checkExceptions()) {
+            Notification.show(String.format("The Commands %s was successfully created.", newCommandsFilePath), "info", null, "bottom_left", 5000);
+            refreshCommandsManagement();
+        }
     }
 
     @Command
     public void deleteCommandsFile() {
-//        commandsService.updateCommands();
-//        if (checkExceptions()) {
-//            Notification.show(String.format("The Commands %s was successfully saved.", commandsModel.getSelectedCommandsSourceLabel()), "info", null, "before_end", 4000);
-//        }
-//        BindUtils.postNotifyChange(this, ".");
+        Messagebox.show(String.format("Are you sure you want to delete the file %s with commands?", commandsModel.getSelectedSourceFileResult().getFilePath()),
+                "Question", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION,
+                (EventListener) e -> {
+                    if (Messagebox.ON_OK.equals(e.getName())) {
+                        if (Files.deleteIfExists(Paths.get(commandsModel.getSelectedSourceFileResult().getFilePath()))) {
+                            Notification.show(String.format("The Commands file %s was successfully deleted.",
+                                    commandsModel.getSelectedSourceFileResult().getFilePath()), "info", null, "bottom_left", 3000);
+                            refreshCommandsManagement();
+                        } else {
+                            Notification.show(String.format("An error occurred while deleting the file %s.",
+                                    commandsModel.getSelectedSourceFileResult().getFilePath()), "warning", null, "bottom_left", 3000);
+                        }
+                    }
+                }
+        );
     }
 
 
@@ -475,6 +496,18 @@ public class CommandsVM implements EventListener<Event> {
         BindUtils.postNotifyChange(this, ".");
     }
 
+    /**
+     * Refreshes commands sources files and content.
+     */
+    @Command
+    public void refreshCommandsManagement() {
+        commandsModel.setCommandsSources(new HashMap<>());
+        commandsService.prepareCommandsManagement(commandsModel);
+        redrawCommandsToolbarbuttons("commandsSourcesToolbarID", commandsModel.getCommandsSources().keySet(), getCommandToolbarButtonId(commandsModel.getSelectedCommandsSourceLabel()));
+        Notification.show("Commands management state has been updated.", "info", null, "bottom_right", 3000);
+        BindUtils.postNotifyChange(this, ".");
+    }
+
 
     /**
      * Changes font size in commands history output panel.
@@ -519,8 +552,8 @@ public class CommandsVM implements EventListener<Event> {
 
     public void disableEnableMainControlButtons() {
         boolean isDisable = commandsModel.getCommandsSources().get(commandsModel.getSelectedCommandsSourceLabel()).isReadonly();
-        pushBtn.setDisabled(isDisable);
         saveBtn.setDisabled(isDisable);
+        minusBtn.setDisabled(isDisable);
     }
 
     private void refreshHistoryRangeCombobox() {

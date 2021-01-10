@@ -1,0 +1,10 @@
+[Command-Name-One]
+group = "My Group"
+description = "Simple command description"
+command = "kubectl get pods --all-namespaces"
+
+[Command_Name_Two]
+group = "My Group2"
+description = "Simple command description"
+command = """ kubectl get pods -A --field-selector=status.phase=Running
+              | grep -v Complete """

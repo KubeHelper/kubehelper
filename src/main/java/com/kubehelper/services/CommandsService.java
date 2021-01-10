@@ -21,7 +21,6 @@ import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.io.Files;
 import com.kubehelper.common.Resource;
 import com.kubehelper.domain.models.CommandsModel;
-import com.kubehelper.domain.models.ConfigsModel;
 import com.kubehelper.domain.results.CommandsResult;
 import com.kubehelper.domain.results.FileSourceResult;
 import com.moandjiezana.toml.Toml;
@@ -75,6 +74,7 @@ public class CommandsService {
 
     private static Logger logger = LoggerFactory.getLogger(CommandsService.class);
     private String historyEntryTemplate;
+    private String newCommandsTemplate;
 
     private KubernetesClient fabric8Client = new DefaultKubernetesClient();
 
@@ -90,12 +90,16 @@ public class CommandsService {
     @Value("${kubehelper.history.entry.template.src.path}")
     private String historyEntryTemplateSrcPath;
 
+    @Value("${kubehelper.new.commands.template.src.path}")
+    private String newCommandsTemplateSrcPath;
+
     @Autowired
     private CommonService commonService;
 
     @PostConstruct
     private void postConstruct() {
         historyEntryTemplate = commonService.getClasspathResourceAsStringByPath(historyEntryTemplateSrcPath);
+        newCommandsTemplate = commonService.getClasspathResourceAsStringByPath(newCommandsTemplateSrcPath);
     }
 
 
@@ -144,7 +148,7 @@ public class CommandsService {
             for (String filePath : userCommandFiles) {
                 commands.put(Files.getNameWithoutExtension(filePath), new Toml().read(commonService.getResourceAsStringByPath(filePath)));
             }
-        } catch (IOException e) {
+        } catch (IOException | IllegalStateException e) {
             commandsModel.addParseException(e);
             logger.error(e.getMessage(), e);
         }
@@ -343,6 +347,15 @@ public class CommandsService {
         } catch (IOException e) {
             cm.addException(String.format("Commands file %s is not valid. Error ", cm.getSelectedCommandsSourceLabel()) + e.getMessage(), e);
             logger.error(String.format("Commands file %s is not valid. Error ", cm.getSelectedCommandsSourceLabel()) + e.getMessage());
+        }
+    }
+
+    public void addNewCommandsFile(CommandsModel model, String newCommandsFilePath) {
+        try {
+            FileUtils.writeStringToFile(new File(newCommandsFilePath), newCommandsTemplate);
+        } catch (IOException e) {
+            model.addException(String.format("Unable to create commands file %s. Error ", newCommandsFilePath) + e.getMessage(), e);
+            logger.error(String.format("Unable to create commands file %s. Error ", newCommandsFilePath) + e.getMessage());
         }
     }
 
