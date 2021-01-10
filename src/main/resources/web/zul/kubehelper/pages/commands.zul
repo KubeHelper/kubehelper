@@ -81,104 +81,105 @@
 
                         <groupbox id="commandsHotReplacementGrBox">
                             <caption iconSclass="z-icon-terminal" label="Full Command"/>
-                            <hbox style="margin-bottom: 3px" align="center">
-                                <checkbox id="hotReplacementChBox" label="Hot replacement" style="vertical-align: middle;"
-                                          tooltiptext="Enables or disables combo boxes that replace resources in a command on the fly."
-                                          checked="@bind(commandsVM.hotReplacementEnabled)" onCheck="@command(hotReplacementEnabled)"/>
-                                <vlayout>
-                                    <label value="Namespaces:"/>
-                                    <combobox id="commandsNamespacesCBox" model="@load(commandsVM.namespaces)" selectedItem="@bind(commandsVM.selectedNamespace)" readonly="true"
-                                              onSelect="@command('changeResourcesInComboxexDependOnNamespace')">
-                                        <template name="model">
-                                            <comboitem label="@load(each)"/>
-                                        </template>
-                                    </combobox>
-                                </vlayout>
-                                <vlayout>
-                                    <label value="Pods:"/>
-                                    <bandbox readonly="true" iconSclass="z-icon-caret-down" tooltiptext="@load(commandsVM.selectedPods)" disabled="@bind(!commandsVM.hotReplacementEnabled)">
-                                        <bandpopup width="150px">
-                                            <listbox model="@load(commandsVM.namespacedPods)" checkmark="true" multiple="true" style="border: none;font-size: 11px;"
-                                                     selectedItems="@bind(commandsVM.selectedPods)">
-                                            </listbox>
-                                        </bandpopup>
-                                    </bandbox>
-                                </vlayout>
-                                <vlayout>
-                                    <label value="Deployments:"/>
-                                    <bandbox readonly="true" iconSclass="z-icon-caret-down" tooltiptext="@load(commandsVM.selectedDeployments)" disabled="@bind(!commandsVM.hotReplacementEnabled)">
-                                        <bandpopup width="150px">
-                                            <listbox model="@load(commandsVM.namespacedDeployments)" checkmark="true" multiple="true" style="border: none"
-                                                     selectedItems="@bind(commandsVM.selectedDeployments)">
-                                            </listbox>
-                                        </bandpopup>
-                                    </bandbox>
-                                </vlayout>
-                                <vlayout>
-                                    <label value="StatefulSets:"/>
-                                    <bandbox readonly="true" iconSclass="z-icon-caret-down" tooltiptext="@load(commandsVM.selectedStatefulSets)" disabled="@bind(!commandsVM.hotReplacementEnabled)">
-                                        <bandpopup width="150px">
-                                            <listbox model="@load(commandsVM.namespacedStatefulSets)" checkmark="true" multiple="true" style="border: none"
-                                                     selectedItems="@bind(commandsVM.selectedStatefulSets)">
-                                            </listbox>
-                                        </bandpopup>
-                                    </bandbox>
-                                </vlayout>
-                                <vlayout>
-                                    <label value="ReplicaSets:"/>
-                                    <bandbox readonly="true" iconSclass="z-icon-caret-down" tooltiptext="@load(commandsVM.selectedReplicaSets)" disabled="@bind(!commandsVM.hotReplacementEnabled)">
-                                        <bandpopup width="150px">
-                                            <listbox model="@load(commandsVM.namespacedReplicaSets)" checkmark="true" multiple="true" style="border: none"
-                                                     selectedItems="@bind(commandsVM.selectedReplicaSets)">
-                                            </listbox>
-                                        </bandpopup>
-                                    </bandbox>
-                                </vlayout>
-                                <vlayout>
-                                    <label value="DaemonSets:"/>
-                                    <bandbox readonly="true" iconSclass="z-icon-caret-down" tooltiptext="@load(commandsVM.selectedDaemonSets)" disabled="@bind(!commandsVM.hotReplacementEnabled)">
-                                        <bandpopup width="150px">
-                                            <listbox model="@load(commandsVM.namespacedDaemonSets)" checkmark="true" multiple="true" style="border: none"
-                                                     selectedItems="@bind(commandsVM.selectedDaemonSets)">
-                                            </listbox>
-                                        </bandpopup>
-                                    </bandbox>
-                                </vlayout>
-                                <vlayout>
-                                    <label value="ConfigMaps:"/>
-                                    <bandbox readonly="true" iconSclass="z-icon-caret-down" tooltiptext="@load(commandsVM.selectedConfigMaps)" disabled="@bind(!commandsVM.hotReplacementEnabled)">
-                                        <bandpopup width="150px">
-                                            <listbox model="@load(commandsVM.namespacedConfigMaps)" checkmark="true" multiple="true" style="border: none"
-                                                     selectedItems="@bind(commandsVM.selectedConfigMaps)">
-                                            </listbox>
-                                        </bandpopup>
-                                    </bandbox>
-                                </vlayout>
-                                <vlayout>
-                                    <label value="Services:"/>
-                                    <bandbox readonly="true" iconSclass="z-icon-caret-down" tooltiptext="@load(commandsVM.selectedServices)" disabled="@bind(!commandsVM.hotReplacementEnabled)">
-                                        <bandpopup width="150px">
-                                            <listbox model="@load(commandsVM.namespacedServices)" checkmark="true" multiple="true" style="border: none"
-                                                     selectedItems="@bind(commandsVM.selectedServices)">
-                                            </listbox>
-                                        </bandpopup>
-                                    </bandbox>
-                                </vlayout>
-                                <vlayout>
-                                    <label value="Jobs:"/>
-                                    <bandbox readonly="true" iconSclass="z-icon-caret-down" tooltiptext="@load(commandsVM.selectedJobs)" disabled="@bind(!commandsVM.hotReplacementEnabled)">
-                                        <bandpopup width="150px">
-                                            <listbox model="@load(commandsVM.namespacedJobs)" checkmark="true" multiple="true" style="border: none" selectedItems="@bind(commandsVM.selectedJobs)">
-                                            </listbox>
-                                        </bandpopup>
-                                    </bandbox>
-                                </vlayout>
-                            </hbox>
+<!--                            <hbox style="margin-bottom: 3px" align="center">-->
+<!--                                <checkbox id="hotReplacementChBox" label="Hot replacement" style="vertical-align: middle;"-->
+<!--                                          tooltiptext="Enables or disables combo boxes that replace resources in a command on the fly."-->
+<!--                                          checked="@bind(commandsVM.hotReplacementEnabled)" onCheck="@command(hotReplacementEnabled)"/>-->
+<!--                                <vlayout>-->
+<!--                                    <label value="Namespaces:"/>-->
+<!--                                    <combobox id="commandsNamespacesCBox" model="@load(commandsVM.namespaces)" selectedItem="@bind(commandsVM.selectedNamespace)" readonly="true"-->
+<!--                                              onSelect="@command('changeResourcesInComboxexDependOnNamespace')">-->
+<!--                                        <template name="model">-->
+<!--                                            <comboitem label="@load(each)"/>-->
+<!--                                        </template>-->
+<!--                                    </combobox>-->
+<!--                                </vlayout>-->
+<!--                                <vlayout>-->
+<!--                                    <label value="Pods:"/>-->
+<!--                                    <bandbox readonly="true" iconSclass="z-icon-caret-down" tooltiptext="@load(commandsVM.selectedPods)" disabled="@bind(!commandsVM.hotReplacementEnabled)">-->
+<!--                                        <bandpopup width="150px">-->
+<!--                                            <listbox model="@load(commandsVM.namespacedPods)" checkmark="true" multiple="true" style="border: none;font-size: 11px;"-->
+<!--                                                     selectedItems="@bind(commandsVM.selectedPods)">-->
+<!--                                            </listbox>-->
+<!--                                        </bandpopup>-->
+<!--                                    </bandbox>-->
+<!--                                </vlayout>-->
+<!--                                <vlayout>-->
+<!--                                    <label value="Deployments:"/>-->
+<!--                                    <bandbox readonly="true" iconSclass="z-icon-caret-down" tooltiptext="@load(commandsVM.selectedDeployments)" disabled="@bind(!commandsVM.hotReplacementEnabled)">-->
+<!--                                        <bandpopup width="150px">-->
+<!--                                            <listbox model="@load(commandsVM.namespacedDeployments)" checkmark="true" multiple="true" style="border: none"-->
+<!--                                                     selectedItems="@bind(commandsVM.selectedDeployments)">-->
+<!--                                            </listbox>-->
+<!--                                        </bandpopup>-->
+<!--                                    </bandbox>-->
+<!--                                </vlayout>-->
+<!--                                <vlayout>-->
+<!--                                    <label value="StatefulSets:"/>-->
+<!--                                    <bandbox readonly="true" iconSclass="z-icon-caret-down" tooltiptext="@load(commandsVM.selectedStatefulSets)" disabled="@bind(!commandsVM.hotReplacementEnabled)">-->
+<!--                                        <bandpopup width="150px">-->
+<!--                                            <listbox model="@load(commandsVM.namespacedStatefulSets)" checkmark="true" multiple="true" style="border: none"-->
+<!--                                                     selectedItems="@bind(commandsVM.selectedStatefulSets)">-->
+<!--                                            </listbox>-->
+<!--                                        </bandpopup>-->
+<!--                                    </bandbox>-->
+<!--                                </vlayout>-->
+<!--                                <vlayout>-->
+<!--                                    <label value="ReplicaSets:"/>-->
+<!--                                    <bandbox readonly="true" iconSclass="z-icon-caret-down" tooltiptext="@load(commandsVM.selectedReplicaSets)" disabled="@bind(!commandsVM.hotReplacementEnabled)">-->
+<!--                                        <bandpopup width="150px">-->
+<!--                                            <listbox model="@load(commandsVM.namespacedReplicaSets)" checkmark="true" multiple="true" style="border: none"-->
+<!--                                                     selectedItems="@bind(commandsVM.selectedReplicaSets)">-->
+<!--                                            </listbox>-->
+<!--                                        </bandpopup>-->
+<!--                                    </bandbox>-->
+<!--                                </vlayout>-->
+<!--                                <vlayout>-->
+<!--                                    <label value="DaemonSets:"/>-->
+<!--                                    <bandbox readonly="true" iconSclass="z-icon-caret-down" tooltiptext="@load(commandsVM.selectedDaemonSets)" disabled="@bind(!commandsVM.hotReplacementEnabled)">-->
+<!--                                        <bandpopup width="150px">-->
+<!--                                            <listbox model="@load(commandsVM.namespacedDaemonSets)" checkmark="true" multiple="true" style="border: none"-->
+<!--                                                     selectedItems="@bind(commandsVM.selectedDaemonSets)">-->
+<!--                                            </listbox>-->
+<!--                                        </bandpopup>-->
+<!--                                    </bandbox>-->
+<!--                                </vlayout>-->
+<!--                                <vlayout>-->
+<!--                                    <label value="ConfigMaps:"/>-->
+<!--                                    <bandbox readonly="true" iconSclass="z-icon-caret-down" tooltiptext="@load(commandsVM.selectedConfigMaps)" disabled="@bind(!commandsVM.hotReplacementEnabled)">-->
+<!--                                        <bandpopup width="150px">-->
+<!--                                            <listbox model="@load(commandsVM.namespacedConfigMaps)" checkmark="true" multiple="true" style="border: none"-->
+<!--                                                     selectedItems="@bind(commandsVM.selectedConfigMaps)">-->
+<!--                                            </listbox>-->
+<!--                                        </bandpopup>-->
+<!--                                    </bandbox>-->
+<!--                                </vlayout>-->
+<!--                                <vlayout>-->
+<!--                                    <label value="Services:"/>-->
+<!--                                    <bandbox readonly="true" iconSclass="z-icon-caret-down" tooltiptext="@load(commandsVM.selectedServices)" disabled="@bind(!commandsVM.hotReplacementEnabled)">-->
+<!--                                        <bandpopup width="150px">-->
+<!--                                            <listbox model="@load(commandsVM.namespacedServices)" checkmark="true" multiple="true" style="border: none"-->
+<!--                                                     selectedItems="@bind(commandsVM.selectedServices)">-->
+<!--                                            </listbox>-->
+<!--                                        </bandpopup>-->
+<!--                                    </bandbox>-->
+<!--                                </vlayout>-->
+<!--                                <vlayout>-->
+<!--                                    <label value="Jobs:"/>-->
+<!--                                    <bandbox readonly="true" iconSclass="z-icon-caret-down" tooltiptext="@load(commandsVM.selectedJobs)" disabled="@bind(!commandsVM.hotReplacementEnabled)">-->
+<!--                                        <bandpopup width="150px">-->
+<!--                                            <listbox model="@load(commandsVM.namespacedJobs)" checkmark="true" multiple="true" style="border: none" selectedItems="@bind(commandsVM.selectedJobs)">-->
+<!--                                            </listbox>-->
+<!--                                        </bandpopup>-->
+<!--                                    </bandbox>-->
+<!--                                </vlayout>-->
+<!--                            </hbox>-->
                             <hbox width="100%" align="center" pack="stretch" height="@load(commandsVM.fullCommandBoxHeight)">
                                 <cell width="89.5%" align="left">
                                     <textbox id="commandToExecuteTBox" value="@bind(commandsVM.commandToExecuteEditable)" width="100%" rows="3"
-                                             onChange="@command('synchronizeCommandToExecuteAndHotReplacement')"
+                                             onChange="@command('synchronizeCommandToExecute')"
                                              style="font-family: Courier, Monaco, monospace;color: blue;font-size: 13px;line-height: 1.4;margin-bottom: 2px;"/>
+                                    <separator orient="horizontal"></separator>
                                     <textbox value="@bind(commandsVM.commandToExecute)" width="100%"
                                              style="font-family: Courier, Monaco, monospace;color: red;font-size: 12px;" readonly="true"/>
                                 </cell>
@@ -220,7 +221,7 @@
                                     </hbox>
                                 </toolbar>
                                 <panelchildren>
-                                    <div width="100%" height="90%"
+                                    <div width="100%" height="93%"
                                          style="overflow:auto;font-family: Courier, Monaco, monospace;display: flex;line-height: 1.3;border: 1px solid lightgray;padding-left: 5px">
                                         <div id="commandOutputId" width="100%" height="100%" class='highlightComOutput' style="@load(commandsVM.commandsOutputFontSizeCss)">
                                         </div>
@@ -270,7 +271,7 @@
                                     </panel>
                                 </div>
                             </center>
-                            <west title="Commands Sources" collapsible="true" splittable="true" autoscroll="true" size="10%" maxsize="250">
+                            <west title="Commands Sources" collapsible="true" autoscroll="true" size="10%">
                                 <div vflex="1">
                                     <vbox id="commandsSourcesToolbarID">
                                     </vbox>
@@ -309,7 +310,7 @@
                                     </panel>
                                 </div>
                             </center>
-                            <west title="Commands History" collapsible="true" splittable="true" autoscroll="true" size="7%" maxsize="200">
+                            <west title="Commands History" collapsible="true" autoscroll="true" size="10%">
                                 <div vflex="1">
                                     <vbox id="commandsHistoriesToolbarID">
                                     </vbox>

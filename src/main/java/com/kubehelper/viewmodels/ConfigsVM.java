@@ -226,12 +226,12 @@ public class ConfigsVM {
         return config.getGitPassword();
     }
 
-    public boolean isMarkCredentials() {
-        return config.getMarkCredentials();
+    public void setGitEmail(String gitEmail) {
+        config.setGitEmail(gitEmail);
     }
 
-    public void setMarkCredentials(boolean markCredentials) {
-        config.setMarkCredentials(markCredentials);
+    public String getGitEmail() {
+        return config.getGitEmail();
     }
 
 }

@@ -28,6 +28,7 @@ public class CronJobResult {
     private String name = "";
     private String period = "";
     private String command = "";
+    private String shell = "";
     private int runs;
     private String email = "";
     private String description = "";
@@ -94,6 +95,15 @@ public class CronJobResult {
         return this;
     }
 
+    public String getShell() {
+        return shell;
+    }
+
+    public CronJobResult setShell(String shell) {
+        this.shell = shell;
+        return this;
+    }
+
     @Override
     public String toString() {
         return new StringJoiner(", ", CronJobResult.class.getSimpleName() + "[", "]")
@@ -101,6 +111,7 @@ public class CronJobResult {
                 .add("name='" + name + "'")
                 .add("period='" + period + "'")
                 .add("command='" + command + "'")
+                .add("shell='" + shell + "'")
                 .add("runs=" + runs)
                 .add("email='" + email + "'")
                 .add("description='" + description + "'")

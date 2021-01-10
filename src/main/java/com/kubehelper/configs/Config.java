@@ -54,8 +54,7 @@ public class Config {
     public static String GIT_BRANCH = "gitBranch";
     public static String GIT_USERNAME = "gitUsername";
     public static String GIT_PASSWORD = "gitPassword";
-    public static Boolean MARK_CREDENTIALS = true;
-
+    public static String GIT_EMAIL = "gitEmail";
 
     @Bean
     public CacheManager cacheManager() {
@@ -68,10 +67,9 @@ public class Config {
         return cacheManager;
     }
 
-    @PostConstruct
-    public void initCache() {
-        cacheManager.getCache(CONFIGS_CACHE).put(MARK_CREDENTIALS, true);
-    }
+//    @PostConstruct
+//    public void initCache() {
+//    }
 
     public void setGitUrl(String gitUrl) {
         cacheManager.getCache(CONFIGS_CACHE).put(GIT_URL, gitUrl);
@@ -100,13 +98,13 @@ public class Config {
         return Objects.isNull(value) ? "" : (String) value.get();
     }
 
-    public Boolean getMarkCredentials() {
-        Cache.ValueWrapper value = cacheManager.getCache(CONFIGS_CACHE).get(MARK_CREDENTIALS);
-        return Objects.isNull(value) ? false : (Boolean) value.get();
+    public void setGitEmail(String gitEmail) {
+        cacheManager.getCache(CONFIGS_CACHE).put(GIT_EMAIL, gitEmail);
     }
 
-    public void setMarkCredentials(Boolean markCredentials) {
-        cacheManager.getCache(CONFIGS_CACHE).put(MARK_CREDENTIALS, markCredentials);
+    public String getGitEmail() {
+        Cache.ValueWrapper value = cacheManager.getCache(CONFIGS_CACHE).get(GIT_EMAIL);
+        return Objects.isNull(value) ? "" : (String) value.get();
     }
 
 

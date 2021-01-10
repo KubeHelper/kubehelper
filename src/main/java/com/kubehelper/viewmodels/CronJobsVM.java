@@ -125,7 +125,7 @@ public class CronJobsVM implements EventListener<Event> {
         Selectors.wireEventListeners(view, this);
     }
 
-    @Listen("onAfterSize=#centerLayoutIpsAndPortsID")
+    @Listen("onAfterSize=#centerLayoutCronJobsID")
     public void onAfterSizeCenter(AfterSizeEvent event) {
         centerLayoutHeight = event.getHeight() - 3;
         BindUtils.postNotifyChange(null, null, this, ".");
@@ -263,6 +263,18 @@ public class CronJobsVM implements EventListener<Event> {
         }
     }
 
+    /**
+     * Synchronizes command to execute and hot replacement on full command textbox onChange event.
+     */
+    @Command
+    public void synchronizeCommandToExecute() {
+//        cronJobsModel.setCommandToExecute(getCommandWithoutUnnecessaryWhitespaces(commandsModel.getCommandToExecuteEditable()));
+//        if (isHotReplacementEnabled()) {
+//            commandsService.commandHotReplacement(commandsModel);
+//        }
+        BindUtils.postNotifyChange(this, "commandToExecute", "commandToExecuteEditable");
+    }
+
 
     /**
      * Shows full command by clicking on grid item.
@@ -347,15 +359,15 @@ public class CronJobsVM implements EventListener<Event> {
     }
 
     public String getCommandsGridHeight() {
-        return centerLayoutHeight * 0.38 + "px";
+        return centerLayoutHeight * 0.3 + "px";
     }
 
-    public String getFullCommandBoxHeight() {
-        return centerLayoutHeight * 0.07 + "px";
+    public String getCronJobBoxHeight() {
+        return centerLayoutHeight * 0.1 + "px";
     }
 
     public String getCronJobsListHeight() {
-        return centerLayoutHeight * 0.43 + "px";
+        return centerLayoutHeight * 0.485 + "px";
     }
 
     public String getCommandToExecuteEditable() {

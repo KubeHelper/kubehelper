@@ -149,7 +149,7 @@ public class CommandsVM implements EventListener<Event> {
     @Listen("onAfterSize=#centerLayoutCommandsID")
     public void onAfterSizeCenter(AfterSizeEvent event) {
         centerLayoutHeight = event.getHeight() - 3;
-        BindUtils.postNotifyChange(null, null, this, ".");
+        BindUtils.postNotifyChange(this, ".");
     }
 
     /**
@@ -272,12 +272,11 @@ public class CommandsVM implements EventListener<Event> {
      * Synchronizes command to execute and hot replacement on full command textbox onChange event.
      */
     @Command
-    public void synchronizeCommandToExecuteAndHotReplacement() {
+    public void synchronizeCommandToExecute() {
         commandsModel.setCommandToExecute(getCommandWithoutUnnecessaryWhitespaces(commandsModel.getCommandToExecuteEditable()));
-        if (isHotReplacementEnabled()) {
-            //TODO
+//        if (isHotReplacementEnabled()) {
 //            commandsService.commandHotReplacement(commandsModel);
-        }
+//        }
         BindUtils.postNotifyChange(this, "commandToExecute", "commandToExecuteEditable");
     }
 
@@ -297,12 +296,12 @@ public class CommandsVM implements EventListener<Event> {
     /**
      * Changes resources in comboxex depend on namespace in commands window.
      */
-    @Command
-    public void changeResourcesInComboxexDependOnNamespace() {
-        commandsService.fetchResourcesDependsOnNamespace(commandsModel);
-        BindUtils.postNotifyChange(this, "namespacedPods", "namespacedDeployments", "namespacedStatefulSets", "namespacedReplicaSets", "namespacedDaemonSets", "namespacedConfigMaps", "namespacedServices", "namespacedJobs");
-        Notification.show(String.format("New resources for %s namespace, successfully fetched.", commandsModel.getSelectedNamespace()), "info", commandOutputGrBox, "bottom_right", 2000);
-    }
+//    @Command
+//    public void changeResourcesInComboxexDependOnNamespace() {
+//        commandsService.fetchResourcesDependsOnNamespace(commandsModel);
+//        BindUtils.postNotifyChange(this, "namespacedPods", "namespacedDeployments", "namespacedStatefulSets", "namespacedReplicaSets", "namespacedDaemonSets", "namespacedConfigMaps", "namespacedServices", "namespacedJobs");
+//        Notification.show(String.format("New resources for %s namespace, successfully fetched.", commandsModel.getSelectedNamespace()), "info", commandOutputGrBox, "bottom_right", 2000);
+//    }
 
     /**
      * Shows popup window with executed command output.
@@ -636,15 +635,15 @@ public class CommandsVM implements EventListener<Event> {
     }
 
     public String getCommandsGridHeight() {
-        return centerLayoutHeight * 0.38 + "px";
+        return centerLayoutHeight * 0.35 + "px";
     }
 
     public String getFullCommandBoxHeight() {
-        return centerLayoutHeight * 0.07 + "px";
+        return centerLayoutHeight * 0.05 + "px";
     }
 
     public String getCommandOutputHeight() {
-        return centerLayoutHeight * 0.43 + "px";
+        return centerLayoutHeight * 0.515 + "px";
     }
 
     public String getExecutedCommandOutput() {

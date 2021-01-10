@@ -240,20 +240,11 @@ public class CommandsService {
 
 
     public void commandHotReplacement(CommandsModel commandsModel) {
-        CommandLineParser parser = new DefaultParser();
-        Options options = new Options();
-        Option option = new Option("pods", "test");
-        Option option1 = new Option("n", "test1");
-        options.addOption(option);
-        options.addOption(option1);
-//        commandsModel.setCommandToExecute(commandsModel.getEditableCommandToExecute());
         String command = commandsModel.getCommandToExecute().trim().toLowerCase(Locale.ROOT);
-        CommandLine parse = null;
-        try {
-            parse = parser.parse(options, command.split(" "));
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+
+        String join = String.join(" ", commandsModel.getSelectedPods());
+        String fixedInput1 = command.replaceAll(" (pods|pod|po) .* ", " get pods " + join);
+
         if (StringUtils.startsWithAny(command, "kubectl get", "kubectl exec")) {
             Resource resource = detectResourceFromCommand(command);
 
@@ -265,6 +256,7 @@ public class CommandsService {
 
         int i = StringUtils.lastIndexOfAny(command, "get", "exec");
         String resourceAsString = command.substring(i, command.indexOf(" ", i));
+
         if (StringUtils.isNotBlank(resourceAsString)) {
             switch (resourceAsString) {
                 case "po", "pod", "pods" -> resource = Resource.POD; //commandsModel.getselectedPods()

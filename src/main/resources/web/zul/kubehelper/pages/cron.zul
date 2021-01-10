@@ -75,106 +75,126 @@
                         </grid>
 
                         <groupbox id="commandsHotReplacementGrBox">
-                            <caption iconSclass="z-icon-terminal" label="Full Command"/>
-                            <hbox style="margin-bottom: 3px" align="center">
-                                <checkbox id="hotReplacementChBox" label="Hot replacement" style="vertical-align: middle;"
-                                          tooltiptext="Enables or disables combo boxes that replace resources in a command on the fly."
-                                          checked="@bind(cronJobsVM.hotReplacementEnabled)" onCheck="@command(hotReplacementEnabled)"/>
-                                <vlayout>
-                                    <label value="Namespaces:"/>
-                                    <combobox id="commandsNamespacesCBox" model="@load(cronJobsVM.namespaces)" selectedItem="@bind(cronJobsVM.selectedNamespace)" readonly="true"
-                                              onSelect="@command('changeResourcesInComboxexDependOnNamespace')">
-                                        <template name="model">
-                                            <comboitem label="@load(each)"/>
-                                        </template>
-                                    </combobox>
-                                </vlayout>
-                                <vlayout>
-                                    <label value="Pods:"/>
-                                    <bandbox readonly="true" iconSclass="z-icon-caret-down" tooltiptext="@load(cronJobsVM.selectedPods)" disabled="@bind(!cronJobsVM.hotReplacementEnabled)">
-                                        <bandpopup width="150px">
-                                            <listbox model="@load(cronJobsVM.namespacedPods)" checkmark="true" multiple="true" style="border: none;font-size: 11px;"
-                                                     selectedItems="@bind(cronJobsVM.selectedPods)">
-                                            </listbox>
-                                        </bandpopup>
-                                    </bandbox>
-                                </vlayout>
-                                <vlayout>
-                                    <label value="Deployments:"/>
-                                    <bandbox readonly="true" iconSclass="z-icon-caret-down" tooltiptext="@load(cronJobsVM.selectedDeployments)" disabled="@bind(!cronJobsVM.hotReplacementEnabled)">
-                                        <bandpopup width="150px">
-                                            <listbox model="@load(cronJobsVM.namespacedDeployments)" checkmark="true" multiple="true" style="border: none"
-                                                     selectedItems="@bind(cronJobsVM.selectedDeployments)">
-                                            </listbox>
-                                        </bandpopup>
-                                    </bandbox>
-                                </vlayout>
-                                <vlayout>
-                                    <label value="StatefulSets:"/>
-                                    <bandbox readonly="true" iconSclass="z-icon-caret-down" tooltiptext="@load(cronJobsVM.selectedStatefulSets)" disabled="@bind(!cronJobsVM.hotReplacementEnabled)">
-                                        <bandpopup width="150px">
-                                            <listbox model="@load(cronJobsVM.namespacedStatefulSets)" checkmark="true" multiple="true" style="border: none"
-                                                     selectedItems="@bind(cronJobsVM.selectedStatefulSets)">
-                                            </listbox>
-                                        </bandpopup>
-                                    </bandbox>
-                                </vlayout>
-                                <vlayout>
-                                    <label value="ReplicaSets:"/>
-                                    <bandbox readonly="true" iconSclass="z-icon-caret-down" tooltiptext="@load(cronJobsVM.selectedReplicaSets)" disabled="@bind(!cronJobsVM.hotReplacementEnabled)">
-                                        <bandpopup width="150px">
-                                            <listbox model="@load(cronJobsVM.namespacedReplicaSets)" checkmark="true" multiple="true" style="border: none"
-                                                     selectedItems="@bind(cronJobsVM.selectedReplicaSets)">
-                                            </listbox>
-                                        </bandpopup>
-                                    </bandbox>
-                                </vlayout>
-                                <vlayout>
-                                    <label value="DaemonSets:"/>
-                                    <bandbox readonly="true" iconSclass="z-icon-caret-down" tooltiptext="@load(cronJobsVM.selectedDaemonSets)" disabled="@bind(!cronJobsVM.hotReplacementEnabled)">
-                                        <bandpopup width="150px">
-                                            <listbox model="@load(cronJobsVM.namespacedDaemonSets)" checkmark="true" multiple="true" style="border: none"
-                                                     selectedItems="@bind(cronJobsVM.selectedDaemonSets)">
-                                            </listbox>
-                                        </bandpopup>
-                                    </bandbox>
-                                </vlayout>
-                                <vlayout>
-                                    <label value="ConfigMaps:"/>
-                                    <bandbox readonly="true" iconSclass="z-icon-caret-down" tooltiptext="@load(cronJobsVM.selectedConfigMaps)" disabled="@bind(!cronJobsVM.hotReplacementEnabled)">
-                                        <bandpopup width="150px">
-                                            <listbox model="@load(cronJobsVM.namespacedConfigMaps)" checkmark="true" multiple="true" style="border: none"
-                                                     selectedItems="@bind(cronJobsVM.selectedConfigMaps)">
-                                            </listbox>
-                                        </bandpopup>
-                                    </bandbox>
-                                </vlayout>
-                                <vlayout>
-                                    <label value="Services:"/>
-                                    <bandbox readonly="true" iconSclass="z-icon-caret-down" tooltiptext="@load(cronJobsVM.selectedServices)" disabled="@bind(!cronJobsVM.hotReplacementEnabled)">
-                                        <bandpopup width="150px">
-                                            <listbox model="@load(cronJobsVM.namespacedServices)" checkmark="true" multiple="true" style="border: none"
-                                                     selectedItems="@bind(cronJobsVM.selectedServices)">
-                                            </listbox>
-                                        </bandpopup>
-                                    </bandbox>
-                                </vlayout>
-                                <vlayout>
-                                    <label value="Jobs:"/>
-                                    <bandbox readonly="true" iconSclass="z-icon-caret-down" tooltiptext="@load(cronJobsVM.selectedJobs)" disabled="@bind(!cronJobsVM.hotReplacementEnabled)">
-                                        <bandpopup width="150px">
-                                            <listbox model="@load(cronJobsVM.namespacedJobs)" checkmark="true" multiple="true" style="border: none" selectedItems="@bind(cronJobsVM.selectedJobs)">
-                                            </listbox>
-                                        </bandpopup>
-                                    </bandbox>
-                                </vlayout>
-                            </hbox>
-                            <hbox width="100%" align="center" pack="stretch" height="@load(cronJobsVM.fullCommandBoxHeight)">
+                            <caption iconSclass="z-icon-terminal" label="Cron Job"/>
+<!--                            <hbox style="margin-bottom: 3px" align="center">-->
+<!--                                <checkbox id="hotReplacementChBox" label="Hot replacement" style="vertical-align: middle;"-->
+<!--                                          tooltiptext="Enables or disables combo boxes that replace resources in a command on the fly."-->
+<!--                                          checked="@bind(cronJobsVM.hotReplacementEnabled)" onCheck="@command(hotReplacementEnabled)"/>-->
+<!--                                <vlayout>-->
+<!--                                    <label value="Namespaces:"/>-->
+<!--                                    <combobox id="commandsNamespacesCBox" model="@load(cronJobsVM.namespaces)" selectedItem="@bind(cronJobsVM.selectedNamespace)" readonly="true"-->
+<!--                                              onSelect="@command('changeResourcesInComboxexDependOnNamespace')">-->
+<!--                                        <template name="model">-->
+<!--                                            <comboitem label="@load(each)"/>-->
+<!--                                        </template>-->
+<!--                                    </combobox>-->
+<!--                                </vlayout>-->
+<!--                                <vlayout>-->
+<!--                                    <label value="Pods:"/>-->
+<!--                                    <bandbox readonly="true" iconSclass="z-icon-caret-down" tooltiptext="@load(cronJobsVM.selectedPods)" disabled="@bind(!cronJobsVM.hotReplacementEnabled)">-->
+<!--                                        <bandpopup width="150px">-->
+<!--                                            <listbox model="@load(cronJobsVM.namespacedPods)" checkmark="true" multiple="true" style="border: none;font-size: 11px;"-->
+<!--                                                     selectedItems="@bind(cronJobsVM.selectedPods)">-->
+<!--                                            </listbox>-->
+<!--                                        </bandpopup>-->
+<!--                                    </bandbox>-->
+<!--                                </vlayout>-->
+<!--                                <vlayout>-->
+<!--                                    <label value="Deployments:"/>-->
+<!--                                    <bandbox readonly="true" iconSclass="z-icon-caret-down" tooltiptext="@load(cronJobsVM.selectedDeployments)" disabled="@bind(!cronJobsVM.hotReplacementEnabled)">-->
+<!--                                        <bandpopup width="150px">-->
+<!--                                            <listbox model="@load(cronJobsVM.namespacedDeployments)" checkmark="true" multiple="true" style="border: none"-->
+<!--                                                     selectedItems="@bind(cronJobsVM.selectedDeployments)">-->
+<!--                                            </listbox>-->
+<!--                                        </bandpopup>-->
+<!--                                    </bandbox>-->
+<!--                                </vlayout>-->
+<!--                                <vlayout>-->
+<!--                                    <label value="StatefulSets:"/>-->
+<!--                                    <bandbox readonly="true" iconSclass="z-icon-caret-down" tooltiptext="@load(cronJobsVM.selectedStatefulSets)" disabled="@bind(!cronJobsVM.hotReplacementEnabled)">-->
+<!--                                        <bandpopup width="150px">-->
+<!--                                            <listbox model="@load(cronJobsVM.namespacedStatefulSets)" checkmark="true" multiple="true" style="border: none"-->
+<!--                                                     selectedItems="@bind(cronJobsVM.selectedStatefulSets)">-->
+<!--                                            </listbox>-->
+<!--                                        </bandpopup>-->
+<!--                                    </bandbox>-->
+<!--                                </vlayout>-->
+<!--                                <vlayout>-->
+<!--                                    <label value="ReplicaSets:"/>-->
+<!--                                    <bandbox readonly="true" iconSclass="z-icon-caret-down" tooltiptext="@load(cronJobsVM.selectedReplicaSets)" disabled="@bind(!cronJobsVM.hotReplacementEnabled)">-->
+<!--                                        <bandpopup width="150px">-->
+<!--                                            <listbox model="@load(cronJobsVM.namespacedReplicaSets)" checkmark="true" multiple="true" style="border: none"-->
+<!--                                                     selectedItems="@bind(cronJobsVM.selectedReplicaSets)">-->
+<!--                                            </listbox>-->
+<!--                                        </bandpopup>-->
+<!--                                    </bandbox>-->
+<!--                                </vlayout>-->
+<!--                                <vlayout>-->
+<!--                                    <label value="DaemonSets:"/>-->
+<!--                                    <bandbox readonly="true" iconSclass="z-icon-caret-down" tooltiptext="@load(cronJobsVM.selectedDaemonSets)" disabled="@bind(!cronJobsVM.hotReplacementEnabled)">-->
+<!--                                        <bandpopup width="150px">-->
+<!--                                            <listbox model="@load(cronJobsVM.namespacedDaemonSets)" checkmark="true" multiple="true" style="border: none"-->
+<!--                                                     selectedItems="@bind(cronJobsVM.selectedDaemonSets)">-->
+<!--                                            </listbox>-->
+<!--                                        </bandpopup>-->
+<!--                                    </bandbox>-->
+<!--                                </vlayout>-->
+<!--                                <vlayout>-->
+<!--                                    <label value="ConfigMaps:"/>-->
+<!--                                    <bandbox readonly="true" iconSclass="z-icon-caret-down" tooltiptext="@load(cronJobsVM.selectedConfigMaps)" disabled="@bind(!cronJobsVM.hotReplacementEnabled)">-->
+<!--                                        <bandpopup width="150px">-->
+<!--                                            <listbox model="@load(cronJobsVM.namespacedConfigMaps)" checkmark="true" multiple="true" style="border: none"-->
+<!--                                                     selectedItems="@bind(cronJobsVM.selectedConfigMaps)">-->
+<!--                                            </listbox>-->
+<!--                                        </bandpopup>-->
+<!--                                    </bandbox>-->
+<!--                                </vlayout>-->
+<!--                                <vlayout>-->
+<!--                                    <label value="Services:"/>-->
+<!--                                    <bandbox readonly="true" iconSclass="z-icon-caret-down" tooltiptext="@load(cronJobsVM.selectedServices)" disabled="@bind(!cronJobsVM.hotReplacementEnabled)">-->
+<!--                                        <bandpopup width="150px">-->
+<!--                                            <listbox model="@load(cronJobsVM.namespacedServices)" checkmark="true" multiple="true" style="border: none"-->
+<!--                                                     selectedItems="@bind(cronJobsVM.selectedServices)">-->
+<!--                                            </listbox>-->
+<!--                                        </bandpopup>-->
+<!--                                    </bandbox>-->
+<!--                                </vlayout>-->
+<!--                                <vlayout>-->
+<!--                                    <label value="Jobs:"/>-->
+<!--                                    <bandbox readonly="true" iconSclass="z-icon-caret-down" tooltiptext="@load(cronJobsVM.selectedJobs)" disabled="@bind(!cronJobsVM.hotReplacementEnabled)">-->
+<!--                                        <bandpopup width="150px">-->
+<!--                                            <listbox model="@load(cronJobsVM.namespacedJobs)" checkmark="true" multiple="true" style="border: none" selectedItems="@bind(cronJobsVM.selectedJobs)">-->
+<!--                                            </listbox>-->
+<!--                                        </bandpopup>-->
+<!--                                    </bandbox>-->
+<!--                                </vlayout>-->
+<!--                            </hbox>-->
+                            <hbox width="100%" align="center" pack="stretch" height="@load(cronJobsVM.cronJobBoxHeight)">
                                 <cell width="89.5%" align="left">
+                                    <hbox width="100%" align="center" pack="stretch">
+                                        <cell width="50%" align="center">
+                                               <vbox hflex="1" pack="stretch">
+                                                   <textbox value="@bind(cronJobsVM.commandToExecute)" width="100%" placeholder="*Cron Job Name"
+                                                            style="font-family: Courier, Monaco, monospace;color: red;font-size: 12px;"/>
+                                                   <textbox value="@bind(cronJobsVM.commandToExecute)" width="100%" placeholder="*Cron Expression. Example: '0 0 8-10 * * *' "
+                                                            style="font-family: Courier, Monaco, monospace;color: red;font-size: 12px;"/>
+                                                   <textbox value="@bind(cronJobsVM.commandToExecute)" width="100%" placeholder="Email for send cron job reports"
+                                                            style="font-family: Courier, Monaco, monospace;color: red;font-size: 12px;"/>
+                                               </vbox>
+                                        </cell>
+                                        <separator orient="vertical"></separator>
+                                        <cell width="50%" align="left">
+                                            <textbox value="@bind(cronJobsVM.commandToExecuteEditable)" width="100%" rows="4"
+                                                     onChange="@command('synchronizeCommandToExecute')" placeholder="Cron Job description"
+                                                     style="font-family: Courier, Monaco, monospace;color: blue;font-size: 13px;line-height: 1.4;margin-bottom: 2px;"/>
+                                        </cell>
+                                    </hbox>
+                                    <separator orient="horizontal"></separator>
                                     <textbox id="commandToExecuteTBox" value="@bind(cronJobsVM.commandToExecuteEditable)" width="100%" rows="3"
-                                             onChange="@command('synchronizeCommandToExecuteAndHotReplacement')"
+                                             onChange="@command('synchronizeCommandToExecute')" placeholder="*Command to execute"
                                              style="font-family: Courier, Monaco, monospace;color: blue;font-size: 13px;line-height: 1.4;margin-bottom: 2px;"/>
-                                    <textbox value="@bind(cronJobsVM.commandToExecute)" width="100%"
+                                    <separator orient="horizontal"></separator>
+                                    <textbox value="@bind(cronJobsVM.commandToExecute)" width="100%" placeholder="Command to execute one line"
                                              style="font-family: Courier, Monaco, monospace;color: red;font-size: 12px;" readonly="true"/>
                                 </cell>
                                 <cell width="10%" valign="middle">
@@ -202,6 +222,7 @@
                                             <listheader label="Name" hflex="1" sort="auto(name)"/>
                                             <listheader label="Cron Period" hflex="2" sort="auto(period)"/>
                                             <listheader label="Command" hflex="4" sort="auto(command)"/>
+                                            <listheader label="Shell" hflex="min" sort="auto(shell)"/>
                                             <listheader label="Runs" hflex="min" sort="auto(runs)"/>
                                             <listheader label="Email" hflex="1" sort="auto(email)"/>
                                             <listheader label="Description" hflex="4" sort="auto(description)"/>
@@ -216,6 +237,9 @@
                                                 </listcell>
                                                 <listcell>
                                                     <label value="${cron.command}" style="cursor: auto;"/>
+                                                </listcell>
+                                                <listcell>
+                                                    <label value="${cron.shell}" style="cursor: auto;"/>
                                                 </listcell>
                                                 <listcell>
                                                     <label value="${cron.runs}" style="cursor: auto;"/>
