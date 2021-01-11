@@ -26,7 +26,6 @@ import org.springframework.cache.support.SimpleCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import javax.annotation.PostConstruct;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -105,16 +104,6 @@ public class Config {
     public String getGitEmail() {
         Cache.ValueWrapper value = cacheManager.getCache(CONFIGS_CACHE).get(GIT_EMAIL);
         return Objects.isNull(value) ? "" : (String) value.get();
-    }
-
-
-    public Boolean getCommandsHotReplacement() {
-        Cache.ValueWrapper value = cacheManager.getCache(CONFIGS_CACHE).get(COMMANDS_HOT_REPLACEMENT);
-        return Objects.isNull(value) ? false : (Boolean) value.get();
-    }
-
-    public void setCommandsHotReplacement(Boolean hotReplacement) {
-        cacheManager.getCache(CONFIGS_CACHE).put(COMMANDS_HOT_REPLACEMENT, hotReplacement);
     }
 
     public String getGitBranch() {

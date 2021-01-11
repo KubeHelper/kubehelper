@@ -28,7 +28,9 @@ import io.kubernetes.client.openapi.apis.RbacAuthorizationV1beta1Api;
 import io.kubernetes.client.util.Config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
 import java.io.IOException;
 
 /**
@@ -78,9 +80,16 @@ public class CustomConfig {
     }
 
     @Bean
-    public BCryptPasswordEncoder passwordEncoder(){
+    public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    @Bean
+    public ThreadPoolTaskScheduler threadPoolTaskScheduler() {
+        ThreadPoolTaskScheduler threadPoolTaskScheduler = new ThreadPoolTaskScheduler();
+        threadPoolTaskScheduler.setPoolSize(1000);
+        threadPoolTaskScheduler.setThreadNamePrefix("kubeHelperTask");
+        return threadPoolTaskScheduler;
+    }
 
 }

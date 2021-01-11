@@ -778,14 +778,6 @@ public class CommandsVM implements EventListener<Event> {
         return commandsModel.getShells();
     }
 
-    public boolean isHotReplacementEnabled() {
-        return config.getCommandsHotReplacement();
-    }
-
-    public void setHotReplacementEnabled(boolean hotReplacement) {
-        config.setCommandsHotReplacement(hotReplacement);
-    }
-
 
     //  COMMANDS MANAGEMENT GETTERS AND SETTERS ================
 

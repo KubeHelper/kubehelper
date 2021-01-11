@@ -19,9 +19,9 @@ package com.kubehelper.services;
 
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.io.Files;
-import com.kubehelper.domain.models.CommandsModel;
 import com.kubehelper.domain.models.CronJobsModel;
 import com.kubehelper.domain.results.CommandsResult;
+import com.kubehelper.domain.results.CronJobResult;
 import com.kubehelper.domain.results.FileSourceResult;
 import com.moandjiezana.toml.Toml;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
@@ -38,11 +38,10 @@ import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalAdjusters;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -50,6 +49,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.stream.Collectors;
 
 /**
@@ -72,26 +73,32 @@ public class CronJobsService {
     @Value("${kubehelper.cron.jobs.reports.path}")
     private String cronJobsHistoryPath;
 
-    @Value("${kubehelper.history.entry.template.src.path}")
-    private String historyEntryTemplateSrcPath;
-
     @Autowired
     private CommonService commonService;
 
+    @Autowired
+    private SchedulerService schedulerService;
+
+
     @PostConstruct
     private void postConstruct() {
-        reportEntryTemplate = commonService.getClasspathResourceAsStringByPath(historyEntryTemplateSrcPath);
     }
 
     /**
      * Executes command and writes output to history file.
-     *
-     * @param cronJobsModel - commands model.
      */
-    public void startCronJob(CronJobsModel cronJobsModel) {
-        String commandOutput = commonService.executeCommand(cronJobsModel.getSelectedShell(), cronJobsModel.getCommandToExecute());
-        cronJobsModel.setExecutedCommandOutput(commandOutput);
-        writeCommandExecutionToHistory(cronJobsModel);
+    public void startCronJob(CronJobResult job) {
+        job.buildReportsFolderPath(cronJobsHistoryPath);
+//        TODO check if folder already exists then return exception
+
+        schedulerService.startCronJob(job);
+    }
+
+    public List<CronJobResult> getActiveCronJobs() {
+        ScheduledThreadPoolExecutor xService = (ScheduledThreadPoolExecutor) schedulerService.getThreadPoolTaskScheduler().getScheduledExecutor();
+
+        BlockingQueue<Runnable> queue = xService.getQueue();
+        return new ArrayList<>();
     }
 
     /**
@@ -188,30 +195,6 @@ public class CronJobsService {
                 }
             }
         }
-    }
-
-    /**
-     * Fehches resources(resource names) depends on namespace for commands hot replacement comboboxes.
-     *
-     * @param model - commands model
-     */
-    public void fetchResourcesDependsOnNamespace(CronJobsModel model) {
-        model.setNamespacedPods(fabric8Client.pods().inNamespace(model.getSelectedNamespace())
-                .list().getItems().stream().map(item -> item.getMetadata().getName()).collect(Collectors.toSet()));
-        model.setNamespacedDeployments(fabric8Client.apps().deployments().inNamespace(model.getSelectedNamespace())
-                .list().getItems().stream().map(item -> item.getMetadata().getName()).collect(Collectors.toSet()));
-        model.setNamespacedStatefulSets(fabric8Client.apps().statefulSets().inNamespace(model.getSelectedNamespace())
-                .list().getItems().stream().map(item -> item.getMetadata().getName()).collect(Collectors.toSet()));
-        model.setNamespacedReplicaSets(fabric8Client.apps().replicaSets().inNamespace(model.getSelectedNamespace())
-                .list().getItems().stream().map(item -> item.getMetadata().getName()).collect(Collectors.toSet()));
-        model.setNamespacedDaemonSets(fabric8Client.apps().daemonSets().inNamespace(model.getSelectedNamespace())
-                .list().getItems().stream().map(item -> item.getMetadata().getName()).collect(Collectors.toSet()));
-        model.setNamespacedConfigMaps(fabric8Client.configMaps().inNamespace(model.getSelectedNamespace())
-                .list().getItems().stream().map(item -> item.getMetadata().getName()).collect(Collectors.toSet()));
-        model.setNamespacedServices(fabric8Client.services().inNamespace(model.getSelectedNamespace())
-                .list().getItems().stream().map(item -> item.getMetadata().getName()).collect(Collectors.toSet()));
-        model.setNamespacedJobs(fabric8Client.batch().jobs().inNamespace(model.getSelectedNamespace())
-                .list().getItems().stream().map(item -> item.getMetadata().getName()).collect(Collectors.toSet()));
     }
 
 

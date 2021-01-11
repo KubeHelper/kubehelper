@@ -26,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
@@ -52,6 +53,12 @@ public class ConfigsService {
 
     @Autowired
     private CommonService commonService;
+
+    @PostConstruct
+    private void postConstruct() {
+//        reportEntryTemplate = commonService.getClasspathResourceAsStringByPath(historyEntryTemplateSrcPath);
+    }
+
 
     /**
      * Checks, creates and search for config.

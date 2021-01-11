@@ -52,7 +52,6 @@ import org.zkoss.zk.ui.util.Notification;
 import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Div;
 import org.zkoss.zul.Footer;
-import org.zkoss.zul.Groupbox;
 import org.zkoss.zul.Html;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Tabbox;
@@ -63,7 +62,6 @@ import org.zkoss.zul.Window;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -82,8 +80,6 @@ public class CronJobsVM implements EventListener<Event> {
 
     private String activeTab = "cronJobs";
 
-    private CronJobsModel cronsModel;
-
     @WireVariable
     private CronJobsService cronJobsService;
 
@@ -101,7 +97,7 @@ public class CronJobsVM implements EventListener<Event> {
 
     private boolean wordWrapCommandsInReport;
 
-    private CronJobsModel cronJobsModel;
+    private CronJobsModel model;
 
     private ListModelList<CommandsResult> commandsResults = new ListModelList<>();
     private ListModelList<CronJobResult> activeCronJobs = new ListModelList<>();
@@ -109,13 +105,14 @@ public class CronJobsVM implements EventListener<Event> {
     @Wire
     private Footer commandsGridFooter;
 
-    @Wire
-    private Groupbox commandOutputGrBox;
-
+    private String cronJobName = "";
+    private String cronJobExpression = "";
+    private String cronJobEmail = "";
+    private String cronJobDescription = "";
 
     @Init
     public void init() {
-        cronJobsModel = new CronJobsModel();
+        model = new CronJobsModel();
         onInitPreparations();
     }
 
@@ -133,7 +130,25 @@ public class CronJobsVM implements EventListener<Event> {
 
     @Command
     public void startCronJob() {
-        cronJobsService.startCronJob(cronJobsModel);
+        if (StringUtils.isAnyBlank(cronJobName, cronJobExpression, model.getCommandToExecute())) {
+            Notification.show("Can't start cron job. Name, expression and command are required fields.", "error", null, "bottom_left", 5000);
+            return;
+        }
+        CronJobResult cronJobResult = new CronJobResult(1)
+                .setName(cronJobName)
+                .setCommand(model.getCommandToExecute())
+                .setExpression("*/20 * * * * *")
+//                .setPeriod(cronJobExpression)
+                .setDescription(cronJobDescription)
+                .setEmail(cronJobEmail)
+                .setShell("bash");
+        cronJobsService.startCronJob(cronJobResult);
+    }
+
+    @Command
+    public void activeCronJobsTest() {
+        cronJobsService.getActiveCronJobs();
+
     }
 
     /**
@@ -141,12 +156,10 @@ public class CronJobsVM implements EventListener<Event> {
      * Parse predefined and user commands an pull namespaces.
      */
     private void onInitPreparations() {
-        cronJobsService.parsePredefinedCommands(cronJobsModel);
-        cronJobsService.parseUserCommands(cronJobsModel);
-        commandsResults = new ListModelList<>(cronJobsModel.getCommandsResults());
-        activeCronJobs = new ListModelList<>(cronJobsModel.getCronJobsResults());
-        cronJobsModel.setNamespaces(cronJobsModel.getNamespaces().isEmpty() ? Set.copyOf(commonService.getAllNamespacesWithoutAll()) : cronJobsModel.getNamespaces());
-        logger.info("Found {} namespaces.", cronJobsModel.getNamespaces());
+        cronJobsService.parsePredefinedCommands(model);
+        cronJobsService.parseUserCommands(model);
+        commandsResults = new ListModelList<>(model.getCommandsResults());
+        activeCronJobs = new ListModelList<>(model.getCronJobsResults());
         checkRuntimeNotificationExceptions();
     }
 
@@ -169,9 +182,9 @@ public class CronJobsVM implements EventListener<Event> {
     @Command
     public void onSelectMainCronJobsTabs(@ContextParam(ContextType.COMPONENT) Tabbox tabbox) {
         activeTab = tabbox.getSelectedTab().getId();
-        if ("cronJobsReports".equals(tabbox.getSelectedTab().getId()) && StringUtils.isBlank(cronJobsModel.getSelectedReportRaw())) {
-            cronJobsService.prepareCronJobsReports(cronJobsModel);
-            redrawCommandsToolbarbuttons("cronJobsReportsToolbarID", cronJobsModel.getCronJobsReports().keySet(), getCommandToolbarButtonId(cronJobsModel.getSelectedReportLabel()));
+        if ("cronJobsReports".equals(tabbox.getSelectedTab().getId()) && StringUtils.isBlank(model.getSelectedReportRaw())) {
+            cronJobsService.prepareCronJobsReports(model);
+            redrawCommandsToolbarbuttons("cronJobsReportsToolbarID", model.getCronJobsReports().keySet(), getCommandToolbarButtonId(model.getSelectedReportLabel()));
             refreshReportsOutput();
         }
         checkRuntimeNotificationExceptions();
@@ -184,7 +197,7 @@ public class CronJobsVM implements EventListener<Event> {
         Div cronJobsReportBlock = (Div) Path.getComponent("//indexPage/templateInclude/cronJobsReportOutputId");
         cronJobsReportBlock.getChildren().clear();
         String style = wordWrapCommandsInReport ? "style=\"white-space: pre-wrap; word-break: keep-all;\"" : "";
-        cronJobsReportBlock.appendChild(new Html("<pre " + style + "><code>" + cronJobsModel.getSelectedReportRaw() + "</code></pre>"));
+        cronJobsReportBlock.appendChild(new Html("<pre " + style + "><code>" + model.getSelectedReportRaw() + "</code></pre>"));
         BindUtils.postNotifyChange(this, ".");
     }
 
@@ -192,8 +205,8 @@ public class CronJobsVM implements EventListener<Event> {
      * Checks if in commands model exists runtime exceptions and shows notification.
      */
     private void checkRuntimeNotificationExceptions() {
-        if (StringUtils.isNotBlank(cronJobsModel.getRuntimeNotificationExceptions())) {
-            Notification.show(cronJobsModel.getRuntimeNotificationExceptions(), "error", null, "bottom_right", 5000);
+        if (StringUtils.isNotBlank(model.getRuntimeNotificationExceptions())) {
+            Notification.show(model.getRuntimeNotificationExceptions(), "error", null, "bottom_right", 5000);
         }
     }
 
@@ -206,7 +219,7 @@ public class CronJobsVM implements EventListener<Event> {
      */
     private void redrawCommandsToolbarbuttons(String toolbarId, Set<String> entries, String activeToolbarButtonId) {
         createReportsToolbarButtons(toolbarId, entries);
-        if (StringUtils.isNotBlank(cronJobsModel.getSelectedReportLabel())) {
+        if (StringUtils.isNotBlank(model.getSelectedReportLabel())) {
             enableDisableMenuItem(activeToolbarButtonId, true, "bold;");
         }
     }
@@ -253,9 +266,10 @@ public class CronJobsVM implements EventListener<Event> {
     @NotifyChange({"commandsTotalItems", "commandsResults"})
     public void filterCommands() {
         commandsResults.clear();
-        for (CommandsResult commandeResult : cronJobsModel.getCommandsResults()) {
+        for (CommandsResult commandeResult : model.getCommandsResults()) {
             if (commonService.checkEqualsFilter(commandeResult.getGroup(), getFilter().getSelectedGroupFilter()) &&
                     commonService.checkEqualsFilter(commandeResult.getFile(), getFilter().getSelectedFileFilter()) &&
+                    StringUtils.containsIgnoreCase(commandeResult.getName(), getFilter().getName()) &&
                     StringUtils.containsIgnoreCase(commandeResult.getCommand(), getFilter().getCommand()) &&
                     StringUtils.containsIgnoreCase(commandeResult.getDescription(), getFilter().getDescription())) {
                 commandsResults.add(commandeResult);
@@ -268,11 +282,20 @@ public class CronJobsVM implements EventListener<Event> {
      */
     @Command
     public void synchronizeCommandToExecute() {
-//        cronJobsModel.setCommandToExecute(getCommandWithoutUnnecessaryWhitespaces(commandsModel.getCommandToExecuteEditable()));
-//        if (isHotReplacementEnabled()) {
-//            commandsService.commandHotReplacement(commandsModel);
-//        }
+        model.setCommandToExecute(getCommandWithoutUnnecessaryWhitespaces(model.getCommandToExecuteEditable()));
         BindUtils.postNotifyChange(this, "commandToExecute", "commandToExecuteEditable");
+    }
+
+    /**
+     * Replaces \n with spaces in commad.
+     *
+     * @param commandToExecuteEditable - editable command to execute.
+     * @return - replaced string without Unnecessary whitespaces.
+     */
+    private String getCommandWithoutUnnecessaryWhitespaces(String commandToExecuteEditable) {
+//        return commandToExecuteEditable.replaceAll("\\n", " ");
+//        TODO correct replacement
+        return commandToExecuteEditable.replaceAll("\\n", " ").replaceAll(" +", " ");
     }
 
 
@@ -285,18 +308,8 @@ public class CronJobsVM implements EventListener<Event> {
     @NotifyChange({"commandToExecute", "commandToExecuteEditable"})
     public void showFullCommand(@BindingParam("clickedItem") CommandsResult item) {
 //        TODO
-//        cronJobsModel.setCommandToExecute(getCommandWithoutUnnecessaryWhitespaces(item.getCommand()));
-        cronJobsModel.setCommandToExecuteEditable(item.getCommand());
-    }
-
-    /**
-     * Changes resources in comboxex depend on namespace in commands window.
-     */
-    @Command
-    public void changeResourcesInComboxexDependOnNamespace() {
-        cronJobsService.fetchResourcesDependsOnNamespace(cronJobsModel);
-        BindUtils.postNotifyChange(this, "namespacedPods", "namespacedDeployments", "namespacedStatefulSets", "namespacedReplicaSets", "namespacedDaemonSets", "namespacedConfigMaps", "namespacedServices", "namespacedJobs");
-        Notification.show(String.format("New resources for %s namespace, successfully fetched.", cronJobsModel.getSelectedNamespace()), "info", commandOutputGrBox, "bottom_right", 2000);
+        model.setCommandToExecute(getCommandWithoutUnnecessaryWhitespaces(item.getCommand()));
+        model.setCommandToExecuteEditable(item.getCommand());
     }
 
     /**
@@ -311,10 +324,10 @@ public class CronJobsVM implements EventListener<Event> {
         if (isOnInit && !commandsResults.isEmpty()) {
             Notification.show("Loaded: " + commandsResults.size() + " items", "info", commandsGridFooter, "before_end", 2000);
         }
-        if (isOnInit && cronJobsModel.hasErrors()) {
-            Window window = (Window) Executions.createComponents(Global.PATH_TO_ERROR_RESOURCE_ZUL, null, Map.of("errors", cronJobsModel.getExceptions()));
+        if (isOnInit && model.hasErrors()) {
+            Window window = (Window) Executions.createComponents(Global.PATH_TO_ERROR_RESOURCE_ZUL, null, Map.of("errors", model.getExceptions()));
             window.doModal();
-            cronJobsModel.setExceptions(new ArrayList<>());
+            model.setExceptions(new ArrayList<>());
         }
         isOnInit = false;
         return commandsResults;
@@ -328,10 +341,10 @@ public class CronJobsVM implements EventListener<Event> {
     private void selectAndChangeSourceToolbarbuttonLabel(Event event) {
         String label = ((Toolbarbutton) event.getTarget()).getLabel();
         String oldToolbarbuttonId = null;
-        if ("commandsHistory".equals(activeTab)) {
-            oldToolbarbuttonId = getCommandToolbarButtonId(cronJobsModel.getSelectedReportLabel());
-            cronJobsModel.setSelectedReportLabel(label);
-            cronJobsService.changeHistoryRaw(cronJobsModel);
+        if ("cronJobsReports".equals(activeTab)) {
+            oldToolbarbuttonId = getCommandToolbarButtonId(model.getSelectedReportLabel());
+            model.setSelectedReportLabel(label);
+            cronJobsService.changeHistoryRaw(model);
             refreshReportsOutput();
         }
         String newToolbarbuttonId = getCommandToolbarButtonId(label);
@@ -343,7 +356,7 @@ public class CronJobsVM implements EventListener<Event> {
 
 
     public CommandsFilter getFilter() {
-        return cronJobsModel.getFilter();
+        return model.getFilter();
     }
 
     public String getCommandsTotalItems() {
@@ -351,11 +364,11 @@ public class CronJobsVM implements EventListener<Event> {
     }
 
     public String getCommandToExecute() {
-        return cronJobsModel.getCommandToExecute();
+        return model.getCommandToExecute();
     }
 
     public void setCommandToExecute(String commandToExecute) {
-        cronJobsModel.setCommandToExecute(commandToExecute);
+        model.setCommandToExecute(commandToExecute);
     }
 
     public String getCommandsGridHeight() {
@@ -367,162 +380,83 @@ public class CronJobsVM implements EventListener<Event> {
     }
 
     public String getCronJobsListHeight() {
-        return centerLayoutHeight * 0.485 + "px";
+        return centerLayoutHeight * 0.47 + "px";
     }
 
     public String getCommandToExecuteEditable() {
-        return cronJobsModel.getCommandToExecuteEditable();
+        return model.getCommandToExecuteEditable();
     }
 
     public void setCommandToExecuteEditable(String commandToExecuteEditable) {
-        cronJobsModel.setCommandToExecuteEditable(commandToExecuteEditable);
-    }
-
-    public Set<String> getNamespaces() {
-        return cronJobsModel.getNamespaces();
-    }
-
-    public Set<String> getNamespacedPods() {
-        return cronJobsModel.getNamespacedPods();
-    }
-
-    public Set<String> getNamespacedDeployments() {
-        return cronJobsModel.getNamespacedDeployments();
-    }
-
-    public Set<String> getNamespacedStatefulSets() {
-        return cronJobsModel.getNamespacedStatefulSets();
-    }
-
-    public Set<String> getNamespacedReplicaSets() {
-        return cronJobsModel.getNamespacedReplicaSets();
-    }
-
-    public Set<String> getNamespacedDaemonSets() {
-        return cronJobsModel.getNamespacedDaemonSets();
-    }
-
-    public Set<String> getNamespacedConfigMaps() {
-        return cronJobsModel.getNamespacedConfigMaps();
-    }
-
-    public Set<String> getNamespacedServices() {
-        return cronJobsModel.getNamespacedServices();
-    }
-
-    public Set<String> getNamespacedJobs() {
-        return cronJobsModel.getNamespacedJobs();
-    }
-
-    public String getSelectedNamespace() {
-        return cronJobsModel.getSelectedNamespace();
-    }
-
-    public void setSelectedNamespace(String selectedNamespace) {
-        cronJobsModel.setSelectedNamespace(selectedNamespace);
-    }
-
-    public Set<String> getSelectedDeployments() {
-        return cronJobsModel.getSelectedDeployments();
-    }
-
-    public Set<String> getSelectedStatefulSets() {
-        return cronJobsModel.getSelectedStatefulSets();
-    }
-
-    public Set<String> getSelectedReplicaSets() {
-        return cronJobsModel.getSelectedReplicaSets();
-    }
-
-    public Set<String> getSelectedDaemonSets() {
-        return cronJobsModel.getSelectedDaemonSets();
-    }
-
-    public Set<String> getSelectedConfigMaps() {
-        return cronJobsModel.getSelectedConfigMaps();
-    }
-
-    public Set<String> getSelectedServices() {
-        return cronJobsModel.getSelectedServices();
-    }
-
-    public Set<String> getSelectedJobs() {
-        return cronJobsModel.getSelectedJobs();
-    }
-
-    public Set<String> getSelectedPods() {
-        return cronJobsModel.getSelectedPods();
-    }
-
-    public void setSelectedPods(Set<String> selectedPods) {
-        cronJobsModel.setSelectedPods(selectedPods);
-    }
-
-    public void setSelectedDeployments(Set<String> selectedDeployments) {
-        cronJobsModel.setSelectedDeployments(selectedDeployments);
-    }
-
-    public void setSelectedStatefulSets(Set<String> selectedStatefulSets) {
-        cronJobsModel.setSelectedStatefulSets(selectedStatefulSets);
-    }
-
-    public void setSelectedReplicaSets(Set<String> selectedReplicaSets) {
-        cronJobsModel.setSelectedReplicaSets(selectedReplicaSets);
-    }
-
-    public void setSelectedDaemonSets(Set<String> selectedDaemonSets) {
-        cronJobsModel.setSelectedDaemonSets(selectedDaemonSets);
-    }
-
-    public void setSelectedConfigMaps(Set<String> selectedConfigMaps) {
-        cronJobsModel.setSelectedConfigMaps(selectedConfigMaps);
-    }
-
-    public void setSelectedServices(Set<String> selectedServices) {
-        cronJobsModel.setSelectedServices(selectedServices);
-    }
-
-    public void setSelectedJobs(Set<String> selectedJobs) {
-        cronJobsModel.setSelectedJobs(selectedJobs);
+        model.setCommandToExecuteEditable(commandToExecuteEditable);
     }
 
     public String getSelectedShell() {
-        return cronJobsModel.getSelectedShell();
+        return model.getSelectedShell();
     }
 
     public void setSelectedShell(String selectedShell) {
-        cronJobsModel.setSelectedShell(selectedShell);
+        model.setSelectedShell(selectedShell);
     }
 
     public List<String> getShells() {
-        return cronJobsModel.getShells();
+        return model.getShells();
     }
 
-    public boolean isHotReplacementEnabled() {
-        return config.getCommandsHotReplacement();
-    }
-
-    public void setHotReplacementEnabled(boolean hotReplacement) {
-        config.setCommandsHotReplacement(hotReplacement);
-    }
 
     public ListModelList<CronJobResult> getActiveCronJobs() {
         return activeCronJobs;
+    }
+
+    public String getCronJobName() {
+        return cronJobName;
+    }
+
+    public CronJobsVM setCronJobName(String cronJobName) {
+        this.cronJobName = cronJobName;
+        return this;
+    }
+
+    public String getCronJobExpression() {
+        return cronJobExpression;
+    }
+
+    public CronJobsVM setCronJobExpression(String cronJobExpression) {
+        this.cronJobExpression = cronJobExpression;
+        return this;
+    }
+
+    public String getCronJobEmail() {
+        return cronJobEmail;
+    }
+
+    public CronJobsVM setCronJobEmail(String cronJobEmail) {
+        this.cronJobEmail = cronJobEmail;
+        return this;
+    }
+
+    public String getCronJobDescription() {
+        return cronJobDescription;
+    }
+
+    public CronJobsVM setCronJobDescription(String cronJobDescription) {
+        this.cronJobDescription = cronJobDescription;
+        return this;
     }
 
     //  CRON JOBS REPORTS GETTERS AND SETTERS ================
 
 
     public String getSelectedCronJobsReportRaw() {
-        return cronJobsModel.getSelectedReportRaw();
+        return model.getSelectedReportRaw();
     }
 
     public String getSelectedCronJobsReportLabel() {
-        return cronJobsModel.getSelectedReportLabel();
+        return model.getSelectedReportLabel();
     }
 
     public void setSelectedCronJobsReportLabel(String selectedCommandsHistory) {
-        cronJobsModel.setSelectedReportLabel(selectedCommandsHistory);
+        model.setSelectedReportLabel(selectedCommandsHistory);
     }
 
     public String getCronJobsReportsSrcPanelHeight() {

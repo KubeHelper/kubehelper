@@ -17,8 +17,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package com.kubehelper.domain.results;
 
-import java.util.StringJoiner;
-
 /**
  * @author JDev
  */
@@ -26,15 +24,20 @@ public class CronJobResult {
 
     private int id;
     private String name = "";
-    private String period = "";
+    private String expression = "";
     private String command = "";
     private String shell = "";
     private int runs;
     private String email = "";
     private String description = "";
+    private String reportsFolderPath = "";
 
     public CronJobResult(int id) {
         this.id = id;
+    }
+
+    public void buildReportsFolderPath(String root){
+        reportsFolderPath = root+name;
     }
 
     public int getId() {
@@ -50,12 +53,12 @@ public class CronJobResult {
         return this;
     }
 
-    public String getPeriod() {
-        return period;
+    public String getExpression() {
+        return expression;
     }
 
-    public CronJobResult setPeriod(String period) {
-        this.period = period;
+    public CronJobResult setExpression(String expression) {
+        this.expression = expression;
         return this;
     }
 
@@ -104,17 +107,29 @@ public class CronJobResult {
         return this;
     }
 
+    public String getReportsFolderPath() {
+        return reportsFolderPath;
+    }
+
+    public CronJobResult setReportsFolderPath(String reportsFolderPath) {
+        this.reportsFolderPath = reportsFolderPath;
+        return this;
+    }
+
+
     @Override
     public String toString() {
-        return new StringJoiner(", ", CronJobResult.class.getSimpleName() + "[", "]")
-                .add("id=" + id)
-                .add("name='" + name + "'")
-                .add("period='" + period + "'")
-                .add("command='" + command + "'")
-                .add("shell='" + shell + "'")
-                .add("runs=" + runs)
-                .add("email='" + email + "'")
-                .add("description='" + description + "'")
-                .toString();
+        final StringBuffer sb = new StringBuffer("CronJobResult{");
+        sb.append("id=").append(id);
+        sb.append(", name='").append(name).append('\'');
+        sb.append(", period='").append(expression).append('\'');
+        sb.append(", command='").append(command).append('\'');
+        sb.append(", shell='").append(shell).append('\'');
+        sb.append(", runs=").append(runs);
+        sb.append(", email='").append(email).append('\'');
+        sb.append(", description='").append(description).append('\'');
+        sb.append(", reportsFolderPath='").append(reportsFolderPath).append('\'');
+        sb.append('}');
+        return sb.toString();
     }
 }
