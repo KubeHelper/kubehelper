@@ -19,6 +19,7 @@ package com.kubehelper.services;
 
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.io.Files;
+import com.kubehelper.common.Global;
 import com.kubehelper.domain.models.CronJobsModel;
 import com.kubehelper.domain.results.CommandsResult;
 import com.kubehelper.domain.results.CronJobResult;
@@ -51,6 +52,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadFactory;
 import java.util.stream.Collectors;
 
 /**
@@ -87,18 +89,33 @@ public class CronJobsService {
     /**
      * Executes command and writes output to history file.
      */
-    public void startCronJob(CronJobResult job) {
+    public void startCronJob(CronJobsModel model, CronJobResult job) {
         job.buildReportsFolderPath(cronJobsHistoryPath);
-//        TODO check if folder already exists then return exception
 
+        File reportsFolder = new File(job.getReportsFolderPath());
+        if (reportsFolder.exists() && reportsFolder.isDirectory()) {
+            model.addException(new RuntimeException("Cron job with this name already exists or existed. Please choose another name."));
+            return;
+        }
         schedulerService.startCronJob(job);
     }
 
     public List<CronJobResult> getActiveCronJobs() {
-        ScheduledThreadPoolExecutor xService = (ScheduledThreadPoolExecutor) schedulerService.getThreadPoolTaskScheduler().getScheduledExecutor();
-
-        BlockingQueue<Runnable> queue = xService.getQueue();
-        return new ArrayList<>();
+        List<CronJobResult> activeCronJobs = new ArrayList<>();
+        Global.CRON_JOBS.forEach((jobName, scheduler) -> {
+            if (!scheduler.getScheduledFuture().isDone()) {
+                CronJobResult jobResult = new CronJobResult(scheduler.getId())
+                        .setName(jobName)
+                        .setCommand(scheduler.getCommand())
+                        .setExpression(scheduler.getExpression())
+                        .setDescription(scheduler.getDescription())
+                        .setEmail(scheduler.getEmail())
+                        .setShell(scheduler.getShell())
+                        .setRuns(scheduler.getRuns());
+                activeCronJobs.add(jobResult);
+            }
+        });
+        return activeCronJobs;
     }
 
     /**

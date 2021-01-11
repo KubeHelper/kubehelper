@@ -17,6 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package com.kubehelper.common;
 
+import com.kubehelper.domain.core.KubeHelperScheduledFuture;
 import com.kubehelper.domain.models.CommandsModel;
 import com.kubehelper.domain.models.ConfigsModel;
 import com.kubehelper.domain.models.CronJobsModel;
@@ -50,6 +51,7 @@ public class Global {
     public static String PATH_TO_RAW_RESOURCE_ZUL = "~./zul/kubehelper/components/raw-resource.zul";
     public static String PATH_TO_ERROR_RESOURCE_ZUL = "~./zul/kubehelper/components/errors.zul";
 
+    public static HashMap<String, KubeHelperScheduledFuture> CRON_JOBS = new HashMap<>();
 
     public static Map<String, PageModel> ACTIVE_MODELS = new HashMap<>() {
     };

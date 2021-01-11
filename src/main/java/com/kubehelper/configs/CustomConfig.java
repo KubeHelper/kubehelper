@@ -87,8 +87,7 @@ public class CustomConfig {
     @Bean
     public ThreadPoolTaskScheduler threadPoolTaskScheduler() {
         ThreadPoolTaskScheduler threadPoolTaskScheduler = new ThreadPoolTaskScheduler();
-        threadPoolTaskScheduler.setPoolSize(1000);
-        threadPoolTaskScheduler.setThreadNamePrefix("kubeHelperTask");
+        threadPoolTaskScheduler.setThreadNamePrefix("kubeHelperTask-");
         return threadPoolTaskScheduler;
     }
 

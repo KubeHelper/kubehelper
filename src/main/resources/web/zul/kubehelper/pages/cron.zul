@@ -127,12 +127,15 @@
                                     <listbox model="@load(cronJobsVM.activeCronJobs)" height="@load(versionsVM.cronJobsListHeight)">
                                         <listhead menupopup="auto">
                                             <listheader label="Name" hflex="1" sort="auto(name)"/>
-                                            <listheader label="Cron Period" hflex="2" sort="auto(expression)"/>
+                                            <listheader label="Expression" hflex="2" sort="auto(expression)"/>
                                             <listheader label="Command" hflex="4" sort="auto(command)"/>
                                             <listheader label="Shell" hflex="min" sort="auto(shell)"/>
                                             <listheader label="Runs" hflex="min" sort="auto(runs)"/>
                                             <listheader label="Email" hflex="1" sort="auto(email)"/>
                                             <listheader label="Description" hflex="4" sort="auto(description)"/>
+                                            <listheader label="Stop" hflex="min"/>
+                                            <listheader label="Status" hflex="min"/>
+                                            <listheader label="Run" hflex="min"/>
                                         </listhead>
                                         <template name="model" var="cron">
                                             <listitem>
@@ -156,6 +159,17 @@
                                                 </listcell>
                                                 <listcell>
                                                     <label value="${cron.description}" style="cursor: auto;"/>
+                                                </listcell>
+                                                <listcell>
+                                                    <button iconSclass="fas fa-trash-alt" onClick="@command('removeCronJob',job=cron)" width="100%"/>
+                                                </listcell>
+                                                <listcell>
+                                                    <!--                                                    TODO add active or inactive job icon-->
+                                                    <button iconSclass="fas fa-trash-alt" onClick="@command('removeCronJob',job=cron)" width="100%"/>
+                                                </listcell>
+                                                <listcell>
+                                                    <!--                                                    TODO add run button-->
+                                                    <button iconSclass="fas fa-trash-alt" onClick="@command('removeCronJob',job=cron)" width="100%"/>
                                                 </listcell>
                                             </listitem>
                                         </template>

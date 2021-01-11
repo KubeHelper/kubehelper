@@ -100,7 +100,6 @@ public class CronJobsVM implements EventListener<Event> {
     private CronJobsModel model;
 
     private ListModelList<CommandsResult> commandsResults = new ListModelList<>();
-    private ListModelList<CronJobResult> activeCronJobs = new ListModelList<>();
 
     @Wire
     private Footer commandsGridFooter;
@@ -134,6 +133,9 @@ public class CronJobsVM implements EventListener<Event> {
             Notification.show("Can't start cron job. Name, expression and command are required fields.", "error", null, "bottom_left", 5000);
             return;
         }
+//        TODO check cron job name, allow only letters, numbers and -_ -regeexp: ^[a-zA-Z0-9_.-]*$      Check if toml accepts . in title
+        //TODO change after test
+//        TODO validate email
         CronJobResult cronJobResult = new CronJobResult(1)
                 .setName(cronJobName)
                 .setCommand(model.getCommandToExecute())
@@ -142,14 +144,41 @@ public class CronJobsVM implements EventListener<Event> {
                 .setDescription(cronJobDescription)
                 .setEmail(cronJobEmail)
                 .setShell("bash");
-        cronJobsService.startCronJob(cronJobResult);
+        cronJobsService.startCronJob(model, cronJobResult);
+        checkExceptions();
     }
 
+//    TODO add trigger to refresh every minute active cron jobs in table and on destroy stop scheduler. Check wit console if it running
+
+    private boolean checkExceptions() {
+        if (model.hasErrors()) {
+            Window window = (Window) Executions.createComponents(Global.PATH_TO_ERROR_RESOURCE_ZUL, null, Map.of("errors", model.getExceptions()));
+            window.doModal();
+            model.setExceptions(new ArrayList<>());
+            return false;
+        }
+        return true;
+    }
+
+    //    TODO TEMP method
     @Command
     public void activeCronJobsTest() {
         cronJobsService.getActiveCronJobs();
-
     }
+
+//    TODO add message box, to check if delete, as in commands management
+    @Command
+    public void removeCronJob(@BindingParam("job") CronJobResult job) {
+        if (Global.CRON_JOBS.get(job.getName()).shutdownCronJob()) {
+            Notification.show(String.format("Cron Job %s was stopped and deleted.", job.getName()), "info", null, "bottom_left", 3000);
+        } else {
+            Notification.show(String.format("An error occurred while stopping the cron job. Please look in the application log.", job.getName()), "error", null, "bottom_left", 5000);
+
+        }
+    }
+
+//    todo add refreshReports method to refresh report files
+
 
     /**
      * Prepare commands view.
@@ -159,7 +188,6 @@ public class CronJobsVM implements EventListener<Event> {
         cronJobsService.parsePredefinedCommands(model);
         cronJobsService.parseUserCommands(model);
         commandsResults = new ListModelList<>(model.getCommandsResults());
-        activeCronJobs = new ListModelList<>(model.getCronJobsResults());
         checkRuntimeNotificationExceptions();
     }
 
@@ -405,7 +433,7 @@ public class CronJobsVM implements EventListener<Event> {
 
 
     public ListModelList<CronJobResult> getActiveCronJobs() {
-        return activeCronJobs;
+        return new ListModelList<>(cronJobsService.getActiveCronJobs());
     }
 
     public String getCronJobName() {
