@@ -22,7 +22,7 @@ public class KubeHelperScheduledFuture {
     private ScheduledFuture<?> scheduledFuture;
 
     public KubeHelperScheduledFuture(CronJobResult jobResult, ScheduledFuture<?> scheduledFuture) {
-        this.id = Global.CRON_JOBS.size()+1;
+        this.id = Global.CRON_JOBS.size() + 1;
         this.name = jobResult.getName();
         this.expression = jobResult.getExpression();
         this.command = jobResult.getCommand();
@@ -33,11 +33,11 @@ public class KubeHelperScheduledFuture {
         this.scheduledFuture = scheduledFuture;
     }
 
-    public boolean shutdownCronJob(){
+    public boolean shutdownCronJob() {
         return scheduledFuture.cancel(true);
     }
 
-    public void addRun(){
+    public void addRun() {
         runs++;
     }
 
@@ -77,7 +77,16 @@ public class KubeHelperScheduledFuture {
         return reportsFolderPath;
     }
 
+    public boolean isDone() {
+        return scheduledFuture.isDone();
+    }
+
     public ScheduledFuture<?> getScheduledFuture() {
         return scheduledFuture;
+    }
+
+    public KubeHelperScheduledFuture setScheduledFuture(ScheduledFuture<?> scheduledFuture) {
+        this.scheduledFuture = scheduledFuture;
+        return this;
     }
 }

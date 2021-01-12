@@ -17,6 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package com.kubehelper.domain.models;
 
+import com.google.common.collect.ImmutableSortedMap;
 import com.kubehelper.common.Global;
 import com.kubehelper.common.KubeHelperException;
 import com.kubehelper.domain.filters.CommandsFilter;
@@ -26,9 +27,11 @@ import com.kubehelper.domain.results.FileSourceResult;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author JDev
@@ -54,11 +57,13 @@ public class CronJobsModel implements PageModel {
     private String executedCommandOutput = "";
 
     //  REPORTS ================
-    private Map<String, FileSourceResult> cronJobsReports = new HashMap<>();
+    private Map<String, Map<String, FileSourceResult>> cronJobsReports = new HashMap<>(); //<folder <file,fileparams>>
+//    private Map<String, FileSourceResult> cronJobsReports = new HashMap<>();
 
     private String selectedReportLabel = "";
     private String selectedReportRaw = "";
     private String commandsRawReportBuffer = "";
+    private String selectedReportsFolder = "";
 
     @Override
     public String getTemplateUrl() {
@@ -85,11 +90,15 @@ public class CronJobsModel implements PageModel {
         filter.addOperationFilter(commandResult.getFile());
     }
 
-    public void addReportSource(String label, String filePath) {
+    public void addReportSource(String label, String filePath, String groupName) {
         FileSourceResult reportSource = new FileSourceResult();
         reportSource.setLabel(label);
         reportSource.setFilePath(filePath);
-        cronJobsReports.put(label, reportSource);
+        cronJobsReports.put(groupName, Map.of(label, reportSource));
+    }
+
+    public void sortCronJobsReportsAlphabeticallyAsc() {
+        cronJobsReports = ImmutableSortedMap.copyOf(cronJobsReports, Comparator.comparing(folder -> folder));
     }
 
     public boolean hasErrors() {
@@ -181,11 +190,15 @@ public class CronJobsModel implements PageModel {
         return this;
     }
 
-    public Map<String, FileSourceResult> getCronJobsReports() {
+    public Map<String, Map<String, FileSourceResult>> getCronJobsReports() {
         return cronJobsReports;
     }
 
-    public CronJobsModel setCronJobsReports(Map<String, FileSourceResult> cronJobsReports) {
+    public Set<String> getCronJobsReportsForJob() {
+        return cronJobsReports.get(selectedReportsFolder).keySet();
+    }
+
+    public CronJobsModel setCronJobsReports(Map<String, Map<String, FileSourceResult>> cronJobsReports) {
         this.cronJobsReports = cronJobsReports;
         return this;
     }
@@ -221,4 +234,12 @@ public class CronJobsModel implements PageModel {
         return runtimeNotificationExceptions;
     }
 
+    public String getSelectedReportsFolder() {
+        return selectedReportsFolder;
+    }
+
+    public CronJobsModel setSelectedReportsFolder(String selectedReportsFolder) {
+        this.selectedReportsFolder = selectedReportsFolder;
+        return this;
+    }
 }

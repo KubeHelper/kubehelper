@@ -54,6 +54,7 @@ import org.zkoss.zul.Div;
 import org.zkoss.zul.Footer;
 import org.zkoss.zul.Html;
 import org.zkoss.zul.ListModelList;
+import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.Tabbox;
 import org.zkoss.zul.Toolbarbutton;
 import org.zkoss.zul.Vbox;
@@ -62,7 +63,9 @@ import org.zkoss.zul.Window;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 /**
  * Class for displaying Kube Helper dashboard Cluster and nodes metrics.
@@ -129,13 +132,11 @@ public class CronJobsVM implements EventListener<Event> {
 
     @Command
     public void startCronJob() {
-        if (StringUtils.isAnyBlank(cronJobName, cronJobExpression, model.getCommandToExecute())) {
-            Notification.show("Can't start cron job. Name, expression and command are required fields.", "error", null, "bottom_left", 5000);
+        if (isCronJobNotValid()) {
             return;
         }
-//        TODO check cron job name, allow only letters, numbers and -_ -regeexp: ^[a-zA-Z0-9_.-]*$      Check if toml accepts . in title
+
         //TODO change after test
-//        TODO validate email
         CronJobResult cronJobResult = new CronJobResult(1)
                 .setName(cronJobName)
                 .setCommand(model.getCommandToExecute())
@@ -146,9 +147,93 @@ public class CronJobsVM implements EventListener<Event> {
                 .setShell("bash");
         cronJobsService.startCronJob(model, cronJobResult);
         checkExceptions();
+        updateActiveCronJobs();
     }
 
-//    TODO add trigger to refresh every minute active cron jobs in table and on destroy stop scheduler. Check wit console if it running
+    /**
+     * Validate cron job parameters, email, name and expression.
+     *
+     * @return - true if cron job parameters are invalid.
+     */
+    private boolean isCronJobNotValid() {
+        if (StringUtils.isAnyBlank(cronJobName, cronJobExpression, model.getCommandToExecute())) {
+            Notification.show(String.format("Can't create cron job %s. Name, expression and command are required fields.", cronJobName), "error", null, "bottom_left", 5000);
+            return true;
+        }
+
+        if (!Pattern.matches("^[a-zA-Z0-9_-]*$", cronJobName)) {
+            Notification.show(String.format("Can't create cron job %s. The job name should contain only: letters, numbers, '-' and '_'", cronJobName),
+                    "error", null, "bottom_left", 5000);
+            return true;
+        }
+
+        if (StringUtils.isNotBlank(cronJobEmail) && !Pattern.matches("^(.+)@(\\S+)$", cronJobEmail)) {
+            Notification.show(String.format("Can't create cron job %s. The cron job email is invalid.", cronJobName), "error", null, "bottom_left", 5000);
+            return true;
+        }
+        return false;
+    }
+
+    @Command
+    public void editCronJob() {
+
+    }
+
+
+    private void updateActiveCronJobs() {
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            logger.error(e.getMessage(), e);
+        }
+        BindUtils.postNotifyChange(this, "activeCronJobs");
+    }
+
+    @Command
+    public void rerunCronJob(@BindingParam("job") CronJobResult job) {
+        cronJobsService.rerunCronJob(job);
+        Notification.show(String.format("Cron Job %s was Started again.", job.getName()), "info", null, "bottom_left", 3000);
+        updateActiveCronJobs();
+    }
+
+    @Command
+    public void stopCronJob(@BindingParam("job") CronJobResult job) {
+        Messagebox.show(String.format("Are you sure you want to stop %s job?", job.getName()),
+                "Question", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION,
+                (EventListener) e -> {
+                    if (Messagebox.ON_OK.equals(e.getName())) {
+                        if (Global.CRON_JOBS.get(job.getName()).shutdownCronJob()) {
+                            Notification.show(String.format("Cron Job %s was stopped.", job.getName()), "info", null, "bottom_left", 3000);
+                        } else {
+                            Notification.show(String.format("An error occurred while stopping the cron job. Please look in the application log.", job.getName()), "error", null, "bottom_left", 5000);
+                        }
+                        updateActiveCronJobs();
+                    }
+                }
+        );
+    }
+
+    @Command
+    public void removeCronJob(@BindingParam("job") CronJobResult job) {
+        Messagebox.show(String.format("Are you sure you want to delete %s job?", job.getName()),
+                "Question", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION,
+                (EventListener) e -> {
+                    if (Messagebox.ON_OK.equals(e.getName())) {
+                        //additional checks, if job is done
+                        if (!Global.CRON_JOBS.get(job.getName()).isDone()) {
+                            Global.CRON_JOBS.get(job.getName()).shutdownCronJob();
+                        }
+                        //remove job from jobs list
+                        if (Objects.nonNull(Global.CRON_JOBS.remove(job.getName()))) {
+                            Notification.show(String.format("Cron Job %s was deleted.", job.getName()), "info", null, "bottom_left", 3000);
+                        } else {
+                            Notification.show(String.format("An error occurred while stopping the cron job. Please look in the application log.", job.getName()), "error", null, "bottom_left", 5000);
+                        }
+                        updateActiveCronJobs();
+                    }
+                }
+        );
+    }
 
     private boolean checkExceptions() {
         if (model.hasErrors()) {
@@ -159,25 +244,6 @@ public class CronJobsVM implements EventListener<Event> {
         }
         return true;
     }
-
-    //    TODO TEMP method
-    @Command
-    public void activeCronJobsTest() {
-        cronJobsService.getActiveCronJobs();
-    }
-
-//    TODO add message box, to check if delete, as in commands management
-    @Command
-    public void removeCronJob(@BindingParam("job") CronJobResult job) {
-        if (Global.CRON_JOBS.get(job.getName()).shutdownCronJob()) {
-            Notification.show(String.format("Cron Job %s was stopped and deleted.", job.getName()), "info", null, "bottom_left", 3000);
-        } else {
-            Notification.show(String.format("An error occurred while stopping the cron job. Please look in the application log.", job.getName()), "error", null, "bottom_left", 5000);
-
-        }
-    }
-
-//    todo add refreshReports method to refresh report files
 
 
     /**
@@ -212,7 +278,7 @@ public class CronJobsVM implements EventListener<Event> {
         activeTab = tabbox.getSelectedTab().getId();
         if ("cronJobsReports".equals(tabbox.getSelectedTab().getId()) && StringUtils.isBlank(model.getSelectedReportRaw())) {
             cronJobsService.prepareCronJobsReports(model);
-            redrawCommandsToolbarbuttons("cronJobsReportsToolbarID", model.getCronJobsReports().keySet(), getCommandToolbarButtonId(model.getSelectedReportLabel()));
+            redrawCommandsToolbarbuttons("cronJobsReportsToolbarID", model.getCronJobsReportsForJob(), getCommandToolbarButtonId(model.getSelectedReportLabel()));
             refreshReportsOutput();
         }
         checkRuntimeNotificationExceptions();
@@ -380,6 +446,11 @@ public class CronJobsVM implements EventListener<Event> {
         enableDisableMenuItem(newToolbarbuttonId, true, "bold;");
     }
 
+    @Command
+    public void changeReportsFolder() {
+
+    }
+
     //  COMMANDS GETTERS AND SETTERS ================
 
 
@@ -509,6 +580,18 @@ public class CronJobsVM implements EventListener<Event> {
 
     public String getCronJobsReportsCss() {
         return String.format(cronJobsReportsCss, cronJobsReportsFontSize);
+    }
+
+    public Set<String> getAllCronJobsReports() {
+        return model.getCronJobsReports().keySet();
+    }
+
+    public void setSelectedReportsFolder(String selectedReportsFolder) {
+        model.setSelectedReportsFolder(selectedReportsFolder);
+    }
+
+    public String getSelectedReportsFolder() {
+        return model.getSelectedReportsFolder();
     }
 
 }

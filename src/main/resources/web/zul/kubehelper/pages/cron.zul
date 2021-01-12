@@ -81,18 +81,15 @@
                                     <hbox width="100%" align="center" pack="stretch">
                                         <cell width="50%" align="center">
                                             <vbox hflex="1" pack="stretch">
-                                                <textbox value="@bind(cronJobsVM.cronJobName)" width="100%" placeholder="*Job Name"
-                                                         style="font-family: Courier, Monaco, monospace;font-size: 12px;"/>
-                                                <textbox value="@bind(cronJobsVM.cronJobExpression)" width="100%" placeholder="*Cron Expression. Example: '0 0 8-10 * * *' "
-                                                         style="font-family: Courier, Monaco, monospace;font-size: 12px;"/>
-                                                <textbox value="@bind(cronJobsVM.cronJobEmail)" width="100%" placeholder="Email for send cron job reports"
-                                                         style="font-family: Courier, Monaco, monospace;font-size: 12px;"/>
+                                                <textbox value="@bind(cronJobsVM.cronJobName)" width="100%" placeholder="*Job Name"/>
+                                                <textbox value="@bind(cronJobsVM.cronJobExpression)" width="100%" placeholder="*Cron Expression. Example: '0 0 8-10 * * *' "/>
+                                                <textbox value="@bind(cronJobsVM.cronJobEmail)" width="100%" placeholder="Email for send cron job reports"/>
                                             </vbox>
                                         </cell>
                                         <separator orient="vertical"></separator>
                                         <cell width="50%" align="left">
                                             <textbox value="@bind(cronJobsVM.cronJobDescription)" width="100%" rows="4" placeholder="Job description"
-                                                     style="font-family: Courier, Monaco, monospace;font-size: 13px;line-height: 1.4;margin-bottom: 2px;"/>
+                                                     style="font-size: 13px;line-height: 1.4;margin-bottom: 2px;"/>
                                         </cell>
                                     </hbox>
                                     <separator orient="horizontal"></separator>
@@ -133,9 +130,10 @@
                                             <listheader label="Runs" hflex="min" sort="auto(runs)"/>
                                             <listheader label="Email" hflex="1" sort="auto(email)"/>
                                             <listheader label="Description" hflex="4" sort="auto(description)"/>
+                                            <listheader label="Edit" hflex="min"/>
                                             <listheader label="Stop" hflex="min"/>
-                                            <listheader label="Status" hflex="min"/>
-                                            <listheader label="Run" hflex="min"/>
+                                            <listheader label="Rerun" hflex="min"/>
+                                            <listheader label="Remove" hflex="min"/>
                                         </listhead>
                                         <template name="model" var="cron">
                                             <listitem>
@@ -160,16 +158,17 @@
                                                 <listcell>
                                                     <label value="${cron.description}" style="cursor: auto;"/>
                                                 </listcell>
-                                                <listcell>
-                                                    <button iconSclass="fas fa-trash-alt" onClick="@command('removeCronJob',job=cron)" width="100%"/>
+                                                <listcell style="text-align: center">
+                                                    <button iconSclass="fas fa-edit" disabled="${not cron.done}" onClick="@command('editCronJob',job=cron)"/>
                                                 </listcell>
-                                                <listcell>
-                                                    <!--                                                    TODO add active or inactive job icon-->
-                                                    <button iconSclass="fas fa-trash-alt" onClick="@command('removeCronJob',job=cron)" width="100%"/>
+                                                <listcell style="text-align: center">
+                                                    <button iconSclass="fas fa-stop" disabled="${cron.done}" onClick="@command('stopCronJob',job=cron)"/>
                                                 </listcell>
-                                                <listcell>
-                                                    <!--                                                    TODO add run button-->
-                                                    <button iconSclass="fas fa-trash-alt" onClick="@command('removeCronJob',job=cron)" width="100%"/>
+                                                <listcell style="text-align: center">
+                                                    <button iconSclass="fas fa-play" disabled="${not cron.done}" onClick="@command('rerunCronJob',job=cron)"/>
+                                                </listcell>
+                                                <listcell style="text-align: center">
+                                                    <button iconSclass="fas fa-times" disabled="${not cron.done}" onClick="@command('removeCronJob',job=cron)"/>
                                                 </listcell>
                                             </listitem>
                                         </template>
@@ -204,6 +203,14 @@
                             </center>
                             <west title="Reports" collapsible="true" splittable="true" autoscroll="true" size="7%" maxsize="200">
                                 <div vflex="1">
+                                    <combobox hflex="1" mold="rounded" model="@load(cronJobsVM.allCronJobsReports)"
+                                              selectedItem="@bind(cronJobsVM.selectedReportsFolder)"
+                                              onChange="@command('changeReportsFolder')">
+                                        <template name="model">
+                                            <comboitem label="@load(each)"/>
+                                        </template>
+                                    </combobox>
+                                    <separator orient="horizontal"></separator>
                                     <vbox id="cronJobsReportsToolbarID">
                                     </vbox>
                                 </div>

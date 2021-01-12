@@ -90,6 +90,14 @@ public class SchedulerService {
         //TODO add to toml boolean config isStart by default
     }
 
+    public void rerunCronJob(CronJobResult job) {
+        ScheduledFuture<?> scheduledFuture = threadPoolTaskScheduler.schedule(getRunnableTask(job), new CronTrigger(job.getExpression()));
+        Global.CRON_JOBS.get(job.getName()).setScheduledFuture(scheduledFuture);
+
+//        TODO write to config toml
+        //TODO add to toml boolean config isStart by default
+    }
+
     /**
      * Creates runnable Task from @{@link CronJobResult}
      *

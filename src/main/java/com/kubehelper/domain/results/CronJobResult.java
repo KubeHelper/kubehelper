@@ -31,13 +31,14 @@ public class CronJobResult {
     private String email = "";
     private String description = "";
     private String reportsFolderPath = "";
+    private boolean isDone;
 
     public CronJobResult(int id) {
         this.id = id;
     }
 
-    public void buildReportsFolderPath(String root){
-        reportsFolderPath = root+name;
+    public void buildReportsFolderPath(String root) {
+        reportsFolderPath = root + name;
     }
 
     public int getId() {
@@ -116,19 +117,28 @@ public class CronJobResult {
         return this;
     }
 
+    public boolean isDone() {
+        return isDone;
+    }
+
+    public CronJobResult setDone(boolean done) {
+        isDone = done;
+        return this;
+    }
 
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("CronJobResult{");
         sb.append("id=").append(id);
         sb.append(", name='").append(name).append('\'');
-        sb.append(", period='").append(expression).append('\'');
+        sb.append(", expression='").append(expression).append('\'');
         sb.append(", command='").append(command).append('\'');
         sb.append(", shell='").append(shell).append('\'');
         sb.append(", runs=").append(runs);
         sb.append(", email='").append(email).append('\'');
         sb.append(", description='").append(description).append('\'');
         sb.append(", reportsFolderPath='").append(reportsFolderPath).append('\'');
+        sb.append(", isDone=").append(isDone);
         sb.append('}');
         return sb.toString();
     }
