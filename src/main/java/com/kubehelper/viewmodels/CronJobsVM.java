@@ -23,6 +23,7 @@ import com.kubehelper.domain.filters.CommandsFilter;
 import com.kubehelper.domain.models.CronJobsModel;
 import com.kubehelper.domain.results.CommandsResult;
 import com.kubehelper.domain.results.CronJobResult;
+import com.kubehelper.domain.results.FileSourceResult;
 import com.kubehelper.services.CommonService;
 import com.kubehelper.services.CronJobsService;
 import org.apache.commons.lang3.StringUtils;
@@ -311,7 +312,7 @@ public class CronJobsVM implements EventListener<Event> {
      * @param entries               - set with button labels.
      * @param activeToolbarButtonId - sets active toolbarbutton if history exists.
      */
-    private void redrawCommandsToolbarbuttons(String toolbarId, Set<String> entries, String activeToolbarButtonId) {
+    private void redrawCommandsToolbarbuttons(String toolbarId, List<String> entries, String activeToolbarButtonId) {
         createReportsToolbarButtons(toolbarId, entries);
         if (StringUtils.isNotBlank(model.getSelectedReportLabel())) {
             enableDisableMenuItem(activeToolbarButtonId, true, "bold;");
@@ -321,7 +322,7 @@ public class CronJobsVM implements EventListener<Event> {
     /**
      * Creates toolbarbuttons on the commands management and commands history tabs for view sources/files.
      */
-    private void createReportsToolbarButtons(String toolbarId, Set<String> sources) {
+    private void createReportsToolbarButtons(String toolbarId, List<String> sources) {
         Vbox commandsSourcesToolbar = (Vbox) Path.getComponent("//indexPage/templateInclude/" + toolbarId);
         commandsSourcesToolbar.getChildren().clear();
         sources.forEach(key -> {
@@ -448,8 +449,23 @@ public class CronJobsVM implements EventListener<Event> {
 
     @Command
     public void changeReportsFolder() {
+        List<FileSourceResult> first = model.getCronJobsReportsObjectsForJob();
+        if (!first.isEmpty()) {
+            model.setSelectedReportRaw(commonService.getResourceAsStringByPath(first.get(0).getFilePath()));
+            model.setSelectedReportLabel(first.get(0).getLabel());
+            redrawCommandsToolbarbuttons("cronJobsReportsToolbarID", model.getCronJobsReportsForJob(), getCommandToolbarButtonId(model.getSelectedReportLabel()));
+            refreshReportsOutput();
+        } else {
+            Notification.show("There are no reports for this job.", "info", null, "bottom_left", 3000);
+        }
+    }
+
+
+    @Command
+    public void refreshReports() {
 
     }
+
 
     //  COMMANDS GETTERS AND SETTERS ================
 
@@ -582,7 +598,7 @@ public class CronJobsVM implements EventListener<Event> {
         return String.format(cronJobsReportsCss, cronJobsReportsFontSize);
     }
 
-    public Set<String> getAllCronJobsReports() {
+    public Set<String> getAllCronJobsReportsGroups() {
         return model.getCronJobsReports().keySet();
     }
 

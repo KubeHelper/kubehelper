@@ -31,7 +31,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * @author JDev
@@ -94,7 +95,10 @@ public class CronJobsModel implements PageModel {
         FileSourceResult reportSource = new FileSourceResult();
         reportSource.setLabel(label);
         reportSource.setFilePath(filePath);
-        cronJobsReports.put(groupName, Map.of(label, reportSource));
+
+        if (Objects.nonNull(cronJobsReports.putIfAbsent(groupName, new HashMap<>(Map.of(label, reportSource))))) {
+            cronJobsReports.get(groupName).put(label, reportSource);
+        }
     }
 
     public void sortCronJobsReportsAlphabeticallyAsc() {
@@ -194,8 +198,12 @@ public class CronJobsModel implements PageModel {
         return cronJobsReports;
     }
 
-    public Set<String> getCronJobsReportsForJob() {
-        return cronJobsReports.get(selectedReportsFolder).keySet();
+    public List<FileSourceResult> getCronJobsReportsObjectsForJob() {
+        return cronJobsReports.get(selectedReportsFolder).values().stream().collect(Collectors.toList());
+    }
+
+    public List<String> getCronJobsReportsForJob() {
+        return cronJobsReports.get(selectedReportsFolder).keySet().stream().sorted().collect(Collectors.toList());
     }
 
     public CronJobsModel setCronJobsReports(Map<String, Map<String, FileSourceResult>> cronJobsReports) {

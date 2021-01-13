@@ -186,11 +186,11 @@ public class CommandsVM implements EventListener<Event> {
         activeTab = tabbox.getSelectedTab().getId();
         if ("commandsHistory".equals(activeTab) && StringUtils.isBlank(commandsModel.getSelectedCommandsHistoryRaw())) {
             commandsService.prepareCommandsHistory(commandsModel);
-            redrawCommandsToolbarbuttons("commandsHistoriesToolbarID", commandsModel.getCommandsHistories().keySet(), getCommandToolbarButtonId(commandsModel.getSelectedCommandsHistoryLabel()));
+            redrawCommandsToolbarbuttons("commandsHistoriesToolbarID", commandsModel.getCommandsHistoriesSortedList(), getCommandToolbarButtonId(commandsModel.getSelectedCommandsHistoryLabel()));
             refreshHistoryOutput();
         } else if ("commandsManagement".equals(activeTab) && StringUtils.isBlank(commandsModel.getSelectedCommandsSourceRaw())) {
             commandsService.prepareCommandsManagement(commandsModel);
-            redrawCommandsToolbarbuttons("commandsSourcesToolbarID", commandsModel.getCommandsSources().keySet(), getCommandToolbarButtonId(commandsModel.getSelectedCommandsSourceLabel()));
+            redrawCommandsToolbarbuttons("commandsSourcesToolbarID", commandsModel.getCommandsSourcesNamesSortedList(), getCommandToolbarButtonId(commandsModel.getSelectedCommandsSourceLabel()));
             refreshCommandsManagementOutput(commandsModel.getSelectedCommandsSourceLabel());
             disableEnableMainControlButtons();
         }
@@ -213,7 +213,7 @@ public class CommandsVM implements EventListener<Event> {
      * @param entries               - set with button labels.
      * @param activeToolbarButtonId - sets active toolbarbutton if history exists.
      */
-    private void redrawCommandsToolbarbuttons(String toolbarId, Set<String> entries, String activeToolbarButtonId) {
+    private void redrawCommandsToolbarbuttons(String toolbarId, List<String> entries, String activeToolbarButtonId) {
         createCommandsToolbarButtons(toolbarId, entries);
         if (StringUtils.isNotBlank(commandsModel.getSelectedCommandsHistoryLabel()) || StringUtils.isNotBlank(commandsModel.getSelectedCommandsSourceLabel())) {
             enableDisableMenuItem(activeToolbarButtonId, true, "bold;");
@@ -490,7 +490,7 @@ public class CommandsVM implements EventListener<Event> {
     public void refreshHistory() {
         commandsModel.setCommandsHistories(new HashMap<>());
         commandsService.prepareCommandsHistory(commandsModel);
-        redrawCommandsToolbarbuttons("commandsHistoriesToolbarID", commandsModel.getCommandsHistories().keySet(), getCommandToolbarButtonId(commandsModel.getSelectedCommandsHistoryLabel()));
+        redrawCommandsToolbarbuttons("commandsHistoriesToolbarID", commandsModel.getCommandsHistoriesSortedList(), getCommandToolbarButtonId(commandsModel.getSelectedCommandsHistoryLabel()));
         refreshHistoryOutput();
         BindUtils.postNotifyChange(this, ".");
     }
@@ -502,7 +502,7 @@ public class CommandsVM implements EventListener<Event> {
     public void refreshCommandsManagement() {
         commandsModel.setCommandsSources(new HashMap<>());
         commandsService.prepareCommandsManagement(commandsModel);
-        redrawCommandsToolbarbuttons("commandsSourcesToolbarID", commandsModel.getCommandsSources().keySet(), getCommandToolbarButtonId(commandsModel.getSelectedCommandsSourceLabel()));
+        redrawCommandsToolbarbuttons("commandsSourcesToolbarID", commandsModel.getCommandsSourcesNamesSortedList(), getCommandToolbarButtonId(commandsModel.getSelectedCommandsSourceLabel()));
         Notification.show("Commands management state has been updated.", "info", null, "bottom_right", 3000);
         BindUtils.postNotifyChange(this, ".");
     }
@@ -564,7 +564,7 @@ public class CommandsVM implements EventListener<Event> {
     /**
      * Creates toolbarbuttons on the commands management and commands history tabs for view sources/files.
      */
-    private void createCommandsToolbarButtons(String toolbarId, Set<String> sources) {
+    private void createCommandsToolbarButtons(String toolbarId, List<String> sources) {
         Vbox commandsSourcesToolbar = (Vbox) Path.getComponent("//indexPage/templateInclude/" + toolbarId);
         commandsSourcesToolbar.getChildren().clear();
         sources.forEach(key -> {
@@ -802,6 +802,10 @@ public class CommandsVM implements EventListener<Event> {
         return centerLayoutHeight - 95 + "px";
     }
 
+    public String getCommandsManagementCss() {
+        return String.format(commandsManagementCss, commandsManagementFontSize);
+    }
+
 
     //  COMMANDS HISTORY GETTERS AND SETTERS ================
 
@@ -860,10 +864,6 @@ public class CommandsVM implements EventListener<Event> {
 
     public String getCommandsHistoryCss() {
         return String.format(commandsHistoryCss, commandsHistoryFontSize);
-    }
-
-    public String getCommandsManagementCss() {
-        return String.format(commandsManagementCss, commandsManagementFontSize);
     }
 
 }

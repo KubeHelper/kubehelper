@@ -35,6 +35,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author JDev
@@ -367,6 +368,10 @@ public class CommandsModel implements PageModel {
         return commandsSources;
     }
 
+    public List<String> getCommandsSourcesNamesSortedList() {
+        return commandsSources.keySet().stream().sorted().collect(Collectors.toList());
+    }
+
     public String getSelectedCommandsSourceLabel() {
         return selectedCommandsSourceLabel;
     }
@@ -441,6 +446,10 @@ public class CommandsModel implements PageModel {
 
     public Map<String, FileSourceResult> getCommandsHistories() {
         return commandsHistories;
+    }
+
+    public List<String> getCommandsHistoriesSortedList() {
+        return commandsHistories.keySet().stream().collect(Collectors.toList());
     }
 
     public CommandsModel setCommandsHistories(Map<String, FileSourceResult> commandsHistories) {

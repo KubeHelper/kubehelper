@@ -203,7 +203,7 @@
                             </center>
                             <west title="Reports" collapsible="true" splittable="true" autoscroll="true" size="7%" maxsize="200">
                                 <div vflex="1">
-                                    <combobox hflex="1" mold="rounded" model="@load(cronJobsVM.allCronJobsReports)"
+                                    <combobox hflex="1" mold="rounded" model="@load(cronJobsVM.allCronJobsReportsGroups)"
                                               selectedItem="@bind(cronJobsVM.selectedReportsFolder)"
                                               onChange="@command('changeReportsFolder')">
                                         <template name="model">

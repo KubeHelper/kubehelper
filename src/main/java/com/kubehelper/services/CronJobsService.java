@@ -43,6 +43,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -70,7 +71,7 @@ public class CronJobsService {
     private String userCommandsLocationSearchPath;
 
     @Value("${kubehelper.cron.jobs.reports.path}")
-    private String cronJobsHistoryPath;
+    private String cronJobsReportsPath;
 
     @Autowired
     private CommonService commonService;
@@ -90,7 +91,7 @@ public class CronJobsService {
      * @param job   - @{@link CronJobResult}
      */
     public void startCronJob(CronJobsModel model, CronJobResult job) {
-        job.buildReportsFolderPath(cronJobsHistoryPath);
+        job.buildReportsFolderPath(cronJobsReportsPath);
 
         File reportsFolder = new File(job.getReportsFolderPath());
         if (reportsFolder.exists() && reportsFolder.isDirectory()) {
@@ -167,7 +168,7 @@ public class CronJobsService {
      */
     private void writeCommandExecutionToHistory(CronJobsModel cronJobsModel) {
         String today = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE);
-        File file = new File(cronJobsHistoryPath + today + ".txt");
+        File file = new File(cronJobsReportsPath + today + ".txt");
         try {
             file.createNewFile();
             String composedHistoryEntry = new StringSubstitutor(buildHistoryEntry(cronJobsModel)).replace(reportEntryTemplate);
@@ -227,12 +228,15 @@ public class CronJobsService {
      */
     public void prepareCronJobsReports(CronJobsModel cronJobsModel) {
         try {
-            Set<String> filesPathsByDirAndExtension = commonService.getFilesPathsByDirAndExtension(cronJobsHistoryPath, 2, ".txt");
+
+            List<File> reportsGroups = Arrays.stream(new File(cronJobsReportsPath).listFiles()).filter(File::isDirectory).sorted(Comparator.comparing(File::getName)).collect(Collectors.toList());
             cronJobsModel.setCronJobsReports(new HashMap<>());
-            filesPathsByDirAndExtension.forEach(file -> {
-                String groupName = new File(file).getParentFile().getName();
-                cronJobsModel.addReportSource(Files.getNameWithoutExtension(file), file, groupName);
-            });
+            for (File group : reportsGroups) {
+                Set<String> filesPathsByDirAndExtension = commonService.getFilesPathsByDirAndExtension(group.getAbsolutePath(), 2, ".txt");
+                filesPathsByDirAndExtension.forEach(file -> {
+                    cronJobsModel.addReportSource(Files.getNameWithoutExtension(file), file, group.getName());
+                });
+            }
             cronJobsModel.sortCronJobsReportsAlphabeticallyAsc();
             Optional<Map.Entry<String, Map<String, FileSourceResult>>> first = cronJobsModel.getCronJobsReports().entrySet().stream().findFirst();
             if (first.isPresent()) {
@@ -245,6 +249,8 @@ public class CronJobsService {
             logger.debug(e.getMessage(), e);
         }
     }
+
+//    changeReportsFolder
 
     /**
      * Shows history for ranges. From Week/Month/Year to today. Default case for single day.
@@ -276,7 +282,7 @@ public class CronJobsService {
 
         //get all history files
         try {
-            filesPathsByDirAndExtension = commonService.getFilesPathsByDirAndExtension(cronJobsHistoryPath, 2, ".txt");
+            filesPathsByDirAndExtension = commonService.getFilesPathsByDirAndExtension(cronJobsReportsPath, 2, ".txt");
         } catch (IOException e) {
             logger.debug(e.getMessage(), e);
         }
