@@ -20,10 +20,13 @@ package com.kubehelper.domain.results;
 import com.kubehelper.common.Resource;
 import com.kubehelper.common.ResourceProperty;
 
+import java.util.StringJoiner;
+
 /**
  * @author JDev
  */
 public class LabelResult {
+
     private int id;
     private String name = "";
     private ResourceProperty resourceProperty;
@@ -32,8 +35,6 @@ public class LabelResult {
     private String namespace = "";
     private String additionalInfo = "";
 
-    public LabelResult() {
-    }
 
     public LabelResult(int id) {
         this.id = id;
@@ -107,5 +108,18 @@ public class LabelResult {
 
     public int getId() {
         return id;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", LabelResult.class.getSimpleName() + "[", "]")
+                .add("id=" + id)
+                .add("name='" + name + "'")
+                .add("resourceProperty=" + resourceProperty)
+                .add("resourceType=" + resourceType)
+                .add("resourceName='" + resourceName + "'")
+                .add("namespace='" + namespace + "'")
+                .add("additionalInfo='" + additionalInfo + "'")
+                .toString();
     }
 }

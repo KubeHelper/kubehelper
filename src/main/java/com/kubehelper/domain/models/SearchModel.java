@@ -45,7 +45,6 @@ public class SearchModel implements PageModel {
     public SearchModel() {
     }
 
-
     public SearchModel addSearchResult(SearchResult searchResult) {
         searchResults.add(searchResult);
         filter.addResourceTypesFilter(searchResult.getResourceType());

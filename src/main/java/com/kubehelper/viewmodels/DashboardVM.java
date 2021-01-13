@@ -23,8 +23,6 @@ import com.kubehelper.domain.results.ClusterResult;
 import com.kubehelper.domain.results.NodeResult;
 import com.kubehelper.services.CommonService;
 import com.kubehelper.services.DashboardService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.AfterCompose;
 import org.zkoss.bind.annotation.ContextParam;
@@ -90,7 +88,7 @@ public class DashboardVM {
     @Listen("onAfterSize=#centerLayoutIpsAndPortsID")
     public void onAfterSizeCenter(AfterSizeEvent event) {
         centerLayoutHeight = event.getHeight() - 3;
-        BindUtils.postNotifyChange(null, null, this, ".");
+        BindUtils.postNotifyChange(this, ".");
     }
 
     public ClusterResult getClusterResult() {

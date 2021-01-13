@@ -19,6 +19,8 @@ package com.kubehelper.domain.results;
 
 import com.kubehelper.common.Resource;
 
+import java.util.StringJoiner;
+
 /**
  * @author JDev
  */
@@ -28,8 +30,8 @@ public class PodSecurityPoliciesResult {
     private String resourceName = "";
     private Resource resourceType = Resource.POD_SECURITY_POLICY;
 
-    private String allowPrivilegeEscalation;
-    private String defaultAllowPrivilegeEscalation;
+    private String allowPrivilegeEscalation = "";
+    private String defaultAllowPrivilegeEscalation = "";
     private String allowedCSIDrivers = "";
     private String allowedCapabilities = "";
     private String allowedFlexVolumes = "";
@@ -39,12 +41,12 @@ public class PodSecurityPoliciesResult {
     private String defaultAddCapabilities = "";
     private String forbiddenSysctls = "";
     private String fsGroup = "";
-    private String hostIPC;
-    private String hostNetwork;
-    private String hostPID;
+    private String hostIPC = "";
+    private String hostNetwork = "";
+    private String hostPID = "";
     private String hostPorts = "";
-    private String privileged;
-    private String readOnlyRootFilesystem;
+    private String privileged = "";
+    private String readOnlyRootFilesystem = "";
     private String requiredDropCapabilities = "";
     private String runAsGroup = "";
     private String runAsUser = "";
@@ -57,9 +59,6 @@ public class PodSecurityPoliciesResult {
     private String creationTime = "";
     private String fullDefinition = "";
 
-
-    public PodSecurityPoliciesResult() {
-    }
 
     public PodSecurityPoliciesResult(int id) {
         this.id = id;
@@ -323,5 +322,41 @@ public class PodSecurityPoliciesResult {
     public PodSecurityPoliciesResult setFullDefinition(String fullDefinition) {
         this.fullDefinition = fullDefinition;
         return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", PodSecurityPoliciesResult.class.getSimpleName() + "[", "]")
+                .add("id=" + id)
+                .add("resourceName='" + resourceName + "'")
+                .add("resourceType=" + resourceType)
+                .add("allowPrivilegeEscalation='" + allowPrivilegeEscalation + "'")
+                .add("defaultAllowPrivilegeEscalation='" + defaultAllowPrivilegeEscalation + "'")
+                .add("allowedCSIDrivers='" + allowedCSIDrivers + "'")
+                .add("allowedCapabilities='" + allowedCapabilities + "'")
+                .add("allowedFlexVolumes='" + allowedFlexVolumes + "'")
+                .add("allowedHostPaths='" + allowedHostPaths + "'")
+                .add("allowedProcMountTypes='" + allowedProcMountTypes + "'")
+                .add("allowedUnsafeSysctls='" + allowedUnsafeSysctls + "'")
+                .add("defaultAddCapabilities='" + defaultAddCapabilities + "'")
+                .add("forbiddenSysctls='" + forbiddenSysctls + "'")
+                .add("fsGroup='" + fsGroup + "'")
+                .add("hostIPC='" + hostIPC + "'")
+                .add("hostNetwork='" + hostNetwork + "'")
+                .add("hostPID='" + hostPID + "'")
+                .add("hostPorts='" + hostPorts + "'")
+                .add("privileged='" + privileged + "'")
+                .add("readOnlyRootFilesystem='" + readOnlyRootFilesystem + "'")
+                .add("requiredDropCapabilities='" + requiredDropCapabilities + "'")
+                .add("runAsGroup='" + runAsGroup + "'")
+                .add("runAsUser='" + runAsUser + "'")
+                .add("runtimeClass='" + runtimeClass + "'")
+                .add("seLinux='" + seLinux + "'")
+                .add("supplementalGroups='" + supplementalGroups + "'")
+                .add("volumes='" + volumes + "'")
+                .add("namespace='" + namespace + "'")
+                .add("creationTime='" + creationTime + "'")
+                .add("fullDefinition='" + fullDefinition + "'")
+                .toString();
     }
 }

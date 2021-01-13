@@ -1,15 +1,18 @@
 package com.kubehelper.domain.results;
 
 import java.net.URI;
+import java.util.StringJoiner;
 
 /**
  * @author JDev
  */
 public class FileSourceResult {
-    private String label;
-    private String filePath;
+
+    private String label = "";
+    private String filePath = "";
     private URI uri;
     private boolean readonly = true;
+
 
     public String getLabel() {
         return label;
@@ -45,5 +48,15 @@ public class FileSourceResult {
     public FileSourceResult setUri(URI uri) {
         this.uri = uri;
         return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", FileSourceResult.class.getSimpleName() + "[", "]")
+                .add("label='" + label + "'")
+                .add("filePath='" + filePath + "'")
+                .add("uri=" + uri)
+                .add("readonly=" + readonly)
+                .toString();
     }
 }

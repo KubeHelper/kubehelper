@@ -1,82 +1,78 @@
 <zk>
-    <script>
-        function highlightCommandOutput () {
-        document.querySelectorAll('div.highlightComOutput').forEach(block => { hljs.highlightBlock(block); });
-        }
-        function highlightCommandManagement () {
-        document.querySelectorAll('div.highlightComManagement').forEach(block => { hljs.highlightBlock(block); });
-        }
-    </script>
     <borderlayout id="cronJobsTemplate" viewModel="@id('cronJobsVM') @init('com.kubehelper.viewmodels.CronJobsVM')" width="100%" height="100%">
-        <center id="centerLayoutCronJobsID" margins="0,3,3,3" title="Cron Jobs" border="none">
-            <tabbox width="100%" sclass="nav_tabs" style="border: none" onSelect="@command('onSelectMainCronJobsTabs')">
+        <center id="centerLayoutCronJobs" margins="0,3,3,3" title="Cron Jobs" border="none">
+            <tabbox id="cronJobsTabbox" width="100%" sclass="nav_tabs" style="border: none" onSelect="@command('onSelectMainCronJobsTabs')">
                 <tabs id="tabs">
                     <tab label="Jobs" id="cronJobs"/>
                     <tab label="Reports" id="cronJobsReports"/>
                 </tabs>
                 <tabpanels>
                     <tabpanel>
-                        <grid id="commandsGridID" model="@load(cronJobsVM.commandsResults)" height="@load(cronJobsVM.commandsGridHeight)">
-                            <auxhead id="commandsGridAuxHead">
-                                <auxheader>
-                                    <span sclass="z-icon-hashtag"/>
-                                </auxheader>
-                                <auxheader colspan="1">
-                                    <combobox id="commandsGroupCBox" hflex="1" mold="rounded" model="@load(cronJobsVM.filter.groupsFilter)"
-                                              selectedItem="@bind(cronJobsVM.filter.selectedGroupFilter)"
-                                              onChange="@command('filterCommands')">
-                                        <template name="model">
-                                            <comboitem label="@load(each)"/>
-                                        </template>
-                                    </combobox>
-                                </auxheader>
-                                <auxheader colspan="1">
-                                    <textbox hflex="1" value="@bind(cronJobsVM.filter.command)" onChange="@command('filterCommands')"/>
-                                </auxheader>
-                                <auxheader colspan="1">
-                                    <textbox instant="true" hflex="1" value="@bind(cronJobsVM.filter.name)" onChange="@command('filterCommands')"/>
-                                </auxheader>
-                                <auxheader colspan="1">
-                                    <textbox instant="true" hflex="1" value="@bind(cronJobsVM.filter.description)" onChange="@command('filterCommands')"/>
-                                </auxheader>
-                                <auxheader colspan="1">
-                                    <combobox id="filesGroupCBox" hflex="1" mold="rounded" model="@load(cronJobsVM.filter.filesFilter)"
-                                              selectedItem="@bind(cronJobsVM.filter.selectedFileFilter)"
-                                              onChange="@command('filterCommands')">
-                                        <template name="model">
-                                            <comboitem label="@load(each)"/>
-                                        </template>
-                                    </combobox>
-                                </auxheader>
-                            </auxhead>
-                            <columns menupopup="auto" sizable="true">
-                                <column hflex="min" label="Id" sort="auto(id)"/>
-                                <column hflex="1" label="Group" sort="auto(group)"/>
-                                <column hflex="5" label="Command" sort="auto(command)"/>
-                                <column hflex="1" label="Name" sort="auto(name)"/>
-                                <column hflex="4" label="Description" sort="auto(description)"/>
-                                <column hflex="1" label="File" sort="auto(file)"/>
-                            </columns>
-                            <rows>
-                                <template name="model" var="item">
-                                    <row onClick="@command('showFullCommand', clickedItem=item)" style="cursor:pointer">
-                                        <label value="${item.id}"/>
-                                        <label value="${item.group}"/>
-                                        <label value="${item.command}" multiline="true"/>
-                                        <label value="${item.name}" multiline="true"/>
-                                        <label value="${item.description}" multiline="true"/>
-                                        <label value="${item.file}" multiline="true"/>
-                                    </row>
-                                </template>
-                            </rows>
-                            <foot>
-                                <footer id="commandsGridFooter" span="6" align="right" label="@load(cronJobsVM.commandsTotalItems)"/>
-                            </foot>
-                        </grid>
+                        <groupbox id="commandsGrBox" height="@load(cronJobsVM.commandsGridHeight)" closable="false">
+                            <caption iconSclass="z-icon-terminal" label="Possible commands"/>
+                            <grid id="commandsGrid" model="@load(cronJobsVM.commandsResults)" vflex="1">
+                                <auxhead id="commandsGridAuxHead">
+                                    <auxheader>
+                                        <span sclass="z-icon-hashtag"/>
+                                    </auxheader>
+                                    <auxheader colspan="1">
+                                        <combobox id="commandsGroupCBox" hflex="1" mold="rounded" model="@load(cronJobsVM.filter.groupsFilter)"
+                                                  selectedItem="@bind(cronJobsVM.filter.selectedGroupFilter)"
+                                                  onChange="@command('filterCommands')">
+                                            <template name="model">
+                                                <comboitem label="@load(each)"/>
+                                            </template>
+                                        </combobox>
+                                    </auxheader>
+                                    <auxheader colspan="1">
+                                        <textbox hflex="1" value="@bind(cronJobsVM.filter.command)" onChange="@command('filterCommands')"/>
+                                    </auxheader>
+                                    <auxheader colspan="1">
+                                        <textbox instant="true" hflex="1" value="@bind(cronJobsVM.filter.name)" onChange="@command('filterCommands')"/>
+                                    </auxheader>
+                                    <auxheader colspan="1">
+                                        <textbox instant="true" hflex="1" value="@bind(cronJobsVM.filter.description)" onChange="@command('filterCommands')"/>
+                                    </auxheader>
+                                    <auxheader colspan="1">
+                                        <combobox id="filesGroupCBox" hflex="1" mold="rounded" model="@load(cronJobsVM.filter.filesFilter)"
+                                                  selectedItem="@bind(cronJobsVM.filter.selectedFileFilter)"
+                                                  onChange="@command('filterCommands')">
+                                            <template name="model">
+                                                <comboitem label="@load(each)"/>
+                                            </template>
+                                        </combobox>
+                                    </auxheader>
+                                </auxhead>
+                                <columns menupopup="auto" sizable="true">
+                                    <column hflex="min" label="Id" sort="auto(id)"/>
+                                    <column hflex="1" label="Group" sort="auto(group)"/>
+                                    <column hflex="5" label="Command" sort="auto(command)"/>
+                                    <column hflex="1" label="Name" sort="auto(name)"/>
+                                    <column hflex="4" label="Description" sort="auto(description)"/>
+                                    <column hflex="1" label="File" sort="auto(file)"/>
+                                </columns>
+                                <rows>
+                                    <template name="model" var="item">
+                                        <row onClick="@command('showFullCommand', clickedItem=item)" style="cursor:pointer">
+                                            <label value="${item.id}"/>
+                                            <label value="${item.group}"/>
+                                            <label value="${item.command}" multiline="true"/>
+                                            <label value="${item.name}" multiline="true"/>
+                                            <label value="${item.description}" multiline="true"/>
+                                            <label value="${item.file}" multiline="true"/>
+                                        </row>
+                                    </template>
+                                </rows>
+                                <foot>
+                                    <footer id="commandsGridFooter" span="6" align="right" label="@load(cronJobsVM.commandsTotalItems)"/>
+                                </foot>
+                            </grid>
+                        </groupbox>
 
-                        <groupbox id="commandsHotReplacementGrBox">
-                            <caption iconSclass="z-icon-terminal" label="Cron Job"/>
-                            <hbox width="100%" align="center" pack="stretch" height="@load(cronJobsVM.cronJobBoxHeight)">
+                        <groupbox id="newCronJobGrBox" closable="false" height="@load(cronJobsVM.newCronJobBoxHeight)">
+                            <caption iconSclass="fas fa-plus" label="New cron job"/>
+
+                            <hbox width="100%" align="center" pack="stretch" vflex="1">
                                 <cell width="89.5%" align="left">
                                     <hbox width="100%" align="center" pack="stretch">
                                         <cell width="50%" align="center">
@@ -102,8 +98,7 @@
                                 </cell>
                                 <cell width="10%" valign="middle">
                                     <hbox width="100%" height="50%" align="start" pack="stretch">
-                                        <label value="Shell: "/>
-                                        <combobox model="@load(cronJobsVM.shells)" selectedItem="@bind(cronJobsVM.selectedShell)" readonly="true">
+                                        <combobox model="@load(cronJobsVM.shells)" width="100%" selectedItem="@bind(cronJobsVM.selectedShell)" readonly="true">
                                             <template name="model">
                                                 <comboitem label="@load(each)"/>
                                             </template>
@@ -111,70 +106,65 @@
                                     </hbox>
                                     <vbox width="100%" height="50%" pack="end">
                                         <button id="runCronJobBtn" iconSclass="fas fa-history" onClick="@command('startCronJob')" width="100%"/>
-                                        <button iconSclass="fas fa-terminal" onClick="@command('activeCronJobsTest')" width="100%"/>
                                     </vbox>
                                 </cell>
                             </hbox>
                         </groupbox>
 
-                        <groupbox id="cronJobsListGrBox" width="100%" height="@load(cronJobsVM.cronJobsListHeight)">
-                            <caption iconSclass="fas fa-history" label="Active Cron Jobs"/>
-                            <panel width="100%" height="@load(cronJobsVM.cronJobsListHeight)">
-                                <panelchildren>
-                                    <listbox model="@load(cronJobsVM.activeCronJobs)" height="@load(versionsVM.cronJobsListHeight)">
-                                        <listhead menupopup="auto">
-                                            <listheader label="Name" hflex="1" sort="auto(name)"/>
-                                            <listheader label="Expression" hflex="2" sort="auto(expression)"/>
-                                            <listheader label="Command" hflex="4" sort="auto(command)"/>
-                                            <listheader label="Shell" hflex="min" sort="auto(shell)"/>
-                                            <listheader label="Runs" hflex="min" sort="auto(runs)"/>
-                                            <listheader label="Email" hflex="1" sort="auto(email)"/>
-                                            <listheader label="Description" hflex="4" sort="auto(description)"/>
-                                            <listheader label="Edit" hflex="min"/>
-                                            <listheader label="Stop" hflex="min"/>
-                                            <listheader label="Rerun" hflex="min"/>
-                                            <listheader label="Remove" hflex="min"/>
-                                        </listhead>
-                                        <template name="model" var="cron">
-                                            <listitem>
-                                                <listcell>
-                                                    <label value="${cron.name}" style="cursor: auto;"/>
-                                                </listcell>
-                                                <listcell>
-                                                    <label value="${cron.expression}" style="cursor: auto;"/>
-                                                </listcell>
-                                                <listcell>
-                                                    <label value="${cron.command}" style="cursor: auto;"/>
-                                                </listcell>
-                                                <listcell>
-                                                    <label value="${cron.shell}" style="cursor: auto;"/>
-                                                </listcell>
-                                                <listcell>
-                                                    <label value="${cron.runs}" style="cursor: auto;"/>
-                                                </listcell>
-                                                <listcell>
-                                                    <label value="${cron.email}" style="cursor: auto;"/>
-                                                </listcell>
-                                                <listcell>
-                                                    <label value="${cron.description}" style="cursor: auto;"/>
-                                                </listcell>
-                                                <listcell style="text-align: center">
-                                                    <button iconSclass="fas fa-edit" disabled="${not cron.done}" onClick="@command('editCronJob',job=cron)"/>
-                                                </listcell>
-                                                <listcell style="text-align: center">
-                                                    <button iconSclass="fas fa-stop" disabled="${cron.done}" onClick="@command('stopCronJob',job=cron)"/>
-                                                </listcell>
-                                                <listcell style="text-align: center">
-                                                    <button iconSclass="fas fa-play" disabled="${not cron.done}" onClick="@command('rerunCronJob',job=cron)"/>
-                                                </listcell>
-                                                <listcell style="text-align: center">
-                                                    <button iconSclass="fas fa-times" disabled="${not cron.done}" onClick="@command('removeCronJob',job=cron)"/>
-                                                </listcell>
-                                            </listitem>
-                                        </template>
-                                    </listbox>
-                                </panelchildren>
-                            </panel>
+                        <groupbox id="cronJobsListGrBox" width="100%" height="@load(cronJobsVM.cronJobsListGroupBoxHeight)" closable="false">
+                            <caption iconSclass="fas fa-history" label="Active cron jobs"/>
+                            <listbox model="@load(cronJobsVM.activeCronJobs)" vflex="1">
+                                <listhead menupopup="auto">
+                                    <listheader label="Name" hflex="1" sort="auto(name)"/>
+                                    <listheader label="Expression" hflex="2" sort="auto(expression)"/>
+                                    <listheader label="Command" hflex="4" sort="auto(command)"/>
+                                    <listheader label="Shell" hflex="min" sort="auto(shell)"/>
+                                    <listheader label="Runs" hflex="min" sort="auto(runs)"/>
+                                    <listheader label="Email" hflex="1" sort="auto(email)"/>
+                                    <listheader label="Description" hflex="4" sort="auto(description)"/>
+                                    <listheader label="Edit" hflex="min"/>
+                                    <listheader label="Stop" hflex="min"/>
+                                    <listheader label="Rerun" hflex="min"/>
+                                    <listheader label="Remove" hflex="min"/>
+                                </listhead>
+                                <template name="model" var="cron">
+                                    <listitem>
+                                        <listcell>
+                                            <label value="${cron.name}" multiline="true" style="cursor: auto;"/>
+                                        </listcell>
+                                        <listcell>
+                                            <label value="${cron.expression}" multiline="true" style="cursor: auto;"/>
+                                        </listcell>
+                                        <listcell>
+                                            <label value="${cron.command}" multiline="true" style="cursor: auto;"/>
+                                        </listcell>
+                                        <listcell>
+                                            <label value="${cron.shell}" style="cursor: auto;"/>
+                                        </listcell>
+                                        <listcell>
+                                            <label value="${cron.runs}" style="cursor: auto;"/>
+                                        </listcell>
+                                        <listcell>
+                                            <label value="${cron.email}" multiline="true" style="cursor: auto;"/>
+                                        </listcell>
+                                        <listcell>
+                                            <label value="${cron.description}" multiline="true" style="cursor: auto;"/>
+                                        </listcell>
+                                        <listcell style="text-align: center">
+                                            <button iconSclass="fas fa-edit" disabled="${not cron.done}" onClick="@command('editCronJob',job=cron)"/>
+                                        </listcell>
+                                        <listcell style="text-align: center">
+                                            <button iconSclass="fas fa-stop" disabled="${cron.done}" onClick="@command('stopCronJob',job=cron)"/>
+                                        </listcell>
+                                        <listcell style="text-align: center">
+                                            <button iconSclass="fas fa-play" disabled="${not cron.done}" onClick="@command('rerunCronJob',job=cron)"/>
+                                        </listcell>
+                                        <listcell style="text-align: center">
+                                            <button iconSclass="fas fa-times" disabled="${not cron.done}" onClick="@command('removeCronJob',job=cron)"/>
+                                        </listcell>
+                                    </listitem>
+                                </template>
+                            </listbox>
                         </groupbox>
                     </tabpanel>
 

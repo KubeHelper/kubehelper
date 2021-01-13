@@ -19,10 +19,13 @@ package com.kubehelper.domain.results;
 
 import com.kubehelper.common.Resource;
 
+import java.util.StringJoiner;
+
 /**
  * @author JDev
  */
 public class SearchResult {
+
     private int id;
     private String namespace = "";
     private Resource resourceType;
@@ -32,8 +35,6 @@ public class SearchResult {
     private String foundString = "";
     private String fullDefinition = "";
 
-    public SearchResult() {
-    }
 
     public SearchResult(int id) {
         this.id = id;
@@ -57,7 +58,7 @@ public class SearchResult {
         return this;
     }
 
-    public Resource getRawResourceType(){
+    public Resource getRawResourceType() {
         return resourceType;
     }
 
@@ -108,5 +109,19 @@ public class SearchResult {
     public SearchResult setFullDefinition(String fullDefinition) {
         this.fullDefinition = fullDefinition;
         return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", SearchResult.class.getSimpleName() + "[", "]")
+                .add("id=" + id)
+                .add("namespace='" + namespace + "'")
+                .add("resourceType=" + resourceType)
+                .add("resourceName='" + resourceName + "'")
+                .add("creationTime='" + creationTime + "'")
+                .add("additionalInfo='" + additionalInfo + "'")
+                .add("foundString='" + foundString + "'")
+                .add("fullDefinition='" + fullDefinition + "'")
+                .toString();
     }
 }

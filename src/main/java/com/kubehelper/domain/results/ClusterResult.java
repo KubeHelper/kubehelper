@@ -19,6 +19,8 @@ package com.kubehelper.domain.results;
 
 import org.apache.commons.io.FileUtils;
 
+import java.util.StringJoiner;
+
 /**
  * @author JDev
  */
@@ -28,16 +30,13 @@ public class ClusterResult {
     private int totalCpus;
     private int totalCpusTime;
     private String totalCpusTimeFormat = "";
-//    private String totalFreeCpusTime = "";
-//    private String totalUsedCpusTime = "";
 
     private long totalMemory;
     private long totalHdd;
-    //    private String totalFreeMemory = "";
-//    private String totalUsedMemory = "";
-//
+
     private int totalPods;
     private int totalAllowedPods;
+
 
     public ClusterResult() {
     }
@@ -62,9 +61,6 @@ public class ClusterResult {
         totalAllowedPods += Integer.valueOf(allowedPods);
     }
 
-    public void addPods(String pods) {
-
-    }
 
     public int getTotalNodes() {
         return totalNodes;
@@ -110,4 +106,17 @@ public class ClusterResult {
         return this;
     }
 
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", ClusterResult.class.getSimpleName() + "[", "]")
+                .add("totalNodes=" + totalNodes)
+                .add("totalCpus=" + totalCpus)
+                .add("totalCpusTime=" + totalCpusTime)
+                .add("totalCpusTimeFormat='" + totalCpusTimeFormat + "'")
+                .add("totalMemory=" + totalMemory)
+                .add("totalHdd=" + totalHdd)
+                .add("totalPods=" + totalPods)
+                .add("totalAllowedPods=" + totalAllowedPods)
+                .toString();
+    }
 }

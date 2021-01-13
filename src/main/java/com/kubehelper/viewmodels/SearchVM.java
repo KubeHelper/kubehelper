@@ -139,7 +139,7 @@ public class SearchVM implements EventListener {
     @Listen("onAfterSize=#centerLayoutSearchID")
     public void onAfterSizeCenter(AfterSizeEvent event) {
         centerLayoutHeight = event.getHeight() - 3;
-        BindUtils.postNotifyChange(null, null, this, ".");
+        BindUtils.postNotifyChange(this, ".");
     }
 
 
@@ -297,7 +297,7 @@ public class SearchVM implements EventListener {
         Checkbox kubeResourcesCheckAll = (Checkbox) Path.getComponent("//indexPage/templateInclude/kubeResourcesGBoxCheckAll");
         if (!kubeResourcesCheckAll.isChecked() && !selectedResources.isEmpty()) {
             kubeResourcesCheckAll.setChecked(true);
-            BindUtils.postNotifyChange(null, null, this, "kubeResourcesGBoxCheckAll");
+            BindUtils.postNotifyChange(this, "kubeResourcesGBoxCheckAll");
         }
     }
 

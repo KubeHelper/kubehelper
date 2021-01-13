@@ -1,6 +1,6 @@
 <zk>
     <div id="dashboardTemplate" viewModel="@id('dashboardVM') @init('com.kubehelper.viewmodels.DashboardVM')" width="100%" height="100%"
-         style="overflow-y:auto;overflow-x:auto;font-family: Courier, Monaco, monospace;">
+         style="overflow: auto;font-family: Courier, Monaco, monospace;">
         <vlayout id="mainDashboardVLayout">
             <panel title="Cluster Info" width="100%" collapsible="true">
                 <panelchildren>

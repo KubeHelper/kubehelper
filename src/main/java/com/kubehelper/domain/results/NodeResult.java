@@ -19,12 +19,14 @@ package com.kubehelper.domain.results;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.StringJoiner;
 
 /**
  * @author JDev
  */
 public class NodeResult {
     private int id;
+
 
     //Meta
     private String name = "";
@@ -55,6 +57,7 @@ public class NodeResult {
     private String conditions = "";
     private String images = "";
     private String totalImagesSize = "";
+
 
     public NodeResult(int id) {
         this.id = id;
@@ -307,4 +310,32 @@ public class NodeResult {
         return this;
     }
 
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", NodeResult.class.getSimpleName() + "[", "]")
+                .add("id=" + id)
+                .add("name='" + name + "'")
+                .add("creationTime='" + creationTime + "'")
+                .add("annotations='" + annotations + "'")
+                .add("labels='" + labels + "'")
+                .add("architecture='" + architecture + "'")
+                .add("bootID='" + bootID + "'")
+                .add("containerRuntimeVersion='" + containerRuntimeVersion + "'")
+                .add("kernelVersion='" + kernelVersion + "'")
+                .add("kubeProxyVersion='" + kubeProxyVersion + "'")
+                .add("kubeletVersion='" + kubeletVersion + "'")
+                .add("machineID='" + machineID + "'")
+                .add("operatingSystem='" + operatingSystem + "'")
+                .add("osImage='" + osImage + "'")
+                .add("systemUUID='" + systemUUID + "'")
+                .add("podCIDR='" + podCIDR + "'")
+                .add("taints='" + taints + "'")
+                .add("addresses='" + addresses + "'")
+                .add("allocatable='" + allocatable + "'")
+                .add("capacity='" + capacity + "'")
+                .add("conditions='" + conditions + "'")
+                .add("images='" + images + "'")
+                .add("totalImagesSize='" + totalImagesSize + "'")
+                .toString();
+    }
 }

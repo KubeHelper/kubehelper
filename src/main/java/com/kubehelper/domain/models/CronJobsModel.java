@@ -35,6 +35,8 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
+ * Cron Jobs Model.
+ *
  * @author JDev
  */
 public class CronJobsModel implements PageModel {
@@ -59,7 +61,6 @@ public class CronJobsModel implements PageModel {
 
     //  REPORTS ================
     private Map<String, Map<String, FileSourceResult>> cronJobsReports = new HashMap<>(); //<folder <file,fileparams>>
-//    private Map<String, FileSourceResult> cronJobsReports = new HashMap<>();
 
     private String selectedReportLabel = "";
     private String selectedReportRaw = "";
@@ -103,6 +104,14 @@ public class CronJobsModel implements PageModel {
 
     public void sortCronJobsReportsAlphabeticallyAsc() {
         cronJobsReports = ImmutableSortedMap.copyOf(cronJobsReports, Comparator.comparing(folder -> folder));
+    }
+
+    public List<FileSourceResult> getCronJobsReportsObjectsForJob() {
+        return cronJobsReports.get(selectedReportsFolder).values().stream().collect(Collectors.toList());
+    }
+
+    public List<String> getCronJobsReportsForJob() {
+        return cronJobsReports.get(selectedReportsFolder).keySet().stream().sorted().collect(Collectors.toList());
     }
 
     public boolean hasErrors() {
@@ -198,13 +207,6 @@ public class CronJobsModel implements PageModel {
         return cronJobsReports;
     }
 
-    public List<FileSourceResult> getCronJobsReportsObjectsForJob() {
-        return cronJobsReports.get(selectedReportsFolder).values().stream().collect(Collectors.toList());
-    }
-
-    public List<String> getCronJobsReportsForJob() {
-        return cronJobsReports.get(selectedReportsFolder).keySet().stream().sorted().collect(Collectors.toList());
-    }
 
     public CronJobsModel setCronJobsReports(Map<String, Map<String, FileSourceResult>> cronJobsReports) {
         this.cronJobsReports = cronJobsReports;

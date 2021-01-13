@@ -18,24 +18,25 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package com.kubehelper.domain.filters;
 
 import org.apache.commons.lang3.StringUtils;
-import org.zkoss.zul.ListModelList;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author JDev
  */
 public class SearchFilter {
+
     private String namespace = "", creationTime = "", foundString = "", additionalInfo = "";
 
     private String selectedNamespaceFilter = "";
     private String selectedResourceTypeFilter = "";
     private String selectedResourceNameFilter = "";
 
-    private ListModelList<String> namespacesFilter = new ListModelList<>();
-    private ListModelList<String> resourceTypesFilter = new ListModelList<>();
-    private ListModelList<String> resourceNamesFilter = new ListModelList<>();
+    private List<String> namespacesFilter = new ArrayList<>();
+    private List<String> resourceTypesFilter = new ArrayList<>();
+    private List<String> resourceNamesFilter = new ArrayList<>();
 
-    public SearchFilter() {
-    }
 
     public void addNamespacesFilter(String namespaceFilter) {
         if (!namespacesFilter.contains(namespaceFilter)) {
@@ -53,6 +54,10 @@ public class SearchFilter {
         if (!resourceNamesFilter.contains(resourceNameFilter)) {
             resourceNamesFilter.add(resourceNameFilter);
         }
+    }
+
+    public boolean isFilterActive() {
+        return StringUtils.isNoneBlank(namespace, creationTime, foundString, additionalInfo, selectedNamespaceFilter, selectedResourceTypeFilter, selectedResourceNameFilter);
     }
 
     public String getNamespace() {
@@ -78,7 +83,7 @@ public class SearchFilter {
     }
 
     public SearchFilter setFoundString(String foundString) {
-        this.foundString = foundString;
+        this.foundString = foundString == null ? "" : foundString;
         return this;
     }
 
@@ -87,37 +92,33 @@ public class SearchFilter {
     }
 
     public SearchFilter setAdditionalInfo(String additionalInfo) {
-        this.additionalInfo = additionalInfo;
+        this.additionalInfo = additionalInfo == null ? "" : additionalInfo;
         return this;
     }
 
-    public boolean isFilterActive() {
-        return StringUtils.isNoneBlank(namespace, creationTime, foundString, additionalInfo, selectedNamespaceFilter, selectedResourceTypeFilter, selectedResourceNameFilter);
-    }
-
-    public ListModelList<String> getNamespacesFilter() {
+    public List<String> getNamespacesFilter() {
         return namespacesFilter;
     }
 
-    public SearchFilter setNamespacesFilter(ListModelList<String> namespacesFilter) {
+    public SearchFilter setNamespacesFilter(List<String> namespacesFilter) {
         this.namespacesFilter = namespacesFilter;
         return this;
     }
 
-    public ListModelList<String> getResourceTypesFilter() {
+    public List<String> getResourceTypesFilter() {
         return resourceTypesFilter;
     }
 
-    public SearchFilter setResourceTypesFilter(ListModelList<String> resourceTypesFilter) {
+    public SearchFilter setResourceTypesFilter(List<String> resourceTypesFilter) {
         this.resourceTypesFilter = resourceTypesFilter;
         return this;
     }
 
-    public ListModelList<String> getResourceNamesFilter() {
+    public List<String> getResourceNamesFilter() {
         return resourceNamesFilter;
     }
 
-    public SearchFilter setResourceNamesFilter(ListModelList<String> resourceNamesFilter) {
+    public SearchFilter setResourceNamesFilter(List<String> resourceNamesFilter) {
         this.resourceNamesFilter = resourceNamesFilter;
         return this;
     }

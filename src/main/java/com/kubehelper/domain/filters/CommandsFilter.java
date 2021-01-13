@@ -26,6 +26,7 @@ import java.util.List;
  * @author JDev
  */
 public class CommandsFilter {
+
     private String description = "", group = "", command = "", name = "";
 
     private String selectedGroupFilter = "";
@@ -34,8 +35,6 @@ public class CommandsFilter {
     private List<String> groupsFilter = new ArrayList<>();
     private List<String> filesFilter = new ArrayList<>();
 
-    public CommandsFilter() {
-    }
 
     public void addGroupFilter(String groupFilter) {
         if (!groupsFilter.contains(groupFilter)) {

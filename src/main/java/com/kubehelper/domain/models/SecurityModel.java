@@ -107,7 +107,6 @@ public class SecurityModel implements PageModel {
         return this;
     }
 
-
     public void addRoleSubjects(String roleName, Resource resource, List<V1beta1Subject> subjects) {
         Optional<RoleResult> role = findRole(roleName, resource);
         if (role.isPresent()) {

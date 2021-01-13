@@ -18,12 +18,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package com.kubehelper.domain.filters;
 
 import org.apache.commons.lang3.StringUtils;
-import org.zkoss.zul.ListModelList;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author JDev
  */
 public class LabelsFilter {
+
     private String name = "", additionalInfo = "";
 
     private String selectedNamespaceFilter = "";
@@ -31,13 +34,11 @@ public class LabelsFilter {
     private String selectedResourcePropertyFilter = "";
     private String selectedResourceNameFilter = "";
 
-    private ListModelList<String> namespacesFilter = new ListModelList<>();
-    private ListModelList<String> resourceTypesFilter = new ListModelList<>();
-    private ListModelList<String> resourcePropertiesFilter = new ListModelList<>();
-    private ListModelList<String> resourceNamesFilter = new ListModelList<>();
+    private List<String> namespacesFilter = new ArrayList<>();
+    private List<String> resourceTypesFilter = new ArrayList<>();
+    private List<String> resourcePropertiesFilter = new ArrayList<>();
+    private List<String> resourceNamesFilter = new ArrayList<>();
 
-    public LabelsFilter() {
-    }
 
     public void addNamespacesFilter(String namespaceFilter) {
         if (!namespacesFilter.contains(namespaceFilter)) {
@@ -81,11 +82,11 @@ public class LabelsFilter {
         return this;
     }
 
-    public ListModelList<String> getResourcePropertiesFilter() {
+    public List<String> getResourcePropertiesFilter() {
         return resourcePropertiesFilter;
     }
 
-    public LabelsFilter setResourcePropertiesFilter(ListModelList<String> resourcePropertiesFilter) {
+    public LabelsFilter setResourcePropertiesFilter(List<String> resourcePropertiesFilter) {
         this.resourcePropertiesFilter = resourcePropertiesFilter;
         return this;
     }
@@ -95,7 +96,7 @@ public class LabelsFilter {
     }
 
     public LabelsFilter setAdditionalInfo(String additionalInfo) {
-        this.additionalInfo = additionalInfo;
+        this.additionalInfo = additionalInfo == null ? "" : additionalInfo;
         return this;
     }
 
@@ -103,29 +104,29 @@ public class LabelsFilter {
         return StringUtils.isNoneBlank(name, additionalInfo, selectedNamespaceFilter, selectedResourceTypeFilter, selectedResourcePropertyFilter, selectedResourceNameFilter);
     }
 
-    public ListModelList<String> getNamespacesFilter() {
+    public List<String> getNamespacesFilter() {
         return namespacesFilter;
     }
 
-    public LabelsFilter setNamespacesFilter(ListModelList<String> namespacesFilter) {
+    public LabelsFilter setNamespacesFilter(List<String> namespacesFilter) {
         this.namespacesFilter = namespacesFilter;
         return this;
     }
 
-    public ListModelList<String> getResourceTypesFilter() {
+    public List<String> getResourceTypesFilter() {
         return resourceTypesFilter;
     }
 
-    public LabelsFilter setResourceTypesFilter(ListModelList<String> resourceTypesFilter) {
+    public LabelsFilter setResourceTypesFilter(List<String> resourceTypesFilter) {
         this.resourceTypesFilter = resourceTypesFilter;
         return this;
     }
 
-    public ListModelList<String> getResourceNamesFilter() {
+    public List<String> getResourceNamesFilter() {
         return resourceNamesFilter;
     }
 
-    public LabelsFilter setResourceNamesFilter(ListModelList<String> resourceNamesFilter) {
+    public LabelsFilter setResourceNamesFilter(List<String> resourceNamesFilter) {
         this.resourceNamesFilter = resourceNamesFilter;
         return this;
     }

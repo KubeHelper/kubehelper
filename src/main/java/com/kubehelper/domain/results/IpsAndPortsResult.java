@@ -19,10 +19,13 @@ package com.kubehelper.domain.results;
 
 import com.kubehelper.common.Resource;
 
+import java.util.StringJoiner;
+
 /**
  * @author JDev
  */
 public class IpsAndPortsResult {
+
     private int id;
     private String namespace = "";
     private Resource resourceType;
@@ -34,8 +37,6 @@ public class IpsAndPortsResult {
     private String additionalInfo = "";
     private String details = "";
 
-    public IpsAndPortsResult() {
-    }
 
     public IpsAndPortsResult(int id) {
         this.id = id;
@@ -129,5 +130,21 @@ public class IpsAndPortsResult {
     public IpsAndPortsResult setDetails(String details) {
         this.details = details;
         return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", IpsAndPortsResult.class.getSimpleName() + "[", "]")
+                .add("id=" + id)
+                .add("namespace='" + namespace + "'")
+                .add("resourceType=" + resourceType)
+                .add("resourceName='" + resourceName + "'")
+                .add("creationTime='" + creationTime + "'")
+                .add("ip='" + ip + "'")
+                .add("ports='" + ports + "'")
+                .add("hostInfo='" + hostInfo + "'")
+                .add("additionalInfo='" + additionalInfo + "'")
+                .add("details='" + details + "'")
+                .toString();
     }
 }

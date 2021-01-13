@@ -69,8 +69,8 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
- * Class for displaying Kube Helper dashboard Cluster and nodes metrics.
- * ViewModel initializes ..kubehelper/pages/dashboard.zul
+ * Class for displaying and creating of cron jobs. And View of reports from cron jobs.
+ * ViewModel initializes ..kubehelper/pages/cron.zul
  *
  * @author JDev
  */
@@ -84,6 +84,20 @@ public class CronJobsVM implements EventListener<Event> {
 
     private String activeTab = "cronJobs";
 
+    private final String cronJobsReportsCss = "font-size: %spx;";
+    private int cronJobsReportsFontSize = 14;
+
+    private String cronJobName = "";
+    private String cronJobExpression = "";
+    private String cronJobEmail = "";
+    private String cronJobDescription = "";
+
+    private boolean wordWrapCommandsInReport;
+
+    private CronJobsModel model;
+
+    private ListModelList<CommandsResult> commandsResults = new ListModelList<>();
+
     @WireVariable
     private CronJobsService cronJobsService;
 
@@ -93,44 +107,70 @@ public class CronJobsVM implements EventListener<Event> {
     @WireVariable
     private Config config;
 
-    private final String cronJobsReportsCss = "font-size: %spx;";
-    private int cronJobsReportsFontSize = 14;
-
-    private final String commandsManagementCss = "font-size: %spx;";
-    private int commandsManagementFontSize = 14;
-
-    private boolean wordWrapCommandsInReport;
-
-    private CronJobsModel model;
-
-    private ListModelList<CommandsResult> commandsResults = new ListModelList<>();
+    @Wire("#cronJobsTabbox")
+    private Tabbox notificationContainer;
 
     @Wire
     private Footer commandsGridFooter;
 
-    private String cronJobName = "";
-    private String cronJobExpression = "";
-    private String cronJobEmail = "";
-    private String cronJobDescription = "";
 
     @Init
     public void init() {
         model = new CronJobsModel();
-        onInitPreparations();
+        cronJobsService.parsePredefinedCommands(model);
+        cronJobsService.parseUserCommands(model);
+        commandsResults = new ListModelList<>(model.getCommandsResults());
     }
 
     @AfterCompose
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) {
         Selectors.wireComponents(view, this, false);
         Selectors.wireEventListeners(view, this);
+        checkRuntimeNotificationExceptions();
     }
 
-    @Listen("onAfterSize=#centerLayoutCronJobsID")
+    @Listen("onAfterSize=#cronJobsTemplate")
     public void onAfterSizeCenter(AfterSizeEvent event) {
         centerLayoutHeight = event.getHeight() - 3;
-        BindUtils.postNotifyChange(null, null, this, ".");
+        BindUtils.postNotifyChange(this, ".");
     }
 
+    /**
+     * Processing of various events. Reports panel. On click on report.
+     *
+     * @param event - event.
+     */
+    @Override
+    public void onEvent(Event event) {
+        if (Events.ON_CLICK.equals(event.getName())) {
+            selectAndChangeSourceToolbarbuttonLabel(event);
+        }
+    }
+
+    /**
+     * Loads first report file into view and prepare links to other report files.
+     * Creates toolbarbuttons for each report group(cron job).
+     *
+     * @param tabbox - main tabbox @{@link Tabbox}.
+     */
+    @Command
+    public void onSelectMainCronJobsTabs(@ContextParam(ContextType.COMPONENT) Tabbox tabbox) {
+        activeTab = tabbox.getSelectedTab().getId();
+        if ("cronJobsReports".equals(tabbox.getSelectedTab().getId()) && StringUtils.isBlank(model.getSelectedReportRaw())) {
+            cronJobsService.prepareCronJobsReports(model);
+            redrawReportsToolbarbuttons("cronJobsReportsToolbarID", model.getCronJobsReportsForJob(), getCommandToolbarButtonId(model.getSelectedReportLabel()));
+            refreshReportsOutput();
+        }
+        checkRuntimeNotificationExceptions();
+    }
+
+
+    //  CRON JOBS METHODS ================
+
+
+    /**
+     * Validates and starts new cron job.
+     */
     @Command
     public void startCronJob() {
         if (isCronJobNotValid()) {
@@ -148,31 +188,7 @@ public class CronJobsVM implements EventListener<Event> {
                 .setShell("bash");
         cronJobsService.startCronJob(model, cronJobResult);
         checkExceptions();
-        updateActiveCronJobs();
-    }
-
-    /**
-     * Validate cron job parameters, email, name and expression.
-     *
-     * @return - true if cron job parameters are invalid.
-     */
-    private boolean isCronJobNotValid() {
-        if (StringUtils.isAnyBlank(cronJobName, cronJobExpression, model.getCommandToExecute())) {
-            Notification.show(String.format("Can't create cron job %s. Name, expression and command are required fields.", cronJobName), "error", null, "bottom_left", 5000);
-            return true;
-        }
-
-        if (!Pattern.matches("^[a-zA-Z0-9_-]*$", cronJobName)) {
-            Notification.show(String.format("Can't create cron job %s. The job name should contain only: letters, numbers, '-' and '_'", cronJobName),
-                    "error", null, "bottom_left", 5000);
-            return true;
-        }
-
-        if (StringUtils.isNotBlank(cronJobEmail) && !Pattern.matches("^(.+)@(\\S+)$", cronJobEmail)) {
-            Notification.show(String.format("Can't create cron job %s. The cron job email is invalid.", cronJobName), "error", null, "bottom_left", 5000);
-            return true;
-        }
-        return false;
+        updateActiveCronJobsUI();
     }
 
     @Command
@@ -181,7 +197,11 @@ public class CronJobsVM implements EventListener<Event> {
     }
 
 
-    private void updateActiveCronJobs() {
+    /**
+     * Updates active cron job view after create/rerun/remove action.
+     * With small delay for register new cron job.
+     */
+    private void updateActiveCronJobsUI() {
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
@@ -190,34 +210,50 @@ public class CronJobsVM implements EventListener<Event> {
         BindUtils.postNotifyChange(this, "activeCronJobs");
     }
 
+    /**
+     * Reruns stopped cron job.
+     *
+     * @param job - @{@link CronJobResult}
+     */
     @Command
     public void rerunCronJob(@BindingParam("job") CronJobResult job) {
         cronJobsService.rerunCronJob(job);
-        Notification.show(String.format("Cron Job %s was Started again.", job.getName()), "info", null, "bottom_left", 3000);
-        updateActiveCronJobs();
+        Notification.show(String.format("Cron Job %s was Started again.", job.getName()), "info", notificationContainer, "top_right", 3000);
+        updateActiveCronJobsUI();
     }
 
+    /**
+     * Stops running cron job and shows confirmation dialog before.
+     *
+     * @param job - @{@link CronJobResult}
+     */
     @Command
     public void stopCronJob(@BindingParam("job") CronJobResult job) {
         Messagebox.show(String.format("Are you sure you want to stop %s job?", job.getName()),
-                "Question", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION,
+                "Confirmation", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION,
                 (EventListener) e -> {
                     if (Messagebox.ON_OK.equals(e.getName())) {
                         if (Global.CRON_JOBS.get(job.getName()).shutdownCronJob()) {
-                            Notification.show(String.format("Cron Job %s was stopped.", job.getName()), "info", null, "bottom_left", 3000);
+                            Notification.show(String.format("Cron Job %s was stopped.", job.getName()), "info", notificationContainer, "top_right", 3000);
                         } else {
-                            Notification.show(String.format("An error occurred while stopping the cron job. Please look in the application log.", job.getName()), "error", null, "bottom_left", 5000);
+                            Notification.show(String.format("An error occurred while stopping the cron job. Please look in the application log.", job.getName()), "error", notificationContainer, "top_right", 5000);
                         }
-                        updateActiveCronJobs();
+                        updateActiveCronJobsUI();
                     }
                 }
         );
     }
 
+
+    /**
+     * Removes stopped cron job and shows confirmation dialog before.
+     *
+     * @param job - @{@link CronJobResult}
+     */
     @Command
     public void removeCronJob(@BindingParam("job") CronJobResult job) {
         Messagebox.show(String.format("Are you sure you want to delete %s job?", job.getName()),
-                "Question", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION,
+                "Confirmation", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION,
                 (EventListener) e -> {
                     if (Messagebox.ON_OK.equals(e.getName())) {
                         //additional checks, if job is done
@@ -226,16 +262,98 @@ public class CronJobsVM implements EventListener<Event> {
                         }
                         //remove job from jobs list
                         if (Objects.nonNull(Global.CRON_JOBS.remove(job.getName()))) {
-                            Notification.show(String.format("Cron Job %s was deleted.", job.getName()), "info", null, "bottom_left", 3000);
+                            Notification.show(String.format("Cron Job %s was deleted.", job.getName()), "info", notificationContainer, "top_right", 3000);
                         } else {
-                            Notification.show(String.format("An error occurred while stopping the cron job. Please look in the application log.", job.getName()), "error", null, "bottom_left", 5000);
+                            Notification.show(String.format("An error occurred while stopping the cron job. Please look in the application log.", job.getName()), "error", notificationContainer, "top_right", 5000);
                         }
-                        updateActiveCronJobs();
+                        updateActiveCronJobsUI();
                     }
                 }
         );
     }
 
+    /**
+     * Filters searches and refresh total items label and commands results view.
+     */
+    @Command
+    @NotifyChange({"commandsTotalItems", "commandsResults"})
+    public void filterCommands() {
+        commandsResults.clear();
+        for (CommandsResult commandeResult : model.getCommandsResults()) {
+            if (commonService.checkEqualsFilter(commandeResult.getGroup(), getFilter().getSelectedGroupFilter()) &&
+                    commonService.checkEqualsFilter(commandeResult.getFile(), getFilter().getSelectedFileFilter()) &&
+                    StringUtils.containsIgnoreCase(commandeResult.getName(), getFilter().getName()) &&
+                    StringUtils.containsIgnoreCase(commandeResult.getCommand(), getFilter().getCommand()) &&
+                    StringUtils.containsIgnoreCase(commandeResult.getDescription(), getFilter().getDescription())) {
+                commandsResults.add(commandeResult);
+            }
+        }
+    }
+
+
+    /**
+     * Synchronizes command to execute and hot replacement on full command textbox onChange event.
+     */
+    @Command
+    @NotifyChange({"commandToExecute", "commandToExecuteEditable"})
+    public void synchronizeCommandToExecute() {
+        model.setCommandToExecute(getCommandWithoutUnnecessaryWhitespaces(model.getCommandToExecuteEditable()));
+    }
+
+
+    /**
+     * Shows full command by clicking on grid item.
+     *
+     * @param item - commands grid item @{@link CommandsResult}.
+     */
+    @Command
+    @NotifyChange({"commandToExecute", "commandToExecuteEditable"})
+    public void showFullCommand(@BindingParam("clickedItem") CommandsResult item) {
+        model.setCommandToExecute(getCommandWithoutUnnecessaryWhitespaces(item.getCommand()));
+        model.setCommandToExecuteEditable(item.getCommand().trim());
+    }
+
+    /**
+     * Replaces \n with spaces in command.
+     *
+     * @param commandToExecuteEditable - editable command to execute.
+     * @return - replaced string without Unnecessary whitespaces.
+     */
+    private String getCommandWithoutUnnecessaryWhitespaces(String commandToExecuteEditable) {
+        return commandToExecuteEditable.replaceAll("\\n", " ").replaceAll(" +", " ").trim();
+    }
+
+
+    /**
+     * Validate cron job parameters, email, name and expression.
+     *
+     * @return - true if cron job parameters are invalid.
+     */
+    private boolean isCronJobNotValid() {
+        if (StringUtils.isAnyBlank(cronJobName, cronJobExpression, model.getCommandToExecute())) {
+            Notification.show(String.format("Can't create cron job %s. Name, expression and command are required fields.", cronJobName), "error", notificationContainer, "top_right", 5000);
+            return true;
+        }
+
+        if (!Pattern.matches("^[a-zA-Z0-9_-]*$", cronJobName)) {
+            Notification.show(String.format("Can't create cron job %s. The job name should contain only: letters, numbers, '-' and '_'", cronJobName),
+                    "error", notificationContainer, "top_right", 5000);
+            return true;
+        }
+
+        if (StringUtils.isNotBlank(cronJobEmail) && !Pattern.matches("^(.+)@(\\S+)$", cronJobEmail)) {
+            Notification.show(String.format("Can't create cron job %s. The cron job email is invalid.", cronJobName), "error", notificationContainer, "top_right", 5000);
+            return true;
+        }
+        return false;
+    }
+
+
+    /**
+     * Checks if model has errors and shows popup windows with errors.
+     *
+     * @return - true if model has no exceptions.
+     */
     private boolean checkExceptions() {
         if (model.hasErrors()) {
             Window window = (Window) Executions.createComponents(Global.PATH_TO_ERROR_RESOURCE_ZUL, null, Map.of("errors", model.getExceptions()));
@@ -247,43 +365,8 @@ public class CronJobsVM implements EventListener<Event> {
     }
 
 
-    /**
-     * Prepare commands view.
-     * Parse predefined and user commands an pull namespaces.
-     */
-    private void onInitPreparations() {
-        cronJobsService.parsePredefinedCommands(model);
-        cronJobsService.parseUserCommands(model);
-        commandsResults = new ListModelList<>(model.getCommandsResults());
-        checkRuntimeNotificationExceptions();
-    }
+    //  CRON JOBS REPORTS METHODS ================
 
-
-    /**
-     * Processing of various events
-     *
-     * @param event - event.
-     */
-    @Override
-    public void onEvent(Event event) {
-        if (Events.ON_CLICK.equals(event.getName())) { //Changes raw source in management,history and toolbarbutton state.
-            selectAndChangeSourceToolbarbuttonLabel(event);
-        }
-    }
-
-    /**
-     * Loads last command history file into view and prepare links to other history files.
-     */
-    @Command
-    public void onSelectMainCronJobsTabs(@ContextParam(ContextType.COMPONENT) Tabbox tabbox) {
-        activeTab = tabbox.getSelectedTab().getId();
-        if ("cronJobsReports".equals(tabbox.getSelectedTab().getId()) && StringUtils.isBlank(model.getSelectedReportRaw())) {
-            cronJobsService.prepareCronJobsReports(model);
-            redrawCommandsToolbarbuttons("cronJobsReportsToolbarID", model.getCronJobsReportsForJob(), getCommandToolbarButtonId(model.getSelectedReportLabel()));
-            refreshReportsOutput();
-        }
-        checkRuntimeNotificationExceptions();
-    }
 
     /**
      * Refreshes commands history output div.
@@ -301,7 +384,7 @@ public class CronJobsVM implements EventListener<Event> {
      */
     private void checkRuntimeNotificationExceptions() {
         if (StringUtils.isNotBlank(model.getRuntimeNotificationExceptions())) {
-            Notification.show(model.getRuntimeNotificationExceptions(), "error", null, "bottom_right", 5000);
+            Notification.show(model.getRuntimeNotificationExceptions(), "error", notificationContainer, "top_right", 5000);
         }
     }
 
@@ -310,9 +393,9 @@ public class CronJobsVM implements EventListener<Event> {
      *
      * @param toolbarId             - toolbar id.
      * @param entries               - set with button labels.
-     * @param activeToolbarButtonId - sets active toolbarbutton if history exists.
+     * @param activeToolbarButtonId - sets active toolbarbutton if report exists.
      */
-    private void redrawCommandsToolbarbuttons(String toolbarId, List<String> entries, String activeToolbarButtonId) {
+    private void redrawReportsToolbarbuttons(String toolbarId, List<String> entries, String activeToolbarButtonId) {
         createReportsToolbarButtons(toolbarId, entries);
         if (StringUtils.isNotBlank(model.getSelectedReportLabel())) {
             enableDisableMenuItem(activeToolbarButtonId, true, "bold;");
@@ -320,7 +403,10 @@ public class CronJobsVM implements EventListener<Event> {
     }
 
     /**
-     * Creates toolbarbuttons on the commands management and commands history tabs for view sources/files.
+     * Creates toolbarbuttons on the reports tabs for view reports.
+     *
+     * @param toolbarId - id of main container for toolbarbuttons.
+     * @param sources   - Set with labels(keys) for toolbarbuttons.
      */
     private void createReportsToolbarButtons(String toolbarId, List<String> sources) {
         Vbox commandsSourcesToolbar = (Vbox) Path.getComponent("//indexPage/templateInclude/" + toolbarId);
@@ -337,7 +423,7 @@ public class CronJobsVM implements EventListener<Event> {
     }
 
     /**
-     * Make active or inactive menu item for commands management and history.
+     * Make active or inactive menu item for report.
      *
      * @param toolbarbuttonId - toolbarbutton id.
      * @param disabled        - disable or enable button.
@@ -349,63 +435,16 @@ public class CronJobsVM implements EventListener<Event> {
         toolbarbutton.setStyle("text-align: left;font-weight: " + fontWeight);
     }
 
+    /**
+     * Generates id for new toolbarbutton from label.
+     *
+     * @param label - toolbarbutton label.
+     * @return - generated id.
+     */
     private String getCommandToolbarButtonId(String label) {
         return label.replaceAll("[^a-zA-Z0-9]", "") + "Id";
     }
 
-
-    /**
-     * Filters searches and refresh total items label and search results view.
-     */
-    @Command
-    @NotifyChange({"commandsTotalItems", "commandsResults"})
-    public void filterCommands() {
-        commandsResults.clear();
-        for (CommandsResult commandeResult : model.getCommandsResults()) {
-            if (commonService.checkEqualsFilter(commandeResult.getGroup(), getFilter().getSelectedGroupFilter()) &&
-                    commonService.checkEqualsFilter(commandeResult.getFile(), getFilter().getSelectedFileFilter()) &&
-                    StringUtils.containsIgnoreCase(commandeResult.getName(), getFilter().getName()) &&
-                    StringUtils.containsIgnoreCase(commandeResult.getCommand(), getFilter().getCommand()) &&
-                    StringUtils.containsIgnoreCase(commandeResult.getDescription(), getFilter().getDescription())) {
-                commandsResults.add(commandeResult);
-            }
-        }
-    }
-
-    /**
-     * Synchronizes command to execute and hot replacement on full command textbox onChange event.
-     */
-    @Command
-    public void synchronizeCommandToExecute() {
-        model.setCommandToExecute(getCommandWithoutUnnecessaryWhitespaces(model.getCommandToExecuteEditable()));
-        BindUtils.postNotifyChange(this, "commandToExecute", "commandToExecuteEditable");
-    }
-
-    /**
-     * Replaces \n with spaces in commad.
-     *
-     * @param commandToExecuteEditable - editable command to execute.
-     * @return - replaced string without Unnecessary whitespaces.
-     */
-    private String getCommandWithoutUnnecessaryWhitespaces(String commandToExecuteEditable) {
-//        return commandToExecuteEditable.replaceAll("\\n", " ");
-//        TODO correct replacement
-        return commandToExecuteEditable.replaceAll("\\n", " ").replaceAll(" +", " ");
-    }
-
-
-    /**
-     * Shows full command by clicking on grid item.
-     *
-     * @param item - commands grid item.
-     */
-    @Command
-    @NotifyChange({"commandToExecute", "commandToExecuteEditable"})
-    public void showFullCommand(@BindingParam("clickedItem") CommandsResult item) {
-//        TODO
-        model.setCommandToExecute(getCommandWithoutUnnecessaryWhitespaces(item.getCommand()));
-        model.setCommandToExecuteEditable(item.getCommand());
-    }
 
     /**
      * Returns commands results for grid and shows Notification if nothing was found or/and error window if some errors has occurred while parsing the results.
@@ -414,7 +453,7 @@ public class CronJobsVM implements EventListener<Event> {
      */
     public ListModelList<CommandsResult> getCommandsResults() {
         if (isOnInit && commandsResults.isEmpty()) {
-            Notification.show("Nothing found.", "info", commandsGridFooter, "bottom_right", 2000);
+            Notification.show("Nothing found.", "info", commandsGridFooter, "before_end", 2000);
         }
         if (isOnInit && !commandsResults.isEmpty()) {
             Notification.show("Loaded: " + commandsResults.size() + " items", "info", commandsGridFooter, "before_end", 2000);
@@ -431,7 +470,7 @@ public class CronJobsVM implements EventListener<Event> {
     /**
      * Changes raw source and toolbarbutton state by onClick event.
      *
-     * @param event - onClick event.
+     * @param event - @Events.ON_CLICK event.
      */
     private void selectAndChangeSourceToolbarbuttonLabel(Event event) {
         String label = ((Toolbarbutton) event.getTarget()).getLabel();
@@ -439,7 +478,8 @@ public class CronJobsVM implements EventListener<Event> {
         if ("cronJobsReports".equals(activeTab)) {
             oldToolbarbuttonId = getCommandToolbarButtonId(model.getSelectedReportLabel());
             model.setSelectedReportLabel(label);
-            cronJobsService.changeHistoryRaw(model);
+//            TODO
+//            cronJobsService.changeHistoryRaw(model);
             refreshReportsOutput();
         }
         String newToolbarbuttonId = getCommandToolbarButtonId(label);
@@ -453,22 +493,43 @@ public class CronJobsVM implements EventListener<Event> {
         if (!first.isEmpty()) {
             model.setSelectedReportRaw(commonService.getResourceAsStringByPath(first.get(0).getFilePath()));
             model.setSelectedReportLabel(first.get(0).getLabel());
-            redrawCommandsToolbarbuttons("cronJobsReportsToolbarID", model.getCronJobsReportsForJob(), getCommandToolbarButtonId(model.getSelectedReportLabel()));
+            redrawReportsToolbarbuttons("cronJobsReportsToolbarID", model.getCronJobsReportsForJob(), getCommandToolbarButtonId(model.getSelectedReportLabel()));
             refreshReportsOutput();
         } else {
             Notification.show("There are no reports for this job.", "info", null, "bottom_left", 3000);
         }
     }
 
-
     @Command
     public void refreshReports() {
+
+    }
+
+    @Command
+    public void wordWrapCommandsInReports() {
+
+    }
+
+    @Command
+    public void cronJobsReportsChangeFontSize() {
 
     }
 
 
     //  COMMANDS GETTERS AND SETTERS ================
 
+
+    public String getCommandsGridHeight() {
+        return centerLayoutHeight * 0.3 + "px";
+    }
+
+    public String getNewCronJobBoxHeight() {
+        return centerLayoutHeight * 0.185 + "px";
+    }
+    
+    public String getCronJobsListGroupBoxHeight() {
+        return centerLayoutHeight > 1200 ? centerLayoutHeight * 0.46 + "px" : centerLayoutHeight * 0.41 + "px";
+    }
 
     public CommandsFilter getFilter() {
         return model.getFilter();
@@ -484,18 +545,6 @@ public class CronJobsVM implements EventListener<Event> {
 
     public void setCommandToExecute(String commandToExecute) {
         model.setCommandToExecute(commandToExecute);
-    }
-
-    public String getCommandsGridHeight() {
-        return centerLayoutHeight * 0.3 + "px";
-    }
-
-    public String getCronJobBoxHeight() {
-        return centerLayoutHeight * 0.1 + "px";
-    }
-
-    public String getCronJobsListHeight() {
-        return centerLayoutHeight * 0.47 + "px";
     }
 
     public String getCommandToExecuteEditable() {
@@ -517,7 +566,6 @@ public class CronJobsVM implements EventListener<Event> {
     public List<String> getShells() {
         return model.getShells();
     }
-
 
     public ListModelList<CronJobResult> getActiveCronJobs() {
         return new ListModelList<>(cronJobsService.getActiveCronJobs());
@@ -562,6 +610,22 @@ public class CronJobsVM implements EventListener<Event> {
     //  CRON JOBS REPORTS GETTERS AND SETTERS ================
 
 
+    public String getCronJobsReportsSrcPanelHeight() {
+        return centerLayoutHeight - 95 + "px";
+    }
+
+    public String getCronJobsReportsHeight() {
+        return centerLayoutHeight - 50 + "px";
+    }
+
+    public String getCronJobsReportsCss() {
+        return String.format(cronJobsReportsCss, cronJobsReportsFontSize);
+    }
+
+    public Set<String> getAllCronJobsReportsGroups() {
+        return model.getCronJobsReports().keySet();
+    }
+
     public String getSelectedCronJobsReportRaw() {
         return model.getSelectedReportRaw();
     }
@@ -574,14 +638,6 @@ public class CronJobsVM implements EventListener<Event> {
         model.setSelectedReportLabel(selectedCommandsHistory);
     }
 
-    public String getCronJobsReportsSrcPanelHeight() {
-        return centerLayoutHeight - 95 + "px";
-    }
-
-    public String getCronJobsReportsHeight() {
-        return centerLayoutHeight - 50 + "px";
-    }
-
     public boolean isWordWrapCommandsInReport() {
         return wordWrapCommandsInReport;
     }
@@ -592,14 +648,6 @@ public class CronJobsVM implements EventListener<Event> {
 
     public int getCronJobsReportsFontSize() {
         return cronJobsReportsFontSize;
-    }
-
-    public String getCronJobsReportsCss() {
-        return String.format(cronJobsReportsCss, cronJobsReportsFontSize);
-    }
-
-    public Set<String> getAllCronJobsReportsGroups() {
-        return model.getCronJobsReports().keySet();
     }
 
     public void setSelectedReportsFolder(String selectedReportsFolder) {

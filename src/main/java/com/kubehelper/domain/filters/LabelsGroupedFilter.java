@@ -21,19 +21,17 @@ package com.kubehelper.domain.filters;
  * @author JDev
  */
 public class LabelsGroupedFilter {
+
     private String name = "";
     private String amount = "";
 
-    public LabelsGroupedFilter() {
-    }
 
     public String getName() {
         return name;
     }
 
-    public LabelsGroupedFilter setName(String name) {
-        this.name = name;
-        return this;
+    public void setName(String name) {
+        this.name = name == null ? "" : name;
     }
 
     public String getAmount() {
@@ -41,6 +39,6 @@ public class LabelsGroupedFilter {
     }
 
     public void setAmount(String amount) {
-        this.amount = amount;
+        this.amount = amount == null ? "" : amount;
     }
 }

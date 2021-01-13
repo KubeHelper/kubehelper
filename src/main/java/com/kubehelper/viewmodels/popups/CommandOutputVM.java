@@ -34,7 +34,6 @@ import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
-import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Div;
 import org.zkoss.zul.Html;
@@ -105,7 +104,7 @@ public class CommandOutputVM implements EventListener<Event> {
     public void onEvent(Event event) {
         Slider fontSlider = (Slider) event.getTarget();
         fontSize = fontSlider.getCurpos();
-        BindUtils.postNotifyChange(null, null, this, "fontSizeCss");
+        BindUtils.postNotifyChange( this, "fontSizeCss");
     }
 
     /**
@@ -114,7 +113,7 @@ public class CommandOutputVM implements EventListener<Event> {
     private void highlightBlock() {
         Div highlightBlock = (Div) Path.getComponent("/commandOutputWindowID/commandOutputWindowId");
         highlightBlock.appendChild(new Html("<pre><code>" + commandOutput + "</code></pre>"));
-        BindUtils.postNotifyChange(null, null, this, ".");
+        BindUtils.postNotifyChange( this, ".");
 //        Clients.evalJavaScript("highlightBlock();");
     }
 

@@ -17,10 +17,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package com.kubehelper.domain.results;
 
+import java.util.StringJoiner;
+
 /**
  * @author JDev
  */
 public class ContainerSecurityResult {
+
     private int id;
     private String resourceName = "null";
     private String podName = "null";
@@ -44,8 +47,6 @@ public class ContainerSecurityResult {
     private String creationTime = "null";
     private String fullDefinition = "null";
 
-    public ContainerSecurityResult() {
-    }
 
     public ContainerSecurityResult(int id) {
         this.id = id;
@@ -188,5 +189,27 @@ public class ContainerSecurityResult {
     public ContainerSecurityResult setFullDefinition(String fullDefinition) {
         this.fullDefinition = fullDefinition;
         return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", ContainerSecurityResult.class.getSimpleName() + "[", "]")
+                .add("id=" + id)
+                .add("resourceName='" + resourceName + "'")
+                .add("podName='" + podName + "'")
+                .add("allowPrivilegeEscalation='" + allowPrivilegeEscalation + "'")
+                .add("capabilities='" + capabilities + "'")
+                .add("privileged='" + privileged + "'")
+                .add("procMount='" + procMount + "'")
+                .add("readOnlyRootFilesystem='" + readOnlyRootFilesystem + "'")
+                .add("runAsGroup='" + runAsGroup + "'")
+                .add("runAsNonRoot='" + runAsNonRoot + "'")
+                .add("runAsUser='" + runAsUser + "'")
+                .add("seLinuxOptions='" + seLinuxOptions + "'")
+                .add("windowsOptions='" + windowsOptions + "'")
+                .add("namespace='" + namespace + "'")
+                .add("creationTime='" + creationTime + "'")
+                .add("fullDefinition='" + fullDefinition + "'")
+                .toString();
     }
 }

@@ -17,6 +17,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package com.kubehelper.domain.results;
 
+import java.util.StringJoiner;
+
 /**
  * @author JDev
  */
@@ -25,22 +27,20 @@ public class PodSecurityContextResult {
     private int id;
     private String resourceName = "";
 
-    private String fsGroup;
-    private String fsGroupChangePolicy;
-    private String runAsGroup;
-    private String runAsNonRoot;
-    private String runAsUser;
-    private String seLinuxOptions;
-    private String supplementalGroups = null;
-    private String sysctls = null;
-    private String windowsOptions;
+    private String fsGroup = "";
+    private String fsGroupChangePolicy = "";
+    private String runAsGroup = "";
+    private String runAsNonRoot = "";
+    private String runAsUser = "";
+    private String seLinuxOptions = "";
+    private String supplementalGroups = "";
+    private String sysctls = "";
+    private String windowsOptions = "";
 
     private String namespace = "";
     private String creationTime = "";
     private String fullDefinition = "";
 
-    public PodSecurityContextResult() {
-    }
 
     public PodSecurityContextResult(int id) {
         this.id = id;
@@ -165,5 +165,25 @@ public class PodSecurityContextResult {
     public PodSecurityContextResult setFullDefinition(String fullDefinition) {
         this.fullDefinition = fullDefinition;
         return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", PodSecurityContextResult.class.getSimpleName() + "[", "]")
+                .add("id=" + id)
+                .add("resourceName='" + resourceName + "'")
+                .add("fsGroup='" + fsGroup + "'")
+                .add("fsGroupChangePolicy='" + fsGroupChangePolicy + "'")
+                .add("runAsGroup='" + runAsGroup + "'")
+                .add("runAsNonRoot='" + runAsNonRoot + "'")
+                .add("runAsUser='" + runAsUser + "'")
+                .add("seLinuxOptions='" + seLinuxOptions + "'")
+                .add("supplementalGroups='" + supplementalGroups + "'")
+                .add("sysctls='" + sysctls + "'")
+                .add("windowsOptions='" + windowsOptions + "'")
+                .add("namespace='" + namespace + "'")
+                .add("creationTime='" + creationTime + "'")
+                .add("fullDefinition='" + fullDefinition + "'")
+                .toString();
     }
 }

@@ -104,7 +104,7 @@ public class IpsAndPortsVM {
     @Listen("onAfterSize=#centerLayoutIpsAndPortsID")
     public void onAfterSizeCenter(AfterSizeEvent event) {
         centerLayoutHeight = event.getHeight() - 3;
-        BindUtils.postNotifyChange(null, null, this, ".");
+        BindUtils.postNotifyChange( this, ".");
     }
 
     /**

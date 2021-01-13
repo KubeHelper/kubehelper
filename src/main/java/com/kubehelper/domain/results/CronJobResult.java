@@ -17,6 +17,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package com.kubehelper.domain.results;
 
+import java.util.StringJoiner;
+
 /**
  * @author JDev
  */
@@ -32,6 +34,7 @@ public class CronJobResult {
     private String description = "";
     private String reportsFolderPath = "";
     private boolean isDone;
+
 
     public CronJobResult(int id) {
         this.id = id;
@@ -128,18 +131,17 @@ public class CronJobResult {
 
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("CronJobResult{");
-        sb.append("id=").append(id);
-        sb.append(", name='").append(name).append('\'');
-        sb.append(", expression='").append(expression).append('\'');
-        sb.append(", command='").append(command).append('\'');
-        sb.append(", shell='").append(shell).append('\'');
-        sb.append(", runs=").append(runs);
-        sb.append(", email='").append(email).append('\'');
-        sb.append(", description='").append(description).append('\'');
-        sb.append(", reportsFolderPath='").append(reportsFolderPath).append('\'');
-        sb.append(", isDone=").append(isDone);
-        sb.append('}');
-        return sb.toString();
+        return new StringJoiner(", ", CronJobResult.class.getSimpleName() + "[", "]")
+                .add("id=" + id)
+                .add("name='" + name + "'")
+                .add("expression='" + expression + "'")
+                .add("command='" + command + "'")
+                .add("shell='" + shell + "'")
+                .add("runs=" + runs)
+                .add("email='" + email + "'")
+                .add("description='" + description + "'")
+                .add("reportsFolderPath='" + reportsFolderPath + "'")
+                .add("isDone=" + isDone)
+                .toString();
     }
 }

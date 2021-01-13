@@ -144,7 +144,7 @@ public class SecurityVM {
     @Listen("onAfterSize=#centerLayoutSecurityID")
     public void onAfterSizeCenter(AfterSizeEvent event) {
         centerLayoutHeight = event.getHeight() - 120;
-        BindUtils.postNotifyChange(null, null, this, ".");
+        BindUtils.postNotifyChange(this, ".");
     }
 
     //  GETTING ================

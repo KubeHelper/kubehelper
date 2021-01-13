@@ -17,16 +17,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package com.kubehelper.domain.results;
 
+import java.util.StringJoiner;
+
 /**
  * @author JDev
  */
 public class CommandsResult {
+
     private int id;
     private String group = "";
     private String command = "";
     private String name = "";
     private String description = "";
     private String file = "";
+
 
     public CommandsResult(int id) {
         this.id = id;
@@ -83,14 +87,13 @@ public class CommandsResult {
 
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("CommandsResult{");
-        sb.append("id=").append(id);
-        sb.append(", group='").append(group).append('\'');
-        sb.append(", command='").append(command).append('\'');
-        sb.append(", name='").append(name).append('\'');
-        sb.append(", description='").append(description).append('\'');
-        sb.append(", file='").append(file).append('\'');
-        sb.append('}');
-        return sb.toString();
+        return new StringJoiner(", ", CommandsResult.class.getSimpleName() + "[", "]")
+                .add("id=" + id)
+                .add("group='" + group + "'")
+                .add("command='" + command + "'")
+                .add("name='" + name + "'")
+                .add("description='" + description + "'")
+                .add("file='" + file + "'")
+                .toString();
     }
 }

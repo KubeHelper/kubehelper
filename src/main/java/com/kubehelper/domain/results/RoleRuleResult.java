@@ -19,11 +19,13 @@ package com.kubehelper.domain.results;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringJoiner;
 
 /**
  * @author JDev
  */
 public class RoleRuleResult {
+
     private int id;
     private List<String> apiGroups = new ArrayList<>();
     private List<String> nonResourceURLs = new ArrayList<>();
@@ -32,8 +34,6 @@ public class RoleRuleResult {
     private List<String> verbs = new ArrayList<>();
     private String fullDefinition = "";
 
-    public RoleRuleResult() {
-    }
 
     public String getApiGroupsAsString() {
         return apiGroups == null ? "" : String.join(", ", apiGroups);
@@ -120,5 +120,18 @@ public class RoleRuleResult {
     public RoleRuleResult setFullDefinition(String fullDefinition) {
         this.fullDefinition = fullDefinition;
         return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", RoleRuleResult.class.getSimpleName() + "[", "]")
+                .add("id=" + id)
+                .add("apiGroups=" + apiGroups)
+                .add("nonResourceURLs=" + nonResourceURLs)
+                .add("resourceNames=" + resourceNames)
+                .add("resources=" + resources)
+                .add("verbs=" + verbs)
+                .add("fullDefinition='" + fullDefinition + "'")
+                .toString();
     }
 }

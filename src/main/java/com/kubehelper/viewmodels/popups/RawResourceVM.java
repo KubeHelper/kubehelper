@@ -131,7 +131,7 @@ public class RawResourceVM implements EventListener<Event> {
         if ("onScroll".equals(event.getName())) {
             Slider fontSlider = (Slider) event.getTarget();
             fontSize = fontSlider.getCurpos();
-            BindUtils.postNotifyChange(null, null, this, "tabPanelFontSize");
+            BindUtils.postNotifyChange( this, "tabPanelFontSize");
         } else if ("onSelect".equals(event.getName())) {
             Tab tab = (Tab) event.getTarget();
             switch (tab.getId()) {
@@ -215,7 +215,7 @@ public class RawResourceVM implements EventListener<Event> {
     private void highlightBlock(String blockId, String blockClass, String content) {
         Div highlightBlock = (Div) Path.getComponent("/rawResourceWindowID/" + blockId);
         highlightBlock.appendChild(new Html("<pre><code class=" + blockClass + ">" + content + "</code></pre>"));
-        BindUtils.postNotifyChange(null, null, this, ".");
+        BindUtils.postNotifyChange( this, ".");
         Clients.evalJavaScript(String.format("highlightBlock('%s');", blockClass));
     }
 

@@ -19,11 +19,13 @@ package com.kubehelper.domain.results;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringJoiner;
 
 /**
  * @author JDev
  */
 public class UtilResult {
+
     private int id;
     private String name = "";
     private String version = "";
@@ -32,6 +34,7 @@ public class UtilResult {
     private String category = "";
     private String description = "";
     private List<String> links = new ArrayList<>();
+
 
     public UtilResult(int id) {
         this.id = id;
@@ -98,5 +101,19 @@ public class UtilResult {
     public UtilResult setLinks(List<String> links) {
         this.links = links;
         return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", UtilResult.class.getSimpleName() + "[", "]")
+                .add("id=" + id)
+                .add("name='" + name + "'")
+                .add("version='" + version + "'")
+                .add("shellCommand='" + shellCommand + "'")
+                .add("versionCheckCommand='" + versionCheckCommand + "'")
+                .add("category='" + category + "'")
+                .add("description='" + description + "'")
+                .add("links=" + links)
+                .toString();
     }
 }

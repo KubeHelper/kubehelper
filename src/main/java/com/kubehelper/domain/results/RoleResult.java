@@ -22,6 +22,7 @@ import io.kubernetes.client.openapi.models.V1beta1Subject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringJoiner;
 
 /**
  * @author JDev
@@ -34,15 +35,32 @@ public class RoleResult {
     private String creationTime = "";
     private String fullDefinition = "";
     private Resource resourceType;
-    //    private List<String> roleSelectors = new ArrayList<>();
     private List<RoleBindingSubject> subjects = new ArrayList<>();
     private List<RoleRuleResult> roleRules = new ArrayList<>();
 
-    public RoleResult() {
-    }
 
     public RoleResult(int id) {
         this.id = id;
+    }
+
+    public void addRoleRules(List<RoleRuleResult> rules) {
+        roleRules = rules;
+    }
+
+    public void addRoleSubjects(List<V1beta1Subject> kubeSubjects) {
+        if (kubeSubjects != null) {
+            kubeSubjects.forEach(s -> {
+                subjects.add(convertSubject(s));
+            });
+        }
+    }
+
+    public RoleBindingSubject convertSubject(V1beta1Subject subject) {
+        RoleBindingSubject roleBindingSubject = new RoleBindingSubject();
+        roleBindingSubject.kind = subject.getKind();
+        roleBindingSubject.name = subject.getName();
+        roleBindingSubject.namespace = subject.getNamespace();
+        return roleBindingSubject;
     }
 
     public int getId() {
@@ -116,30 +134,10 @@ public class RoleResult {
         return this;
     }
 
-    public void addRoleRules(List<RoleRuleResult> rules) {
-        roleRules = rules;
-    }
-
-    public void addRoleSubjects(List<V1beta1Subject> kubeSubjects) {
-        if (kubeSubjects != null) {
-            kubeSubjects.forEach(s -> {
-                subjects.add(convertSubject(s));
-            });
-        }
-    }
-
-    public RoleBindingSubject convertSubject(V1beta1Subject subject) {
-        RoleBindingSubject roleBindingSubject = new RoleBindingSubject();
-        roleBindingSubject.kind = subject.getKind();
-        roleBindingSubject.name = subject.getName();
-        roleBindingSubject.namespace = subject.getNamespace();
-        return roleBindingSubject;
-    }
-
     public class RoleBindingSubject {
-        private String kind;
-        private String name;
-        private String namespace;
+        private String kind = "";
+        private String name = "";
+        private String namespace = "";
 
         public String getKind() {
             return kind;
@@ -152,5 +150,28 @@ public class RoleResult {
         public String getNamespace() {
             return namespace;
         }
+
+        @Override
+        public String toString() {
+            return new StringJoiner(", ", RoleBindingSubject.class.getSimpleName() + "[", "]")
+                    .add("kind='" + kind + "'")
+                    .add("name='" + name + "'")
+                    .add("namespace='" + namespace + "'")
+                    .toString();
+        }
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", RoleResult.class.getSimpleName() + "[", "]")
+                .add("id=" + id)
+                .add("resourceName='" + resourceName + "'")
+                .add("namespace='" + namespace + "'")
+                .add("creationTime='" + creationTime + "'")
+                .add("fullDefinition='" + fullDefinition + "'")
+                .add("resourceType=" + resourceType)
+                .add("subjects=" + subjects)
+                .add("roleRules=" + roleRules)
+                .toString();
     }
 }

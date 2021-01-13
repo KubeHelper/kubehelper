@@ -20,7 +20,9 @@ package com.kubehelper.controllers;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
-
+/**
+ * Kube Helper controller.
+ */
 @Controller
 public class KubeHelperController {
 

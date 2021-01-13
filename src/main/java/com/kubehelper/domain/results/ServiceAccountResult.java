@@ -19,10 +19,13 @@ package com.kubehelper.domain.results;
 
 import com.kubehelper.common.Resource;
 
+import java.util.StringJoiner;
+
 /**
  * @author JDev
  */
 public class ServiceAccountResult {
+
     private int id;
     private String resourceName = "";
     private Resource resourceType = Resource.SERVICE_ACCOUNT;
@@ -32,8 +35,6 @@ public class ServiceAccountResult {
     private String creationTime = "";
     private String fullDefinition = "";
 
-    public ServiceAccountResult() {
-    }
 
     public ServiceAccountResult(int id) {
         this.id = id;
@@ -99,5 +100,19 @@ public class ServiceAccountResult {
     public ServiceAccountResult setFullDefinition(String fullDefinition) {
         this.fullDefinition = fullDefinition;
         return this;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", ServiceAccountResult.class.getSimpleName() + "[", "]")
+                .add("id=" + id)
+                .add("resourceName='" + resourceName + "'")
+                .add("resourceType=" + resourceType)
+                .add("kind='" + kind + "'")
+                .add("namespace='" + namespace + "'")
+                .add("secrets='" + secrets + "'")
+                .add("creationTime='" + creationTime + "'")
+                .add("fullDefinition='" + fullDefinition + "'")
+                .toString();
     }
 }

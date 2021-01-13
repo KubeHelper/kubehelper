@@ -18,15 +18,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package com.kubehelper.domain.filters;
 
 import org.apache.commons.lang3.StringUtils;
-import org.zkoss.zul.ListModelList;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author JDev
  */
 public class RBACFilter {
+    
     private String apiGroup = "", others = "";
 
     private String selectedResourceNameFilter = "";
@@ -47,15 +47,13 @@ public class RBACFilter {
     private String verbDeleteCollection = "";
     private String verbOthers = "";
 
-    private ListModelList<String> resourceNamesFilter = new ListModelList<>();
-    private ListModelList<String> subjectKindsFilter = new ListModelList<>();
-    private ListModelList<String> subjectNamesFilter = new ListModelList<>();
-    private ListModelList<String> resourceTypesFilter = new ListModelList<>();
-    private ListModelList<String> namespacesFilter = new ListModelList<>();
-    private ListModelList<String> roleNamesFilter = new ListModelList<>();
+    private List<String> resourceNamesFilter = new ArrayList<>();
+    private List<String> subjectKindsFilter = new ArrayList<>();
+    private List<String> subjectNamesFilter = new ArrayList<>();
+    private List<String> resourceTypesFilter = new ArrayList<>();
+    private List<String> namespacesFilter = new ArrayList<>();
+    private List<String> roleNamesFilter = new ArrayList<>();
 
-    public RBACFilter() {
-    }
 
     public void addResourceNamesFilter(String resourceNameFilter) {
         if (!resourceNamesFilter.contains(resourceNameFilter)) {
@@ -100,12 +98,16 @@ public class RBACFilter {
                 selectedRoleNameFilter, selectedResourceNameFilter, selectedSubjectKindFilter, selectedSubjectNameFilter, selectedResourceTypeFilter, selectedNamespaceFilter);
     }
 
+    public List<String> getVerbsFilter() {
+        return new ArrayList<>(List.of("Yes", "No"));
+    }
+
     public String getApiGroup() {
         return apiGroup;
     }
 
     public RBACFilter setApiGroup(String apiGroup) {
-        this.apiGroup = apiGroup;
+        this.apiGroup = apiGroup == null ? "" : apiGroup;
         return this;
     }
 
@@ -114,31 +116,31 @@ public class RBACFilter {
     }
 
     public RBACFilter setOthers(String others) {
-        this.others = others;
+        this.others = others == null ? "" : others;
         return this;
     }
 
-    public ListModelList<String> getNamespacesFilter() {
+    public List<String> getNamespacesFilter() {
         return namespacesFilter;
     }
 
-    public ListModelList<String> getResourceTypesFilter() {
+    public List<String> getResourceTypesFilter() {
         return resourceTypesFilter;
     }
 
-    public ListModelList<String> getResourceNamesFilter() {
+    public List<String> getResourceNamesFilter() {
         return resourceNamesFilter;
     }
 
-    public ListModelList<String> getSubjectKindsFilter() {
+    public List<String> getSubjectKindsFilter() {
         return subjectKindsFilter;
     }
 
-    public ListModelList<String> getSubjectNamesFilter() {
+    public List<String> getSubjectNamesFilter() {
         return subjectNamesFilter;
     }
 
-    public ListModelList<String> getRoleNamesFilter() {
+    public List<String> getRoleNamesFilter() {
         return roleNamesFilter;
     }
 
@@ -286,7 +288,4 @@ public class RBACFilter {
         return this;
     }
 
-    public ListModelList<String> getVerbsFilter() {
-        return new ListModelList<>(List.of("Yes", "No"));
-    }
 }

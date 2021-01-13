@@ -6,6 +6,8 @@ import com.kubehelper.domain.results.CronJobResult;
 import java.util.concurrent.ScheduledFuture;
 
 /**
+ * The class for store scheduledFuture cron Job.
+ *
  * @author JDev
  */
 public class KubeHelperScheduledFuture {
@@ -31,6 +33,10 @@ public class KubeHelperScheduledFuture {
         this.description = jobResult.getDescription();
         this.reportsFolderPath = jobResult.getReportsFolderPath();
         this.scheduledFuture = scheduledFuture;
+    }
+
+    public boolean isDone() {
+        return scheduledFuture.isDone();
     }
 
     public boolean shutdownCronJob() {
@@ -77,9 +83,6 @@ public class KubeHelperScheduledFuture {
         return reportsFolderPath;
     }
 
-    public boolean isDone() {
-        return scheduledFuture.isDone();
-    }
 
     public ScheduledFuture<?> getScheduledFuture() {
         return scheduledFuture;

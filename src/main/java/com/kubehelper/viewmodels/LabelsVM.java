@@ -153,7 +153,7 @@ public class LabelsVM implements EventListener {
     @Listen("onAfterSize=#centerLayoutLabelsID")
     public void onAfterSizeCenter(AfterSizeEvent event) {
         centerLayoutHeight = event.getHeight();
-        BindUtils.postNotifyChange(null, null, this, ".");
+        BindUtils.postNotifyChange( this, ".");
     }
 
     @Command
@@ -364,7 +364,7 @@ public class LabelsVM implements EventListener {
         Checkbox kubeResourcesCheckAll = (Checkbox) Path.getComponent("//indexPage/templateInclude/kubeResourcesGBoxCheckAll");
         if (!kubeResourcesCheckAll.isChecked() && !selectedResources.isEmpty()) {
             kubeResourcesCheckAll.setChecked(true);
-            BindUtils.postNotifyChange(null, null, this, "kubeResourcesGBoxCheckAll");
+            BindUtils.postNotifyChange(this, "kubeResourcesGBoxCheckAll");
         }
     }
 

@@ -75,7 +75,7 @@ public class VersionsVM {
     @Listen("onAfterSize=#versionsPanelId")
     public void onAfterSizeCenter(AfterSizeEvent event) {
         centerLayoutHeight = event.getHeight() - 43;
-        BindUtils.postNotifyChange(null, null, this, ".");
+        BindUtils.postNotifyChange( this, ".");
     }
 
 

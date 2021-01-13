@@ -18,12 +18,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package com.kubehelper.domain.filters;
 
 import org.apache.commons.lang3.StringUtils;
-import org.zkoss.zul.ListModelList;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author JDev
  */
 public class LabelsGroupedColumnsFilter {
+
     private String name = "", additionalInfo = "";
 
     private String selectedNamespaceFilter = "";
@@ -31,10 +34,11 @@ public class LabelsGroupedColumnsFilter {
     private String selectedResourcePropertyFilter = "";
     private String selectedResourceNameFilter = "";
 
-    private ListModelList<String> namespacesFilter = new ListModelList<>();
-    private ListModelList<String> resourceTypesFilter = new ListModelList<>();
-    private ListModelList<String> resourcePropertiesFilter = new ListModelList<>();
-    private ListModelList<String> resourceNamesFilter = new ListModelList<>();
+    private List<String> namespacesFilter = new ArrayList<>();
+    private List<String> resourceTypesFilter = new ArrayList<>();
+    private List<String> resourcePropertiesFilter = new ArrayList<>();
+    private List<String> resourceNamesFilter = new ArrayList<>();
+
 
     public LabelsGroupedColumnsFilter() {
     }
@@ -67,6 +71,10 @@ public class LabelsGroupedColumnsFilter {
         return this;
     }
 
+    public boolean isFilterActive() {
+        return StringUtils.isNoneBlank(name, additionalInfo, selectedNamespaceFilter, selectedResourceTypeFilter, selectedResourcePropertyFilter, selectedResourceNameFilter);
+    }
+
     public String getName() {
         return name;
     }
@@ -85,11 +93,11 @@ public class LabelsGroupedColumnsFilter {
         return this;
     }
 
-    public ListModelList<String> getResourcePropertiesFilter() {
+    public List<String> getResourcePropertiesFilter() {
         return resourcePropertiesFilter;
     }
 
-    public LabelsGroupedColumnsFilter setResourcePropertiesFilter(ListModelList<String> resourcePropertiesFilter) {
+    public LabelsGroupedColumnsFilter setResourcePropertiesFilter(List<String> resourcePropertiesFilter) {
         this.resourcePropertiesFilter = resourcePropertiesFilter;
         return this;
     }
@@ -99,37 +107,34 @@ public class LabelsGroupedColumnsFilter {
     }
 
     public LabelsGroupedColumnsFilter setAdditionalInfo(String additionalInfo) {
-        this.additionalInfo = additionalInfo;
+        this.additionalInfo = additionalInfo== null ? "" : additionalInfo;
         return this;
     }
 
-    public boolean isFilterActive() {
-        return StringUtils.isNoneBlank(name, additionalInfo, selectedNamespaceFilter, selectedResourceTypeFilter, selectedResourcePropertyFilter, selectedResourceNameFilter);
-    }
 
-    public ListModelList<String> getNamespacesFilter() {
+    public List<String> getNamespacesFilter() {
         return namespacesFilter;
     }
 
-    public LabelsGroupedColumnsFilter setNamespacesFilter(ListModelList<String> namespacesFilter) {
+    public LabelsGroupedColumnsFilter setNamespacesFilter(List<String> namespacesFilter) {
         this.namespacesFilter = namespacesFilter;
         return this;
     }
 
-    public ListModelList<String> getResourceTypesFilter() {
+    public List<String> getResourceTypesFilter() {
         return resourceTypesFilter;
     }
 
-    public LabelsGroupedColumnsFilter setResourceTypesFilter(ListModelList<String> resourceTypesFilter) {
+    public LabelsGroupedColumnsFilter setResourceTypesFilter(List<String> resourceTypesFilter) {
         this.resourceTypesFilter = resourceTypesFilter;
         return this;
     }
 
-    public ListModelList<String> getResourceNamesFilter() {
+    public List<String> getResourceNamesFilter() {
         return resourceNamesFilter;
     }
 
-    public LabelsGroupedColumnsFilter setResourceNamesFilter(ListModelList<String> resourceNamesFilter) {
+    public LabelsGroupedColumnsFilter setResourceNamesFilter(List<String> resourceNamesFilter) {
         this.resourceNamesFilter = resourceNamesFilter;
         return this;
     }

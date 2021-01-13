@@ -19,10 +19,13 @@ package com.kubehelper.domain.results;
 
 import com.kubehelper.common.Resource;
 
+import java.util.StringJoiner;
+
 /**
  * @author JDev
  */
 public class RBACResult {
+
     private int id;
     private String resourceName = "";
     private String subjectKind = "";
@@ -31,7 +34,6 @@ public class RBACResult {
     private Resource resourceType;
     private String namespace = "";
     private String apiGroup = "";
-    //    private String resourceNames = "";
     private boolean all;
     private boolean get;
     private boolean list;
@@ -51,9 +53,6 @@ public class RBACResult {
     private String others = "";
 
 //other verbs: impersonate,escalate approve,sign proxy use bind
-
-    public RBACResult() {
-    }
 
     public RBACResult(int id) {
         this.id = id;
@@ -296,4 +295,34 @@ public class RBACResult {
         return this;
     }
 
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", RBACResult.class.getSimpleName() + "[", "]")
+                .add("id=" + id)
+                .add("resourceName='" + resourceName + "'")
+                .add("subjectKind='" + subjectKind + "'")
+                .add("subjectName='" + subjectName + "'")
+                .add("roleName='" + roleName + "'")
+                .add("resourceType=" + resourceType)
+                .add("namespace='" + namespace + "'")
+                .add("apiGroup='" + apiGroup + "'")
+                .add("all=" + all)
+                .add("get=" + get)
+                .add("list=" + list)
+                .add("create=" + create)
+                .add("update=" + update)
+                .add("patch=" + patch)
+                .add("watch=" + watch)
+                .add("delete=" + delete)
+                .add("deletecollection=" + deletecollection)
+                .add("impersonate=" + impersonate)
+                .add("escalate=" + escalate)
+                .add("approve=" + approve)
+                .add("sign=" + sign)
+                .add("proxy=" + proxy)
+                .add("use=" + use)
+                .add("bind=" + bind)
+                .add("others='" + others + "'")
+                .toString();
+    }
 }

@@ -267,7 +267,7 @@ public class LabelsModel implements PageModel {
     public class GroupedLabel {
         private int id;
         private String name = "";
-        private String amount;
+        private String amount = "";
 
         public GroupedLabel(int id) {
             this.id = id;
@@ -340,7 +340,7 @@ public class LabelsModel implements PageModel {
             return this;
         }
 
-        public Resource getRawResourceType(){
+        public Resource getRawResourceType() {
             return resourceType;
         }
 

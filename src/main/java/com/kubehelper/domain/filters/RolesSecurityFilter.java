@@ -18,24 +18,25 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package com.kubehelper.domain.filters;
 
 import org.apache.commons.lang3.StringUtils;
-import org.zkoss.zul.ListModelList;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author JDev
  */
 public class RolesSecurityFilter {
+
     private String creationTime = "";
 
     private String selectedResourceNameFilter = "";
     private String selectedNamespaceFilter = "";
     private String selectedResourceTypeFilter = "";
 
-    private ListModelList<String> namespacesFilter = new ListModelList<>();
-    private ListModelList<String> resourceTypesFilter = new ListModelList<>();
-    private ListModelList<String> resourceNamesFilter = new ListModelList<>();
+    private List<String> namespacesFilter = new ArrayList<>();
+    private List<String> resourceTypesFilter = new ArrayList<>();
+    private List<String> resourceNamesFilter = new ArrayList<>();
 
-    public RolesSecurityFilter() {
-    }
 
     public void addNamespacesFilter(String namespaceFilter) {
         if (!namespacesFilter.contains(namespaceFilter)) {
@@ -55,6 +56,10 @@ public class RolesSecurityFilter {
         }
     }
 
+    public boolean isFilterActive() {
+        return StringUtils.isNoneBlank(creationTime, selectedNamespaceFilter, selectedResourceTypeFilter, selectedResourceNameFilter);
+    }
+
     public String getSelectedResourceNameFilter() {
         return selectedResourceNameFilter;
     }
@@ -64,11 +69,11 @@ public class RolesSecurityFilter {
         return this;
     }
 
-    public ListModelList<String> getResourceNamesFilter() {
+    public List<String> getResourceNamesFilter() {
         return resourceNamesFilter;
     }
 
-    public RolesSecurityFilter setResourceNamesFilter(ListModelList<String> resourceNamesFilter) {
+    public RolesSecurityFilter setResourceNamesFilter(List<String> resourceNamesFilter) {
         this.resourceNamesFilter = resourceNamesFilter;
         return this;
     }
@@ -78,28 +83,24 @@ public class RolesSecurityFilter {
     }
 
     public RolesSecurityFilter setCreationTime(String creationTime) {
-        this.creationTime = creationTime;
+        this.creationTime = creationTime == null ? "" : creationTime;
         return this;
     }
 
-    public boolean isFilterActive() {
-        return StringUtils.isNoneBlank(creationTime, selectedNamespaceFilter, selectedResourceTypeFilter, selectedResourceNameFilter);
-    }
-
-    public ListModelList<String> getNamespacesFilter() {
+    public List<String> getNamespacesFilter() {
         return namespacesFilter;
     }
 
-    public RolesSecurityFilter setNamespacesFilter(ListModelList<String> namespacesFilter) {
+    public RolesSecurityFilter setNamespacesFilter(List<String> namespacesFilter) {
         this.namespacesFilter = namespacesFilter;
         return this;
     }
 
-    public ListModelList<String> getResourceTypesFilter() {
+    public List<String> getResourceTypesFilter() {
         return resourceTypesFilter;
     }
 
-    public RolesSecurityFilter setResourceTypesFilter(ListModelList<String> resourceTypesFilter) {
+    public RolesSecurityFilter setResourceTypesFilter(List<String> resourceTypesFilter) {
         this.resourceTypesFilter = resourceTypesFilter;
         return this;
     }
@@ -121,5 +122,4 @@ public class RolesSecurityFilter {
         this.selectedResourceTypeFilter = selectedResourceTypeFilter == null ? "" : selectedResourceTypeFilter;
         return this;
     }
-
 }

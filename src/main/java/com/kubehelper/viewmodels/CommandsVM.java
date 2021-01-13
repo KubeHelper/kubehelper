@@ -287,9 +287,7 @@ public class CommandsVM implements EventListener<Event> {
      * @return - replaced string without Unnecessary whitespaces.
      */
     private String getCommandWithoutUnnecessaryWhitespaces(String commandToExecuteEditable) {
-//        return commandToExecuteEditable.replaceAll("\\n", " ");
-//        TODO correct replacement
-        return commandToExecuteEditable.replaceAll("\\n", " ").replaceAll(" +", " ");
+        return commandToExecuteEditable.replaceAll("\\n", " ").replaceAll(" +", " ").trim();
     }
 
 
@@ -419,7 +417,7 @@ public class CommandsVM implements EventListener<Event> {
     @Command
     public void deleteCommandsFile() {
         Messagebox.show(String.format("Are you sure you want to delete the file %s with commands?", commandsModel.getSelectedSourceFileResult().getFilePath()),
-                "Question", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION,
+                "Confirmation", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION,
                 (EventListener) e -> {
                     if (Messagebox.ON_OK.equals(e.getName())) {
                         if (Files.deleteIfExists(Paths.get(commandsModel.getSelectedSourceFileResult().getFilePath()))) {
