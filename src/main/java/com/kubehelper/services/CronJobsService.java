@@ -24,6 +24,7 @@ import com.kubehelper.domain.results.CommandsResult;
 import com.kubehelper.domain.results.CronJobResult;
 import com.kubehelper.domain.results.FileSourceResult;
 import com.moandjiezana.toml.Toml;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -192,21 +193,13 @@ public class CronJobsService {
      */
     public void prepareCronJobsReports(CronJobsModel model) {
         try {
-
             List<File> reportsGroups = Arrays.stream(new File(cronJobsReportsPath).listFiles()).filter(File::isDirectory).sorted(Comparator.comparing(File::getName)).collect(Collectors.toList());
-            model.setCronJobsReports(new HashMap<>());
-            for (File group : reportsGroups) {
-                Set<String> filesPathsByDirAndExtension = commonService.getFilesPathsByDirAndExtension(group.getAbsolutePath(), 2, ".txt");
-                filesPathsByDirAndExtension.forEach(file -> {
-                    model.addReportSource(Files.getNameWithoutExtension(file), file, group.getName());
-                });
-            }
-            model.sortCronJobsReportsAlphabeticallyAsc();
-            Optional<Map.Entry<String, Map<String, FileSourceResult>>> first = model.getCronJobsReports().entrySet().stream().findFirst();
-            if (first.isPresent()) {
-                model.setSelectedReportRaw(commonService.getResourceAsStringByPath(first.get().getValue().values().stream().findFirst().get().getFilePath()));
-                model.setSelectedReportLabel(first.get().getValue().keySet().stream().findFirst().get());
-                model.setSelectedReportsFolder(first.get().getKey());
+            if (CollectionUtils.isNotEmpty(reportsGroups)) {
+                String selectedReportsFolder = reportsGroups.get(0).getName();
+                model.setCronJobsReports(new HashMap<>());
+                model.setSelectedReportsFolder(selectedReportsFolder);
+                Set<String> filesPathsByDirAndExtension = commonService.getFilesPathsByDirAndExtension(reportsGroups.get(0).getAbsolutePath(), 2, ".txt");
+                setNewReportsFromSelectedFolder(model, filesPathsByDirAndExtension);
             }
         } catch (IOException e) {
             model.addNotificationException("Cannot Prepare Reports: Error: " + e.getMessage());
@@ -214,4 +207,42 @@ public class CronJobsService {
         }
     }
 
+    /**
+     * Change Reports Folder. Finds all cron job files from selected folder and set active newest.
+     *
+     * @param model - cron jobs model @{@link CronJobsModel}.
+     */
+    public void changeReportsFolder(CronJobsModel model) {
+        try {
+            model.setCronJobsReports(new HashMap<>());
+            Set<String> filesPathsByDirAndExtension = commonService.getFilesPathsByDirAndExtension(model.getSelectedReportsFolder(), 2, ".txt");
+            setNewReportsFromSelectedFolder(model, filesPathsByDirAndExtension);
+        } catch (IOException e) {
+            model.addNotificationException("Cannot Prepare Reports: Error: " + e.getMessage());
+            logger.debug(e.getMessage(), e);
+        }
+    }
+
+    private void setNewReportsFromSelectedFolder(CronJobsModel model, Set<String> filesPathsByDirAndExtension) {
+        model.setCronJobsReports(new HashMap<>());
+        filesPathsByDirAndExtension.forEach(file -> {
+            model.addReportSource(Files.getNameWithoutExtension(file), file);
+        });
+        model.sortCronJobsReportsAlphabeticallyAsc();
+
+        Optional<Map.Entry<String, FileSourceResult>> first = model.getCronJobsReports().entrySet().stream().findFirst();
+        if (first.isPresent()) {
+            model.setSelectedReportRaw(commonService.getResourceAsStringByPath(first.get().getValue().getFilePath()));
+            model.setSelectedReportLabel(first.get().getKey());
+        }
+    }
+
+    /**
+     * Change report raw at click on report button.
+     *
+     * @param model - @{@link CronJobsModel}
+     */
+    public void changeReportRaw(CronJobsModel model) {
+        model.setSelectedReportRaw(commonService.getResourceAsStringByPath(model.getCronJobsReports().get(model.getSelectedReportLabel()).getFilePath()));
+    }
 }

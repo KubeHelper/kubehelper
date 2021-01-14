@@ -23,12 +23,12 @@ import com.kubehelper.domain.filters.CommandsFilter;
 import com.kubehelper.domain.models.CronJobsModel;
 import com.kubehelper.domain.results.CommandsResult;
 import com.kubehelper.domain.results.CronJobResult;
-import com.kubehelper.domain.results.FileSourceResult;
 import com.kubehelper.services.CommonService;
 import com.kubehelper.services.CronJobsService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.zkoss.bind.BindContext;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.AfterCompose;
 import org.zkoss.bind.annotation.BindingParam;
@@ -56,6 +56,7 @@ import org.zkoss.zul.Footer;
 import org.zkoss.zul.Html;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Messagebox;
+import org.zkoss.zul.Slider;
 import org.zkoss.zul.Tabbox;
 import org.zkoss.zul.Toolbarbutton;
 import org.zkoss.zul.Vbox;
@@ -485,8 +486,7 @@ public class CronJobsVM implements EventListener<Event> {
         if ("cronJobsReports".equals(activeTab)) {
             oldToolbarbuttonId = getCommandToolbarButtonId(model.getSelectedReportLabel());
             model.setSelectedReportLabel(label);
-//            TODO
-//            cronJobsService.changeHistoryRaw(model);
+            cronJobsService.changeReportRaw(model);
             refreshReportsOutput();
         }
         String newToolbarbuttonId = getCommandToolbarButtonId(label);
@@ -496,30 +496,32 @@ public class CronJobsVM implements EventListener<Event> {
 
     @Command
     public void changeReportsFolder() {
-        List<FileSourceResult> first = model.getCronJobsReportsObjectsForJob();
-        if (!first.isEmpty()) {
-            model.setSelectedReportRaw(commonService.getResourceAsStringByPath(first.get(0).getFilePath()));
-            model.setSelectedReportLabel(first.get(0).getLabel());
+        cronJobsService.changeReportsFolder(model);
+        if (checkExceptions()) {
             redrawReportsToolbarbuttons("cronJobsReportsToolbarID", model.getCronJobsReportsForJob(), getCommandToolbarButtonId(model.getSelectedReportLabel()));
             refreshReportsOutput();
-        } else {
-            Notification.show("There are no reports for this job.", "info", null, "bottom_left", 3000);
         }
     }
 
     @Command
     public void refreshReports() {
-
+        cronJobsService.prepareCronJobsReports(model);
+        if (checkExceptions()) {
+            redrawReportsToolbarbuttons("cronJobsReportsToolbarID", model.getCronJobsReportsForJob(), getCommandToolbarButtonId(model.getSelectedReportLabel()));
+            refreshReportsOutput();
+        }
     }
 
     @Command
     public void wordWrapInReports() {
-
+        refreshReportsOutput();
     }
 
     @Command
-    public void cronJobsReportsChangeFontSize() {
-
+    public void cronJobsReportsChangeFontSize(BindContext ctxEvent) {
+        Slider fontSlider = (Slider) ctxEvent.getComponent();
+        cronJobsReportsFontSize = fontSlider.getCurpos();
+        BindUtils.postNotifyChange(this, "cronJobsReportsCss");
     }
 
 
@@ -527,13 +529,13 @@ public class CronJobsVM implements EventListener<Event> {
 
 
     public String getCommandsGridHeight() {
-        return centerLayoutHeight * 0.3 + "px";
+        return centerLayoutHeight * 0.4 + "px";
     }
 
     public String getNewCronJobBoxHeight() {
         return centerLayoutHeight * 0.185 + "px";
     }
-    
+
     public String getCronJobsListGroupBoxHeight() {
         return centerLayoutHeight > 1200 ? centerLayoutHeight * 0.46 + "px" : centerLayoutHeight * 0.41 + "px";
     }

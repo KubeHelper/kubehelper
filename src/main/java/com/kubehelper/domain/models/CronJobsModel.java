@@ -31,7 +31,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -60,7 +59,7 @@ public class CronJobsModel implements PageModel {
     private String executedCommandOutput = "";
 
     //  REPORTS ================
-    private Map<String, Map<String, FileSourceResult>> cronJobsReports = new HashMap<>(); //<folder <file,fileparams>>
+    private Map<String, FileSourceResult> cronJobsReports = new HashMap<>();
 
     private String selectedReportLabel = "";
     private String selectedReportRaw = "";
@@ -92,26 +91,23 @@ public class CronJobsModel implements PageModel {
         filter.addOperationFilter(commandResult.getFile());
     }
 
-    public void addReportSource(String label, String filePath, String groupName) {
+    public void addReportSource(String label, String filePath) {
         FileSourceResult reportSource = new FileSourceResult();
         reportSource.setLabel(label);
         reportSource.setFilePath(filePath);
-
-        if (Objects.nonNull(cronJobsReports.putIfAbsent(groupName, new HashMap<>(Map.of(label, reportSource))))) {
-            cronJobsReports.get(groupName).put(label, reportSource);
-        }
+        cronJobsReports.put(label, reportSource);
     }
 
     public void sortCronJobsReportsAlphabeticallyAsc() {
-        cronJobsReports = ImmutableSortedMap.copyOf(cronJobsReports, Comparator.comparing(folder -> folder));
+        cronJobsReports = ImmutableSortedMap.copyOf(cronJobsReports, Comparator.comparing(file -> file));
     }
 
-    public List<FileSourceResult> getCronJobsReportsObjectsForJob() {
-        return cronJobsReports.get(selectedReportsFolder).values().stream().collect(Collectors.toList());
-    }
+//    public List<FileSourceResult> getCronJobsReportsObjectsForJob() {
+//        return cronJobsReports.values().stream().collect(Collectors.toList());
+//    }
 
     public List<String> getCronJobsReportsForJob() {
-        return cronJobsReports.get(selectedReportsFolder).keySet().stream().sorted().collect(Collectors.toList());
+        return cronJobsReports.keySet().stream().sorted().collect(Collectors.toList());
     }
 
     public boolean hasErrors() {
@@ -203,12 +199,12 @@ public class CronJobsModel implements PageModel {
         return this;
     }
 
-    public Map<String, Map<String, FileSourceResult>> getCronJobsReports() {
+    public Map<String, FileSourceResult> getCronJobsReports() {
         return cronJobsReports;
     }
 
 
-    public CronJobsModel setCronJobsReports(Map<String, Map<String, FileSourceResult>> cronJobsReports) {
+    public CronJobsModel setCronJobsReports(Map<String, FileSourceResult> cronJobsReports) {
         this.cronJobsReports = cronJobsReports;
         return this;
     }
