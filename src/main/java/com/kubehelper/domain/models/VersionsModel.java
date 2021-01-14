@@ -243,7 +243,6 @@ public class VersionsModel implements PageModel {
         return NAME;
     }
 
-
     @Override
     public String getTemplateUrl() {
         return templateUrl;

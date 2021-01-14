@@ -34,6 +34,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import java.io.IOException;
 
 /**
+ * Kube helper beans/configs.
+ *
  * @author JDev
  */
 @Configuration

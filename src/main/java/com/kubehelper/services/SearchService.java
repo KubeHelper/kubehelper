@@ -209,17 +209,17 @@ public class SearchService {
     /**
      * Searches string in Pods by selected namespace.
      *
-     * @param searchModel - search model
+     * @param model - search model
      */
-    private void searchInPods(SearchModel searchModel) {
-        V1PodList podsList = kubeAPI.getV1PodsList(searchModel.getSelectedNamespace(), searchModel);
+    private void searchInPods(SearchModel model) {
+        V1PodList podsList = kubeAPI.getV1PodsList(model.getSelectedNamespace(), model);
         for (V1Pod pod : podsList.getItems()) {
             try {
-                if (isStringsContainsSearchString(searchModel.getSearchString(), pod.getMetadata().getName())) {
-                    addSearchResultToModel(pod.getMetadata(), searchModel, POD, pod.getMetadata().getName(), pod.getMetadata().getName(), "", pod.toString());
+                if (isStringsContainsSearchString(model.getSearchString(), pod.getMetadata().getName())) {
+                    addSearchResultToModel(pod.getMetadata(), model, POD, pod.getMetadata().getName(), pod.getMetadata().getName(), "", pod.toString());
                 }
             } catch (RuntimeException e) {
-                searchModel.addSearchException(e);
+                model.addSearchException(e);
                 logger.error(e.getMessage(), e);
             }
         }
@@ -228,17 +228,17 @@ public class SearchService {
     /**
      * Searches string in PersistentVolumes by selected namespace.
      *
-     * @param searchModel - search model
+     * @param model - search model
      */
-    private void searchInPersistentVolumes(SearchModel searchModel) {
-        V1PersistentVolumeList persistentVolumesList = kubeAPI.getV1PersistentVolumesList(searchModel);
+    private void searchInPersistentVolumes(SearchModel model) {
+        V1PersistentVolumeList persistentVolumesList = kubeAPI.getV1PersistentVolumesList(model);
         for (V1PersistentVolume persistentVolume : persistentVolumesList.getItems()) {
             try {
-                if (isStringsContainsSearchString(searchModel.getSearchString(), persistentVolume.getMetadata().getName())) {
-                    addSearchResultToModel(persistentVolume.getMetadata(), searchModel, PERSISTENT_VOLUME, persistentVolume.getMetadata().getName(), persistentVolume.getMetadata().getName(), "", persistentVolume.toString());
+                if (isStringsContainsSearchString(model.getSearchString(), persistentVolume.getMetadata().getName())) {
+                    addSearchResultToModel(persistentVolume.getMetadata(), model, PERSISTENT_VOLUME, persistentVolume.getMetadata().getName(), persistentVolume.getMetadata().getName(), "", persistentVolume.toString());
                 }
             } catch (RuntimeException e) {
-                searchModel.addSearchException(e);
+                model.addSearchException(e);
                 logger.error(e.getMessage(), e);
             }
         }
@@ -247,17 +247,17 @@ public class SearchService {
     /**
      * Searches string in PersistentVolumeClaims by selected namespace.
      *
-     * @param searchModel - search model
+     * @param model - search model
      */
-    private void searchInPersistentVolumeClaims(SearchModel searchModel) {
-        V1PersistentVolumeClaimList persistentVolumeClaimsList = kubeAPI.getV1PersistentVolumeClaimsList(searchModel.getSelectedNamespace(), searchModel);
+    private void searchInPersistentVolumeClaims(SearchModel model) {
+        V1PersistentVolumeClaimList persistentVolumeClaimsList = kubeAPI.getV1PersistentVolumeClaimsList(model.getSelectedNamespace(), model);
         for (V1PersistentVolumeClaim persistentVolumeClaim : persistentVolumeClaimsList.getItems()) {
             try {
-                if (isStringsContainsSearchString(searchModel.getSearchString(), persistentVolumeClaim.getMetadata().getName())) {
-                    addSearchResultToModel(persistentVolumeClaim.getMetadata(), searchModel, PERSISTENT_VOLUME_CLAIM, persistentVolumeClaim.getMetadata().getName(), persistentVolumeClaim.getMetadata().getName(), "", persistentVolumeClaim.toString());
+                if (isStringsContainsSearchString(model.getSearchString(), persistentVolumeClaim.getMetadata().getName())) {
+                    addSearchResultToModel(persistentVolumeClaim.getMetadata(), model, PERSISTENT_VOLUME_CLAIM, persistentVolumeClaim.getMetadata().getName(), persistentVolumeClaim.getMetadata().getName(), "", persistentVolumeClaim.toString());
                 }
             } catch (RuntimeException e) {
-                searchModel.addSearchException(e);
+                model.addSearchException(e);
                 logger.error(e.getMessage(), e);
             }
         }
@@ -266,20 +266,20 @@ public class SearchService {
     /**
      * Searches string in Services by selected namespace.
      *
-     * @param searchModel - search model
+     * @param model - search model
      */
-    private void searchInServices(SearchModel searchModel) {
-        V1ServiceList servicesList = kubeAPI.getV1ServicesList(searchModel.getSelectedNamespace(), searchModel);
+    private void searchInServices(SearchModel model) {
+        V1ServiceList servicesList = kubeAPI.getV1ServicesList(model.getSelectedNamespace(), model);
         for (V1Service service : servicesList.getItems()) {
             try {
-                if (skipKubeNamespace(searchModel, service.getMetadata())) {
+                if (skipKubeNamespace(model, service.getMetadata())) {
                     continue;
                 }
-                if (isStringsContainsSearchString(searchModel.getSearchString(), service.getMetadata().getName())) {
-                    addSearchResultToModel(service.getMetadata(), searchModel, SERVICE, service.getMetadata().getName(), service.getMetadata().getName(), "", service.toString());
+                if (isStringsContainsSearchString(model.getSearchString(), service.getMetadata().getName())) {
+                    addSearchResultToModel(service.getMetadata(), model, SERVICE, service.getMetadata().getName(), service.getMetadata().getName(), "", service.toString());
                 }
             } catch (RuntimeException e) {
-                searchModel.addSearchException(e);
+                model.addSearchException(e);
                 logger.error(e.getMessage(), e);
             }
         }
@@ -288,25 +288,25 @@ public class SearchService {
     /**
      * Searches string in ServiceAccounts by selected namespace.
      *
-     * @param searchModel - search model
+     * @param model - search model
      */
-    private void searchInServiceAccounts(SearchModel searchModel) {
-        V1ServiceAccountList serviceAccountsList = kubeAPI.getV1ServiceAccountsList(searchModel.getSelectedNamespace(), searchModel);
+    private void searchInServiceAccounts(SearchModel model) {
+        V1ServiceAccountList serviceAccountsList = kubeAPI.getV1ServiceAccountsList(model.getSelectedNamespace(), model);
         for (V1ServiceAccount serviceAccount : serviceAccountsList.getItems()) {
             try {
-                if (skipKubeNamespace(searchModel, serviceAccount.getMetadata())) {
+                if (skipKubeNamespace(model, serviceAccount.getMetadata())) {
                     continue;
                 }
                 StringJoiner additionalInfo = new StringJoiner(",", "[", "]");
-                if (isStringsContainsSearchString(searchModel.getSearchString(), serviceAccount.getMetadata().getName())) {
+                if (isStringsContainsSearchString(model.getSearchString(), serviceAccount.getMetadata().getName())) {
                     if (ObjectUtils.isNotEmpty(serviceAccount.getSecrets())) {
                         serviceAccount.getSecrets().forEach(secretObject -> additionalInfo.add(secretObject.getName()));
                     }
-                    addSearchResultToModel(serviceAccount.getMetadata(), searchModel, SERVICE_ACCOUNT, serviceAccount.getMetadata().getName(), serviceAccount.getMetadata().getName(),
+                    addSearchResultToModel(serviceAccount.getMetadata(), model, SERVICE_ACCOUNT, serviceAccount.getMetadata().getName(), serviceAccount.getMetadata().getName(),
                             "secrets " + additionalInfo.toString(), serviceAccount.toString());
                 }
             } catch (RuntimeException e) {
-                searchModel.addSearchException(e);
+                model.addSearchException(e);
                 logger.error(e.getMessage(), e);
             }
         }
@@ -315,26 +315,26 @@ public class SearchService {
     /**
      * Searches string in Secrets by selected namespace.
      *
-     * @param searchModel - search model
+     * @param model - search model
      */
-    private void searchInSecrets(SearchModel searchModel) {
-        V1SecretList secretsList = kubeAPI.getV1SecretsList(searchModel.getSelectedNamespace(), searchModel);
+    private void searchInSecrets(SearchModel model) {
+        V1SecretList secretsList = kubeAPI.getV1SecretsList(model.getSelectedNamespace(), model);
         for (V1Secret secret : secretsList.getItems()) {
             try {
-                if (skipKubeNamespace(searchModel, secret.getMetadata())) {
+                if (skipKubeNamespace(model, secret.getMetadata())) {
                     continue;
                 }
                 if (ObjectUtils.isNotEmpty(secret.getData())) {
                     secret.getData().forEach((secretName, secretValue) -> {
-                        if (isStringsContainsSearchString(searchModel.getSearchString(), secret.getMetadata().getName(), secretName)) {
+                        if (isStringsContainsSearchString(model.getSearchString(), secret.getMetadata().getName(), secretName)) {
                             String secretType = secret.getType() == null ? "null" : secret.getType();
                             String foundString = secret.getMetadata().getName() + " [" + secretType + "] : " + secretName;
-                            addSearchResultToModel(secret.getMetadata(), searchModel, SECRET, secret.getMetadata().getName(), foundString, new String(secretValue, UTF_8), secret.toString());
+                            addSearchResultToModel(secret.getMetadata(), model, SECRET, secret.getMetadata().getName(), foundString, new String(secretValue, UTF_8), secret.toString());
                         }
                     });
                 }
             } catch (RuntimeException e) {
-                searchModel.addSearchException(e);
+                model.addSearchException(e);
                 logger.error(e.getMessage(), e);
             }
         }
@@ -343,229 +343,289 @@ public class SearchService {
     /**
      * Searches string in ConfigMaps by selected namespace.
      *
-     * @param searchModel - search model
+     * @param model - search model
      */
-    private void searchInConfigMaps(SearchModel searchModel) {
-        V1ConfigMapList configMapsList = kubeAPI.getV1ConfigMapsList(searchModel.getSelectedNamespace(), searchModel);
+    private void searchInConfigMaps(SearchModel model) {
+        V1ConfigMapList configMapsList = kubeAPI.getV1ConfigMapsList(model.getSelectedNamespace(), model);
         for (V1ConfigMap configMap : configMapsList.getItems()) {
             try {
-                if (skipKubeNamespace(searchModel, configMap.getMetadata())) {
+                if (skipKubeNamespace(model, configMap.getMetadata())) {
                     continue;
                 }
                 if (ObjectUtils.isNotEmpty(configMap.getData())) {
                     configMap.getData().forEach((configName, configValue) -> {
-                        if (isStringsContainsSearchString(searchModel.getSearchString(), configMap.getMetadata().getName(), configName, configValue)) {
-                            addSearchResultToModel(configMap.getMetadata(), searchModel, CONFIG_MAP, configMap.getMetadata().getName(), configName, configValue, configMap.toString());
+                        if (isStringsContainsSearchString(model.getSearchString(), configMap.getMetadata().getName(), configName, configValue)) {
+                            addSearchResultToModel(configMap.getMetadata(), model, CONFIG_MAP, configMap.getMetadata().getName(), configName, configValue, configMap.toString());
                         }
                     });
                 }
             } catch (RuntimeException e) {
-                searchModel.addSearchException(e);
+                model.addSearchException(e);
                 logger.error(e.getMessage(), e);
             }
         }
     }
 
 
-    private void searchInDaemonSets(SearchModel searchModel) {
-        V1DaemonSetList daemonSetsList = kubeAPI.getV1DaemonSetList(searchModel.getSelectedNamespace(), searchModel);
+    /**
+     * Searches string in DaemonSets by selected namespace.
+     *
+     * @param model - search model
+     */
+    private void searchInDaemonSets(SearchModel model) {
+        V1DaemonSetList daemonSetsList = kubeAPI.getV1DaemonSetList(model.getSelectedNamespace(), model);
         for (V1DaemonSet daemonSet : daemonSetsList.getItems()) {
             try {
-                if (skipKubeNamespace(searchModel, daemonSet.getMetadata())) {
+                if (skipKubeNamespace(model, daemonSet.getMetadata())) {
                     continue;
                 }
-                if (isStringsContainsSearchString(searchModel.getSearchString(), daemonSet.getMetadata().getName())) {
-                    addSearchResultToModel(daemonSet.getMetadata(), searchModel, DAEMON_SET, daemonSet.getMetadata().getName(), daemonSet.getMetadata().getName(), "", daemonSet.toString());
+                if (isStringsContainsSearchString(model.getSearchString(), daemonSet.getMetadata().getName())) {
+                    addSearchResultToModel(daemonSet.getMetadata(), model, DAEMON_SET, daemonSet.getMetadata().getName(), daemonSet.getMetadata().getName(), "", daemonSet.toString());
                 }
             } catch (RuntimeException e) {
-                searchModel.addSearchException(e);
+                model.addSearchException(e);
                 logger.error(e.getMessage(), e);
             }
         }
     }
 
-    private void searchInDeployments(SearchModel searchModel) {
-        V1DeploymentList deploymentsList = kubeAPI.getV1DeploymentList(searchModel.getSelectedNamespace(), searchModel);
+    /**
+     * Searches string in Deployments by selected namespace.
+     *
+     * @param model - search model
+     */
+    private void searchInDeployments(SearchModel model) {
+        V1DeploymentList deploymentsList = kubeAPI.getV1DeploymentList(model.getSelectedNamespace(), model);
         for (V1Deployment deployment : deploymentsList.getItems()) {
             try {
-                if (skipKubeNamespace(searchModel, deployment.getMetadata())) {
+                if (skipKubeNamespace(model, deployment.getMetadata())) {
                     continue;
                 }
-                if (isStringsContainsSearchString(searchModel.getSearchString(), deployment.getMetadata().getName())) {
-                    addSearchResultToModel(deployment.getMetadata(), searchModel, DEPLOYMENT, deployment.getMetadata().getName(), deployment.getMetadata().getName(), "", deployment.toString());
+                if (isStringsContainsSearchString(model.getSearchString(), deployment.getMetadata().getName())) {
+                    addSearchResultToModel(deployment.getMetadata(), model, DEPLOYMENT, deployment.getMetadata().getName(), deployment.getMetadata().getName(), "", deployment.toString());
                 }
             } catch (RuntimeException e) {
-                searchModel.addSearchException(e);
+                model.addSearchException(e);
                 logger.error(e.getMessage(), e);
             }
         }
     }
 
-    private void searchInReplicaSets(SearchModel searchModel) {
-        V1ReplicaSetList replicaSetsList = kubeAPI.getV1ReplicaSetList(searchModel.getSelectedNamespace(), searchModel);
+    /**
+     * Searches string in ReplicaSets by selected namespace.
+     *
+     * @param model - search model
+     */
+    private void searchInReplicaSets(SearchModel model) {
+        V1ReplicaSetList replicaSetsList = kubeAPI.getV1ReplicaSetList(model.getSelectedNamespace(), model);
         for (V1ReplicaSet replicaSet : replicaSetsList.getItems()) {
             try {
-                if (skipKubeNamespace(searchModel, replicaSet.getMetadata())) {
+                if (skipKubeNamespace(model, replicaSet.getMetadata())) {
                     continue;
                 }
-                if (isStringsContainsSearchString(searchModel.getSearchString(), replicaSet.getMetadata().getName())) {
-                    addSearchResultToModel(replicaSet.getMetadata(), searchModel, REPLICA_SET, replicaSet.getMetadata().getName(), replicaSet.getMetadata().getName(), "", replicaSet.toString());
+                if (isStringsContainsSearchString(model.getSearchString(), replicaSet.getMetadata().getName())) {
+                    addSearchResultToModel(replicaSet.getMetadata(), model, REPLICA_SET, replicaSet.getMetadata().getName(), replicaSet.getMetadata().getName(), "", replicaSet.toString());
                 }
             } catch (RuntimeException e) {
-                searchModel.addSearchException(e);
+                model.addSearchException(e);
                 logger.error(e.getMessage(), e);
             }
         }
     }
 
-    private void searchInStatefulSets(SearchModel searchModel) {
-        V1StatefulSetList statefulSetsList = kubeAPI.getV1StatefulSetList(searchModel.getSelectedNamespace(), searchModel);
+    /**
+     * Searches string in StatefulSets by selected namespace.
+     *
+     * @param model - search model
+     */
+    private void searchInStatefulSets(SearchModel model) {
+        V1StatefulSetList statefulSetsList = kubeAPI.getV1StatefulSetList(model.getSelectedNamespace(), model);
         for (V1StatefulSet statefulSet : statefulSetsList.getItems()) {
             try {
-                if (skipKubeNamespace(searchModel, statefulSet.getMetadata())) {
+                if (skipKubeNamespace(model, statefulSet.getMetadata())) {
                     continue;
                 }
-                if (isStringsContainsSearchString(searchModel.getSearchString(), statefulSet.getMetadata().getName())) {
-                    addSearchResultToModel(statefulSet.getMetadata(), searchModel, STATEFUL_SET, statefulSet.getMetadata().getName(), statefulSet.getMetadata().getName(), "", statefulSet.toString());
+                if (isStringsContainsSearchString(model.getSearchString(), statefulSet.getMetadata().getName())) {
+                    addSearchResultToModel(statefulSet.getMetadata(), model, STATEFUL_SET, statefulSet.getMetadata().getName(), statefulSet.getMetadata().getName(), "", statefulSet.toString());
                 }
             } catch (RuntimeException e) {
-                searchModel.addSearchException(e);
+                model.addSearchException(e);
                 logger.error(e.getMessage(), e);
             }
         }
     }
 
-    private void searchInJobs(SearchModel searchModel) {
-        V1JobList jobsList = kubeAPI.getV1JobList(searchModel.getSelectedNamespace(), searchModel);
+    /**
+     * Searches string in Jobs by selected namespace.
+     *
+     * @param model - search model
+     */
+    private void searchInJobs(SearchModel model) {
+        V1JobList jobsList = kubeAPI.getV1JobList(model.getSelectedNamespace(), model);
         for (V1Job job : jobsList.getItems()) {
             try {
-                if (skipKubeNamespace(searchModel, job.getMetadata())) {
+                if (skipKubeNamespace(model, job.getMetadata())) {
                     continue;
                 }
-                if (isStringsContainsSearchString(searchModel.getSearchString(), job.getMetadata().getName())) {
-                    addSearchResultToModel(job.getMetadata(), searchModel, JOB, job.getMetadata().getName(), job.getMetadata().getName(), "", job.toString());
+                if (isStringsContainsSearchString(model.getSearchString(), job.getMetadata().getName())) {
+                    addSearchResultToModel(job.getMetadata(), model, JOB, job.getMetadata().getName(), job.getMetadata().getName(), "", job.toString());
                 }
             } catch (RuntimeException e) {
-                searchModel.addSearchException(e);
+                model.addSearchException(e);
                 logger.error(e.getMessage(), e);
             }
         }
     }
 
-    private void searchInClusterRoleBindings(SearchModel searchModel) {
-        V1beta1ClusterRoleBindingList clusterRoleBindingsList = kubeAPI.getV1ClusterRolesBindingsList(searchModel);
+    /**
+     * Searches string in ClusterRoleBindings.
+     *
+     * @param model - search model
+     */
+    private void searchInClusterRoleBindings(SearchModel model) {
+        V1beta1ClusterRoleBindingList clusterRoleBindingsList = kubeAPI.getV1ClusterRolesBindingsList(model);
         for (V1beta1ClusterRoleBinding binding : clusterRoleBindingsList.getItems()) {
             try {
-                if (skipKubeNamespace(searchModel, binding.getMetadata())) {
+                if (skipKubeNamespace(model, binding.getMetadata())) {
                     continue;
                 }
-                if (isStringsContainsSearchString(searchModel.getSearchString(), binding.getMetadata().getName())) {
-                    addSearchResultToModel(binding.getMetadata(), searchModel, ROLE_BINDING, binding.getMetadata().getName(), binding.getMetadata().getName(), "", binding.toString());
+                if (isStringsContainsSearchString(model.getSearchString(), binding.getMetadata().getName())) {
+                    addSearchResultToModel(binding.getMetadata(), model, ROLE_BINDING, binding.getMetadata().getName(), binding.getMetadata().getName(), "", binding.toString());
                 }
             } catch (RuntimeException e) {
-                searchModel.addSearchException(e);
+                model.addSearchException(e);
                 logger.error(e.getMessage(), e);
             }
         }
     }
 
-    private void searchInClusterRoles(SearchModel searchModel) {
-        V1beta1ClusterRoleList clusterRolesList = kubeAPI.getV1ClusterRolesList(searchModel);
+    /**
+     * Searches string in ClusterRoles.
+     *
+     * @param model - search model.
+     */
+    private void searchInClusterRoles(SearchModel model) {
+        V1beta1ClusterRoleList clusterRolesList = kubeAPI.getV1ClusterRolesList(model);
         for (V1beta1ClusterRole clusterRole : clusterRolesList.getItems()) {
             try {
-                if (skipKubeNamespace(searchModel, clusterRole.getMetadata())) {
+                if (skipKubeNamespace(model, clusterRole.getMetadata())) {
                     continue;
                 }
-                if (isStringsContainsSearchString(searchModel.getSearchString(), clusterRole.getMetadata().getName())) {
-                    addSearchResultToModel(clusterRole.getMetadata(), searchModel, CLUSTER_ROLE, clusterRole.getMetadata().getName(), clusterRole.getMetadata().getName(), "", clusterRole.toString());
+                if (isStringsContainsSearchString(model.getSearchString(), clusterRole.getMetadata().getName())) {
+                    addSearchResultToModel(clusterRole.getMetadata(), model, CLUSTER_ROLE, clusterRole.getMetadata().getName(), clusterRole.getMetadata().getName(), "", clusterRole.toString());
                 }
             } catch (RuntimeException e) {
-                searchModel.addSearchException(e);
+                model.addSearchException(e);
                 logger.error(e.getMessage(), e);
             }
         }
     }
 
-    private void searchInRoleBindings(SearchModel searchModel) {
-        V1beta1RoleBindingList rolesBindingsList = kubeAPI.getV1RolesBindingList(searchModel.getSelectedNamespace(), searchModel);
+    /**
+     * Searches string in RoleBindings by selected namespace.
+     *
+     * @param model - search model.
+     */
+    private void searchInRoleBindings(SearchModel model) {
+        V1beta1RoleBindingList rolesBindingsList = kubeAPI.getV1RolesBindingList(model.getSelectedNamespace(), model);
         for (V1beta1RoleBinding roleBinding : rolesBindingsList.getItems()) {
             try {
-                if (skipKubeNamespace(searchModel, roleBinding.getMetadata())) {
+                if (skipKubeNamespace(model, roleBinding.getMetadata())) {
                     continue;
                 }
-                if (isStringsContainsSearchString(searchModel.getSearchString(), roleBinding.getMetadata().getName())) {
-                    addSearchResultToModel(roleBinding.getMetadata(), searchModel, ROLE_BINDING, roleBinding.getMetadata().getName(), roleBinding.getMetadata().getName(), "", roleBinding.toString());
+                if (isStringsContainsSearchString(model.getSearchString(), roleBinding.getMetadata().getName())) {
+                    addSearchResultToModel(roleBinding.getMetadata(), model, ROLE_BINDING, roleBinding.getMetadata().getName(), roleBinding.getMetadata().getName(), "", roleBinding.toString());
                 }
             } catch (RuntimeException e) {
-                searchModel.addSearchException(e);
+                model.addSearchException(e);
                 logger.error(e.getMessage(), e);
             }
         }
     }
 
-    private void searchInRoles(SearchModel searchModel) {
-        V1beta1RoleList rolesList = kubeAPI.getV1RolesList(searchModel.getSelectedNamespace(), searchModel);
+    /**
+     * Searches string in Roles by selected namespace.
+     *
+     * @param model - search model.
+     */
+    private void searchInRoles(SearchModel model) {
+        V1beta1RoleList rolesList = kubeAPI.getV1RolesList(model.getSelectedNamespace(), model);
         for (V1beta1Role role : rolesList.getItems()) {
             try {
-                if (skipKubeNamespace(searchModel, role.getMetadata())) {
+                if (skipKubeNamespace(model, role.getMetadata())) {
                     continue;
                 }
-                if (isStringsContainsSearchString(searchModel.getSearchString(), role.getMetadata().getName())) {
-                    addSearchResultToModel(role.getMetadata(), searchModel, ROLE, role.getMetadata().getName(), role.getMetadata().getName(), "", role.toString());
+                if (isStringsContainsSearchString(model.getSearchString(), role.getMetadata().getName())) {
+                    addSearchResultToModel(role.getMetadata(), model, ROLE, role.getMetadata().getName(), role.getMetadata().getName(), "", role.toString());
                 }
             } catch (RuntimeException e) {
-                searchModel.addSearchException(e);
+                model.addSearchException(e);
                 logger.error(e.getMessage(), e);
             }
         }
     }
 
-    private void searchInNetworkPolicies(SearchModel searchModel) {
-        V1NetworkPolicyList networkPoliciesList = kubeAPI.getV1NetworkPolicyList(searchModel.getSelectedNamespace(), searchModel);
+    /**
+     * Searches string in NetworkPolicies by selected namespace.
+     *
+     * @param model - search model.
+     */
+    private void searchInNetworkPolicies(SearchModel model) {
+        V1NetworkPolicyList networkPoliciesList = kubeAPI.getV1NetworkPolicyList(model.getSelectedNamespace(), model);
         for (V1NetworkPolicy policy : networkPoliciesList.getItems()) {
             try {
-                if (skipKubeNamespace(searchModel, policy.getMetadata())) {
+                if (skipKubeNamespace(model, policy.getMetadata())) {
                     continue;
                 }
-                if (isStringsContainsSearchString(searchModel.getSearchString(), policy.getMetadata().getName())) {
-                    addSearchResultToModel(policy.getMetadata(), searchModel, NETWORK_POLICY, policy.getMetadata().getName(), policy.getMetadata().getName(), "", policy.toString());
+                if (isStringsContainsSearchString(model.getSearchString(), policy.getMetadata().getName())) {
+                    addSearchResultToModel(policy.getMetadata(), model, NETWORK_POLICY, policy.getMetadata().getName(), policy.getMetadata().getName(), "", policy.toString());
                 }
             } catch (RuntimeException e) {
-                searchModel.addSearchException(e);
+                model.addSearchException(e);
                 logger.error(e.getMessage(), e);
             }
         }
     }
 
-    private void searchInPodDistributionBudgets(SearchModel searchModel) {
-        V1beta1PodDisruptionBudgetList budgetsList = kubeAPI.getV1beta1PodDisruptionBudgetsList(searchModel.getSelectedNamespace(), searchModel);
+    /**
+     * Searches string in PodDisruptionBudgets by selected namespace.
+     *
+     * @param model - search model.
+     */
+    private void searchInPodDistributionBudgets(SearchModel model) {
+        V1beta1PodDisruptionBudgetList budgetsList = kubeAPI.getV1beta1PodDisruptionBudgetsList(model.getSelectedNamespace(), model);
         for (V1beta1PodDisruptionBudget budget : budgetsList.getItems()) {
             try {
-                if (skipKubeNamespace(searchModel, budget.getMetadata())) {
+                if (skipKubeNamespace(model, budget.getMetadata())) {
                     continue;
                 }
-                if (isStringsContainsSearchString(searchModel.getSearchString(), budget.getMetadata().getName())) {
-                    addSearchResultToModel(budget.getMetadata(), searchModel, POD_DISRUPTION_BUDGET, budget.getMetadata().getName(), budget.getMetadata().getName(), "", budget.toString());
+                if (isStringsContainsSearchString(model.getSearchString(), budget.getMetadata().getName())) {
+                    addSearchResultToModel(budget.getMetadata(), model, POD_DISRUPTION_BUDGET, budget.getMetadata().getName(), budget.getMetadata().getName(), "", budget.toString());
                 }
             } catch (RuntimeException e) {
-                searchModel.addSearchException(e);
+                model.addSearchException(e);
                 logger.error(e.getMessage(), e);
             }
         }
     }
 
-    private void searchInPodSecurityPolicies(SearchModel searchModel) {
-        V1beta1PodSecurityPolicyList policiesList = kubeAPI.getPolicyV1beta1PodSecurityPolicyList(searchModel);
+    /**
+     * Searches string in PodSecurityPolicies.
+     *
+     * @param model - search model.
+     */
+    private void searchInPodSecurityPolicies(SearchModel model) {
+        V1beta1PodSecurityPolicyList policiesList = kubeAPI.getPolicyV1beta1PodSecurityPolicyList(model);
         for (V1beta1PodSecurityPolicy policy : policiesList.getItems()) {
             try {
-                if (skipKubeNamespace(searchModel, policy.getMetadata())) {
+                if (skipKubeNamespace(model, policy.getMetadata())) {
                     continue;
                 }
-                if (isStringsContainsSearchString(searchModel.getSearchString(), policy.getMetadata().getName())) {
-                    addSearchResultToModel(policy.getMetadata(), searchModel, POD_SECURITY_POLICY, policy.getMetadata().getName(), policy.getMetadata().getName(), "", policy.toString());
+                if (isStringsContainsSearchString(model.getSearchString(), policy.getMetadata().getName())) {
+                    addSearchResultToModel(policy.getMetadata(), model, POD_SECURITY_POLICY, policy.getMetadata().getName(), policy.getMetadata().getName(), "", policy.toString());
                 }
             } catch (RuntimeException e) {
-                searchModel.addSearchException(e);
+                model.addSearchException(e);
                 logger.error(e.getMessage(), e);
             }
         }
@@ -575,15 +635,15 @@ public class SearchService {
     /**
      * Searches for environment variable in pods by selected namespace.
      *
-     * @param searchModel - search model
+     * @param model - search model
      */
-    private void searchInEnvironmentVariables(SearchModel searchModel) {
+    private void searchInEnvironmentVariables(SearchModel model) {
 
-        List<V1Pod> podList = kubeAPI.getV1PodsList(searchModel.getSelectedNamespace(), searchModel).getItems();
+        List<V1Pod> podList = kubeAPI.getV1PodsList(model.getSelectedNamespace(), model).getItems();
         for (V1Pod pod : podList) {
 
             //skips search in kube- namespace
-            if (skipKubeNamespace(searchModel, pod.getMetadata())) {
+            if (skipKubeNamespace(model, pod.getMetadata())) {
                 continue;
             }
             try {
@@ -592,7 +652,7 @@ public class SearchService {
                         for (V1EnvVar v1EnvVar : container.getEnv()) {
                             if (ObjectUtils.isEmpty(v1EnvVar.getValueFrom())) {
                                 //get simple Environment variables
-                                composeValueFromToSearchResult(v1EnvVar, pod, container, searchModel, null, null, null);
+                                composeValueFromToSearchResult(v1EnvVar, pod, container, model, null, null, null);
                             } else {
                                 V1EnvVarSource valueFrom = v1EnvVar.getValueFrom();
 
@@ -602,15 +662,15 @@ public class SearchService {
                                     String declaredField = fieldPath.substring(fieldPath.lastIndexOf(".") + 1);
                                     if (valueFrom.getFieldRef().getFieldPath().startsWith("metadata")) {
                                         String envValueFromFieldObject = getEnvValueFromFieldObject(V1ObjectMeta.class.getDeclaredField(declaredField), pod.getMetadata());
-                                        composeValueFromToSearchResult(v1EnvVar, pod, container, searchModel, "fieldRef", fieldPath, envValueFromFieldObject);
+                                        composeValueFromToSearchResult(v1EnvVar, pod, container, model, "fieldRef", fieldPath, envValueFromFieldObject);
                                     }
                                     if (fieldPath.startsWith("status")) {
                                         String envValueFromFieldObject = getEnvValueFromFieldObject(V1PodStatus.class.getDeclaredField(declaredField), pod.getStatus());
-                                        composeValueFromToSearchResult(v1EnvVar, pod, container, searchModel, "fieldRef", fieldPath, envValueFromFieldObject);
+                                        composeValueFromToSearchResult(v1EnvVar, pod, container, model, "fieldRef", fieldPath, envValueFromFieldObject);
                                     }
                                     if (fieldPath.startsWith("spec")) {
                                         String envValueFromFieldObject = getEnvValueFromFieldObject(V1PodSpec.class.getDeclaredField(declaredField), pod.getSpec());
-                                        composeValueFromToSearchResult(v1EnvVar, pod, container, searchModel, "fieldRef", fieldPath, envValueFromFieldObject);
+                                        composeValueFromToSearchResult(v1EnvVar, pod, container, model, "fieldRef", fieldPath, envValueFromFieldObject);
                                     }
                                 }
 
@@ -621,7 +681,7 @@ public class SearchService {
                                     valueFromValue.append("{ containerName: ").append(resourceFieldRef.getContainerName() == null ? "null" : resourceFieldRef.getContainerName()).append(", ");
                                     valueFromValue.append("divisor: ").append(resourceFieldRef.getContainerName() == null ? "null" : resourceFieldRef.getContainerName()).append(", ");
                                     valueFromValue.append("resource: ").append(resourceFieldRef.getContainerName() == null ? "null" : resourceFieldRef.getContainerName()).append(" }");
-                                    composeValueFromToSearchResult(v1EnvVar, pod, container, searchModel, "resourceFieldRef", "", valueFromValue.toString());
+                                    composeValueFromToSearchResult(v1EnvVar, pod, container, model, "resourceFieldRef", "", valueFromValue.toString());
                                 }
 
                                 //get Environment variables from ConfigMapKeyRef
@@ -630,7 +690,7 @@ public class SearchService {
                                     StringBuilder valueFromValue = new StringBuilder();
                                     valueFromValue.append("{ key: ").append(configMapKeyRef.getKey() == null ? "null" : configMapKeyRef.getKey()).append(", ");
                                     valueFromValue.append("name: ").append(configMapKeyRef.getName() == null ? "null" : configMapKeyRef.getName()).append(" }");
-                                    composeValueFromToSearchResult(v1EnvVar, pod, container, searchModel, "configMapKeyRef", "", valueFromValue.toString());
+                                    composeValueFromToSearchResult(v1EnvVar, pod, container, model, "configMapKeyRef", "", valueFromValue.toString());
                                 }
 
                                 //get Environment variables from SecretKeyRef
@@ -639,19 +699,19 @@ public class SearchService {
                                     StringBuilder valueFromValue = new StringBuilder();
                                     valueFromValue.append("{ key: ").append(secretKeyRef.getKey() == null ? "null" : secretKeyRef.getKey()).append(", ");
                                     valueFromValue.append("name: ").append(secretKeyRef.getName() == null ? "null" : secretKeyRef.getName()).append(" }");
-                                    composeValueFromToSearchResult(v1EnvVar, pod, container, searchModel, "secretKeyRef", "", valueFromValue.toString());
+                                    composeValueFromToSearchResult(v1EnvVar, pod, container, model, "secretKeyRef", "", valueFromValue.toString());
                                 }
                             }
                         }
                     }
                 }
             } catch (NoSuchFieldException | IllegalAccessException e) {
-                searchModel.addSearchException(e);
+                model.addSearchException(e);
                 logger.error(e.getMessage(), e);
             }
             //collect all env vars from pod with exec
-            if (!searchModel.isSkipNativeEnvVars()) {
-                mergeNativeEnvVarsToSearchResult(pod, searchModel);
+            if (!model.isSkipNativeEnvVars()) {
+                mergeNativeEnvVarsToSearchResult(pod, model);
             }
         }
     }
@@ -662,12 +722,12 @@ public class SearchService {
      * @param v1EnvVar        - valueFrom Environment Variable
      * @param pod             - pod
      * @param container       - container
-     * @param searchModel     - search model
+     * @param model           - search model
      * @param valueFromSource - environment from value source
      * @param valueFromValue  - environment from value
      * @param envValue        - environment value
      */
-    private void composeValueFromToSearchResult(V1EnvVar v1EnvVar, V1Pod pod, V1Container container, SearchModel searchModel, String valueFromSource, String valueFromValue, String envValue) {
+    private void composeValueFromToSearchResult(V1EnvVar v1EnvVar, V1Pod pod, V1Container container, SearchModel model, String valueFromSource, String valueFromValue, String envValue) {
         String envName, additionalInfo = "";
         envName = v1EnvVar.getName().toLowerCase();
         if (StringUtils.isNotBlank(valueFromSource)) {
@@ -676,21 +736,21 @@ public class SearchService {
             additionalInfo = "Simple Environment Variable";
             envValue = v1EnvVar.getValue().toLowerCase();
         }
-        if (isStringsContainsSearchString(searchModel.getSearchString(), envName, envValue)) {
+        if (isStringsContainsSearchString(model.getSearchString(), envName, envValue)) {
             String resourceName = pod.getMetadata().getName() + " [" + container.getName() + "]";
             String composedFoundString = v1EnvVar.getName() + "=" + envValue;
-            addSearchResultToModel(pod.getMetadata(), searchModel, ENV_VARIABLE, resourceName, composedFoundString, additionalInfo, pod.toString());
+            addSearchResultToModel(pod.getMetadata(), model, ENV_VARIABLE, resourceName, composedFoundString, additionalInfo, pod.toString());
         }
     }
 
     /**
      * Executes env command on pod, and collects native environment variables.
      *
-     * @param pod         - kubernetes pod
-     * @param searchModel - search model
+     * @param pod   - kubernetes pod
+     * @param model - search model
      * @return - properties object with key=value native environment variables map.
      */
-    private Properties getPodEnvironmentVars(V1Pod pod, SearchModel searchModel) {
+    private Properties getPodEnvironmentVars(V1Pod pod, SearchModel model) {
         Properties envVars = new Properties();
         String[] command = new String[]{"env"};
         try {
@@ -706,7 +766,7 @@ public class SearchService {
                 }
             }
         } catch (ApiException | IOException | RuntimeException e) {
-            searchModel.addSearchException(e);
+            model.addSearchException(e);
             logger.error(e.getMessage(), e);
         }
         return envVars;
@@ -716,13 +776,13 @@ public class SearchService {
     /**
      * Merge native environment variables (env) into search model.
      *
-     * @param pod         - kubernetes pod
-     * @param searchModel - search model
+     * @param pod   - kubernetes pod
+     * @param model - search model
      */
-    private void mergeNativeEnvVarsToSearchResult(V1Pod pod, SearchModel searchModel) {
-        Properties podEnvironmentVars = getPodEnvironmentVars(pod, searchModel);
+    private void mergeNativeEnvVarsToSearchResult(V1Pod pod, SearchModel model) {
+        Properties podEnvironmentVars = getPodEnvironmentVars(pod, model);
         //copy list, because concurrent modification exception
-        List<SearchResult> searchResultList = new ArrayList<>(searchModel.getSearchResults());
+        List<SearchResult> searchResultList = new ArrayList<>(model.getSearchResults());
         for (Map.Entry<Object, Object> entry : podEnvironmentVars.entrySet()) {
             String key = (String) entry.getKey(), envValue = (String) entry.getValue();
             boolean isEnvVarNotFound = true;
@@ -734,9 +794,9 @@ public class SearchService {
                 }
             }
             //add new native environment variable
-            if (isEnvVarNotFound && isStringsContainsSearchString(searchModel.getSearchString(), key, envValue)) {
+            if (isEnvVarNotFound && isStringsContainsSearchString(model.getSearchString(), key, envValue)) {
                 String composedFoundString = key + "=" + envValue;
-                addSearchResultToModel(pod.getMetadata(), searchModel, ENV_VARIABLE, pod.getMetadata().getName(), composedFoundString, "Native Environment Variable", pod.toString());
+                addSearchResultToModel(pod.getMetadata(), model, ENV_VARIABLE, pod.getMetadata().getName(), composedFoundString, "Native Environment Variable", pod.toString());
             }
         }
     }
@@ -745,26 +805,33 @@ public class SearchService {
     /**
      * Add new found variable/text/string to search result.
      *
-     * @param metadata       - kubernetes resource/object metadata
-     * @param searchModel    - search model
+     * @param meta           - kubernetes resource/object meta
+     * @param model          - search model
      * @param resource       - kubernetes @{@link Resource}
      * @param resourceName   - resource name
      * @param foundString    - found string
      * @param additionalInfo - additional info
      */
-    private void addSearchResultToModel(V1ObjectMeta metadata, SearchModel searchModel, Resource resource, String resourceName, String foundString, String additionalInfo, String fullDefinition) {
-        SearchResult newSearchResult = new SearchResult(searchModel.getSearchResults().size() + 1)
-                .setNamespace(metadata.getNamespace() == null ? "N/A" : metadata.getNamespace())
+    private void addSearchResultToModel(V1ObjectMeta meta, SearchModel model, Resource resource, String resourceName, String foundString, String additionalInfo, String fullDefinition) {
+        SearchResult newSearchResult = new SearchResult(model.getSearchResults().size() + 1)
+                .setNamespace(meta.getNamespace() == null ? "N/A" : meta.getNamespace())
                 .setResourceType(resource)
                 .setResourceName(resourceName)
                 .setFoundString(foundString)
                 .setAdditionalInfo(additionalInfo)
-                .setCreationTime(getParsedCreationTime(metadata.getCreationTimestamp()))
+                .setCreationTime(getParsedCreationTime(meta.getCreationTimestamp()))
                 .setFullDefinition(fullDefinition);
-        searchModel.addSearchResult(newSearchResult)
-                .addResourceNameFilter(metadata.getName());
+        model.addSearchResult(newSearchResult)
+                .addResourceNameFilter(meta.getName());
     }
 
+    /**
+     * Checks if searched string contains in strings.
+     *
+     * @param searchString - searched string.
+     * @param strings      - searched strings.
+     * @return - true is searches string contains in searched strings.
+     */
     private boolean isStringsContainsSearchString(String searchString, String... strings) {
         for (String s : strings) {
             if (StringUtils.containsIgnoreCase(s, searchString)) {
@@ -783,7 +850,7 @@ public class SearchService {
         return ((String) field.get(fieldObject)).toLowerCase();
     }
 
-    private boolean skipKubeNamespace(SearchModel searchModel, V1ObjectMeta meta) {
-        return searchModel.isSkipKubeNamespaces() && StringUtils.isNotBlank(meta.getNamespace()) && meta.getNamespace().startsWith("kube-");
+    private boolean skipKubeNamespace(SearchModel model, V1ObjectMeta meta) {
+        return model.isSkipKubeNamespaces() && StringUtils.isNotBlank(meta.getNamespace()) && meta.getNamespace().startsWith("kube-");
     }
 }

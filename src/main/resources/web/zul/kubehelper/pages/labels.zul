@@ -51,7 +51,7 @@
                     </vbox>
                 </groupbox>
             </north>
-            <center id="centerLayoutLabelsID" vflex="max" margins="0,3,3,3">
+            <center id="centerLayoutLabelsID" vflex="max">
                 <tabbox width="100%" sclass="nav_tabs">
                     <tabs id="tabs">
                         <tab label="All"/>

@@ -37,9 +37,6 @@ public class KubeHelperUser implements UserDetails {
         this.password = password;
     }
 
-    public KubeHelperUser() {
-    }
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return AuthorityUtils.commaSeparatedStringToAuthorityList("ROLE_ADMIN");

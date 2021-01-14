@@ -27,7 +27,6 @@ import com.kubehelper.domain.results.RBACResult;
 import com.kubehelper.domain.results.RoleResult;
 import com.kubehelper.domain.results.RoleRuleResult;
 import com.kubehelper.domain.results.ServiceAccountResult;
-import io.kubernetes.client.Exec;
 import io.kubernetes.client.openapi.models.V1Container;
 import io.kubernetes.client.openapi.models.V1ObjectMeta;
 import io.kubernetes.client.openapi.models.V1Pod;
@@ -67,7 +66,7 @@ import static com.kubehelper.common.Resource.CLUSTER_ROLE;
 import static com.kubehelper.common.Resource.ROLE;
 
 /**
- * Search service.
+ * Security service.
  *
  * @author JDev
  */
@@ -79,94 +78,93 @@ public class SecurityService {
     @Autowired
     private KubeAPI kubeAPI;
 
-    @Autowired
-    private Exec exec;
-
-    public void getRoles(SecurityModel securityModel) {
-        securityModel.getRolesResults().clear();
-        securityModel.getSearchExceptions().clear();
-        searchInClusterRoles(securityModel);
-        searchInRoles(securityModel);
-        searchInClusterRoleBindings(securityModel);
-        searchInRoleBindings(securityModel);
+    public void getRoles(SecurityModel model) {
+        model.getRolesResults().clear();
+        model.getSearchExceptions().clear();
+        searchInClusterRoles(model);
+        searchInRoles(model);
+        searchInClusterRoleBindings(model);
+        searchInRoleBindings(model);
     }
 
-    public void getRBACs(SecurityModel securityModel) {
-        securityModel.getRbacsResults().clear();
-        securityModel.getSearchExceptions().clear();
-        searchForRBACsInRoles(securityModel);
-        if ("all".equals(securityModel.getSelectedRBACsNamespace())) {
-            searchForRBACsInClusterRoles(securityModel);
+    public void getRBACs(SecurityModel model) {
+        model.getRbacsResults().clear();
+        model.getSearchExceptions().clear();
+        searchForRBACsInRoles(model);
+        if ("all".equals(model.getSelectedRBACsNamespace())) {
+            searchForRBACsInClusterRoles(model);
         }
     }
 
-    public void getPodsSecurityContexts(SecurityModel securityModel) {
-        securityModel.getPodsSecurityContextsResults().clear();
-        securityModel.getSearchExceptions().clear();
-        searchInPodSecurityContexts(securityModel);
+    public void getPodsSecurityContexts(SecurityModel model) {
+        model.getPodsSecurityContextsResults().clear();
+        model.getSearchExceptions().clear();
+        searchInPodSecurityContexts(model);
     }
 
-    public void getContainersSecurityContexts(SecurityModel securityModel) {
-        securityModel.getContainersSecurityResults().clear();
-        securityModel.getSearchExceptions().clear();
-        searchInContainersSecurityContexts(securityModel);
+    public void getContainersSecurityContexts(SecurityModel model) {
+        model.getContainersSecurityResults().clear();
+        model.getSearchExceptions().clear();
+        searchInContainersSecurityContexts(model);
     }
 
-    public void getPodsSecurityPolicies(SecurityModel securityModel) {
-        securityModel.getPodSecurityPoliciesResults().clear();
-        securityModel.getSearchExceptions().clear();
-        searchInPodSecurityPolicies(securityModel);
+    public void getPodsSecurityPolicies(SecurityModel model) {
+        model.getPodSecurityPoliciesResults().clear();
+        model.getSearchExceptions().clear();
+        searchInPodSecurityPolicies(model);
     }
 
-    public void getServiceAccounts(SecurityModel securityModel) {
-        securityModel.getServiceAccountsResults().clear();
-        securityModel.getSearchExceptions().clear();
-        searchInServiceAccounts(securityModel);
+    public void getServiceAccounts(SecurityModel model) {
+        model.getServiceAccountsResults().clear();
+        model.getSearchExceptions().clear();
+        searchInServiceAccounts(model);
     }
+
 
     // RBAC =============
 
-    private void searchForRBACsInClusterRoles(SecurityModel securityModel) {
+
+    private void searchForRBACsInClusterRoles(SecurityModel model) {
         try {
-            V1beta1ClusterRoleList rolesList = kubeAPI.getV1ClusterRolesList(securityModel);
+            V1beta1ClusterRoleList rolesList = kubeAPI.getV1ClusterRolesList(model);
             for (V1beta1ClusterRole role : rolesList.getItems()) {
-                V1beta1ClusterRoleBinding roleBinding = kubeAPI.getV1ClusterRoleBinding(role.getMetadata().getName(), securityModel);
+                V1beta1ClusterRoleBinding roleBinding = kubeAPI.getV1ClusterRoleBinding(role.getMetadata().getName(), model);
                 if (Objects.nonNull(roleBinding) && Objects.nonNull(roleBinding.getSubjects())) {
-                    buildRoleAndRoleBindingWithSubjects(role.getRules(), roleBinding.getSubjects(), role.getMetadata(), roleBinding.getMetadata(), securityModel, CLUSTER_ROLE);
+                    buildRoleAndRoleBindingWithSubjects(role.getRules(), roleBinding.getSubjects(), role.getMetadata(), model, CLUSTER_ROLE);
                 } else {
-                    buildRoleAndRoleBindingWithoutSubjects(role.getRules(), role.getMetadata(), securityModel, CLUSTER_ROLE);
+                    buildRoleAndRoleBindingWithoutSubjects(role.getRules(), role.getMetadata(), model, CLUSTER_ROLE);
                 }
             }
         } catch (RuntimeException e) {
-            securityModel.addSearchException(e);
+            model.addSearchException(e);
             logger.error(e.getMessage(), e);
         }
     }
 
-    private void searchForRBACsInRoles(SecurityModel securityModel) {
+    private void searchForRBACsInRoles(SecurityModel model) {
         try {
-            V1beta1RoleList rolesList = kubeAPI.getV1RolesList(securityModel.getSelectedRBACsNamespace(), securityModel);
+            V1beta1RoleList rolesList = kubeAPI.getV1RolesList(model.getSelectedRBACsNamespace(), model);
             for (V1beta1Role role : rolesList.getItems()) {
-                V1beta1RoleBinding roleBinding = kubeAPI.getV1RoleBinding(role.getMetadata().getName(), role.getMetadata().getNamespace() == null ? "default" : role.getMetadata().getNamespace(), securityModel);
+                V1beta1RoleBinding roleBinding = kubeAPI.getV1RoleBinding(role.getMetadata().getName(), role.getMetadata().getNamespace() == null ? "default" : role.getMetadata().getNamespace(), model);
                 if (Objects.nonNull(roleBinding) && Objects.nonNull(roleBinding.getSubjects())) {
-                    buildRoleAndRoleBindingWithSubjects(role.getRules(), roleBinding.getSubjects(), role.getMetadata(), roleBinding.getMetadata(), securityModel, ROLE);
+                    buildRoleAndRoleBindingWithSubjects(role.getRules(), roleBinding.getSubjects(), role.getMetadata(), model, ROLE);
                 } else {
-                    buildRoleAndRoleBindingWithoutSubjects(role.getRules(), role.getMetadata(), securityModel, ROLE);
+                    buildRoleAndRoleBindingWithoutSubjects(role.getRules(), role.getMetadata(), model, ROLE);
                 }
             }
         } catch (RuntimeException e) {
-            securityModel.addSearchException(e);
+            model.addSearchException(e);
             logger.error(e.getMessage(), e);
         }
     }
 
-    private void buildRoleAndRoleBindingWithSubjects(List<V1beta1PolicyRule> rules, List<V1beta1Subject> subjects, V1ObjectMeta roleMeta, V1ObjectMeta roleBindingMeta, SecurityModel securityModel, Resource role) {
+    private void buildRoleAndRoleBindingWithSubjects(List<V1beta1PolicyRule> rules, List<V1beta1Subject> subjects, V1ObjectMeta roleMeta, SecurityModel model, Resource role) {
         subjects.forEach(subject -> {
             rules.forEach(rule -> {
                 if (Optional.ofNullable(rule.getResources()).isPresent()) {
                     rule.getResources().forEach(resource -> {
                         rule.getVerbs().forEach(verb -> {
-                            buildRBACResultWithSubject(securityModel, roleMeta, roleBindingMeta, subject, resource, verb, role);
+                            buildRBACResultWithSubject(model, roleMeta, subject, resource, verb, role);
                         });
                     });
                 }
@@ -174,23 +172,23 @@ public class SecurityService {
         });
     }
 
-    private void buildRoleAndRoleBindingWithoutSubjects(List<V1beta1PolicyRule> rules, V1ObjectMeta roleMeta, SecurityModel securityModel, Resource role) {
+    private void buildRoleAndRoleBindingWithoutSubjects(List<V1beta1PolicyRule> rules, V1ObjectMeta roleMeta, SecurityModel model, Resource role) {
         rules.forEach(rule -> {
             if (Optional.ofNullable(rule.getResources()).isPresent()) {
                 rule.getResources().forEach(resource -> {
                     rule.getVerbs().forEach(verb -> {
-                        buildRBACResultWithoutSubject(securityModel, roleMeta, "N/A", resource, verb, role);
+                        buildRBACResultWithoutSubject(model, roleMeta, "N/A", resource, verb, role);
                     });
                 });
             }
         });
     }
 
-    private void buildRBACResultWithSubject(SecurityModel securityModel, V1ObjectMeta roleMeta, V1ObjectMeta roleBindingMeta, V1beta1Subject subject, String resource, String verb, Resource role) {
-        if (skipKubeNamespace(securityModel, subject.getNamespace())) {
+    private void buildRBACResultWithSubject(SecurityModel model, V1ObjectMeta roleMeta, V1beta1Subject subject, String resource, String verb, Resource role) {
+        if (skipKubeNamespace(model, subject.getNamespace())) {
             return;
         }
-        RBACResult rbacResult = new RBACResult(securityModel.getRbacsResults().size() + 1)
+        RBACResult rbacResult = new RBACResult(model.getRbacsResults().size() + 1)
                 .setResourceName(resource)
                 .setSubjectKind(subject.getKind())
                 .setSubjectName(subject.getName())
@@ -199,14 +197,14 @@ public class SecurityService {
                 .setNamespace(Objects.isNull(subject.getNamespace()) ? "N/A" : subject.getNamespace())
                 .setApiGroup(Objects.isNull(subject.getApiGroup()) ? "" : subject.getApiGroup())
                 .setVerb(verb);
-        securityModel.addRBACResult(rbacResult);
+        model.addRBACResult(rbacResult);
     }
 
-    private void buildRBACResultWithoutSubject(SecurityModel securityModel, V1ObjectMeta roleMeta, String subject, String resource, String verb, Resource role) {
-        if (skipKubeNamespace(securityModel, roleMeta.getNamespace())) {
+    private void buildRBACResultWithoutSubject(SecurityModel model, V1ObjectMeta roleMeta, String subject, String resource, String verb, Resource role) {
+        if (skipKubeNamespace(model, roleMeta.getNamespace())) {
             return;
         }
-        RBACResult rbacResult = new RBACResult(securityModel.getRbacsResults().size() + 1)
+        RBACResult rbacResult = new RBACResult(model.getRbacsResults().size() + 1)
                 .setResourceName(resource)
                 .setSubjectKind(subject)
                 .setSubjectName(subject)
@@ -215,56 +213,57 @@ public class SecurityService {
                 .setNamespace(roleMeta.getNamespace() == null ? "N/A" : roleMeta.getNamespace())
                 .setApiGroup("")
                 .setVerb(verb);
-        securityModel.addRBACResult(rbacResult);
+        model.addRBACResult(rbacResult);
     }
+
 
     // ROLES =============
 
 
-    private void searchInClusterRoles(SecurityModel securityModel) {
-        V1beta1ClusterRoleList clusterRolesList = kubeAPI.getV1ClusterRolesList(securityModel);
+    private void searchInClusterRoles(SecurityModel model) {
+        V1beta1ClusterRoleList clusterRolesList = kubeAPI.getV1ClusterRolesList(model);
         for (V1beta1ClusterRole clusterRole : clusterRolesList.getItems()) {
             try {
-                addRoleResultToModel(clusterRole.getMetadata(), securityModel, CLUSTER_ROLE, clusterRole.toString(), clusterRole.getRules());
+                addRoleResultToModel(clusterRole.getMetadata(), model, CLUSTER_ROLE, clusterRole.toString(), clusterRole.getRules());
             } catch (RuntimeException e) {
-                securityModel.addSearchException(e);
+                model.addSearchException(e);
                 logger.error(e.getMessage(), e);
             }
         }
     }
 
 
-    private void searchInRoles(SecurityModel securityModel) {
-        V1beta1RoleList rolesList = kubeAPI.getV1RolesList(securityModel.getSelectedRolesNamespace(), securityModel);
+    private void searchInRoles(SecurityModel model) {
+        V1beta1RoleList rolesList = kubeAPI.getV1RolesList(model.getSelectedRolesNamespace(), model);
         for (V1beta1Role role : rolesList.getItems()) {
             try {
-                addRoleResultToModel(role.getMetadata(), securityModel, ROLE, role.toString(), role.getRules());
+                addRoleResultToModel(role.getMetadata(), model, ROLE, role.toString(), role.getRules());
             } catch (RuntimeException e) {
-                securityModel.addSearchException(e);
+                model.addSearchException(e);
                 logger.error(e.getMessage(), e);
             }
         }
     }
 
-    private void searchInClusterRoleBindings(SecurityModel securityModel) {
-        V1beta1ClusterRoleBindingList clusterRoleBindingsList = kubeAPI.getV1ClusterRolesBindingsList(securityModel);
+    private void searchInClusterRoleBindings(SecurityModel model) {
+        V1beta1ClusterRoleBindingList clusterRoleBindingsList = kubeAPI.getV1ClusterRolesBindingsList(model);
         for (V1beta1ClusterRoleBinding binding : clusterRoleBindingsList.getItems()) {
             try {
-                securityModel.addRoleSubjects(binding.getRoleRef().getName(), CLUSTER_ROLE, binding.getSubjects());
+                model.addRoleSubjects(binding.getRoleRef().getName(), CLUSTER_ROLE, binding.getSubjects());
             } catch (RuntimeException e) {
-                securityModel.addSearchException(e);
+                model.addSearchException(e);
                 logger.error(e.getMessage(), e);
             }
         }
     }
 
-    private void searchInRoleBindings(SecurityModel securityModel) {
-        V1beta1RoleBindingList rolesBindingsList = kubeAPI.getV1RolesBindingList(securityModel.getSelectedRolesNamespace(), securityModel);
+    private void searchInRoleBindings(SecurityModel model) {
+        V1beta1RoleBindingList rolesBindingsList = kubeAPI.getV1RolesBindingList(model.getSelectedRolesNamespace(), model);
         for (V1beta1RoleBinding roleBinding : rolesBindingsList.getItems()) {
             try {
-                securityModel.addRoleSubjects(roleBinding.getRoleRef().getName(), ROLE, roleBinding.getSubjects());
+                model.addRoleSubjects(roleBinding.getRoleRef().getName(), ROLE, roleBinding.getSubjects());
             } catch (RuntimeException e) {
-                securityModel.addSearchException(e);
+                model.addSearchException(e);
                 logger.error(e.getMessage(), e);
             }
         }
@@ -273,19 +272,19 @@ public class SecurityService {
     /**
      * Add new found variable/text/string to search result.
      *
-     * @param metadata      - kubernetes resource/object metadata
-     * @param securityModel - security model
+     * @param meta      - kubernetes resource/object meta
+     * @param model - security model
      * @param resource      - kubernetes @{@link Resource}
      */
-    private void addRoleResultToModel(V1ObjectMeta metadata, SecurityModel securityModel, Resource resource, String fullDefinition, List<V1beta1PolicyRule> rules) {
-        RoleResult newRoleResult = new RoleResult(securityModel.getRolesResults().size() + 1)
-                .setNamespace(metadata.getNamespace() == null ? "N/A" : metadata.getNamespace())
+    private void addRoleResultToModel(V1ObjectMeta meta, SecurityModel model, Resource resource, String fullDefinition, List<V1beta1PolicyRule> rules) {
+        RoleResult newRoleResult = new RoleResult(model.getRolesResults().size() + 1)
+                .setNamespace(meta.getNamespace() == null ? "N/A" : meta.getNamespace())
                 .setResourceType(resource)
-                .setResourceName(metadata.getName())
-                .setCreationTime(getParsedCreationTime(metadata.getCreationTimestamp()))
+                .setResourceName(meta.getName())
+                .setCreationTime(getParsedCreationTime(meta.getCreationTimestamp()))
                 .setFullDefinition(fullDefinition);
         addRoleRulesToRoleResult(newRoleResult, rules);
-        securityModel.addRoleResult(newRoleResult);
+        model.addRoleResult(newRoleResult);
     }
 
     private void addRoleRulesToRoleResult(RoleResult roleResult, List<V1beta1PolicyRule> rules) {
@@ -305,22 +304,23 @@ public class SecurityService {
 
     // POD SECURITY CONTEXTS =============
 
-    private void searchInPodSecurityContexts(SecurityModel securityModel) {
-        V1PodList podsList = kubeAPI.getV1PodsList(securityModel.getSelectedPodsSecurityContextsNamespace(), securityModel);
+
+    private void searchInPodSecurityContexts(SecurityModel model) {
+        V1PodList podsList = kubeAPI.getV1PodsList(model.getSelectedPodsSecurityContextsNamespace(), model);
         for (V1Pod pod : podsList.getItems()) {
             try {
-                addPodSecurityContextToModel(pod.getMetadata(), securityModel, pod.getSpec().getSecurityContext());
+                addPodSecurityContextToModel(pod.getMetadata(), model, pod.getSpec().getSecurityContext());
             } catch (RuntimeException e) {
-                securityModel.addSearchException(e);
+                model.addSearchException(e);
                 logger.error(e.getMessage(), e);
             }
         }
     }
 
 
-    private void addPodSecurityContextToModel(V1ObjectMeta metadata, SecurityModel securityModel, V1PodSecurityContext securityContext) {
-        PodSecurityContextResult result = new PodSecurityContextResult(securityModel.getPodsSecurityContextsResults().size() + 1)
-                .setResourceName(metadata.getName())
+    private void addPodSecurityContextToModel(V1ObjectMeta meta, SecurityModel model, V1PodSecurityContext securityContext) {
+        PodSecurityContextResult result = new PodSecurityContextResult(model.getPodsSecurityContextsResults().size() + 1)
+                .setResourceName(meta.getName())
                 .setFsGroup(String.valueOf(securityContext.getFsGroup()))
                 .setFsGroupChangePolicy(StringUtils.isEmpty(securityContext.getFsGroupChangePolicy()) ? "null" : securityContext.getFsGroupChangePolicy())
                 .setRunAsGroup(String.valueOf(securityContext.getRunAsGroup()))
@@ -330,36 +330,38 @@ public class SecurityService {
                 .setSupplementalGroups(securityContext.getSupplementalGroups() == null ? "null" : securityContext.getSupplementalGroups().toString())
                 .setSysctls(securityContext.getSysctls() == null ? "null" : securityContext.getSysctls().toString())
                 .setWindowsOptions(securityContext.getWindowsOptions() == null ? "null" : securityContext.getWindowsOptions().toString())
-                .setCreationTime(getParsedCreationTime(metadata.getCreationTimestamp()))
+                .setCreationTime(getParsedCreationTime(meta.getCreationTimestamp()))
                 .setFullDefinition(securityContext.toString())
-                .setNamespace(metadata.getNamespace());
-        securityModel.addPodSecurityContext(result);
+                .setNamespace(meta.getNamespace());
+        model.addPodSecurityContext(result);
     }
+
 
     // CONTAINER SECURITY CONTEXTS =============
 
-    private void searchInContainersSecurityContexts(SecurityModel securityModel) {
-        V1PodList podsList = kubeAPI.getV1PodsList(securityModel.getSelectedContainersSecurityNamespace(), securityModel);
+
+    private void searchInContainersSecurityContexts(SecurityModel model) {
+        V1PodList podsList = kubeAPI.getV1PodsList(model.getSelectedContainersSecurityNamespace(), model);
         for (V1Pod pod : podsList.getItems()) {
             try {
                 for (V1Container container : pod.getSpec().getContainers()) {
-                    addPodSecurityContextToModel(pod.getMetadata(), container, securityModel);
+                    addPodSecurityContextToModel(pod.getMetadata(), container, model);
                 }
             } catch (RuntimeException e) {
-                securityModel.addSearchException(e);
+                model.addSearchException(e);
                 logger.error(e.getMessage(), e);
             }
         }
     }
 
 
-    private void addPodSecurityContextToModel(V1ObjectMeta metadata, V1Container container, SecurityModel securityModel) {
+    private void addPodSecurityContextToModel(V1ObjectMeta meta, V1Container container, SecurityModel model) {
         V1SecurityContext securityContext = container.getSecurityContext();
-        ContainerSecurityResult result = new ContainerSecurityResult(securityModel.getContainersSecurityResults().size() + 1)
+        ContainerSecurityResult result = new ContainerSecurityResult(model.getContainersSecurityResults().size() + 1)
                 .setResourceName(container.getName())
-                .setPodName(metadata.getName())
-                .setCreationTime(getParsedCreationTime(metadata.getCreationTimestamp()))
-                .setNamespace(metadata.getNamespace());
+                .setPodName(meta.getName())
+                .setCreationTime(getParsedCreationTime(meta.getCreationTimestamp()))
+                .setNamespace(meta.getNamespace());
 
         if (Objects.nonNull(securityContext)) {
             result.setAllowPrivilegeEscalation(String.valueOf(securityContext.getAllowPrivilegeEscalation()))
@@ -372,29 +374,29 @@ public class SecurityService {
                     .setRunAsUser(String.valueOf(securityContext.getRunAsUser()))
                     .setSeLinuxOptions(securityContext.getSeLinuxOptions() == null ? "null" : securityContext.getSeLinuxOptions().toString())
                     .setWindowsOptions(securityContext.getWindowsOptions() == null ? "null" : securityContext.getWindowsOptions().toString())
-//                TODO get user permissions from container if possible
                     .setFullDefinition(securityContext.toString());
         }
-        securityModel.addContainerSecurityResult(result);
+        model.addContainerSecurityResult(result);
     }
 
 
     // SERVICE ACCOUNTS =============
 
-    private void searchInServiceAccounts(SecurityModel securityModel) {
-        V1ServiceAccountList serviceAccountsList = kubeAPI.getV1ServiceAccountsList(securityModel.getSelectedServiceAccountsNamespace(), securityModel);
+
+    private void searchInServiceAccounts(SecurityModel model) {
+        V1ServiceAccountList serviceAccountsList = kubeAPI.getV1ServiceAccountsList(model.getSelectedServiceAccountsNamespace(), model);
         for (V1ServiceAccount sa : serviceAccountsList.getItems()) {
             try {
-                ServiceAccountResult saResult = new ServiceAccountResult(securityModel.getServiceAccountsResults().size() + 1)
+                ServiceAccountResult saResult = new ServiceAccountResult(model.getServiceAccountsResults().size() + 1)
                         .setResourceName(sa.getMetadata().getName())
                         .setKind(sa.getKind())
                         .setNamespace(sa.getMetadata().getNamespace())
                         .setSecrets(Strings.join(sa.getSecrets().stream().map(secret -> secret.getName()).collect(Collectors.toList()), ','))
                         .setCreationTime(getParsedCreationTime(sa.getMetadata().getCreationTimestamp()))
                         .setFullDefinition(sa.toString());
-                securityModel.addServiceAccountResult(saResult);
+                model.addServiceAccountResult(saResult);
             } catch (RuntimeException e) {
-                securityModel.addSearchException(e);
+                model.addSearchException(e);
                 logger.error(e.getMessage(), e);
             }
         }
@@ -403,28 +405,23 @@ public class SecurityService {
 
     // POD SECURITY POLICIES =============
 
-    private void searchInPodSecurityPolicies(SecurityModel securityModel) {
-        V1beta1PodSecurityPolicyList policiesList = kubeAPI.getPolicyV1beta1PodSecurityPolicyList(securityModel);
+
+    private void searchInPodSecurityPolicies(SecurityModel model) {
+        V1beta1PodSecurityPolicyList policiesList = kubeAPI.getPolicyV1beta1PodSecurityPolicyList(model);
         for (V1beta1PodSecurityPolicy policy : policiesList.getItems()) {
             try {
-                addPodSecurityPolicyToModel(policy.getMetadata(), securityModel, policy.getSpec(), policy.toString());
+                addPodSecurityPolicyToModel(policy.getMetadata(), model, policy.getSpec(), policy.toString());
             } catch (RuntimeException e) {
-                securityModel.addSearchException(e);
+                model.addSearchException(e);
                 logger.error(e.getMessage(), e);
             }
         }
     }
 
 
-    /**
-     * Add new found variable/text/string to search result.
-     *
-     * @param metadata      - kubernetes resource/object metadata
-     * @param securityModel - security model
-     */
-    private void addPodSecurityPolicyToModel(V1ObjectMeta metadata, SecurityModel securityModel, V1beta1PodSecurityPolicySpec spec, String fullDefinition) {
-        PodSecurityPoliciesResult result = new PodSecurityPoliciesResult(securityModel.getPodSecurityPoliciesResults().size() + 1)
-                .setResourceName(metadata.getName() == null ? "null" : metadata.getName())
+    private void addPodSecurityPolicyToModel(V1ObjectMeta meta, SecurityModel model, V1beta1PodSecurityPolicySpec spec, String fullDefinition) {
+        PodSecurityPoliciesResult result = new PodSecurityPoliciesResult(model.getPodSecurityPoliciesResults().size() + 1)
+                .setResourceName(meta.getName() == null ? "null" : meta.getName())
                 .setAllowPrivilegeEscalation(spec.getAllowPrivilegeEscalation() == null ? "null" : spec.getAllowPrivilegeEscalation().toString())
                 .setDefaultAllowPrivilegeEscalation(spec.getDefaultAllowPrivilegeEscalation() == null ? "null" : spec.getDefaultAllowPrivilegeEscalation().toString())
                 .setAllowedCSIDrivers(spec.getAllowedCSIDrivers() == null ? "null" : spec.getAllowedCSIDrivers().toString())
@@ -450,9 +447,9 @@ public class SecurityService {
                 .setSupplementalGroups(spec.getSupplementalGroups() == null ? "null" : spec.getSupplementalGroups().toString())
                 .setVolumes(spec.getVolumes() == null ? "null" : spec.getVolumes().toString())
                 .setFullDefinition(fullDefinition)
-                .setCreationTime(getParsedCreationTime(metadata.getCreationTimestamp()))
-                .setNamespace(metadata.getNamespace() == null ? "null" : metadata.getNamespace());
-        securityModel.addPodSecurityPolicy(result);
+                .setCreationTime(getParsedCreationTime(meta.getCreationTimestamp()))
+                .setNamespace(meta.getNamespace() == null ? "null" : meta.getNamespace());
+        model.addPodSecurityPolicy(result);
     }
 
 

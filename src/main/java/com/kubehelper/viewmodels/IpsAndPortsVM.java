@@ -58,8 +58,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Class for displaying ips, ports and container details for kubernetes pods.
- * ViewModel initializes ..kubehelper/pages/imagesandports.zul
+ * View Model for displaying ips, ports and container details for kubernetes pods.
+ * ViewModel initializes ..kubehelper/pages/ipsandports.zul
  *
  * @author JDev
  */
@@ -74,11 +74,8 @@ public class IpsAndPortsVM {
 
     private String detailsLabel = "";
 
-    private IpsAndPortsModel ipsAndPortsModel;
+    private IpsAndPortsModel model;
     private ListModelList<IpsAndPortsResult> ipsAndPortsResults = new ListModelList<>();
-
-    @Wire
-    private Footer ipsAndPortsGridFooter;
 
     @WireVariable
     private CommonService commonService;
@@ -86,14 +83,21 @@ public class IpsAndPortsVM {
     @WireVariable
     private IpsAndPortsService ipsAndPortsService;
 
+    @Wire
+    private Footer ipsAndPortsGridFooter;
+
     @Init
     public void init() {
-        ipsAndPortsModel = (IpsAndPortsModel) Global.ACTIVE_MODELS.computeIfAbsent(Global.IPS_AND_PORTS_MODEL, (k) -> Global.NEW_MODELS.get(Global.IPS_AND_PORTS_MODEL));
+        model = (IpsAndPortsModel) Global.ACTIVE_MODELS.computeIfAbsent(Global.IPS_AND_PORTS_MODEL, (k) -> Global.NEW_MODELS.get(Global.IPS_AND_PORTS_MODEL));
         onInitPreparations();
     }
 
     /**
-     * For @Wire GUI components and Event Listeners.
+     * Calls after UI render.
+     * <p>
+     * Explanation:
+     * Selectors.wireComponents() in order to be able to @Wire GUI components.
+     * Selectors.wireEventListeners() in order to be able to work with listeners and events.
      */
     @AfterCompose
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) {
@@ -101,10 +105,11 @@ public class IpsAndPortsVM {
         Selectors.wireEventListeners(view, this);
     }
 
-    @Listen("onAfterSize=#centerLayoutIpsAndPortsID")
+
+    @Listen("onAfterSize=#centerLayoutIpsAndPortsGrBox")
     public void onAfterSizeCenter(AfterSizeEvent event) {
-        centerLayoutHeight = event.getHeight() - 3;
-        BindUtils.postNotifyChange( this, ".");
+        centerLayoutHeight = event.getHeight() - 10;
+        BindUtils.postNotifyChange(this, ".");
     }
 
     /**
@@ -113,8 +118,8 @@ public class IpsAndPortsVM {
     @Command
     @NotifyChange({"totalItems", "ipsAndPortsResults", "filter"})
     public void search() {
-        ipsAndPortsModel.setFilter(new IpsAndPortsFilter());
-        ipsAndPortsService.get(ipsAndPortsModel);
+        model.setFilter(new IpsAndPortsFilter());
+        ipsAndPortsService.get(model);
         isGetButtonPressed = true;
         onInitPreparations();
     }
@@ -125,14 +130,14 @@ public class IpsAndPortsVM {
      * Sort results by namespace.
      */
     private void onInitPreparations() {
-        ipsAndPortsModel.setNamespaces(ipsAndPortsModel.getNamespaces().isEmpty() ? commonService.getAllNamespaces() : ipsAndPortsModel.getNamespaces());
-        if (ipsAndPortsModel.getFilter().isFilterActive() && !ipsAndPortsModel.getIpsAndPortsResults().isEmpty()) {
+        model.setNamespaces(model.getNamespaces().isEmpty() ? commonService.getAllNamespaces() : model.getNamespaces());
+        if (model.getFilter().isFilterActive() && !model.getIpsAndPortsResults().isEmpty()) {
             filterIps();
         } else {
-            ipsAndPortsResults = new ListModelList<>(ipsAndPortsModel.getIpsAndPortsResults());
+            ipsAndPortsResults = new ListModelList<>(model.getIpsAndPortsResults());
         }
         sortResultsByNamespace();
-        logger.info("Found {} namespaces.", ipsAndPortsModel.getNamespaces());
+        logger.debug("Found {} namespaces.", model.getNamespaces());
     }
 
     /**
@@ -142,12 +147,13 @@ public class IpsAndPortsVM {
     @NotifyChange({"totalItems", "ipsAndPortsResults"})
     public void filterIps() {
         ipsAndPortsResults.clear();
-        for (IpsAndPortsResult ipsAndPortsResult : ipsAndPortsModel.getIpsAndPortsResults()) {
+        for (IpsAndPortsResult ipsAndPortsResult : model.getIpsAndPortsResults()) {
             if (StringUtils.containsIgnoreCase(ipsAndPortsResult.getIp(), getFilter().getIp()) &&
                     StringUtils.containsIgnoreCase(ipsAndPortsResult.getPorts(), getFilter().getPorts()) &&
                     StringUtils.containsIgnoreCase(ipsAndPortsResult.getHostInfo(), getFilter().getHostInfo()) &&
                     StringUtils.containsIgnoreCase(ipsAndPortsResult.getCreationTime(), getFilter().getCreationTime()) &&
                     StringUtils.containsIgnoreCase(ipsAndPortsResult.getResourceName(), getFilter().getResourceName()) &&
+                    StringUtils.containsIgnoreCase(ipsAndPortsResult.getAdditionalInfo(), getFilter().getAdditionalInfo()) &&
                     commonService.checkEqualsFilter(ipsAndPortsResult.getResourceType(), getFilter().getSelectedResourceTypeFilter()) &&
                     commonService.checkEqualsFilter(ipsAndPortsResult.getNamespace(), getFilter().getSelectedNamespaceFilter())) {
                 ipsAndPortsResults.add(ipsAndPortsResult);
@@ -158,6 +164,7 @@ public class IpsAndPortsVM {
 
     /**
      * Show pod details label.
+     *
      * @param item - {@link IpsAndPortsResult} item
      */
     @Command
@@ -172,11 +179,8 @@ public class IpsAndPortsVM {
     @Command
     @NotifyChange({"totalItems", "ipsAndPortsResults", "filter", "selectedNamespace"})
     public void clearAll() {
-        ipsAndPortsModel.setIpsAndPortsResults(new ListModelList<>())
-                .setFilter(new IpsAndPortsFilter())
-                .setNamespaces(commonService.getAllNamespaces())
-                .setSelectedNamespace("all")
-                .setSearchExceptions(new ArrayList<>());
+        model = new IpsAndPortsModel();
+        Global.ACTIVE_MODELS.replace(Global.IPS_AND_PORTS_MODEL,model);
         ipsAndPortsResults = new ListModelList<>();
         clearAllFilterComboboxes();
     }
@@ -187,7 +191,7 @@ public class IpsAndPortsVM {
     private void clearAllFilterComboboxes() {
         Auxhead searchGridAuxHead = (Auxhead) Path.getComponent("//indexPage/templateInclude/ipsAndPortsGridAuxHead");
         for (Component child : searchGridAuxHead.getFellows()) {
-            if (Arrays.asList("filterResourceNamesCBox", "filterNamespacesCBox", "filterResourceTypesCBox").contains(child.getId())) {
+            if (Arrays.asList("filterNamespacesCBox", "filterResourceTypesCBox").contains(child.getId())) {
                 Combobox cBox = (Combobox) child;
                 cBox.setValue("");
             }
@@ -204,12 +208,12 @@ public class IpsAndPortsVM {
             Notification.show("Nothing found.", "info", ipsAndPortsGridFooter, "before_end", 2000);
         }
         if (isGetButtonPressed && !ipsAndPortsResults.isEmpty()) {
-            Notification.show("Found: " + ipsAndPortsResults.size() + " items", "info", ipsAndPortsGridFooter, "before_end", 2000);
+            Notification.show(String.format("Found: %s items", ipsAndPortsResults.size()), "info", ipsAndPortsGridFooter, "before_end", 2000);
         }
-        if (isGetButtonPressed && ipsAndPortsModel.hasSearchErrors()) {
-            Window window = (Window) Executions.createComponents(Global.PATH_TO_ERROR_RESOURCE_ZUL, null, Map.of("errors", ipsAndPortsModel.getSearchExceptions()));
+        if (isGetButtonPressed && model.hasSearchErrors()) {
+            Window window = (Window) Executions.createComponents(Global.PATH_TO_ERROR_RESOURCE_ZUL, null, Map.of("errors", model.getSearchExceptions()));
             window.doModal();
-            ipsAndPortsModel.setSearchExceptions(new ArrayList<>());
+            model.setSearchExceptions(new ArrayList<>());
         }
         isGetButtonPressed = false;
         return ipsAndPortsResults;
@@ -220,15 +224,15 @@ public class IpsAndPortsVM {
     }
 
     public IpsAndPortsModel getModel() {
-        return ipsAndPortsModel;
+        return model;
     }
 
     public String getSelectedNamespace() {
-        return this.ipsAndPortsModel.getSelectedNamespace();
+        return this.model.getSelectedNamespace();
     }
 
     public void setSelectedNamespace(String selectedNamespace) {
-        this.ipsAndPortsModel.setSelectedNamespace(selectedNamespace);
+        this.model.setSelectedNamespace(selectedNamespace);
     }
 
     public String getTotalItems() {
@@ -236,12 +240,12 @@ public class IpsAndPortsVM {
     }
 
     public List<String> getNamespaces() {
-        return ipsAndPortsModel.getNamespaces();
+        return model.getNamespaces();
     }
 
 
     public IpsAndPortsFilter getFilter() {
-        return ipsAndPortsModel.getFilter();
+        return model.getFilter();
     }
 
     public String getDetailsLabel() {

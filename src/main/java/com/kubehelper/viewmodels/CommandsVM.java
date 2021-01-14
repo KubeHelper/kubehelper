@@ -76,6 +76,9 @@ import java.util.Map;
 import java.util.Set;
 
 /**
+ * Class for displaying/management and view history for commands.
+ * ViewModel initializes ..kubehelper/pages/commands.zul
+ *
  * @author JDev
  */
 @VariableResolver(DelegatingVariableResolver.class)
@@ -135,10 +138,11 @@ public class CommandsVM implements EventListener<Event> {
     }
 
     /**
-     * Creates CheckBox components Dynamically after UI render.
+     * Calls after UI render.
      * <p>
      * Explanation:
-     * We need Selectors.wireComponents() in order to be able to @Wire GUI components.
+     * Selectors.wireComponents() in order to be able to @Wire GUI components.
+     * Selectors.wireEventListeners() in order to be able to work with listeners and events.
      */
     @AfterCompose
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) {
@@ -161,7 +165,7 @@ public class CommandsVM implements EventListener<Event> {
         commandsService.parseUserCommands(commandsModel);
         commandsResults = new ListModelList<>(commandsModel.getCommandsResults());
         commandsModel.setNamespaces(commandsModel.getNamespaces().isEmpty() ? Set.copyOf(commonService.getAllNamespacesWithoutAll()) : commandsModel.getNamespaces());
-        logger.info("Found {} namespaces.", commandsModel.getNamespaces());
+        logger.debug("Found {} namespaces.", commandsModel.getNamespaces());
         checkRuntimeNotificationExceptions();
     }
 

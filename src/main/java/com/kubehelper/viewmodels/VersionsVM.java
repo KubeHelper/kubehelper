@@ -40,7 +40,7 @@ import org.zkoss.zul.ListModelList;
 import java.util.List;
 
 /**
- * Class for displaying versions of tools which running in container.
+ * View Model for displaying versions of tools which running in container.
  * ViewModel initializes ..kubehelper/pages/versions.zul
  *
  * @author JDev
@@ -64,7 +64,11 @@ public class VersionsVM {
     }
 
     /**
-     * For @Wire GUI components and Event Listeners.
+     * Calls after UI render.
+     * <p>
+     * Explanation:
+     * Selectors.wireComponents() in order to be able to @Wire GUI components.
+     * Selectors.wireEventListeners() in order to be able to work with listeners and events.
      */
     @AfterCompose
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) {

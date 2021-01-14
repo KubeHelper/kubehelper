@@ -18,8 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package com.kubehelper.viewmodels.popups;
 
 import com.google.common.io.Files;
-import com.kubehelper.services.CommandsService;
-import com.kubehelper.services.CommonService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +32,6 @@ import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
-import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Notification;
 import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zkplus.spring.SpringUtil;
@@ -56,10 +53,10 @@ public class NewCommandsVM {
 
     private String newCommandsFileName = "";
 
+    private String commandsLocationPath = "";
+
     @Wire
     private Window newCommandsWindow;
-
-    private String commandsLocationPath = "";
 
     /**
      * Initializes popup window.

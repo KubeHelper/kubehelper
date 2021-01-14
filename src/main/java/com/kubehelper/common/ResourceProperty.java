@@ -21,6 +21,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * Resources for labels view.
+ *
  * @author JDev
  */
 public enum ResourceProperty {

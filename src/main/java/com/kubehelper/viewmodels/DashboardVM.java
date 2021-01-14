@@ -53,7 +53,7 @@ import org.zkoss.zul.Vlayout;
 import java.util.Map;
 
 /**
- * Class for displaying Kube Helper dashboard Cluster and nodes metrics.
+ * View Model for displaying Kube Helper dashboard Cluster and nodes metrics.
  * ViewModel initializes ..kubehelper/pages/dashboard.zul
  *
  * @author JDev
@@ -78,6 +78,13 @@ public class DashboardVM {
         dashboardService.showDashboard(dashboardModel);
     }
 
+    /**
+     * Calls after UI render and creates dashboard dynamically.
+     * <p>
+     * Explanation:
+     * Selectors.wireComponents() in order to be able to @Wire GUI components.
+     * Selectors.wireEventListeners() in order to be able to work with listeners and events.
+     */
     @AfterCompose
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) {
         Selectors.wireComponents(view, this, false);

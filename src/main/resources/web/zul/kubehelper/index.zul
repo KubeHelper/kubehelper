@@ -7,15 +7,37 @@
 <!--<?link href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/atom-one-dark.min.css" rel="stylesheet" type="text/css"?>-->
 <?link href="~./css/all.css" rel="stylesheet" type="text/css"?>
 <zk>
+    <style>
+        .z-auxheader{
+        background-color:#326ce5;
+        border-left:1px solid #f68f2a;
+        border-bottom:1px solid #f68f2a;
+        padding:0;
+        position:relative;
+        overflow:hidden;
+        white-space:nowrap
+        }
+        .z-column{
+        background: #326ce5;
+        border-left: 1px solid #f68f2a;
+        border-bottom: 1px solid #f68f2a;
+        padding:0;
+        position:relative;
+        overflow:hidden;
+        white-space:nowrap;
+        }
+        <!--        .z-column-hover .z-column-content{-->
+        <!--        background: #FFFFFF;-->
+        <!--        }-->
+    </style>
     <script type="text/javascript" defer="true">hljs.initHighlightingOnLoad();</script>
     <div id="indexWindow" viewModel="@id('indexVM') @init('com.kubehelper.viewmodels.IndexVM')" height="100%" width="100%">
         <borderlayout>
             <!-- Sidebar -->
-            <west id="mainMenuId" title="Kube Helper" size="13%" collapsible="true" autoscroll="true" border="none">
+            <west id="mainMenuId" title="Kube Helper" size="13%" collapsible="true" autoscroll="true">
                 <vbox>
                     <vbox id="mainMenuVBoxId">
                         <image id="mainLogoId" src="~./img/kube-helper-512.png" width="@load(indexVM.logoSize)" height="@load(indexVM.logoSize)"/>
-                        <!--                        <separator orient="horizontal" style="padding: 0 0 5px 0;"/>-->
                         <panel width="100%" title="Menu" collapsible="true">
                             <panelchildren>
                                 <toolbarbutton id="dashboardMenuBtn" hflex="1" iconSclass="z-icon-dashboard" label="&#160;Dashboard" style="text-align: left; padding-left: 2px;"
@@ -79,7 +101,7 @@
                     </vbox>
                 </vbox>
             </west>
-            <center>
+            <center border="none">
                 <include id="templateInclude" src="@load(indexVM.pageModel.templateUrl)"/>
             </center>
             <south id="indexGlobalFooter" border="none">

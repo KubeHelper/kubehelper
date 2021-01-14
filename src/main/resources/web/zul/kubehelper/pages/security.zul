@@ -1,49 +1,49 @@
 <zk>
-    <div id="securityTemplate" viewModel="@id('securityVM') @init('com.kubehelper.viewmodels.SecurityVM')" width="100%" height="100%">
-        <borderlayout>
-            <center margins="0,3,3,3" title="Security" id="centerLayoutSecurityID">
-                <tabbox width="100%" sclass="nav_tabs">
-                    <tabs id="tabs">
-                        <tab label="Roles"/>
-                        <tab label="RBAC"/>
-                        <tab label="Pods Security Contexts"/>
-                        <tab label="Containers"/>
-                        <tab label="Service Accounts"/>
-                        <tab label="Pod Security Policies"/>
-                    </tabs>
-                    <tabpanels>
+    <borderlayout id="securityTemplate" viewModel="@id('securityVM') @init('com.kubehelper.viewmodels.SecurityVM')" width="100%" height="100%">
+        <center title="Security" id="centerLayoutSecurityID" border="none">
+            <tabbox width="100%" sclass="nav_tabs">
+                <tabs id="tabs">
+                    <tab label="Roles"/>
+                    <tab label="RBAC"/>
+                    <tab label="Pods Security Contexts"/>
+                    <tab label="Containers"/>
+                    <tab label="Service Accounts"/>
+                    <tab label="Pod Security Policies"/>
+                </tabs>
+                <tabpanels>
 
-                        <!--                        ROLES-->
+                    <!--                        ROLES-->
 
-                        <tabpanel>
-                            <groupbox width="100%">
-                                <caption iconSclass="z-icon-sliders" label="Search Configuration"/>
-                                <vbox height="100%" width="100%">
-                                    <hbox id="menuHboxRoles" height="100%" width="100%" align="stretch">
-                                        <cell id="clearAllCellRoles" width="10%" tooltip="clearAllTooltip">
-                                            <button id="clearAllBtnRoles" width="100%" iconSclass="z-icon-eraser" label="Clear all" onClick="@command('clearAllRoles')"/>
-                                        </cell>
-                                        <separator width="15px" orient="vertical" bar="true"/>
-                                        <cell id="namespacesCellRoles" width="20%" align="left">
-                                            <hlayout valign="middle">
-                                                <label value="Namespace: "/>
-                                                <combobox id="namespacesCBoxRoles" tooltip="namespacesTooltip" hflex="1" model="@load(securityVM.namespaces)"
-                                                          selectedItem="@bind(securityVM.selectedRolesNamespace)" readonly="true">
-                                                    <template name="model">
-                                                        <comboitem label="@load(each)"/>
-                                                    </template>
-                                                </combobox>
-                                            </hlayout>
-                                        </cell>
-                                        <cell width="59%">
-                                        </cell>
-                                        <cell id="cellGetBtnRoles" width="10%">
-                                            <button id="getRolesBtn" label="Search" iconSclass="z-icon-search" onClick="@command('getRoles')" width="100%"/>
-                                        </cell>
-                                    </hbox>
-                                </vbox>
-                            </groupbox>
-                            <separator width="100%" orient="horizontal"/>
+                    <tabpanel>
+                        <groupbox width="100%" closable="false" height="100%">
+                            <caption iconSclass="z-icon-sliders" label="Search configuration"/>
+                            <!--                            <vbox height="100%" width="100%">-->
+                            <hbox id="menuHboxRoles" height="100%" width="100%" align="stretch">
+                                <cell id="clearAllCellRoles" width="10%" tooltip="clearAllTooltip">
+                                    <button id="clearAllBtnRoles" width="100%" iconSclass="z-icon-eraser" label="Clear all" onClick="@command('clearAllRoles')"/>
+                                </cell>
+                                <separator width="15px" orient="vertical" bar="true"/>
+                                <cell id="namespacesCellRoles" width="20%" align="left">
+                                    <hlayout valign="middle">
+                                        <label value="Namespace: "/>
+                                        <combobox id="namespacesCBoxRoles" tooltip="namespacesTooltip" hflex="1" model="@load(securityVM.namespaces)"
+                                                  selectedItem="@bind(securityVM.selectedRolesNamespace)" readonly="true">
+                                            <template name="model">
+                                                <comboitem label="@load(each)"/>
+                                            </template>
+                                        </combobox>
+                                    </hlayout>
+                                </cell>
+                                <cell width="59%">
+                                </cell>
+                                <cell id="cellGetBtnRoles" width="10%">
+                                    <button id="getRolesBtn" label="Search" iconSclass="z-icon-search" onClick="@command('getRoles')" width="100%"/>
+                                </cell>
+                            </hbox>
+                            <!--                            </vbox>-->
+                        </groupbox>
+<!--                        <groupbox id="centerLayoutIpsAndPortsGrBox" width="100%" closable="false" height="100%">-->
+<!--                            <caption iconSclass="fas fa-list" label="Results"/>-->
                             <grid id="securityRolesGrid" model="@load(securityVM.rolesResults)" height="@load(securityVM.rolesGridHeight)">
                                 <auxhead id="rolesGridAuxHead">
                                     <auxheader>
@@ -107,601 +107,601 @@
                                     <footer id="rolesGridFooter" span="6" align="right" label="@load(securityVM.rolesTotalItems)"/>
                                 </foot>
                             </grid>
+<!--                        </groupbox>-->
 
-                            <groupbox id="roleSubjectsGroupBox">
-                                <caption iconSclass="z-icon-columns" label="@load(securityVM.clickedRoleBindingSubjectsLabel)"/>
-                                <grid id="roleSubjectsResultsGrid" model="@load(securityVM.roleSubjectsResults)" height="@load(securityVM.subjectsGridHeight)">
-                                    <columns menupopup="auto" sizable="true">
-                                        <column hflex="1" label="Kind" sort="auto(kind)"/>
-                                        <column hflex="2" label="Name" sort="auto(name)"/>
-                                        <column hflex="1" label="Namespace" sort="auto(namespace)"/>
-                                    </columns>
-                                    <rows>
-                                        <template name="model" var="item">
-                                            <row style="cursor:pointer">
-                                                <label value="${item.kind}"/>
-                                                <label value="${item.name}"/>
-                                                <label value="${item.namespace}"/>
-                                            </row>
+                        <groupbox id="roleSubjectsGroupBox" width="100%" closable="false" height="100%">
+                            <caption iconSclass="z-icon-columns" label="@load(securityVM.clickedRoleBindingSubjectsLabel)"/>
+                            <grid id="roleSubjectsResultsGrid" model="@load(securityVM.roleSubjectsResults)" height="@load(securityVM.subjectsGridHeight)">
+                                <columns menupopup="auto" sizable="true">
+                                    <column hflex="1" label="Kind" sort="auto(kind)"/>
+                                    <column hflex="2" label="Name" sort="auto(name)"/>
+                                    <column hflex="1" label="Namespace" sort="auto(namespace)"/>
+                                </columns>
+                                <rows>
+                                    <template name="model" var="item">
+                                        <row style="cursor:pointer">
+                                            <label value="${item.kind}"/>
+                                            <label value="${item.name}"/>
+                                            <label value="${item.namespace}"/>
+                                        </row>
+                                    </template>
+                                </rows>
+                            </grid>
+                        </groupbox>
+
+                        <groupbox id="roleRulesGroupBox" width="100%" closable="false" height="100%">
+                            <caption iconSclass="z-icon-columns" label="@load(securityVM.clickedRoleRulesLabel)"/>
+                            <grid id="securityRoleRulesGrid" model="@load(securityVM.roleRulesResults)" height="@load(securityVM.roleRulesGridHeight)">
+                                <columns menupopup="auto" sizable="true">
+                                    <column hflex="min" label="Id" sort="auto(id)"/>
+                                    <column hflex="1" label="Resources" sort="auto(resourcesAsString)"/>
+                                    <column hflex="1" label="Verbs" sort="auto(verbsAsString)"/>
+                                    <column hflex="1" label="API Groups" sort="auto(apiGroupsAsString)"/>
+                                    <column hflex="1.5" label="Resource Names" sort="auto(resourceNamesAsString)"/>
+                                    <column hflex="1" label="Non Resource URLs" sort="auto(nonResourceURLsAsString)"/>
+                                    <column hflex="0.5" label="Raws"/>
+                                </columns>
+                                <rows>
+                                    <template name="model" var="item">
+                                        <row style="cursor:pointer">
+                                            <label value="${item.id}" multiline="true"/>
+                                            <label value="${item.resourcesAsString}" multiline="true"/>
+                                            <label value="${item.verbsAsString}" multiline="true"/>
+                                            <label value="${item.apiGroupsAsString}" multiline="true"/>
+                                            <label value="${item.resourceNamesAsString}" multiline="true"/>
+                                            <label value="${item.nonResourceURLsAsString}" multiline="true"/>
+                                            <toolbarbutton label="Raw/Yaml/Json" onClick="@command('showRoleRuleFullDefinition', item=item)" hflex="1"/>
+                                        </row>
+                                    </template>
+                                </rows>
+                                <foot>
+                                    <footer id="roleRulesGridFooter" span="7" align="right" label="@load(securityVM.roleRulesTotalItems)"/>
+                                </foot>
+                            </grid>
+                        </groupbox>
+
+                    </tabpanel>
+
+                    <!--                        RBAC-->
+
+                    <tabpanel>
+                        <groupbox width="100%">
+                            <caption iconSclass="z-icon-sliders" label="Search Configuration"/>
+                            <vbox height="100%" width="100%">
+                                <hbox id="menuHboxRBACs" height="100%" width="100%" align="stretch">
+                                    <cell id="clearAllCellRBACs" width="10%" tooltip="clearAllTooltip">
+                                        <button id="clearAllBtnRBACs" width="100%" iconSclass="z-icon-eraser" label="Clear all" onClick="@command('clearAllRbacs')"/>
+                                    </cell>
+                                    <separator width="15px" orient="vertical" bar="true"/>
+                                    <cell id="namespacesCellRBACs" width="20%" align="left">
+                                        <hlayout valign="middle">
+                                            <label value="Namespace: "/>
+                                            <combobox id="namespacesCBoxRBACs" tooltip="namespacesRBACsTooltip" hflex="1" model="@load(securityVM.namespaces)"
+                                                      selectedItem="@bind(securityVM.selectedRBACsNamespace)" readonly="true">
+                                                <template name="model">
+                                                    <comboitem label="@load(each)"/>
+                                                </template>
+                                            </combobox>
+                                        </hlayout>
+                                    </cell>
+                                    <separator width="15px" orient="vertical" bar="true"/>
+                                    <cell width="10%">
+                                        <checkbox checked="@bind(securityVM.skipKubeNamespaces)" tooltip="skipKubeNamespacesTooltip"/>Skip kube* namespaces
+                                    </cell>
+                                    <cell width="48%">
+                                    </cell>
+                                    <cell id="cellGetBtnRBACs" width="10%">
+                                        <button id="getRBACsBtn" label="Search" iconSclass="z-icon-search" onClick="@command('getRbacs')" width="100%"/>
+                                    </cell>
+                                </hbox>
+                            </vbox>
+                        </groupbox>
+                        <separator width="100%" orient="horizontal"/>
+                        <grid id="securityRBACsGrid" model="@load(securityVM.rbacsResults)" height="@load(securityVM.rbacsGridHeight)">
+                            <auxhead id="rbacGridAuxHead">
+                                <auxheader>
+                                    <span sclass="z-icon-hashtag"/>
+                                </auxheader>
+                                <auxheader colspan="1">
+                                    <combobox id="rbacResourceNamesFilterCBox" hflex="1" model="@load(securityVM.rbacFilter.resourceNamesFilter)"
+                                              selectedItem="@bind(securityVM.rbacFilter.selectedResourceNameFilter)" onChange="@command('filterRbacs')">
+                                        <template name="model">
+                                            <comboitem label="@load(each)"/>
                                         </template>
-                                    </rows>
-                                </grid>
-                            </groupbox>
-
-                            <groupbox id="roleRulesGroupBox">
-                                <caption iconSclass="z-icon-columns" label="@load(securityVM.clickedRoleRulesLabel)"/>
-                                <grid id="securityRoleRulesGrid" model="@load(securityVM.roleRulesResults)" height="@load(securityVM.roleRulesGridHeight)">
-                                    <columns menupopup="auto" sizable="true">
-                                        <column hflex="min" label="Id" sort="auto(id)"/>
-                                        <column hflex="1" label="Resources" sort="auto(resourcesAsString)"/>
-                                        <column hflex="1" label="Verbs" sort="auto(verbsAsString)"/>
-                                        <column hflex="1" label="API Groups" sort="auto(apiGroupsAsString)"/>
-                                        <column hflex="1.5" label="Resource Names" sort="auto(resourceNamesAsString)"/>
-                                        <column hflex="1" label="Non Resource URLs" sort="auto(nonResourceURLsAsString)"/>
-                                        <column hflex="0.5" label="Raws"/>
-                                    </columns>
-                                    <rows>
-                                        <template name="model" var="item">
-                                            <row style="cursor:pointer">
-                                                <label value="${item.id}" multiline="true"/>
-                                                <label value="${item.resourcesAsString}" multiline="true"/>
-                                                <label value="${item.verbsAsString}" multiline="true"/>
-                                                <label value="${item.apiGroupsAsString}" multiline="true"/>
-                                                <label value="${item.resourceNamesAsString}" multiline="true"/>
-                                                <label value="${item.nonResourceURLsAsString}" multiline="true"/>
-                                                <toolbarbutton label="Raw/Yaml/Json" onClick="@command('showRoleRuleFullDefinition', item=item)" hflex="1"/>
-                                            </row>
+                                    </combobox>
+                                </auxheader>
+                                <auxheader colspan="1">
+                                    <combobox id="rbacSubjectKindsFilterCBox" hflex="1" model="@load(securityVM.rbacFilter.subjectKindsFilter)"
+                                              selectedItem="@bind(securityVM.rbacFilter.selectedSubjectKindFilter)" onChange="@command('filterRbacs')">
+                                        <template name="model">
+                                            <comboitem label="@load(each)"/>
                                         </template>
-                                    </rows>
-                                    <foot>
-                                        <footer id="roleRulesGridFooter" span="7" align="right" label="@load(securityVM.roleRulesTotalItems)"/>
-                                    </foot>
-                                </grid>
-                            </groupbox>
+                                    </combobox>
+                                </auxheader>
+                                <auxheader colspan="1">
+                                    <combobox id="rbacSubjectNamesFilterCBox" hflex="1" model="@load(securityVM.rbacFilter.subjectNamesFilter)"
+                                              selectedItem="@bind(securityVM.rbacFilter.selectedSubjectNameFilter)" onChange="@command('filterRbacs')">
+                                        <template name="model">
+                                            <comboitem label="@load(each)"/>
+                                        </template>
+                                    </combobox>
+                                </auxheader>
+                                <auxheader colspan="1">
+                                    <textbox hflex="1" value="@bind(securityVM.rbacFilter.apiGroup)" onChange="@command('filterRbacs')"/>
+                                </auxheader>
+                                <auxheader colspan="1">
+                                    <combobox id="rbacResourceTypesFilterCBox" hflex="1" model="@load(securityVM.rbacFilter.resourceTypesFilter)"
+                                              selectedItem="@bind(securityVM.rbacFilter.selectedResourceTypeFilter)" onChange="@command('filterRbacs')">
+                                        <template name="model">
+                                            <comboitem label="@load(each)"/>
+                                        </template>
+                                    </combobox>
+                                </auxheader>
+                                <auxheader colspan="1">
+                                    <combobox id="rbacRoleNamesFilterCBox" hflex="1" mold="rounded" model="@load(securityVM.rbacFilter.roleNamesFilter)"
+                                              selectedItem="@bind(securityVM.rbacFilter.selectedRoleNameFilter)"
+                                              onChange="@command('filterRbacs')">
+                                        <template name="model">
+                                            <comboitem label="@load(each)"/>
+                                        </template>
+                                    </combobox>
+                                </auxheader>
+                                <auxheader colspan="1">
+                                    <combobox id="rbacNamespacesFilterCBox" hflex="1" model="@load(securityVM.rbacFilter.namespacesFilter)"
+                                              selectedItem="@bind(securityVM.rbacFilter.selectedNamespaceFilter)" onChange="@command('filterRbacs')">
+                                        <template name="model">
+                                            <comboitem label="@load(each)"/>
+                                        </template>
+                                    </combobox>
+                                </auxheader>
+                                <auxheader colspan="1">
+                                    <combobox id="rbacVerbAllCBox" hflex="1" model="@bind(securityVM.rbacFilter.verbsFilter)"
+                                              selectedItem="@bind(securityVM.rbacFilter.verbAll)" onChange="@command('filterRbacs')">
+                                        <template name="model">
+                                            <comboitem label="@load(each)"/>
+                                        </template>
+                                    </combobox>
+                                </auxheader>
+                                <auxheader colspan="1">
+                                    <combobox id="rbacVerbGetCBox" hflex="1" model="@load(securityVM.rbacFilter.verbsFilter)"
+                                              selectedItem="@bind(securityVM.rbacFilter.verbGet)" onChange="@command('filterRbacs')">
+                                        <template name="model">
+                                            <comboitem label="@load(each)"/>
+                                        </template>
+                                    </combobox>
+                                </auxheader>
+                                <auxheader colspan="1">
+                                    <combobox id="rbacVerbListCBox" hflex="1" model="@load(securityVM.rbacFilter.verbsFilter)"
+                                              selectedItem="@bind(securityVM.rbacFilter.verbList)" onChange="@command('filterRbacs')">
+                                        <template name="model">
+                                            <comboitem label="@load(each)"/>
+                                        </template>
+                                    </combobox>
+                                </auxheader>
+                                <auxheader colspan="1">
+                                    <combobox id="rbacVerbCreateCBox" hflex="1" model="@load(securityVM.rbacFilter.verbsFilter)"
+                                              selectedItem="@bind(securityVM.rbacFilter.verbCreate)" onChange="@command('filterRbacs')">
+                                        <template name="model">
+                                            <comboitem label="@load(each)"/>
+                                        </template>
+                                    </combobox>
+                                </auxheader>
+                                <auxheader colspan="1">
+                                    <combobox id="rbacVerbUpdateCBox" hflex="1" model="@load(securityVM.rbacFilter.verbsFilter)"
+                                              selectedItem="@bind(securityVM.rbacFilter.verbUpdate)" onChange="@command('filterRbacs')">
+                                        <template name="model">
+                                            <comboitem label="@load(each)"/>
+                                        </template>
+                                    </combobox>
+                                </auxheader>
+                                <auxheader colspan="1">
+                                    <combobox id="rbacVerbPatchCBox" hflex="1" model="@load(securityVM.rbacFilter.verbsFilter)"
+                                              selectedItem="@bind(securityVM.rbacFilter.verbPatch)" onChange="@command('filterRbacs')">
+                                        <template name="model">
+                                            <comboitem label="@load(each)"/>
+                                        </template>
+                                    </combobox>
+                                </auxheader>
+                                <auxheader colspan="1">
+                                    <combobox id="rbacWerbWatchCBox" hflex="1" model="@load(securityVM.rbacFilter.verbsFilter)"
+                                              selectedItem="@bind(securityVM.rbacFilter.verbWatch)" onChange="@command('filterRbacs')">
+                                        <template name="model">
+                                            <comboitem label="@load(each)"/>
+                                        </template>
+                                    </combobox>
+                                </auxheader>
+                                <auxheader colspan="1">
+                                    <combobox id="rbacVerbDeleteCBox" hflex="1" model="@load(securityVM.rbacFilter.verbsFilter)"
+                                              selectedItem="@bind(securityVM.rbacFilter.verbDelete)" onChange="@command('filterRbacs')">
+                                        <template name="model">
+                                            <comboitem label="@load(each)"/>
+                                        </template>
+                                    </combobox>
+                                </auxheader>
+                                <auxheader colspan="1">
+                                    <combobox id="rbacVerbDeleteCollectionCBox" hflex="1" model="@load(securityVM.rbacFilter.verbsFilter)"
+                                              selectedItem="@bind(securityVM.rbacFilter.verbDeleteCollection)" onChange="@command('filterRbacs')">
+                                        <template name="model">
+                                            <comboitem label="@load(each)"/>
+                                        </template>
+                                    </combobox>
+                                </auxheader>
+                                <auxheader colspan="1">
+                                    <textbox hflex="1" value="@bind(securityVM.rbacFilter.others)" onChange="@command('filterRbacs')"/>
+                                </auxheader>
+                            </auxhead>
+                            <columns menupopup="auto" sizable="true" style="text-align: center;">
+                                <column hflex="min" label="Id" sort="auto(id)"/>
+                                <column hflex="1" label="Resource Name" tooltiptext="Resource Name" sort="auto(resourceName)"/>
+                                <column hflex="1" label="Subject Kind" tooltiptext="Subject Kind" sort="auto(subjectKind)"/>
+                                <column hflex="2" label="Subject Name" tooltiptext="Subject Name" sort="auto(subjectName)"/>
+                                <column hflex="1" label="API Group" tooltiptext="API Group" sort="auto(apiGroup)"/>
+                                <column hflex="1" label="Role Type" tooltiptext="Role Type" sort="auto(resourceType)"/>
+                                <column hflex="2" label="Role Name" tooltiptext="Role Name" sort="auto(roleName)"/>
+                                <column hflex="1" label="Namespace" tooltiptext="Namespace" sort="auto(namespace)"/>
 
-                        </tabpanel>
+                                <column hflex="0.5" label="*" tooltiptext="all" sort="auto(all)"/>
+                                <column hflex="0.5" label="get" sort="auto(get)"/>
+                                <column hflex="0.5" label="list" sort="auto(list)"/>
+                                <column hflex="0.5" label="create" sort="auto(create)"/>
+                                <column hflex="0.5" label="update" sort="auto(update)"/>
+                                <column hflex="0.5" label="patch" sort="auto(patch)"/>
+                                <column hflex="0.5" label="watch" sort="auto(watch)"/>
+                                <column hflex="0.5" label="delete" sort="auto(delete)"/>
+                                <column hflex="1" label="deletecollection" sort="auto(deletecollection)"/>
+                                <column hflex="1" label="others" sort="auto(others)"/>
+                            </columns>
+                            <rows>
+                                <template name="model" var="item">
+                                    <row style="cursor:pointer;">
+                                        <label value="${item.id}"/>
+                                        <label value="${item.resourceName}" multiline="true"/>
+                                        <label value="${item.subjectKind}" multiline="true"/>
+                                        <label value="${item.subjectName}" multiline="true"/>
+                                        <label value="${item.apiGroup}" multiline="true"/>
+                                        <label value="${item.resourceType}" multiline="true"/>
+                                        <label value="${item.roleName}" multiline="true"/>
+                                        <label value="${item.namespace}" multiline="true"/>
+                                        <toolbarbutton iconSclass="@load(securityVM.getRBACIcon(item.all))" style="@load(securityVM.getRBACIconColor(item.all))"/>
+                                        <toolbarbutton iconSclass="@load(securityVM.getRBACIcon(item.get))" style="@load(securityVM.getRBACIconColor(item.get))"/>
+                                        <toolbarbutton iconSclass="@load(securityVM.getRBACIcon(item.list))" style="@load(securityVM.getRBACIconColor(item.list))"/>
+                                        <toolbarbutton iconSclass="@load(securityVM.getRBACIcon(item.create))" style="@load(securityVM.getRBACIconColor(item.create))"/>
+                                        <toolbarbutton iconSclass="@load(securityVM.getRBACIcon(item.update))" style="@load(securityVM.getRBACIconColor(item.update))"/>
+                                        <toolbarbutton iconSclass="@load(securityVM.getRBACIcon(item.patch))" style="@load(securityVM.getRBACIconColor(item.patch))"/>
+                                        <toolbarbutton iconSclass="@load(securityVM.getRBACIcon(item.watch))" style="@load(securityVM.getRBACIconColor(item.watch))"/>
+                                        <toolbarbutton iconSclass="@load(securityVM.getRBACIcon(item.delete))" style="@load(securityVM.getRBACIconColor(item.delete))"/>
+                                        <toolbarbutton iconSclass="@load(securityVM.getRBACIcon(item.deletecollection))" style="@load(securityVM.getRBACIconColor(item.deletecollection))"/>
+                                        <label value="${item.others}" multiline="true"/>
+                                    </row>
+                                </template>
+                            </rows>
+                            <foot>
+                                <footer id="rbacsGridFooter" span="18" align="right" label="@load(securityVM.rbacsTotalItems)"/>
+                            </foot>
+                        </grid>
+                    </tabpanel>
 
-                        <!--                        RBAC-->
+                    <!--                        POD SECURITY CONTEXTS-->
 
-                        <tabpanel>
-                            <groupbox width="100%">
-                                <caption iconSclass="z-icon-sliders" label="Search Configuration"/>
-                                <vbox height="100%" width="100%">
-                                    <hbox id="menuHboxRBACs" height="100%" width="100%" align="stretch">
-                                        <cell id="clearAllCellRBACs" width="10%" tooltip="clearAllTooltip">
-                                            <button id="clearAllBtnRBACs" width="100%" iconSclass="z-icon-eraser" label="Clear all" onClick="@command('clearAllRbacs')"/>
-                                        </cell>
-                                        <separator width="15px" orient="vertical" bar="true"/>
-                                        <cell id="namespacesCellRBACs" width="20%" align="left">
-                                            <hlayout valign="middle">
-                                                <label value="Namespace: "/>
-                                                <combobox id="namespacesCBoxRBACs" tooltip="namespacesRBACsTooltip" hflex="1" model="@load(securityVM.namespaces)"
-                                                          selectedItem="@bind(securityVM.selectedRBACsNamespace)" readonly="true">
-                                                    <template name="model">
-                                                        <comboitem label="@load(each)"/>
-                                                    </template>
-                                                </combobox>
-                                            </hlayout>
-                                        </cell>
-                                        <separator width="15px" orient="vertical" bar="true"/>
-                                        <cell width="10%">
-                                            <checkbox checked="@bind(securityVM.skipKubeNamespaces)" tooltip="skipKubeNamespacesTooltip"/>Skip kube* namespaces
-                                        </cell>
-                                        <cell width="48%">
-                                        </cell>
-                                        <cell id="cellGetBtnRBACs" width="10%">
-                                            <button id="getRBACsBtn" label="Search" iconSclass="z-icon-search" onClick="@command('getRbacs')" width="100%"/>
-                                        </cell>
-                                    </hbox>
-                                </vbox>
-                            </groupbox>
-                            <separator width="100%" orient="horizontal"/>
-                            <grid id="securityRBACsGrid" model="@load(securityVM.rbacsResults)" height="@load(securityVM.rbacsGridHeight)">
-                                <auxhead id="rbacGridAuxHead">
-                                    <auxheader>
-                                        <span sclass="z-icon-hashtag"/>
-                                    </auxheader>
-                                    <auxheader colspan="1">
-                                        <combobox id="rbacResourceNamesFilterCBox" hflex="1" model="@load(securityVM.rbacFilter.resourceNamesFilter)"
-                                                  selectedItem="@bind(securityVM.rbacFilter.selectedResourceNameFilter)" onChange="@command('filterRbacs')">
-                                            <template name="model">
-                                                <comboitem label="@load(each)"/>
-                                            </template>
-                                        </combobox>
-                                    </auxheader>
-                                    <auxheader colspan="1">
-                                        <combobox id="rbacSubjectKindsFilterCBox" hflex="1" model="@load(securityVM.rbacFilter.subjectKindsFilter)"
-                                                  selectedItem="@bind(securityVM.rbacFilter.selectedSubjectKindFilter)" onChange="@command('filterRbacs')">
-                                            <template name="model">
-                                                <comboitem label="@load(each)"/>
-                                            </template>
-                                        </combobox>
-                                    </auxheader>
-                                    <auxheader colspan="1">
-                                        <combobox id="rbacSubjectNamesFilterCBox" hflex="1" model="@load(securityVM.rbacFilter.subjectNamesFilter)"
-                                                  selectedItem="@bind(securityVM.rbacFilter.selectedSubjectNameFilter)" onChange="@command('filterRbacs')">
-                                            <template name="model">
-                                                <comboitem label="@load(each)"/>
-                                            </template>
-                                        </combobox>
-                                    </auxheader>
-                                    <auxheader colspan="1">
-                                        <textbox hflex="1" value="@bind(securityVM.rbacFilter.apiGroup)" onChange="@command('filterRbacs')"/>
-                                    </auxheader>
-                                    <auxheader colspan="1">
-                                        <combobox id="rbacResourceTypesFilterCBox" hflex="1" model="@load(securityVM.rbacFilter.resourceTypesFilter)"
-                                                  selectedItem="@bind(securityVM.rbacFilter.selectedResourceTypeFilter)" onChange="@command('filterRbacs')">
-                                            <template name="model">
-                                                <comboitem label="@load(each)"/>
-                                            </template>
-                                        </combobox>
-                                    </auxheader>
-                                    <auxheader colspan="1">
-                                        <combobox id="rbacRoleNamesFilterCBox" hflex="1" mold="rounded" model="@load(securityVM.rbacFilter.roleNamesFilter)"
-                                                  selectedItem="@bind(securityVM.rbacFilter.selectedRoleNameFilter)"
-                                                  onChange="@command('filterRbacs')">
-                                            <template name="model">
-                                                <comboitem label="@load(each)"/>
-                                            </template>
-                                        </combobox>
-                                    </auxheader>
-                                    <auxheader colspan="1">
-                                        <combobox id="rbacNamespacesFilterCBox" hflex="1" model="@load(securityVM.rbacFilter.namespacesFilter)"
-                                                  selectedItem="@bind(securityVM.rbacFilter.selectedNamespaceFilter)" onChange="@command('filterRbacs')">
-                                            <template name="model">
-                                                <comboitem label="@load(each)"/>
-                                            </template>
-                                        </combobox>
-                                    </auxheader>
-                                    <auxheader colspan="1">
-                                        <combobox id="rbacVerbAllCBox" hflex="1" model="@bind(securityVM.rbacFilter.verbsFilter)"
-                                                  selectedItem="@bind(securityVM.rbacFilter.verbAll)" onChange="@command('filterRbacs')">
-                                            <template name="model">
-                                                <comboitem label="@load(each)"/>
-                                            </template>
-                                        </combobox>
-                                    </auxheader>
-                                    <auxheader colspan="1">
-                                        <combobox id="rbacVerbGetCBox" hflex="1" model="@load(securityVM.rbacFilter.verbsFilter)"
-                                                  selectedItem="@bind(securityVM.rbacFilter.verbGet)" onChange="@command('filterRbacs')">
-                                            <template name="model">
-                                                <comboitem label="@load(each)"/>
-                                            </template>
-                                        </combobox>
-                                    </auxheader>
-                                    <auxheader colspan="1">
-                                        <combobox id="rbacVerbListCBox" hflex="1" model="@load(securityVM.rbacFilter.verbsFilter)"
-                                                  selectedItem="@bind(securityVM.rbacFilter.verbList)" onChange="@command('filterRbacs')">
-                                            <template name="model">
-                                                <comboitem label="@load(each)"/>
-                                            </template>
-                                        </combobox>
-                                    </auxheader>
-                                    <auxheader colspan="1">
-                                        <combobox id="rbacVerbCreateCBox" hflex="1" model="@load(securityVM.rbacFilter.verbsFilter)"
-                                                  selectedItem="@bind(securityVM.rbacFilter.verbCreate)" onChange="@command('filterRbacs')">
-                                            <template name="model">
-                                                <comboitem label="@load(each)"/>
-                                            </template>
-                                        </combobox>
-                                    </auxheader>
-                                    <auxheader colspan="1">
-                                        <combobox id="rbacVerbUpdateCBox" hflex="1" model="@load(securityVM.rbacFilter.verbsFilter)"
-                                                  selectedItem="@bind(securityVM.rbacFilter.verbUpdate)" onChange="@command('filterRbacs')">
-                                            <template name="model">
-                                                <comboitem label="@load(each)"/>
-                                            </template>
-                                        </combobox>
-                                    </auxheader>
-                                    <auxheader colspan="1">
-                                        <combobox id="rbacVerbPatchCBox" hflex="1" model="@load(securityVM.rbacFilter.verbsFilter)"
-                                                  selectedItem="@bind(securityVM.rbacFilter.verbPatch)" onChange="@command('filterRbacs')">
-                                            <template name="model">
-                                                <comboitem label="@load(each)"/>
-                                            </template>
-                                        </combobox>
-                                    </auxheader>
-                                    <auxheader colspan="1">
-                                        <combobox id="rbacWerbWatchCBox" hflex="1" model="@load(securityVM.rbacFilter.verbsFilter)"
-                                                  selectedItem="@bind(securityVM.rbacFilter.verbWatch)" onChange="@command('filterRbacs')">
-                                            <template name="model">
-                                                <comboitem label="@load(each)"/>
-                                            </template>
-                                        </combobox>
-                                    </auxheader>
-                                    <auxheader colspan="1">
-                                        <combobox id="rbacVerbDeleteCBox" hflex="1" model="@load(securityVM.rbacFilter.verbsFilter)"
-                                                  selectedItem="@bind(securityVM.rbacFilter.verbDelete)" onChange="@command('filterRbacs')">
-                                            <template name="model">
-                                                <comboitem label="@load(each)"/>
-                                            </template>
-                                        </combobox>
-                                    </auxheader>
-                                    <auxheader colspan="1">
-                                        <combobox id="rbacVerbDeleteCollectionCBox" hflex="1" model="@load(securityVM.rbacFilter.verbsFilter)"
-                                                  selectedItem="@bind(securityVM.rbacFilter.verbDeleteCollection)" onChange="@command('filterRbacs')">
-                                            <template name="model">
-                                                <comboitem label="@load(each)"/>
-                                            </template>
-                                        </combobox>
-                                    </auxheader>
-                                    <auxheader colspan="1">
-                                        <textbox hflex="1" value="@bind(securityVM.rbacFilter.others)" onChange="@command('filterRbacs')"/>
-                                    </auxheader>
-                                </auxhead>
-                                <columns menupopup="auto" sizable="true" style="text-align: center;">
-                                    <column hflex="min" label="Id" sort="auto(id)"/>
-                                    <column hflex="1" label="Resource Name" tooltiptext="Resource Name" sort="auto(resourceName)"/>
-                                    <column hflex="1" label="Subject Kind" tooltiptext="Subject Kind" sort="auto(subjectKind)"/>
-                                    <column hflex="2" label="Subject Name" tooltiptext="Subject Name" sort="auto(subjectName)"/>
-                                    <column hflex="1" label="API Group" tooltiptext="API Group" sort="auto(apiGroup)"/>
-                                    <column hflex="1" label="Role Type" tooltiptext="Role Type" sort="auto(resourceType)"/>
-                                    <column hflex="2" label="Role Name" tooltiptext="Role Name" sort="auto(roleName)"/>
-                                    <column hflex="1" label="Namespace" tooltiptext="Namespace" sort="auto(namespace)"/>
+                    <tabpanel>
+                        <groupbox width="100%">
+                            <caption iconSclass="z-icon-sliders" label="Search Configuration"/>
+                            <vbox height="100%" width="100%">
+                                <hbox height="100%" width="100%" align="stretch">
+                                    <cell id="clearAllCellPods" width="10%" tooltip="clearAllTooltip">
+                                        <button id="clearAllBtnPods" width="100%" iconSclass="z-icon-eraser" label="Clear all" onClick="@command('clearAllPodsSecurityContexts')"/>
+                                    </cell>
+                                    <separator width="15px" orient="vertical" bar="true"/>
+                                    <cell id="namespacesCellPods" width="20%" align="left">
+                                        <hlayout valign="middle">
+                                            <label value="Namespace: "/>
+                                            <combobox id="namespacesCBoxPods" tooltip="namespacesTooltip" hflex="1" model="@load(securityVM.namespaces)"
+                                                      selectedItem="@bind(securityVM.selectedPodsSecurityContextsNamespace)" readonly="true">
+                                                <template name="model">
+                                                    <comboitem label="@load(each)"/>
+                                                </template>
+                                            </combobox>
+                                        </hlayout>
+                                    </cell>
+                                    <cell width="59%">
+                                    </cell>
+                                    <cell id="cellGetBtnPods" width="10%">
+                                        <button id="getPodsBtn" label="Search" iconSclass="z-icon-search" onClick="@command('getPodsSecurityContexts')" width="100%"/>
+                                    </cell>
+                                </hbox>
+                            </vbox>
+                        </groupbox>
+                        <separator width="100%" orient="horizontal"/>
+                        <grid id="securityPodsGrid" model="@load(securityVM.podsSecurityContextsResults)" height="@load(securityVM.podsSecurityContextsGridHeight)">
+                            <columns menupopup="auto" sizable="true" style="text-align: center;">
+                                <column hflex="min" label="Id" tooltiptext="Id" sort="auto(id)"/>
+                                <column hflex="2" label="Name" tooltiptext="Name" sort="auto(resourceName)"/>
+                                <column hflex="1" label="fsGroup" tooltiptext="fsGroup" sort="auto(fsGroup)"/>
+                                <column hflex="1" label="fsGroupChangePolicy" tooltiptext="fsGroupChangePolicy" sort="auto(fsGroupChangePolicy)"/>
+                                <column hflex="1" label="runAsGroup" tooltiptext="runAsGroup" sort="auto(runAsGroup)"/>
+                                <column hflex="1" label="runAsNonRoot" tooltiptext="runAsNonRoot" sort="auto(runAsNonRoot)"/>
+                                <column hflex="1" label="runAsUser" tooltiptext="runAsUser" sort="auto(runAsUser)"/>
+                                <column hflex="1" label="seLinuxOptions" tooltiptext="seLinuxOptions" sort="auto(seLinuxOptions)"/>
+                                <column hflex="1" label="supplementalGroups" tooltiptext="supplementalGroups" sort="auto(supplementalGroups)"/>
+                                <column hflex="1" label="sysctls" tooltiptext="sysctls" sort="auto(sysctls)"/>
+                                <column hflex="1" label="windowsOptions" tooltiptext="windowsOptions" sort="auto(windowsOptions)"/>
+                                <column hflex="1" label="namespace" tooltiptext="Namespace" sort="auto(namespace)"/>
+                                <column hflex="1" label="Creation Time" tooltiptext="Creation Time" sort="auto(creationTime)"/>
+                                <column hflex="1" tooltiptext="Raws" label="Raws"/>
+                            </columns>
+                            <rows>
+                                <template name="model" var="item">
+                                    <row style="cursor:pointer">
+                                        <label value="${item.id}"/>
+                                        <label value="${item.resourceName}" multiline="true"/>
+                                        <label value="${item.fsGroup}" multiline="true"/>
+                                        <label value="${item.fsGroupChangePolicy}" multiline="true"/>
+                                        <label value="${item.runAsGroup}" multiline="true"/>
+                                        <label value="${item.runAsNonRoot}" multiline="true"/>
+                                        <label value="${item.runAsUser}" multiline="true"/>
+                                        <label value="${item.seLinuxOptions}" multiline="true"/>
+                                        <label value="${item.supplementalGroups}" multiline="true"/>
+                                        <label value="${item.sysctls}" multiline="true"/>
+                                        <label value="${item.windowsOptions}" multiline="true"/>
+                                        <label value="${item.namespace}" multiline="true"/>
+                                        <label value="${item.creationTime}" multiline="true"/>
+                                        <toolbarbutton label="Raw/Yaml/Json" onClick="@command('showPodSecurityContextFullDefinition', item=item)" hflex="1"/>
+                                    </row>
+                                </template>
+                            </rows>
+                            <foot>
+                                <footer id="podsSecurityContextsGridFooter" span="14" align="right" label="@load(securityVM.podsSecurityContextsTotalItems)"/>
+                            </foot>
+                        </grid>
+                    </tabpanel>
 
-                                    <column hflex="0.5" label="*" tooltiptext="all" sort="auto(all)"/>
-                                    <column hflex="0.5" label="get" sort="auto(get)"/>
-                                    <column hflex="0.5" label="list" sort="auto(list)"/>
-                                    <column hflex="0.5" label="create" sort="auto(create)"/>
-                                    <column hflex="0.5" label="update" sort="auto(update)"/>
-                                    <column hflex="0.5" label="patch" sort="auto(patch)"/>
-                                    <column hflex="0.5" label="watch" sort="auto(watch)"/>
-                                    <column hflex="0.5" label="delete" sort="auto(delete)"/>
-                                    <column hflex="1" label="deletecollection" sort="auto(deletecollection)"/>
-                                    <column hflex="1" label="others" sort="auto(others)"/>
-                                </columns>
-                                <rows>
-                                    <template name="model" var="item">
-                                        <row style="cursor:pointer;">
-                                            <label value="${item.id}"/>
-                                            <label value="${item.resourceName}" multiline="true"/>
-                                            <label value="${item.subjectKind}" multiline="true"/>
-                                            <label value="${item.subjectName}" multiline="true"/>
-                                            <label value="${item.apiGroup}" multiline="true"/>
-                                            <label value="${item.resourceType}" multiline="true"/>
-                                            <label value="${item.roleName}" multiline="true"/>
-                                            <label value="${item.namespace}" multiline="true"/>
-                                            <toolbarbutton iconSclass="@load(securityVM.getRBACIcon(item.all))" style="@load(securityVM.getRBACIconColor(item.all))"/>
-                                            <toolbarbutton iconSclass="@load(securityVM.getRBACIcon(item.get))" style="@load(securityVM.getRBACIconColor(item.get))"/>
-                                            <toolbarbutton iconSclass="@load(securityVM.getRBACIcon(item.list))" style="@load(securityVM.getRBACIconColor(item.list))"/>
-                                            <toolbarbutton iconSclass="@load(securityVM.getRBACIcon(item.create))" style="@load(securityVM.getRBACIconColor(item.create))"/>
-                                            <toolbarbutton iconSclass="@load(securityVM.getRBACIcon(item.update))" style="@load(securityVM.getRBACIconColor(item.update))"/>
-                                            <toolbarbutton iconSclass="@load(securityVM.getRBACIcon(item.patch))" style="@load(securityVM.getRBACIconColor(item.patch))"/>
-                                            <toolbarbutton iconSclass="@load(securityVM.getRBACIcon(item.watch))" style="@load(securityVM.getRBACIconColor(item.watch))"/>
-                                            <toolbarbutton iconSclass="@load(securityVM.getRBACIcon(item.delete))" style="@load(securityVM.getRBACIconColor(item.delete))"/>
-                                            <toolbarbutton iconSclass="@load(securityVM.getRBACIcon(item.deletecollection))" style="@load(securityVM.getRBACIconColor(item.deletecollection))"/>
-                                            <label value="${item.others}" multiline="true"/>
-                                        </row>
-                                    </template>
-                                </rows>
-                                <foot>
-                                    <footer id="rbacsGridFooter" span="18" align="right" label="@load(securityVM.rbacsTotalItems)"/>
-                                </foot>
-                            </grid>
-                        </tabpanel>
+                    <!--                        CONTAINER SECURITY CONTEXTS-->
 
-                        <!--                        POD SECURITY CONTEXTS-->
+                    <tabpanel>
+                        <groupbox width="100%">
+                            <caption iconSclass="z-icon-sliders" label="Search Configuration"/>
+                            <vbox height="100%" width="100%">
+                                <hbox id="menuHboxContainers" height="100%" width="100%" align="stretch">
+                                    <cell width="10%" tooltip="clearAllTooltip">
+                                        <button iconSclass="z-icon-eraser" width="100%" label="Clear all" onClick="@command('clearAllContainersSecurityContexts')"/>
+                                    </cell>
+                                    <separator width="15px" orient="vertical" bar="true"/>
+                                    <cell id="namespacesCellContainers" width="20%" align="left">
+                                        <hlayout valign="middle">
+                                            <label value="Namespace: "/>
+                                            <combobox tooltip="namespacesTooltip" hflex="1" model="@load(securityVM.namespaces)"
+                                                      selectedItem="@bind(securityVM.selectedContainersSecurityNamespace)" readonly="true">
+                                                <template name="model">
+                                                    <comboitem label="@load(each)"/>
+                                                </template>
+                                            </combobox>
+                                        </hlayout>
+                                    </cell>
+                                    <cell width="59%">
+                                    </cell>
+                                    <cell id="cellGetBtnContainers" width="10%">
+                                        <button id="getContainersBtn" label="Search" iconSclass="z-icon-search" onClick="@command('getContainersSecurityContexts')" width="100%"/>
+                                    </cell>
+                                </hbox>
+                            </vbox>
+                        </groupbox>
+                        <separator width="100%" orient="horizontal"/>
+                        <grid id="securityContainersGrid" model="@load(securityVM.containersSecurityResults)" height="@load(securityVM.containersSecurityContextsGridHeight)">
+                            <columns menupopup="auto" sizable="true">
+                                <column hflex="min" label="Id" sort="auto(id)"/>
+                                <column hflex="1" label="resourceName" tooltiptext="resourceName" sort="auto(resourceName)"/>
+                                <column hflex="1" label="podName" tooltiptext="podName" sort="auto(podName)"/>
+                                <column hflex="1" label="allowPrivilegeEscalation" tooltiptext="allowPrivilegeEscalation" sort="auto(allowPrivilegeEscalation)"/>
+                                <column hflex="1" label="capabilities" tooltiptext="capabilities" sort="auto(capabilities)"/>
+                                <column hflex="1" label="privileged" tooltiptext="privileged" sort="auto(privileged)"/>
+                                <column hflex="1" label="procMount" tooltiptext="procMount" sort="auto(procMount)"/>
+                                <column hflex="1" label="readOnlyRootFilesystem" tooltiptext="readOnlyRootFilesystem" sort="auto(readOnlyRootFilesystem)"/>
+                                <column hflex="1" label="runAsGroup" tooltiptext="runAsGroup" sort="auto(runAsGroup)"/>
+                                <column hflex="1" label="runAsNonRoot" tooltiptext="runAsNonRoot" sort="auto(runAsNonRoot)"/>
+                                <column hflex="1" label="runAsUser" tooltiptext="runAsUser" sort="auto(runAsUser)"/>
+                                <column hflex="1" label="seLinuxOptions" tooltiptext="seLinuxOptions" sort="auto(seLinuxOptions)"/>
+                                <column hflex="1" label="windowsOptions" tooltiptext="windowsOptions" sort="auto(windowsOptions)"/>
+                                <column hflex="1" label="namespace" tooltiptext="namespace" sort="auto(namespace)"/>
+                                <column hflex="1" label="creationTime" tooltiptext="creationTime" sort="auto(creationTime)"/>
+                                <column hflex="1" tooltiptext="Raws" label="Raws"/>
+                            </columns>
+                            <rows>
+                                <template name="model" var="item">
+                                    <row style="cursor:pointer">
+                                        <label value="${item.id}"/>
+                                        <label value="${item.resourceName}" multiline="true"/>
+                                        <label value="${item.podName}" multiline="true"/>
+                                        <label value="${item.allowPrivilegeEscalation}" multiline="true"/>
+                                        <label value="${item.capabilities}" multiline="true"/>
+                                        <label value="${item.privileged}" multiline="true"/>
+                                        <label value="${item.procMount}" multiline="true"/>
+                                        <label value="${item.readOnlyRootFilesystem}" multiline="true"/>
+                                        <label value="${item.runAsGroup}" multiline="true"/>
+                                        <label value="${item.runAsNonRoot}" multiline="true"/>
+                                        <label value="${item.runAsUser}" multiline="true"/>
+                                        <label value="${item.seLinuxOptions}" multiline="true"/>
+                                        <label value="${item.windowsOptions}" multiline="true"/>
+                                        <label value="${item.namespace}" multiline="true"/>
+                                        <label value="${item.creationTime}" multiline="true"/>
+                                        <toolbarbutton label="Raw/Yaml/Json" tooltiptext="Raw/Yaml/Json" onClick="@command('showContainerSecurityContextFullDefinition', item=item)"
+                                                       hflex="1"/>
+                                    </row>
+                                </template>
+                            </rows>
+                            <foot>
+                                <footer id="containersSecurityGridFooter" span="16" align="right" label="@load(securityVM.containersSecurityTotalItems)"/>
+                            </foot>
+                        </grid>
+                    </tabpanel>
 
-                        <tabpanel>
-                            <groupbox width="100%">
-                                <caption iconSclass="z-icon-sliders" label="Search Configuration"/>
-                                <vbox height="100%" width="100%">
-                                    <hbox height="100%" width="100%" align="stretch">
-                                        <cell id="clearAllCellPods" width="10%" tooltip="clearAllTooltip">
-                                            <button id="clearAllBtnPods" width="100%" iconSclass="z-icon-eraser" label="Clear all" onClick="@command('clearAllPodsSecurityContexts')"/>
-                                        </cell>
-                                        <separator width="15px" orient="vertical" bar="true"/>
-                                        <cell id="namespacesCellPods" width="20%" align="left">
-                                            <hlayout valign="middle">
-                                                <label value="Namespace: "/>
-                                                <combobox id="namespacesCBoxPods" tooltip="namespacesTooltip" hflex="1" model="@load(securityVM.namespaces)"
-                                                          selectedItem="@bind(securityVM.selectedPodsSecurityContextsNamespace)" readonly="true">
-                                                    <template name="model">
-                                                        <comboitem label="@load(each)"/>
-                                                    </template>
-                                                </combobox>
-                                            </hlayout>
-                                        </cell>
-                                        <cell width="59%">
-                                        </cell>
-                                        <cell id="cellGetBtnPods" width="10%">
-                                            <button id="getPodsBtn" label="Search" iconSclass="z-icon-search" onClick="@command('getPodsSecurityContexts')" width="100%"/>
-                                        </cell>
-                                    </hbox>
-                                </vbox>
-                            </groupbox>
-                            <separator width="100%" orient="horizontal"/>
-                            <grid id="securityPodsGrid" model="@load(securityVM.podsSecurityContextsResults)" height="@load(securityVM.podsSecurityContextsGridHeight)">
-                                <columns menupopup="auto" sizable="true" style="text-align: center;">
-                                    <column hflex="min" label="Id" tooltiptext="Id" sort="auto(id)"/>
-                                    <column hflex="2" label="Name" tooltiptext="Name" sort="auto(resourceName)"/>
-                                    <column hflex="1" label="fsGroup" tooltiptext="fsGroup" sort="auto(fsGroup)"/>
-                                    <column hflex="1" label="fsGroupChangePolicy" tooltiptext="fsGroupChangePolicy" sort="auto(fsGroupChangePolicy)"/>
-                                    <column hflex="1" label="runAsGroup" tooltiptext="runAsGroup" sort="auto(runAsGroup)"/>
-                                    <column hflex="1" label="runAsNonRoot" tooltiptext="runAsNonRoot" sort="auto(runAsNonRoot)"/>
-                                    <column hflex="1" label="runAsUser" tooltiptext="runAsUser" sort="auto(runAsUser)"/>
-                                    <column hflex="1" label="seLinuxOptions" tooltiptext="seLinuxOptions" sort="auto(seLinuxOptions)"/>
-                                    <column hflex="1" label="supplementalGroups" tooltiptext="supplementalGroups" sort="auto(supplementalGroups)"/>
-                                    <column hflex="1" label="sysctls" tooltiptext="sysctls" sort="auto(sysctls)"/>
-                                    <column hflex="1" label="windowsOptions" tooltiptext="windowsOptions" sort="auto(windowsOptions)"/>
-                                    <column hflex="1" label="namespace" tooltiptext="Namespace" sort="auto(namespace)"/>
-                                    <column hflex="1" label="Creation Time" tooltiptext="Creation Time" sort="auto(creationTime)"/>
-                                    <column hflex="1" tooltiptext="Raws" label="Raws"/>
-                                </columns>
-                                <rows>
-                                    <template name="model" var="item">
-                                        <row style="cursor:pointer">
-                                            <label value="${item.id}"/>
-                                            <label value="${item.resourceName}" multiline="true"/>
-                                            <label value="${item.fsGroup}" multiline="true"/>
-                                            <label value="${item.fsGroupChangePolicy}" multiline="true"/>
-                                            <label value="${item.runAsGroup}" multiline="true"/>
-                                            <label value="${item.runAsNonRoot}" multiline="true"/>
-                                            <label value="${item.runAsUser}" multiline="true"/>
-                                            <label value="${item.seLinuxOptions}" multiline="true"/>
-                                            <label value="${item.supplementalGroups}" multiline="true"/>
-                                            <label value="${item.sysctls}" multiline="true"/>
-                                            <label value="${item.windowsOptions}" multiline="true"/>
-                                            <label value="${item.namespace}" multiline="true"/>
-                                            <label value="${item.creationTime}" multiline="true"/>
-                                            <toolbarbutton label="Raw/Yaml/Json" onClick="@command('showPodSecurityContextFullDefinition', item=item)" hflex="1"/>
-                                        </row>
-                                    </template>
-                                </rows>
-                                <foot>
-                                    <footer id="podsSecurityContextsGridFooter" span="14" align="right" label="@load(securityVM.podsSecurityContextsTotalItems)"/>
-                                </foot>
-                            </grid>
-                        </tabpanel>
+                    <!--                        SERVICE ACCOUNTS-->
 
-                        <!--                        CONTAINER SECURITY CONTEXTS-->
+                    <tabpanel>
+                        <groupbox width="100%">
+                            <caption iconSclass="z-icon-sliders" label="Search Configuration"/>
+                            <vbox height="100%" width="100%">
+                                <hbox height="100%" width="100%" align="stretch">
+                                    <cell width="10%" tooltip="clearAllTooltip">
+                                        <button iconSclass="z-icon-eraser" width="100%" label="Clear all" onClick="@command('clearAllServiceAccounts')"/>
+                                    </cell>
+                                    <separator width="15px" orient="vertical" bar="true"/>
+                                    <cell width="20%" align="left">
+                                        <hlayout valign="middle">
+                                            <label value="Namespace: "/>
+                                            <combobox tooltip="namespacesTooltip" hflex="1" model="@load(securityVM.namespaces)"
+                                                      selectedItem="@bind(securityVM.selectedServiceAccountsNamespace)" readonly="true">
+                                                <template name="model">
+                                                    <comboitem label="@load(each)"/>
+                                                </template>
+                                            </combobox>
+                                        </hlayout>
+                                    </cell>
+                                    <cell width="59%">
+                                    </cell>
+                                    <cell width="10%">
+                                        <button label="Get" onClick="@command('getServiceAccounts')" width="100%"/>
+                                    </cell>
+                                </hbox>
+                            </vbox>
+                        </groupbox>
+                        <separator width="100%" orient="horizontal"/>
+                        <grid id="securityServiceAccountsGrid" model="@load(securityVM.serviceAccountsResults)" height="@load(securityVM.serviceAccountsGridHeight)">
+                            <columns menupopup="auto" sizable="true">
+                                <column hflex="min" label="Id" sort="auto(id)"/>
+                                <column hflex="2" label="Service Account Name" tooltiptext="Service Account Name" sort="auto(resourceName)"/>
+                                <column hflex="1" label="Kind" tooltiptext="Kind" sort="auto(kind)"/>
+                                <column hflex="2" label="Secrets" tooltiptext="Secrets" sort="auto(secrets)"/>
+                                <column hflex="1" label="Namespace" tooltiptext="Namespace" sort="auto(namespace)"/>
+                                <column hflex="min" label="Creation Time" tooltiptext="Creation Time" sort="auto(creationTime)"/>
+                                <column hflex="min" tooltiptext="Raws" label="Raws"/>
+                            </columns>
+                            <rows>
+                                <template name="model" var="item">
+                                    <row style="cursor:pointer">
+                                        <label value="${item.id}"/>
+                                        <label value="${item.resourceName}" multiline="true"/>
+                                        <label value="${item.kind}" multiline="true"/>
+                                        <label value="${item.secrets}" multiline="true"/>
+                                        <label value="${item.namespace}" multiline="true"/>
+                                        <label value="${item.creationTime}"/>
+                                        <toolbarbutton label="Raw/Yaml/Json" tooltiptext="Raw/Yaml/Json" onClick="@command('showServiceAccountFullDefinition', item=item)" hflex="1"/>
+                                    </row>
+                                </template>
+                            </rows>
+                            <foot>
+                                <footer id="serviceAccountsGridFooter" span="7" align="right" label="@load(securityVM.serviceAccountsTotalItems)"/>
+                            </foot>
+                        </grid>
+                    </tabpanel>
 
-                        <tabpanel>
-                            <groupbox width="100%">
-                                <caption iconSclass="z-icon-sliders" label="Search Configuration"/>
-                                <vbox height="100%" width="100%">
-                                    <hbox id="menuHboxContainers" height="100%" width="100%" align="stretch">
-                                        <cell width="10%" tooltip="clearAllTooltip">
-                                            <button iconSclass="z-icon-eraser" width="100%" label="Clear all" onClick="@command('clearAllContainersSecurityContexts')"/>
-                                        </cell>
-                                        <separator width="15px" orient="vertical" bar="true"/>
-                                        <cell id="namespacesCellContainers" width="20%" align="left">
-                                            <hlayout valign="middle">
-                                                <label value="Namespace: "/>
-                                                <combobox tooltip="namespacesTooltip" hflex="1" model="@load(securityVM.namespaces)"
-                                                          selectedItem="@bind(securityVM.selectedContainersSecurityNamespace)" readonly="true">
-                                                    <template name="model">
-                                                        <comboitem label="@load(each)"/>
-                                                    </template>
-                                                </combobox>
-                                            </hlayout>
-                                        </cell>
-                                        <cell width="59%">
-                                        </cell>
-                                        <cell id="cellGetBtnContainers" width="10%">
-                                            <button id="getContainersBtn" label="Search" iconSclass="z-icon-search" onClick="@command('getContainersSecurityContexts')" width="100%"/>
-                                        </cell>
-                                    </hbox>
-                                </vbox>
-                            </groupbox>
-                            <separator width="100%" orient="horizontal"/>
-                            <grid id="securityContainersGrid" model="@load(securityVM.containersSecurityResults)" height="@load(securityVM.containersSecurityContextsGridHeight)">
-                                <columns menupopup="auto" sizable="true">
-                                    <column hflex="min" label="Id" sort="auto(id)"/>
-                                    <column hflex="1" label="resourceName" tooltiptext="resourceName" sort="auto(resourceName)"/>
-                                    <column hflex="1" label="podName" tooltiptext="podName" sort="auto(podName)"/>
-                                    <column hflex="1" label="allowPrivilegeEscalation" tooltiptext="allowPrivilegeEscalation" sort="auto(allowPrivilegeEscalation)"/>
-                                    <column hflex="1" label="capabilities" tooltiptext="capabilities" sort="auto(capabilities)"/>
-                                    <column hflex="1" label="privileged" tooltiptext="privileged" sort="auto(privileged)"/>
-                                    <column hflex="1" label="procMount" tooltiptext="procMount" sort="auto(procMount)"/>
-                                    <column hflex="1" label="readOnlyRootFilesystem" tooltiptext="readOnlyRootFilesystem" sort="auto(readOnlyRootFilesystem)"/>
-                                    <column hflex="1" label="runAsGroup" tooltiptext="runAsGroup" sort="auto(runAsGroup)"/>
-                                    <column hflex="1" label="runAsNonRoot" tooltiptext="runAsNonRoot" sort="auto(runAsNonRoot)"/>
-                                    <column hflex="1" label="runAsUser" tooltiptext="runAsUser" sort="auto(runAsUser)"/>
-                                    <column hflex="1" label="seLinuxOptions" tooltiptext="seLinuxOptions" sort="auto(seLinuxOptions)"/>
-                                    <column hflex="1" label="windowsOptions" tooltiptext="windowsOptions" sort="auto(windowsOptions)"/>
-                                    <column hflex="1" label="namespace" tooltiptext="namespace" sort="auto(namespace)"/>
-                                    <column hflex="1" label="creationTime" tooltiptext="creationTime" sort="auto(creationTime)"/>
-                                    <column hflex="1" tooltiptext="Raws" label="Raws"/>
-                                </columns>
-                                <rows>
-                                    <template name="model" var="item">
-                                        <row style="cursor:pointer">
-                                            <label value="${item.id}"/>
-                                            <label value="${item.resourceName}" multiline="true"/>
-                                            <label value="${item.podName}" multiline="true"/>
-                                            <label value="${item.allowPrivilegeEscalation}" multiline="true"/>
-                                            <label value="${item.capabilities}" multiline="true"/>
-                                            <label value="${item.privileged}" multiline="true"/>
-                                            <label value="${item.procMount}" multiline="true"/>
-                                            <label value="${item.readOnlyRootFilesystem}" multiline="true"/>
-                                            <label value="${item.runAsGroup}" multiline="true"/>
-                                            <label value="${item.runAsNonRoot}" multiline="true"/>
-                                            <label value="${item.runAsUser}" multiline="true"/>
-                                            <label value="${item.seLinuxOptions}" multiline="true"/>
-                                            <label value="${item.windowsOptions}" multiline="true"/>
-                                            <label value="${item.namespace}" multiline="true"/>
-                                            <label value="${item.creationTime}" multiline="true"/>
-                                            <toolbarbutton label="Raw/Yaml/Json" tooltiptext="Raw/Yaml/Json" onClick="@command('showContainerSecurityContextFullDefinition', item=item)"
-                                                           hflex="1"/>
-                                        </row>
-                                    </template>
-                                </rows>
-                                <foot>
-                                    <footer id="containersSecurityGridFooter" span="16" align="right" label="@load(securityVM.containersSecurityTotalItems)"/>
-                                </foot>
-                            </grid>
-                        </tabpanel>
+                    <!--                        POD SECURITY POLICIES-->
 
-                        <!--                        SERVICE ACCOUNTS-->
+                    <tabpanel>
+                        <groupbox width="100%">
+                            <caption iconSclass="z-icon-sliders" label="Search Configuration"/>
+                            <vbox height="100%" width="100%">
+                                <hbox id="menuHboxPodSecurityPolicies" height="100%" width="100%" align="stretch">
+                                    <cell id="clearAllCellPodSecurityPolicies" width="10%" tooltip="clearAllTooltip">
+                                        <button id="clearAllBtnPodSecurityPolicies" width="100%" iconSclass="z-icon-eraser" label="Clear all" onClick="@command('clearAllPodSecurityPolicies')"/>
+                                    </cell>
+                                    <separator width="15px" orient="vertical" bar="true"/>
+                                    <cell id="namespacesCellPodSecurityPolicies" width="20%" align="left">
+                                        <hlayout valign="middle">
+                                            <label value="Namespace: "/>
+                                            <combobox id="namespacesCBoxPodSecurityPolicies" tooltip="namespacesTooltip" hflex="1" model="@load(securityVM.namespaces)"
+                                                      selectedItem="@bind(securityVM.selectedPodSecurityPoliciesNamespace)" readonly="true">
+                                                <template name="model">
+                                                    <comboitem label="@load(each)"/>
+                                                </template>
+                                            </combobox>
+                                        </hlayout>
+                                    </cell>
+                                    <cell width="59%">
+                                    </cell>
+                                    <cell id="cellGetBtnPodSecurityPolicies" width="10%">
+                                        <button id="getPodSecurityPoliciesBtn" label="Get" iconSclass="z-icon-angle-double-right" onClick="@command('getPodsSecurityPolicies')" width="100%"/>
+                                    </cell>
+                                </hbox>
+                            </vbox>
+                        </groupbox>
+                        <separator width="100%" orient="horizontal"/>
+                        <grid id="securityPodSecurityPoliciesGrid" model="@load(securityVM.podsSecurityPoliciesResults)" height="@load(securityVM.podsSecurityPoliciesGridHeight)">
+                            <columns menupopup="auto" sizable="true">
+                                <column hflex="min" label="Id" sort="auto(id)" tooltiptext="Id"/>
+                                <column hflex="2" label="Name" sort="auto(resourceName)" tooltiptext="Name"/>
+                                <column hflex="1" label="allowPrivilegeEscalation" sort="auto(allowPrivilegeEscalation)" tooltiptext="allowPrivilegeEscalation"/>
+                                <column hflex="1" label="defaultAllowPrivilegeEscalation" sort="auto(defaultAllowPrivilegeEscalation)" tooltiptext="defaultAllowPrivilegeEscalation"/>
+                                <column hflex="1" label="allowedCSIDrivers" sort="auto(allowedCSIDrivers)" tooltiptext="allowedCSIDrivers"/>
+                                <column hflex="1" label="allowedCapabilities" sort="auto(allowedCapabilities)" tooltiptext="allowedCapabilities"/>
+                                <column hflex="1" label="allowedFlexVolumes" sort="auto(allowedFlexVolumes)" tooltiptext="allowedFlexVolumes"/>
+                                <column hflex="1" label="allowedHostPaths" sort="auto(allowedHostPaths)" tooltiptext="allowedHostPaths"/>
+                                <column hflex="1" label="allowedProcMountTypes" sort="auto(allowedProcMountTypes)" tooltiptext="allowedProcMountTypes"/>
+                                <column hflex="1" label="allowedUnsafeSysctls" sort="auto(allowedUnsafeSysctls)" tooltiptext="allowedUnsafeSysctls"/>
+                                <column hflex="1" label="defaultAddCapabilities" sort="auto(defaultAddCapabilities)" tooltiptext="defaultAddCapabilities"/>
+                                <column hflex="1" label="forbiddenSysctls" sort="auto(forbiddenSysctls)" tooltiptext="forbiddenSysctls"/>
+                                <column hflex="1" label="fsGroup" sort="auto(fsGroup)" tooltiptext="fsGroup"/>
+                                <column hflex="1" label="hostIPC" sort="auto(hostIPC)" tooltiptext="hostIPC"/>
+                                <column hflex="1" label="hostNetwork" sort="auto(hostNetwork)" tooltiptext="hostNetwork"/>
+                                <column hflex="1" label="hostPID" sort="auto(hostPID)" tooltiptext="hostPID"/>
+                                <column hflex="1" label="hostPorts" sort="auto(hostPorts)" tooltiptext="hostPorts"/>
+                                <column hflex="1" label="privileged" sort="auto(privileged)" tooltiptext="privileged"/>
+                                <column hflex="1" label="readOnlyRootFilesystem" sort="auto(readOnlyRootFilesystem)" tooltiptext="readOnlyRootFilesystem"/>
+                                <column hflex="1" label="requiredDropCapabilities" sort="auto(requiredDropCapabilities)" tooltiptext="requiredDropCapabilities"/>
+                                <column hflex="1" label="runAsGroup" sort="auto(runAsGroup)" tooltiptext="runAsGroup"/>
+                                <column hflex="1" label="runAsUser" sort="auto(runAsUser)" tooltiptext="runAsUser"/>
+                                <column hflex="1" label="runtimeClass" sort="auto(runtimeClass)" tooltiptext="runtimeClass"/>
+                                <column hflex="1" label="seLinux" sort="auto(seLinux)" tooltiptext="seLinux"/>
+                                <column hflex="1" label="supplementalGroups" sort="auto(supplementalGroups)" tooltiptext="supplementalGroups"/>
+                                <column hflex="1" label="volumes" sort="auto(volumes)" tooltiptext="volumes"/>
+                                <column hflex="1" label="namespace" sort="auto(namespace)" tooltiptext="namespace"/>
+                                <column hflex="1" label="creationTime" sort="auto(creationTime)" tooltiptext="creationTime"/>
+                                <column hflex="1" label="Raws" sort="auto(fullDefinition)" tooltiptext="Raws"/>
+                            </columns>
+                            <rows>
+                                <template name="model" var="item">
+                                    <row style="cursor:pointer">
+                                        <label value="${item.id}"/>
+                                        <label value="${item.resourceName}" multiline="true"/>
+                                        <label value="${item.allowPrivilegeEscalation}" multiline="true"/>
+                                        <label value="${item.defaultAllowPrivilegeEscalation}" multiline="true"/>
+                                        <label value="${item.allowedCSIDrivers}" multiline="true"/>
+                                        <label value="${item.allowedCapabilities}" multiline="true"/>
+                                        <label value="${item.allowedFlexVolumes}" multiline="true"/>
+                                        <label value="${item.allowedHostPaths}" multiline="true"/>
+                                        <label value="${item.allowedProcMountTypes}" multiline="true"/>
+                                        <label value="${item.allowedUnsafeSysctls}" multiline="true"/>
+                                        <label value="${item.defaultAddCapabilities}" multiline="true"/>
+                                        <label value="${item.forbiddenSysctls}" multiline="true"/>
+                                        <label value="${item.fsGroup}" multiline="true"/>
+                                        <label value="${item.hostIPC}" multiline="true"/>
+                                        <label value="${item.hostNetwork}" multiline="true"/>
+                                        <label value="${item.hostPID}" multiline="true"/>
+                                        <label value="${item.hostPorts}" multiline="true"/>
+                                        <label value="${item.privileged}" multiline="true"/>
+                                        <label value="${item.readOnlyRootFilesystem}" multiline="true"/>
+                                        <label value="${item.requiredDropCapabilities}" multiline="true"/>
+                                        <label value="${item.runAsGroup}" multiline="true"/>
+                                        <label value="${item.runAsUser}" multiline="true"/>
+                                        <label value="${item.runtimeClass}" multiline="true"/>
+                                        <label value="${item.seLinux}" multiline="true"/>
+                                        <label value="${item.supplementalGroups}" multiline="true"/>
+                                        <label value="${item.volumes}" multiline="true"/>
+                                        <label value="${item.namespace}" multiline="true"/>
+                                        <label value="${item.creationTime}" multiline="true"/>
+                                        <toolbarbutton label="Raw/Yaml/Json" onClick="@command('showPodSecurityPolicyFullDefinition', item=item)" hflex="1"/>
+                                    </row>
+                                </template>
+                            </rows>
+                            <foot>
+                                <footer id="podSecurityPoliciesGridFooter" span="29" align="right" label="@load(securityVM.podsSecurityPoliciesTotalItems)"/>
+                            </foot>
+                        </grid>
+                    </tabpanel>
 
-                        <tabpanel>
-                            <groupbox width="100%">
-                                <caption iconSclass="z-icon-sliders" label="Search Configuration"/>
-                                <vbox height="100%" width="100%">
-                                    <hbox height="100%" width="100%" align="stretch">
-                                        <cell width="10%" tooltip="clearAllTooltip">
-                                            <button iconSclass="z-icon-eraser" width="100%" label="Clear all" onClick="@command('clearAllServiceAccounts')"/>
-                                        </cell>
-                                        <separator width="15px" orient="vertical" bar="true"/>
-                                        <cell width="20%" align="left">
-                                            <hlayout valign="middle">
-                                                <label value="Namespace: "/>
-                                                <combobox tooltip="namespacesTooltip" hflex="1" model="@load(securityVM.namespaces)"
-                                                          selectedItem="@bind(securityVM.selectedServiceAccountsNamespace)" readonly="true">
-                                                    <template name="model">
-                                                        <comboitem label="@load(each)"/>
-                                                    </template>
-                                                </combobox>
-                                            </hlayout>
-                                        </cell>
-                                        <cell width="59%">
-                                        </cell>
-                                        <cell width="10%">
-                                            <button label="Get" onClick="@command('getServiceAccounts')" width="100%"/>
-                                        </cell>
-                                    </hbox>
-                                </vbox>
-                            </groupbox>
-                            <separator width="100%" orient="horizontal"/>
-                            <grid id="securityServiceAccountsGrid" model="@load(securityVM.serviceAccountsResults)" height="@load(securityVM.serviceAccountsGridHeight)">
-                                <columns menupopup="auto" sizable="true">
-                                    <column hflex="min" label="Id" sort="auto(id)"/>
-                                    <column hflex="2" label="Service Account Name" tooltiptext="Service Account Name" sort="auto(resourceName)"/>
-                                    <column hflex="1" label="Kind" tooltiptext="Kind" sort="auto(kind)"/>
-                                    <column hflex="2" label="Secrets" tooltiptext="Secrets" sort="auto(secrets)"/>
-                                    <column hflex="1" label="Namespace" tooltiptext="Namespace" sort="auto(namespace)"/>
-                                    <column hflex="min" label="Creation Time" tooltiptext="Creation Time" sort="auto(creationTime)"/>
-                                    <column hflex="min" tooltiptext="Raws" label="Raws"/>
-                                </columns>
-                                <rows>
-                                    <template name="model" var="item">
-                                        <row style="cursor:pointer">
-                                            <label value="${item.id}"/>
-                                            <label value="${item.resourceName}" multiline="true"/>
-                                            <label value="${item.kind}" multiline="true"/>
-                                            <label value="${item.secrets}" multiline="true"/>
-                                            <label value="${item.namespace}" multiline="true"/>
-                                            <label value="${item.creationTime}"/>
-                                            <toolbarbutton label="Raw/Yaml/Json" tooltiptext="Raw/Yaml/Json" onClick="@command('showServiceAccountFullDefinition', item=item)" hflex="1"/>
-                                        </row>
-                                    </template>
-                                </rows>
-                                <foot>
-                                    <footer id="serviceAccountsGridFooter" span="7" align="right" label="@load(securityVM.serviceAccountsTotalItems)"/>
-                                </foot>
-                            </grid>
-                        </tabpanel>
-
-                        <!--                        POD SECURITY POLICIES-->
-
-                        <tabpanel>
-                            <groupbox width="100%">
-                                <caption iconSclass="z-icon-sliders" label="Search Configuration"/>
-                                <vbox height="100%" width="100%">
-                                    <hbox id="menuHboxPodSecurityPolicies" height="100%" width="100%" align="stretch">
-                                        <cell id="clearAllCellPodSecurityPolicies" width="10%" tooltip="clearAllTooltip">
-                                            <button id="clearAllBtnPodSecurityPolicies" width="100%" iconSclass="z-icon-eraser" label="Clear all" onClick="@command('clearAllPodSecurityPolicies')"/>
-                                        </cell>
-                                        <separator width="15px" orient="vertical" bar="true"/>
-                                        <cell id="namespacesCellPodSecurityPolicies" width="20%" align="left">
-                                            <hlayout valign="middle">
-                                                <label value="Namespace: "/>
-                                                <combobox id="namespacesCBoxPodSecurityPolicies" tooltip="namespacesTooltip" hflex="1" model="@load(securityVM.namespaces)"
-                                                          selectedItem="@bind(securityVM.selectedPodSecurityPoliciesNamespace)" readonly="true">
-                                                    <template name="model">
-                                                        <comboitem label="@load(each)"/>
-                                                    </template>
-                                                </combobox>
-                                            </hlayout>
-                                        </cell>
-                                        <cell width="59%">
-                                        </cell>
-                                        <cell id="cellGetBtnPodSecurityPolicies" width="10%">
-                                            <button id="getPodSecurityPoliciesBtn" label="Get" iconSclass="z-icon-angle-double-right" onClick="@command('getPodsSecurityPolicies')" width="100%"/>
-                                        </cell>
-                                    </hbox>
-                                </vbox>
-                            </groupbox>
-                            <separator width="100%" orient="horizontal"/>
-                            <grid id="securityPodSecurityPoliciesGrid" model="@load(securityVM.podsSecurityPoliciesResults)" height="@load(securityVM.podsSecurityPoliciesGridHeight)">
-                                <columns menupopup="auto" sizable="true">
-                                    <column hflex="min" label="Id" sort="auto(id)" tooltiptext="Id"/>
-                                    <column hflex="2" label="Name" sort="auto(resourceName)" tooltiptext="Name"/>
-                                    <column hflex="1" label="allowPrivilegeEscalation" sort="auto(allowPrivilegeEscalation)" tooltiptext="allowPrivilegeEscalation"/>
-                                    <column hflex="1" label="defaultAllowPrivilegeEscalation" sort="auto(defaultAllowPrivilegeEscalation)" tooltiptext="defaultAllowPrivilegeEscalation"/>
-                                    <column hflex="1" label="allowedCSIDrivers" sort="auto(allowedCSIDrivers)" tooltiptext="allowedCSIDrivers"/>
-                                    <column hflex="1" label="allowedCapabilities" sort="auto(allowedCapabilities)" tooltiptext="allowedCapabilities"/>
-                                    <column hflex="1" label="allowedFlexVolumes" sort="auto(allowedFlexVolumes)" tooltiptext="allowedFlexVolumes"/>
-                                    <column hflex="1" label="allowedHostPaths" sort="auto(allowedHostPaths)" tooltiptext="allowedHostPaths"/>
-                                    <column hflex="1" label="allowedProcMountTypes" sort="auto(allowedProcMountTypes)" tooltiptext="allowedProcMountTypes"/>
-                                    <column hflex="1" label="allowedUnsafeSysctls" sort="auto(allowedUnsafeSysctls)" tooltiptext="allowedUnsafeSysctls"/>
-                                    <column hflex="1" label="defaultAddCapabilities" sort="auto(defaultAddCapabilities)" tooltiptext="defaultAddCapabilities"/>
-                                    <column hflex="1" label="forbiddenSysctls" sort="auto(forbiddenSysctls)" tooltiptext="forbiddenSysctls"/>
-                                    <column hflex="1" label="fsGroup" sort="auto(fsGroup)" tooltiptext="fsGroup"/>
-                                    <column hflex="1" label="hostIPC" sort="auto(hostIPC)" tooltiptext="hostIPC"/>
-                                    <column hflex="1" label="hostNetwork" sort="auto(hostNetwork)" tooltiptext="hostNetwork"/>
-                                    <column hflex="1" label="hostPID" sort="auto(hostPID)" tooltiptext="hostPID"/>
-                                    <column hflex="1" label="hostPorts" sort="auto(hostPorts)" tooltiptext="hostPorts"/>
-                                    <column hflex="1" label="privileged" sort="auto(privileged)" tooltiptext="privileged"/>
-                                    <column hflex="1" label="readOnlyRootFilesystem" sort="auto(readOnlyRootFilesystem)" tooltiptext="readOnlyRootFilesystem"/>
-                                    <column hflex="1" label="requiredDropCapabilities" sort="auto(requiredDropCapabilities)" tooltiptext="requiredDropCapabilities"/>
-                                    <column hflex="1" label="runAsGroup" sort="auto(runAsGroup)" tooltiptext="runAsGroup"/>
-                                    <column hflex="1" label="runAsUser" sort="auto(runAsUser)" tooltiptext="runAsUser"/>
-                                    <column hflex="1" label="runtimeClass" sort="auto(runtimeClass)" tooltiptext="runtimeClass"/>
-                                    <column hflex="1" label="seLinux" sort="auto(seLinux)" tooltiptext="seLinux"/>
-                                    <column hflex="1" label="supplementalGroups" sort="auto(supplementalGroups)" tooltiptext="supplementalGroups"/>
-                                    <column hflex="1" label="volumes" sort="auto(volumes)" tooltiptext="volumes"/>
-                                    <column hflex="1" label="namespace" sort="auto(namespace)" tooltiptext="namespace"/>
-                                    <column hflex="1" label="creationTime" sort="auto(creationTime)" tooltiptext="creationTime"/>
-                                    <column hflex="1" label="Raws" sort="auto(fullDefinition)" tooltiptext="Raws"/>
-                                </columns>
-                                <rows>
-                                    <template name="model" var="item">
-                                        <row style="cursor:pointer">
-                                            <label value="${item.id}"/>
-                                            <label value="${item.resourceName}" multiline="true"/>
-                                            <label value="${item.allowPrivilegeEscalation}" multiline="true"/>
-                                            <label value="${item.defaultAllowPrivilegeEscalation}" multiline="true"/>
-                                            <label value="${item.allowedCSIDrivers}" multiline="true"/>
-                                            <label value="${item.allowedCapabilities}" multiline="true"/>
-                                            <label value="${item.allowedFlexVolumes}" multiline="true"/>
-                                            <label value="${item.allowedHostPaths}" multiline="true"/>
-                                            <label value="${item.allowedProcMountTypes}" multiline="true"/>
-                                            <label value="${item.allowedUnsafeSysctls}" multiline="true"/>
-                                            <label value="${item.defaultAddCapabilities}" multiline="true"/>
-                                            <label value="${item.forbiddenSysctls}" multiline="true"/>
-                                            <label value="${item.fsGroup}" multiline="true"/>
-                                            <label value="${item.hostIPC}" multiline="true"/>
-                                            <label value="${item.hostNetwork}" multiline="true"/>
-                                            <label value="${item.hostPID}" multiline="true"/>
-                                            <label value="${item.hostPorts}" multiline="true"/>
-                                            <label value="${item.privileged}" multiline="true"/>
-                                            <label value="${item.readOnlyRootFilesystem}" multiline="true"/>
-                                            <label value="${item.requiredDropCapabilities}" multiline="true"/>
-                                            <label value="${item.runAsGroup}" multiline="true"/>
-                                            <label value="${item.runAsUser}" multiline="true"/>
-                                            <label value="${item.runtimeClass}" multiline="true"/>
-                                            <label value="${item.seLinux}" multiline="true"/>
-                                            <label value="${item.supplementalGroups}" multiline="true"/>
-                                            <label value="${item.volumes}" multiline="true"/>
-                                            <label value="${item.namespace}" multiline="true"/>
-                                            <label value="${item.creationTime}" multiline="true"/>
-                                            <toolbarbutton label="Raw/Yaml/Json" onClick="@command('showPodSecurityPolicyFullDefinition', item=item)" hflex="1"/>
-                                        </row>
-                                    </template>
-                                </rows>
-                                <foot>
-                                    <footer id="podSecurityPoliciesGridFooter" span="29" align="right" label="@load(securityVM.podsSecurityPoliciesTotalItems)"/>
-                                </foot>
-                            </grid>
-                        </tabpanel>
-
-                    </tabpanels>
-                </tabbox>
-            </center>
-        </borderlayout>
-    </div>
+                </tabpanels>
+            </tabbox>
+        </center>
+    </borderlayout>
     <popup id="clearAllTooltip">
         Clears the entire model and sets the view to its original state.
     </popup>

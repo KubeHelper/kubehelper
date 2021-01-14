@@ -1,10 +1,5 @@
 <window id="commandOutputWindowID" viewModel="@id('commandOutputVM') @init('com.kubehelper.viewmodels.popups.CommandOutputVM')" title="@load(commandOutputVM.title)"
         mode="highlighted" width="1200px" height="@load(commandOutputVM.mainWindowHeight)" position="center,top" closable="true" maximizable="true" action="show: slideDown;hide: slideUp">
-<!--    <script>-->
-<!--        function highlightBlock () {-->
-<!--        document.querySelectorAll('div.highlightComOutWindow').forEach(block => { hljs.highlightBlock(block); });-->
-<!--        }-->
-<!--    </script>-->
     <panel width="100%" height="100%">
         <panelchildren>
             <hbox width="100%" pack="end" align="center">

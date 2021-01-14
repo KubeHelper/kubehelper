@@ -27,6 +27,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 /**
+ * Implementation of UserDetailsService.
+ *
  * @author JDev
  */
 @Service

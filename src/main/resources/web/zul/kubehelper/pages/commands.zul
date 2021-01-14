@@ -12,7 +12,7 @@
         }
     </script>
     <borderlayout id="commandsTemplate" viewModel="@id('commandsVM') @init('com.kubehelper.viewmodels.CommandsVM')" width="100%" height="100%">
-        <center id="centerLayoutCommandsID" margins="0,3,3,3" title="Commands" border="none">
+        <center id="centerLayoutCommandsID" title="Commands" border="none">
             <tabbox width="100%" sclass="nav_tabs" style="border: none" onSelect="@command('onSelectMainCommandsTabs')">
                 <tabs id="tabs">
                     <tab label="Commands" id="commands"/>

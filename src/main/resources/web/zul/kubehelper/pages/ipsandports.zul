@@ -1,37 +1,38 @@
 <zk>
-    <div id="ipsAndPortsTemplate" viewModel="@id('ipsAndPortsVM') @init('com.kubehelper.viewmodels.IpsAndPortsVM')" width="100%" height="100%">
-        <borderlayout>
-            <north title="Ips Ports" collapsible="true" vflex="min" style="overflow:auto;">
-                <groupbox id="labelsConfigGroupBox" width="100%" style="margin: 0px 5px 5px 5px;">
-                    <caption iconSclass="z-icon-sliders" label="Search Configuration"/>
-                    <vbox height="100%" width="100%">
-                        <hbox id="menuHbox" height="100%" width="100%" align="stretch">
-                            <cell id="clearAllCell" width="10%" tooltip="clearAllTooltip">
-                                <button id="clearAll" iconSclass="z-icon-eraser" width="100%" label="Clear all" onClick="@command('clearAll')"/>
-                            </cell>
-                            <separator width="15px" orient="vertical" bar="true"/>
-                            <cell id="namespacesCell" width="20%">
-                                <hlayout id="menuHlayout" valign="middle">
-                                    <label value="Namespace: "/>
-                                    <combobox tooltip="namespacesTooltip" id="namespacesCBox" hflex="1" model="@load(ipsAndPortsVM.namespaces)"
-                                              selectedItem="@bind(ipsAndPortsVM.selectedNamespace)" readonly="true">
-                                        <template name="model">
-                                            <comboitem label="@load(each)"/>
-                                        </template>
-                                    </combobox>
-                                </hlayout>
-                            </cell>
-                            <cell width="59%">
-                            </cell>
-                            <cell id="cellGetBtn" width="10%">
-                                <button id="getIpsBtn" label="Search" iconSclass="z-icon-search" onClick="@command('search')" width="100%"/>
-                            </cell>
-                        </hbox>
-                        <separator width="100%" orient="horizontal" bar="false"/>
-                    </vbox>
-                </groupbox>
-            </north>
-            <center margins="0,3,3,3" id="centerLayoutIpsAndPortsID">
+    <borderlayout id="ipsAndPortsTemplate" viewModel="@id('ipsAndPortsVM') @init('com.kubehelper.viewmodels.IpsAndPortsVM')" width="100%" height="100%">
+        <north title="Ips Ports" collapsible="true" border="none">
+            <groupbox id="labelsConfigGroupBox" width="100%" closable="false">
+                <caption iconSclass="z-icon-sliders" label="Search configuration"/>
+                <!--                <vbox height="100%" width="100%">-->
+                <hbox id="menuHbox" height="100%" width="100%" align="stretch">
+                    <cell id="clearAllCell" width="10%" tooltip="clearAllTooltip" valign="middle">
+                        <button id="clearAll" iconSclass="z-icon-eraser" width="100%" label="Clear all" onClick="@command('clearAll')"/>
+                    </cell>
+                    <separator width="15px" orient="vertical" bar="true"/>
+                    <cell id="namespacesCell" width="20%" valign="middle">
+<!--                        <hlayout id="menuHlayout" valign="middle">-->
+                            <label value="Namespace: "/>
+                            <combobox tooltip="namespacesTooltip" id="namespacesCBox" hflex="1" model="@load(ipsAndPortsVM.namespaces)"
+                                      selectedItem="@bind(ipsAndPortsVM.selectedNamespace)" readonly="true">
+                                <template name="model">
+                                    <comboitem label="@load(each)"/>
+                                </template>
+                            </combobox>
+<!--                        </hlayout>-->
+                    </cell>
+                    <cell width="59%">
+                    </cell>
+                    <cell id="cellGetBtn" width="10%" valign="middle">
+                        <button id="getIpsBtn" label="Search" iconSclass="z-icon-search" onClick="@command('search')" width="100%"/>
+                    </cell>
+                </hbox>
+                <separator width="100%" orient="horizontal" bar="false"/>
+                <!--                </vbox>-->
+            </groupbox>
+        </north>
+        <center id="centerLayoutIpsAndPortsID" vflex="1" border="none">
+            <groupbox id="centerLayoutIpsAndPortsGrBox" width="100%" closable="false" height="100%">
+                <caption iconSclass="fas fa-list" label="Results"/>
                 <grid id="ipsAndPortsGrid" model="@load(ipsAndPortsVM.ipsAndPortsResults)" height="@load(ipsAndPortsVM.mainGridHeight)">
                     <auxhead id="ipsAndPortsGridAuxHead">
                         <auxheader>
@@ -47,7 +48,7 @@
                             <textbox instant="true" hflex="1" value="@bind(ipsAndPortsVM.filter.resourceName)" onChange="@command('filterIps')"/>
                         </auxheader>
                         <auxheader colspan="1">
-                            <combobox hflex="1" mold="rounded" model="@load(ipsAndPortsVM.filter.namespacesFilter)"
+                            <combobox id="filterNamespacesCBox" hflex="1" mold="rounded" model="@load(ipsAndPortsVM.filter.namespacesFilter)"
                                       selectedItem="@bind(ipsAndPortsVM.filter.selectedNamespaceFilter)" onChange="@command('filterIps')">
                                 <template name="model">
                                     <comboitem label="@load(each)"/>
@@ -55,7 +56,7 @@
                             </combobox>
                         </auxheader>
                         <auxheader colspan="1">
-                            <combobox hflex="1" model="@load(ipsAndPortsVM.filter.resourceTypesFilter)"
+                            <combobox id="filterResourceTypesCBox" hflex="1" model="@load(ipsAndPortsVM.filter.resourceTypesFilter)"
                                       selectedItem="@bind(ipsAndPortsVM.filter.selectedResourceTypeFilter)" onChange="@command('filterIps')">
                                 <template name="model">
                                     <comboitem label="@load(each)"/>
@@ -102,12 +103,12 @@
                         <footer id="ipsAndPortsGridFooter" span="9" align="right" label="@load(ipsAndPortsVM.totalItems)"/>
                     </foot>
                 </grid>
-            </center>
-            <south size="20%" splittable="true" collapsible="true" margins="0,0,3,3" style="overflow-y:auto;overflow-x: hidden;padding: 7px;">
-                <html id="detailsLabel" content="@load(ipsAndPortsVM.detailsLabel)" style="font-family: Courier, Monaco, monospace;font-size: 12px;"/>
-            </south>
-        </borderlayout>
-    </div>
+            </groupbox>
+        </center>
+        <south size="20%" splittable="true" collapsible="true" style="overflow-y:auto;overflow-x: hidden;padding: 7px;">
+            <html id="detailsLabel" content="@load(ipsAndPortsVM.detailsLabel)" style="font-family: Courier, Monaco, monospace;font-size: 12px;"/>
+        </south>
+    </borderlayout>
     <popup id="clearAllTooltip">
         Clears the entire model and sets the view to its original state.
     </popup>

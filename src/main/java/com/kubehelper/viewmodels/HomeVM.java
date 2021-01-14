@@ -28,7 +28,7 @@ import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.util.Notification;
 
 /**
- * Class for displaying login form and common help for Kube Helper.
+ * View Model for displaying login form and common help for Kube Helper.
  * ViewModel initializes ..zul/home.zul
  *
  * @author JDev

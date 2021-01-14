@@ -70,6 +70,9 @@ import static com.kubehelper.common.Resource.KUBE_HELPER_CUSTOM;
 import static com.kubehelper.common.Resource.KUBE_HELPER_POD_SECURITY_CONTEXT;
 
 /**
+ * View Model for search for security components and visualize results in table.
+ * ViewModel initializes ..kubehelper/pages/security.zul
+ *
  * @author JDev
  */
 @VariableResolver(DelegatingVariableResolver.class)
@@ -84,7 +87,7 @@ public class SecurityVM {
     private boolean isGetServiceAccountsButtonPressed;
     private boolean isGetPodSecurityPoliciesButtonPressed;
 
-    private SecurityModel securityModel;
+    private SecurityModel model;
 
     private ListModelList<RoleResult> rolesResults = new ListModelList<>();
     private ListModelList<RoleResult.RoleBindingSubject> roleSubjectsResults = new ListModelList<>();
@@ -98,6 +101,12 @@ public class SecurityVM {
     private String clickedRoleBindingSubjectsLabel = "";
     private String clickedRoleRulesLabel = "";
     private int centerLayoutHeight = 700;
+
+    @WireVariable
+    private CommonService commonService;
+
+    @WireVariable
+    private SecurityService securityService;
 
     @Wire
     private Footer rolesGridFooter;
@@ -120,20 +129,19 @@ public class SecurityVM {
     @Wire
     private Footer podSecurityPoliciesGridFooter;
 
-    @WireVariable
-    private CommonService commonService;
-
-    @WireVariable
-    private SecurityService securityService;
 
     @Init
     public void init() {
-        securityModel = (SecurityModel) Global.ACTIVE_MODELS.computeIfAbsent(Global.SECURITY_MODEL, (k) -> Global.NEW_MODELS.get(Global.SECURITY_MODEL));
+        model = (SecurityModel) Global.ACTIVE_MODELS.computeIfAbsent(Global.SECURITY_MODEL, (k) -> Global.NEW_MODELS.get(Global.SECURITY_MODEL));
         setAllNamespacesToModel();
     }
 
     /**
-     * We need Selectors.wireComponents() in order to be able to @Wire GUI components.
+     * Calls after UI render.
+     * <p>
+     * Explanation:
+     * Selectors.wireComponents() in order to be able to @Wire GUI components.
+     * Selectors.wireEventListeners() in order to be able to work with listeners and events.
      */
     @AfterCompose
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) {
@@ -143,88 +151,113 @@ public class SecurityVM {
 
     @Listen("onAfterSize=#centerLayoutSecurityID")
     public void onAfterSizeCenter(AfterSizeEvent event) {
-        centerLayoutHeight = event.getHeight() - 120;
+        centerLayoutHeight = event.getHeight();
         BindUtils.postNotifyChange(this, ".");
     }
 
+
     //  GETTING ================
 
+
+    /**
+     * Gets/Searches for all Roles depends on namespace.
+     */
     @Command
     @NotifyChange({"rolesTotalItems", "rolesResults", "rolesFilter"})
     public void getRoles() {
-        securityModel.setRolesFilter(new RolesSecurityFilter());
-        securityService.getRoles(securityModel);
+        model.setRolesFilter(new RolesSecurityFilter());
+        securityService.getRoles(model);
         isGetRolesButtonPressed = true;
         setAllNamespacesToModel();
-        if (securityModel.getRolesFilter().isFilterActive() && !securityModel.getRolesResults().isEmpty()) {
+        if (model.getRolesFilter().isFilterActive() && !model.getRolesResults().isEmpty()) {
             filterSecurityRoles();
         } else {
-            rolesResults = new ListModelList<>(securityModel.getRolesResultsList());
+            rolesResults = new ListModelList<>(model.getRolesResultsList());
         }
     }
 
+    /**
+     * Gets/Searches for all Rbacs depends on namespace.
+     */
     @Command
     @NotifyChange({"rbacsTotalItems", "rbacsResults", "rbacsFilter"})
     public void getRbacs() {
-        securityModel.setRbacsFilter(new RBACFilter());
-        securityService.getRBACs(securityModel);
+        model.setRbacsFilter(new RBACFilter());
+        securityService.getRBACs(model);
         isGetRBACsButtonPressed = true;
         setAllNamespacesToModel();
-        if (securityModel.getRbacsFilter().isFilterActive() && !securityModel.getRbacsResults().isEmpty()) {
+        if (model.getRbacsFilter().isFilterActive() && !model.getRbacsResults().isEmpty()) {
             filterRbacs();
         } else {
-            rbacsResults = new ListModelList<>(securityModel.getRbacsResults());
+            rbacsResults = new ListModelList<>(model.getRbacsResults());
         }
     }
 
+    /**
+     * Gets/Searches for all PodsSecurityContexts depends on namespace.
+     */
     @Command
     @NotifyChange({"podsSecurityContextsTotalItems", "podsSecurityContextsResults"})
     public void getPodsSecurityContexts() {
-        securityService.getPodsSecurityContexts(securityModel);
+        securityService.getPodsSecurityContexts(model);
         isGetPodsSecurityContextsButtonPressed = true;
         setAllNamespacesToModel();
-        podsSecurityContextsResults = new ListModelList<>(securityModel.getPodsSecurityContextsResults());
+        podsSecurityContextsResults = new ListModelList<>(model.getPodsSecurityContextsResults());
     }
 
+    /**
+     * Gets/Searches for all ContainersSecurityContexts depends on namespace.
+     */
     @Command
     @NotifyChange({"containersSecurityTotalItems", "containersSecurityResults", "containersSecurityFilter"})
     public void getContainersSecurityContexts() {
-        securityService.getContainersSecurityContexts(securityModel);
+        securityService.getContainersSecurityContexts(model);
         isGetContainersSecurityContextsButtonPressed = true;
         setAllNamespacesToModel();
-        containersSecurityResults = new ListModelList<>(securityModel.getContainersSecurityResults());
+        containersSecurityResults = new ListModelList<>(model.getContainersSecurityResults());
     }
 
+    /**
+     * Gets/Searches for ServiceAccounts roles depends on namespace.
+     */
     @Command
     @NotifyChange({"serviceAccountsTotalItems", "serviceAccountsResults", "serviceAccountsFilter"})
     public void getServiceAccounts() {
-        securityService.getServiceAccounts(securityModel);
+        securityService.getServiceAccounts(model);
         isGetServiceAccountsButtonPressed = true;
         setAllNamespacesToModel();
-        serviceAccountsResults = new ListModelList<>(securityModel.getServiceAccountsResults());
+        serviceAccountsResults = new ListModelList<>(model.getServiceAccountsResults());
     }
 
+    /**
+     * Gets/Searches for all PodsSecurityPolicies depends on namespace.
+     */
     @Command
     @NotifyChange({"podsSecurityPoliciesTotalItems", "podsSecurityPoliciesResults", "podSecurityPoliciesFilter"})
     public void getPodsSecurityPolicies() {
-        securityService.getPodsSecurityPolicies(securityModel);
+        securityService.getPodsSecurityPolicies(model);
         isGetPodSecurityPoliciesButtonPressed = true;
-        podsSecurityPoliciesResults = new ListModelList<>(securityModel.getPodSecurityPoliciesResults());
+        podsSecurityPoliciesResults = new ListModelList<>(model.getPodSecurityPoliciesResults());
         setAllNamespacesToModel();
     }
 
     private void setAllNamespacesToModel() {
-        securityModel.setNamespaces(securityModel.getNamespaces().isEmpty() ? commonService.getAllNamespaces() : securityModel.getNamespaces());
-        logger.info("Found {} namespaces.", securityModel.getNamespaces());
+        model.setNamespaces(model.getNamespaces().isEmpty() ? commonService.getAllNamespaces() : model.getNamespaces());
+        logger.debug("Found {} namespaces.", model.getNamespaces());
     }
+
 
     //  FILTERING ================
 
+
+    /**
+     * Filter for SecurityRoles.
+     */
     @Command
     @NotifyChange({"rolesTotalItems", "rolesResults"})
     public void filterSecurityRoles() {
         rolesResults.clear();
-        for (RoleResult roleResult : securityModel.getRolesResultsList()) {
+        for (RoleResult roleResult : model.getRolesResultsList()) {
             if (StringUtils.containsIgnoreCase(roleResult.getCreationTime(), getRolesFilter().getCreationTime()) &&
                     commonService.checkEqualsFilter(roleResult.getResourceName(), getRolesFilter().getSelectedResourceNameFilter()) &&
                     commonService.checkEqualsFilter(roleResult.getResourceType(), getRolesFilter().getSelectedResourceTypeFilter()) &&
@@ -234,11 +267,14 @@ public class SecurityVM {
         }
     }
 
+    /**
+     * Filter for Rbacs.
+     */
     @Command
     @NotifyChange({"rbacsTotalItems", "rbacsResults"})
     public void filterRbacs() {
         rbacsResults.clear();
-        for (RBACResult rbacResult : securityModel.getRbacsResults()) {
+        for (RBACResult rbacResult : model.getRbacsResults()) {
             if (StringUtils.containsIgnoreCase(rbacResult.getApiGroup(), getRbacFilter().getApiGroup()) &&
                     commonService.checkEqualsFilter(rbacResult.getResourceName(), getRbacFilter().getSelectedResourceNameFilter()) &&
                     commonService.checkEqualsFilter(rbacResult.getResourceType(), getRbacFilter().getSelectedResourceTypeFilter()) &&
@@ -261,7 +297,13 @@ public class SecurityVM {
         }
     }
 
-
+    /**
+     * Methot helps filter RBAC verbs correct.
+     *
+     * @param verb     - verb.
+     * @param rbacVerb - rbac verb.
+     * @return - Yes/No/Empty
+     */
     private String checkRbacRoleFilter(String verb, boolean rbacVerb) {
         if (rbacVerb && verb.equals("Yes")) {
             return "Yes";
@@ -272,13 +314,17 @@ public class SecurityVM {
         return "";
     }
 
+
     //  CLEARING ================
 
 
+    /**
+     * Clears all model items that belongs to Roles.
+     */
     @Command
     @NotifyChange({"rolesTotalItems", "rolesResults", "roleRulesResults", "roleSubjectsResults", "rolesFilter", "selectedRolesNamespace", "clickedRoleBindingSubjectsLabel", "clickedRoleRulesLabel"})
     public void clearAllRoles() {
-        securityModel.setRolesResults(new HashMap<>())
+        model.setRolesResults(new HashMap<>())
                 .setRolesFilter(new RolesSecurityFilter())
                 .setNamespaces(commonService.getAllNamespaces())
                 .setSelectedRolesNamespace("all")
@@ -291,10 +337,13 @@ public class SecurityVM {
         clearAllRolesFilterComboboxes();
     }
 
+    /**
+     * Clears all model items that belongs to Rbacs.
+     */
     @Command
     @NotifyChange({"rbacsTotalItems", "rbacsResults", "rbacFilter", "selectedRBACsNamespace"})
     public void clearAllRbacs() {
-        securityModel.setRbacsResults(new ArrayList<>())
+        model.setRbacsResults(new ArrayList<>())
                 .setRbacsFilter(new RBACFilter())
                 .setNamespaces(commonService.getAllNamespaces())
                 .setSelectedRBACsNamespace("all")
@@ -303,47 +352,61 @@ public class SecurityVM {
         clearAllRbacFilterComboboxes();
     }
 
+    /**
+     * Clears all model items that belongs to PodsSecurityContexts.
+     */
     @Command
     @NotifyChange({"podsSecurityContextsTotalItems", "podsSecurityContextsResults", "selectedPodsSecurityContextsNamespace"})
     public void clearAllPodsSecurityContexts() {
-        securityModel.setPodsSecurityContextResults(new ListModelList<>())
+        model.setPodsSecurityContextResults(new ListModelList<>())
                 .setNamespaces(commonService.getAllNamespaces())
                 .setSelectedPodsSecurityContextsNamespace("all")
                 .setSearchExceptions(new ArrayList<>());
         podsSecurityContextsResults = new ListModelList<>();
     }
 
+    /**
+     * Clears all model items that belongs to ContainersSecurityContexts.
+     */
     @Command
     @NotifyChange({"containersSecurityTotalItems", "containersSecurityResults", "selectedContainersSecurityNamespace"})
     public void clearAllContainersSecurityContexts() {
-        securityModel.setContainersSecurityResults(new ListModelList<>())
+        model.setContainersSecurityResults(new ListModelList<>())
                 .setNamespaces(commonService.getAllNamespaces())
                 .setSelectedContainersSecurityNamespace("all")
                 .setSearchExceptions(new ArrayList<>());
         containersSecurityResults = new ListModelList<>();
     }
 
+    /**
+     * Clears all model items that belongs to ServiceAccounts.
+     */
     @Command
     @NotifyChange({"serviceAccountsTotalItems", "serviceAccountsResults", "selectedServiceAccountsNamespace"})
     public void clearAllServiceAccounts() {
-        securityModel.setServiceAccountsResults(new ListModelList<>())
+        model.setServiceAccountsResults(new ListModelList<>())
                 .setNamespaces(commonService.getAllNamespaces())
                 .setSelectedServiceAccountsNamespace("all")
                 .setSearchExceptions(new ArrayList<>());
         serviceAccountsResults = new ListModelList<>();
     }
 
+    /**
+     * Clears all model items that belongs to PodSecurityPolicies.
+     */
     @Command
     @NotifyChange({"podsSecurityPoliciesTotalItems", "podsSecurityPoliciesResults", "selectedPodSecurityPoliciesNamespace"})
     public void clearAllPodSecurityPolicies() {
-        securityModel.setPodSecurityPoliciesResults(new ListModelList<>())
+        model.setPodSecurityPoliciesResults(new ListModelList<>())
                 .setNamespaces(commonService.getAllNamespaces())
                 .setSelectedPodSecurityPoliciesNamespace("all")
                 .setSearchExceptions(new ArrayList<>());
         podsSecurityPoliciesResults = new ListModelList<>();
     }
 
-
+    /**
+     * Removes last selected value from all RolesFilter comboboxes.
+     */
     private void clearAllRolesFilterComboboxes() {
         Auxhead searchGridAuxHead = (Auxhead) Path.getComponent("//indexPage/templateInclude/rolesGridAuxHead");
         for (Component child : searchGridAuxHead.getFellows()) {
@@ -355,7 +418,7 @@ public class SecurityVM {
     }
 
     /**
-     * Removes last selected value from all filter comboboxes.
+     * Removes last selected value from all RbacFilter comboboxes.
      */
     private void clearAllRbacFilterComboboxes() {
         Auxhead searchGridAuxHead = (Auxhead) Path.getComponent("//indexPage/templateInclude/rbacGridAuxHead");
@@ -369,6 +432,11 @@ public class SecurityVM {
 
     //  FULL DEFINITION / LOGIC ================
 
+    /**
+     * Shows full definitions window for Role.
+     *
+     * @param item - @{@link RoleResult} item
+     */
     @Command
     public void showRoleFullDefinition(@BindingParam("item") RoleResult item) {
         Map<String, Object> parameters = getParametersMap(item.getRawResourceType(), item.getResourceName(), item.getResourceName(), item.getNamespace(), item.getFullDefinition());
@@ -376,6 +444,11 @@ public class SecurityVM {
         window.doModal();
     }
 
+    /**
+     * Shows full definitions window for RoleRule.
+     *
+     * @param item - @{@link RoleRuleResult} item
+     */
     @Command
     public void showRoleRuleFullDefinition(@BindingParam("item") RoleRuleResult item) {
         Map<String, Object> parameters = getParametersMap(KUBE_HELPER_CUSTOM, String.valueOf(item.getId()), String.valueOf(item.getId()), "N/A", item.getFullDefinition());
@@ -383,6 +456,11 @@ public class SecurityVM {
         window.doModal();
     }
 
+    /**
+     * Shows full definitions window for PodSecurityContext.
+     *
+     * @param item - @{@link PodSecurityContextResult} item
+     */
     @Command
     public void showPodSecurityContextFullDefinition(@BindingParam("item") PodSecurityContextResult item) {
         Map<String, Object> parameters = getParametersMap(KUBE_HELPER_POD_SECURITY_CONTEXT, item.getResourceName(), item.getResourceName(), item.getNamespace(), item.getFullDefinition());
@@ -390,6 +468,11 @@ public class SecurityVM {
         window.doModal();
     }
 
+    /**
+     * Shows full definitions window for ContainerSecurityContext.
+     *
+     * @param item - @{@link ContainerSecurityResult} item
+     */
     @Command
     public void showContainerSecurityContextFullDefinition(@BindingParam("item") ContainerSecurityResult item) {
         String title = item.getPodName() + " [ " + item.getResourceName() + " ]";
@@ -398,6 +481,11 @@ public class SecurityVM {
         window.doModal();
     }
 
+    /**
+     * Shows full definitions window for ServiceAccount.
+     *
+     * @param item - @{@link ServiceAccountResult} item
+     */
     @Command
     public void showServiceAccountFullDefinition(@BindingParam("item") ServiceAccountResult item) {
         Map<String, Object> parameters = getParametersMap(item.getRawResourceType(), item.getResourceName(), item.getResourceName(), item.getNamespace(), item.getFullDefinition());
@@ -405,6 +493,11 @@ public class SecurityVM {
         window.doModal();
     }
 
+    /**
+     * Shows full definitions window for PodSecurityPolicy.
+     *
+     * @param item - @{@link PodSecurityPoliciesResult} item
+     */
     @Command
     public void showPodSecurityPolicyFullDefinition(@BindingParam("item") PodSecurityPoliciesResult item) {
         Map<String, Object> parameters = getParametersMap(item.getRawResourceType(), item.getResourceName(), item.getResourceName(), item.getNamespace(), item.getFullDefinition());
@@ -412,10 +505,11 @@ public class SecurityVM {
         window.doModal();
     }
 
-    private Map<String, Object> getParametersMap(Resource resource, String name, String title, String namespace, String content) {
-        return Map.of("resource", resource, "name", name, "title", title, "namespace", namespace, "content", content);
-    }
-
+    /**
+     * Shows(by click) rules that belongs to role.
+     *
+     * @param item - @{@link RoleResult} item.
+     */
     @Command
     @NotifyChange({"roleSubjectsResults", "roleRulesResults", "clickedRoleBindingSubjectsLabel", "clickedRoleRulesLabel", "roleRulesTotalItems"})
     public void showRoleRules(@BindingParam("clickedItem") RoleResult item) {
@@ -425,23 +519,37 @@ public class SecurityVM {
         clickedRoleBindingSubjectsLabel = item.getResourceName();
     }
 
+    /**
+     * Builds parameters map for WIndow parameters.
+     *
+     * @param resource  - Resource
+     * @param name      -  name
+     * @param title     - title
+     * @param namespace -  namespace
+     * @param content   - content
+     * @return - parameters map
+     */
+    private Map<String, Object> getParametersMap(Resource resource, String name, String title, String namespace, String content) {
+        return Map.of("resource", resource, "name", name, "title", title, "namespace", namespace, "content", content);
+    }
+
 
     public void showNotificationAndExceptions(boolean pressedButton, ListModelList results, Footer footer) {
         if (pressedButton && results.isEmpty()) {
             Notification.show("Nothing found.", "info", footer, "before_end", 2000);
         }
         if (pressedButton && !results.isEmpty()) {
-            Notification.show("Found: " + results.size() + " items", "info", footer, "before_end", 2000);
+            Notification.show(String.format("Found %s items", results.size()), "info", footer, "before_end", 2000);
         }
-        if (pressedButton && securityModel.hasSearchErrors()) {
-            Window window = (Window) Executions.createComponents(Global.PATH_TO_ERROR_RESOURCE_ZUL, null, Map.of("errors", securityModel.getSearchExceptions()));
+        if (pressedButton && model.hasSearchErrors()) {
+            Window window = (Window) Executions.createComponents(Global.PATH_TO_ERROR_RESOURCE_ZUL, null, Map.of("errors", model.getSearchExceptions()));
             window.doModal();
-            securityModel.setSearchExceptions(new ArrayList<>());
+            model.setSearchExceptions(new ArrayList<>());
         }
     }
 
     public SecurityModel getModel() {
-        return securityModel;
+        return model;
     }
 
 
@@ -496,51 +604,51 @@ public class SecurityVM {
     //  SELECTED NAMESPACES ================
 
     public String getSelectedRolesNamespace() {
-        return securityModel.getSelectedRolesNamespace();
+        return model.getSelectedRolesNamespace();
     }
 
     public String getSelectedRBACsNamespace() {
-        return securityModel.getSelectedRBACsNamespace();
+        return model.getSelectedRBACsNamespace();
     }
 
     public void setSelectedRolesNamespace(String selectedRolesNamespace) {
-        this.securityModel.setSelectedRolesNamespace(selectedRolesNamespace);
+        this.model.setSelectedRolesNamespace(selectedRolesNamespace);
     }
 
     public void setSelectedRBACsNamespace(String selectedRBACsNamespace) {
-        this.securityModel.setSelectedRBACsNamespace(selectedRBACsNamespace);
+        this.model.setSelectedRBACsNamespace(selectedRBACsNamespace);
     }
 
     public String getSelectedPodsSecurityContextsNamespace() {
-        return securityModel.getSelectedPodsSecurityContextsNamespace();
+        return model.getSelectedPodsSecurityContextsNamespace();
     }
 
     public void setSelectedPodsSecurityContextsNamespace(String selectedPodsNamespace) {
-        this.securityModel.setSelectedPodsSecurityContextsNamespace(selectedPodsNamespace);
+        this.model.setSelectedPodsSecurityContextsNamespace(selectedPodsNamespace);
     }
 
     public String getSelectedContainersSecurityNamespace() {
-        return securityModel.getSelectedContainersSecurityNamespace();
+        return model.getSelectedContainersSecurityNamespace();
     }
 
     public void setSelectedContainersSecurityNamespace(String selectedContainersNamespace) {
-        this.securityModel.setSelectedContainersSecurityNamespace(selectedContainersNamespace);
+        this.model.setSelectedContainersSecurityNamespace(selectedContainersNamespace);
     }
 
     public String getSelectedServiceAccountsNamespace() {
-        return securityModel.getSelectedServiceAccountsNamespace();
+        return model.getSelectedServiceAccountsNamespace();
     }
 
     public void setSelectedServiceAccountsNamespace(String selectedServiceAccountsNamespace) {
-        this.securityModel.setSelectedServiceAccountsNamespace(selectedServiceAccountsNamespace);
+        this.model.setSelectedServiceAccountsNamespace(selectedServiceAccountsNamespace);
     }
 
     public String getSelectedPodSecurityPoliciesNamespace() {
-        return securityModel.getSelectedPodSecurityPoliciesNamespace();
+        return model.getSelectedPodSecurityPoliciesNamespace();
     }
 
     public void setSelectedPodSecurityPoliciesNamespace(String selectedPodSecurityPoliciesNamespace) {
-        this.securityModel.setSelectedPodSecurityPoliciesNamespace(selectedPodSecurityPoliciesNamespace);
+        this.model.setSelectedPodSecurityPoliciesNamespace(selectedPodSecurityPoliciesNamespace);
     }
 
 
@@ -578,11 +686,11 @@ public class SecurityVM {
     //  FILTERS ================
 
     public RolesSecurityFilter getRolesFilter() {
-        return securityModel.getRolesFilter();
+        return model.getRolesFilter();
     }
 
     public RBACFilter getRbacFilter() {
-        return securityModel.getRbacsFilter();
+        return model.getRbacsFilter();
     }
 
 
@@ -606,11 +714,11 @@ public class SecurityVM {
 
 
     public List<String> getNamespaces() {
-        return securityModel.getNamespaces();
+        return model.getNamespaces();
     }
 
     public String getRolesGridHeight() {
-        return centerLayoutHeight * 0.40 + "px";
+        return centerLayoutHeight * 0.45 + "px";
     }
 
     public String getSubjectsGridHeight() {
@@ -642,11 +750,11 @@ public class SecurityVM {
     }
 
     public boolean isSkipKubeNamespaces() {
-        return securityModel.isSkipKubeNamespaces();
+        return model.isSkipKubeNamespaces();
     }
 
     public void setSkipKubeNamespaces(boolean skipKubeNamespaces) {
-        securityModel.setSkipKubeNamespaces(skipKubeNamespaces);
+        model.setSkipKubeNamespaces(skipKubeNamespaces);
     }
 
 }

@@ -46,6 +46,9 @@ import org.zkoss.zul.Window;
 import java.time.LocalDate;
 
 /**
+ * View Model for init Kube Helper GUI.
+ * ViewModel initializes ..kubehelper/index.zul
+ *
  * @author JDev
  */
 @VariableResolver(DelegatingVariableResolver.class)
@@ -74,12 +77,19 @@ public class IndexVM {
 //        pageModel = Global.ACTIVE_MODELS.computeIfAbsent(Global.SEARCH_MODEL, (k) -> Global.NEW_MODELS.get(Global.SEARCH_MODEL));
 //        pageModel = Global.ACTIVE_MODELS.computeIfAbsent(Global.SECURITY_MODEL, (k) -> Global.NEW_MODELS.get(Global.SECURITY_MODEL));
 //        pageModel = Global.ACTIVE_MODELS.computeIfAbsent(Global.COMMANDS_MODEL, (k) -> Global.NEW_MODELS.get(Global.COMMANDS_MODEL));
-        pageModel = Global.ACTIVE_MODELS.computeIfAbsent(Global.CRON_JOBS_MODEL, (k) -> Global.NEW_MODELS.get(Global.CRON_JOBS_MODEL));
+//        pageModel = Global.ACTIVE_MODELS.computeIfAbsent(Global.CRON_JOBS_MODEL, (k) -> Global.NEW_MODELS.get(Global.CRON_JOBS_MODEL));
 //        pageModel = Global.ACTIVE_MODELS.computeIfAbsent(Global.CONFIGS_MODEL, (k) -> Global.NEW_MODELS.get(Global.CONFIGS_MODEL));
-//        pageModel = Global.ACTIVE_MODELS.computeIfAbsent(Global.LABELS_MODEL, (k) -> Global.NEW_MODELS.get(Global.LABELS_MODEL));
+        pageModel = Global.ACTIVE_MODELS.computeIfAbsent(Global.LABELS_MODEL, (k) -> Global.NEW_MODELS.get(Global.LABELS_MODEL));
         currentModelName = pageModel.getName();
     }
 
+    /**
+     * Calls after UI render.
+     * <p>
+     * Explanation:
+     * Selectors.wireEventListeners() in order to be able to work with listeners and events.
+     * Set start main menu state.
+     */
     @AfterCompose
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) {
         Selectors.wireEventListeners(view, this);

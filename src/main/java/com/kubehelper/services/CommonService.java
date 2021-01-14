@@ -149,6 +149,7 @@ public class CommonService {
         return "";
     }
 
+    
     /**
      * Reads file to string by path.
      *
@@ -164,22 +165,6 @@ public class CommonService {
         return "";
     }
 
-    /**
-     * Gets Lines with strings from file by path.
-     *
-     * @param path - file path.
-     * @return - Lines with strings.
-     */
-    public List<String> getLinesFromResourceByPath(String path) {
-        List<String> lines = new ArrayList<>();
-        ClassPathResource cpr = new ClassPathResource(path);
-        try {
-            lines = new BufferedReader(new InputStreamReader(cpr.getInputStream())).lines().collect(Collectors.toList());
-        } catch (IOException e) {
-            logger.error(e.getMessage(), e);
-        }
-        return lines;
-    }
 
     /**
      * Gets sets of Strings with paths to files from folder.

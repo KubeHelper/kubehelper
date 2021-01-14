@@ -35,8 +35,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -68,9 +66,6 @@ public class IpsAndPortsService {
 
     /**
      * Constructor initializes templates for the detail view.
-     *
-     * @throws URISyntaxException
-     * @throws IOException
      */
     @PostConstruct
     private void postConstruct() {
@@ -99,11 +94,11 @@ public class IpsAndPortsService {
     /**
      * Fill {@link IpsAndPortsModel} with new data from pods depends on namespace.
      *
-     * @param ipsAndPortsModel - model for @{@link com.kubehelper.viewmodels.IpsAndPortsVM} view.
+     * @param model - model for @{@link com.kubehelper.viewmodels.IpsAndPortsVM} view.
      */
-    private void fillModelWithPodsInfo(IpsAndPortsModel ipsAndPortsModel) {
-        for (V1Pod pod : kubeAPI.getV1PodsList(ipsAndPortsModel.getSelectedNamespace(), ipsAndPortsModel).getItems()) {
-            IpsAndPortsResult ipsAndPortsResult = new IpsAndPortsResult(ipsAndPortsModel.getIpsAndPortsResults().size() + 1);
+    private void fillModelWithPodsInfo(IpsAndPortsModel model) {
+        for (V1Pod pod : kubeAPI.getV1PodsList(model.getSelectedNamespace(), model).getItems()) {
+            IpsAndPortsResult ipsAndPortsResult = new IpsAndPortsResult(model.getIpsAndPortsResults().size() + 1);
             StringJoiner portsJoiner = getStringsJoiner(), containerNamesJoiner = getStringsJoiner();
             String resourceName = pod.getMetadata().getName() + ": ";
             Map<String, String> detailsMap = new HashMap<>(), containersDetailsMap = new HashMap<>();
@@ -152,24 +147,24 @@ public class IpsAndPortsService {
                     .setAdditionalInfo("Phase: " + pod.getStatus().getPhase())
                     .setCreationTime(getParsedCreationTime(pod.getMetadata().getCreationTimestamp()))
                     .setDetails(podDetailsString);
-            ipsAndPortsModel.addIpsAndPortsResult(ipsAndPortsResult);
+            model.addIpsAndPortsResult(ipsAndPortsResult);
         }
     }
 
     /**
      * Fill {@link IpsAndPortsModel} with new data from services depends on namespace.
      *
-     * @param ipsAndPortsModel - model for @{@link com.kubehelper.viewmodels.IpsAndPortsVM} view.
+     * @param model - model for @{@link com.kubehelper.viewmodels.IpsAndPortsVM} view.
      */
-    private void fillModelWithServicesInfo(IpsAndPortsModel ipsAndPortsModel) {
+    private void fillModelWithServicesInfo(IpsAndPortsModel model) {
 
-        for (V1Service service : kubeAPI.getV1ServicesList(ipsAndPortsModel.getSelectedNamespace(), ipsAndPortsModel).getItems()) {
+        for (V1Service service : kubeAPI.getV1ServicesList(model.getSelectedNamespace(), model).getItems()) {
             Map<String, String> detailsMap = new HashMap<>();
-            IpsAndPortsResult ipsAndPortsResult = new IpsAndPortsResult(ipsAndPortsModel.getIpsAndPortsResults().size() + 1);
+            IpsAndPortsResult ipsAndPortsResult = new IpsAndPortsResult(model.getIpsAndPortsResults().size() + 1);
             StringBuilder servicePortsBuilder = new StringBuilder();
             StringJoiner ipsJoiner = new StringJoiner(LS);
 
-//          compose service ips
+            //compose service ips
             Optional.ofNullable(service.getSpec().getClusterIP()).ifPresent(clusterIp -> ipsJoiner.add(clusterIp));
             Optional.ofNullable(service.getSpec().getLoadBalancerIP()).ifPresent(lbIp -> ipsJoiner.add(lbIp));
             Optional.ofNullable(service.getSpec().getExternalIPs()).ifPresent(externalIps -> {
@@ -180,7 +175,7 @@ public class IpsAndPortsService {
                 ipsJoiner.add("\nExternalIPs: " + externalIpsJoiner.toString());
             });
 
-//          compose service portss
+            //compose service portss
             Optional.ofNullable(service.getSpec().getPorts()).ifPresent(ports -> {
                 for (V1ServicePort port : ports) {
                     StringJoiner portsJoiner = getStringsJoiner();
@@ -194,7 +189,7 @@ public class IpsAndPortsService {
                 }
             });
 
-//          compose service selectors
+            //compose service selectors
             StringJoiner selectorsJoiner = getStringsJoiner();
             Optional.ofNullable(service.getSpec().getSelector()).ifPresent(selectors -> {
                 for (Map.Entry<String, String> entry : selectors.entrySet()) {
@@ -202,16 +197,16 @@ public class IpsAndPortsService {
                 }
             });
 
-//          compose service data to details
+            //compose service data to details
             Optional.ofNullable(service.getMetadata().getName()).ifPresent(s -> detailsMap.put("id", ipsAndPortsResult.getId() + " => " + s));
 
-//          compose service labels
+            //compose service labels
             Optional.ofNullable(service.getMetadata().getLabels()).ifPresent(labels -> joinKeyValuesFromEntrySet(labels.entrySet(), detailsMap, "labels"));
 
-//          compose service annotations
+            //compose service annotations
             Optional.ofNullable(service.getMetadata().getAnnotations()).ifPresent(annotations -> joinKeyValuesFromEntrySet(annotations.entrySet(), detailsMap, "annotations"));
 
-//          compose other service data into details
+            //compose other service data into details
             Optional.ofNullable(service.getApiVersion()).ifPresent(s -> detailsMap.put("apiVersion", s));
             Optional.ofNullable(service.getSpec().getSessionAffinity()).ifPresent(s -> detailsMap.put("sessionAffinity", s));
             Optional.ofNullable(service.getMetadata().getSelfLink()).ifPresent(s -> detailsMap.put("selfLink", s));
@@ -229,7 +224,7 @@ public class IpsAndPortsService {
                     .setAdditionalInfo(additionalInfo)
                     .setCreationTime(getParsedCreationTime(service.getMetadata().getCreationTimestamp()))
                     .setDetails(buildHtmlDetails(detailsMap, serviceDetailsTemplate));
-            ipsAndPortsModel.addIpsAndPortsResult(ipsAndPortsResult);
+            model.addIpsAndPortsResult(ipsAndPortsResult);
         }
     }
 
@@ -248,10 +243,6 @@ public class IpsAndPortsService {
         collector.put(key, joiner.toString());
     }
 
-    private String getParsedCreationTime(DateTime dateTime) {
-        return dateTime.toString("dd.MM.yyyy HH:mm:ss");
-    }
-
     /**
      * Build html string from template and map with key/values for replace.
      *
@@ -263,6 +254,10 @@ public class IpsAndPortsService {
         StringSubstitutor sub = new StringSubstitutor(detailsMap);
         String html = sub.replace(template);
         return html.replaceAll("\\$\\{\\w*\\}", "");
+    }
+
+    private String getParsedCreationTime(DateTime dateTime) {
+        return dateTime.toString("dd.MM.yyyy HH:mm:ss");
     }
 
     private StringJoiner getStringsJoiner() {

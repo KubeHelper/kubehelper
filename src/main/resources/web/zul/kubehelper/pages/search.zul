@@ -1,83 +1,57 @@
 <zk>
-    <style>
-        .z-auxheader{
-        background-color:#326ce5;
-        border-left:1px solid #f68f2a;
-        border-bottom:1px solid #f68f2a;
-        padding:0;
-        position:relative;
-        overflow:hidden;
-        white-space:nowrap
-        }
-        .z-column{
-        background: #326ce5;
-        border-left: 1px solid #f68f2a;
-        border-bottom: 1px solid #f68f2a;
-        padding:0;
-        position:relative;
-        overflow:hidden;
-        white-space:nowrap;
-        }
-<!--        .z-column-hover .z-column-content{-->
-<!--        background: #FFFFFF;-->
-<!--        }-->
-    </style>
-    <div id="searchTemplate" viewModel="@id('searchVM') @init('com.kubehelper.viewmodels.SearchVM')" width="100%" height="100%">
-        <borderlayout>
-            <north title="Search" collapsible="true">
-                <groupbox width="100%">
-                    <caption iconSclass="z-icon-sliders" label="Search Configuration"/>
-                    <vbox height="100%" width="100%">
-                        <hbox height="100%" width="100%" align="stretch">
-                            <cell id="clearAllCell" width="10%" tooltip="clearAllTooltip">
-                                <button id="clearAll" iconSclass="z-icon-eraser" label="Clear all" width="100%" onClick="@command('clearAll')"/>
-                            </cell>
-                            <separator width="15px" orient="vertical" bar="true"/>
-                            <cell width="20%">
-                                <hlayout valign="middle">
-                                    <label value="Namespace: "/>
-                                    <combobox tooltip="namespacesTooltip" id="namespacesCBox" hflex="1" model="@load(searchVM.namespaces)" selectedItem="@bind(searchVM.selectedNamespace)"
-                                              readonly="true">
-                                        <template name="model">
-                                            <comboitem label="@load(each)"/>
-                                        </template>
-                                    </combobox>
-                                </hlayout>
-                            </cell>
-                            <separator width="15px" orient="vertical" bar="true"/>
-                            <cell width="10%">
-                                <hlayout valign="middle">
-                                    <checkbox id="skipKubeNamespacesCBox" checked="@bind(searchVM.skipKubeNamespaces)" tooltip="skipKubeNamespacesTooltip"/>Skip kube* namespaces
-                                </hlayout>
-                            </cell>
-                            <separator width="15px" orient="vertical" bar="true"/>
-                            <cell width="10%">
-                                <hlayout valign="middle">
-                                    <checkbox id="skipNativeEnvVarsCBox" checked="@bind(searchVM.skipNativeEnvVars)" tooltip="skipNativeEnvVarsTooltip"/>Skip native Env variables
-                                </hlayout>
-                            </cell>
-                            <cell width="40%">
-                                <hlayout valign="middle">
-                                    <label value="Search: "/>
-                                    <textbox id="searchStringTBox" hflex="1" value="@bind(searchVM.searchString)" onOK="@command('search')"/>
-                                </hlayout>
-                            </cell>
-                            <separator width="15px" orient="vertical" bar="true"/>
-                            <cell id="cellSearchBtn" width="10%">
-                                <button id="searchBtn" label="Search" iconSclass="z-icon-search" width="100%" onClick="@command('search')"/>
-                            </cell>
-                        </hbox>
-                        <groupbox id="kubeResourcesGBox" width="100%">
-                            <caption>
-                                <checkbox id="kubeResourcesGBoxCheckAll" checked="true" onCheck="@command('selectAllResources')"/>Resources
-                            </caption>
-                            <vbox id="kubeResourcesVBox" spacing="1" align="center" width="100%">
-                            </vbox>
-                        </groupbox>
-                    </vbox>
-                </groupbox>
-            </north>
-            <center id="centerLayoutSearchID" margins="0,3,3,3" vflex="max">
+    <borderlayout id="searchTemplate" viewModel="@id('searchVM') @init('com.kubehelper.viewmodels.SearchVM')" width="100%" height="100%">
+        <north title="Search" collapsible="true" border="none">
+            <groupbox width="100%" closable="false">
+                <caption iconSclass="z-icon-sliders" label="Search configuration"/>
+                <vbox height="100%" width="100%">
+                    <hbox height="100%" width="100%" align="stretch">
+                        <cell id="clearAllCell" width="10%" tooltip="clearAllTooltip" valign="middle">
+                            <button id="clearAll" iconSclass="z-icon-eraser" label="Clear all" width="100%" onClick="@command('clearAll')"/>
+                        </cell>
+                        <separator width="15px" orient="vertical" bar="true"/>
+                        <cell width="20%" valign="middle">
+                            <hbox align="center" pack="stretch" width="100%">
+                                <label value="Namespace: "/>
+                                <combobox tooltip="namespacesTooltip" id="namespacesCBox" width="100%" model="@load(searchVM.namespaces)" selectedItem="@bind(searchVM.selectedNamespace)"
+                                          readonly="true">
+                                    <template name="model">
+                                        <comboitem label="@load(each)"/>
+                                    </template>
+                                </combobox>
+                            </hbox>
+                        </cell>
+                        <separator width="15px" orient="vertical" bar="true"/>
+                        <cell width="10%" align="left" valign="middle">
+                            <checkbox id="skipKubeNamespacesCBox" checked="@bind(searchVM.skipKubeNamespaces)" tooltip="skipKubeNamespacesTooltip"/>Skip kube* namespaces
+                        </cell>
+                        <separator width="15px" orient="vertical" bar="true"/>
+                        <cell width="15%" align="left" valign="middle">
+                            <checkbox id="skipNativeEnvVarsCBox" checked="@bind(searchVM.skipNativeEnvVars)" tooltip="skipNativeEnvVarsTooltip"/>Skip native Env variables
+                        </cell>
+                        <cell width="35%" align="center" valign="middle">
+                            <hlayout valign="middle">
+                                <label value="Search: "/>
+                                <textbox id="searchStringTBox" hflex="1" value="@bind(searchVM.searchString)" onOK="@command('search')"/>
+                            </hlayout>
+                        </cell>
+                        <separator width="15px" orient="vertical" bar="true"/>
+                        <cell id="cellSearchBtn" width="10%" valign="middle">
+                            <button id="searchBtn" label="Search" iconSclass="z-icon-search" width="100%" onClick="@command('search')"/>
+                        </cell>
+                    </hbox>
+                    <groupbox id="kubeResourcesGBox" width="100%">
+                        <caption>
+                            <checkbox id="kubeResourcesGBoxCheckAll" checked="true" onCheck="@command('selectAllResources')"/>Resources
+                        </caption>
+                        <vbox id="kubeResourcesVBox" spacing="1" align="center" width="100%">
+                        </vbox>
+                    </groupbox>
+                </vbox>
+            </groupbox>
+        </north>
+        <center vflex="1" border="none">
+            <groupbox id="centerLayoutSearchGrBox" width="100%" closable="false" height="100%">
+                <caption iconSclass="fas fa-list" label="Results"/>
                 <grid model="@load(searchVM.searchResults)" height="@load(searchVM.mainGridHeight)">
                     <auxhead id="searchGridAuxHead">
                         <auxheader class="pageNorthClass">
@@ -134,8 +108,8 @@
                     <rows>
                         <template name="model" var="item">
                             <row style="cursor:pointer">
-                                <label value="${item.id}"></label>
-                                <label value="${item.foundString}" multiline="true"></label>
+                                <label value="${item.id}"/>
+                                <label value="${item.foundString}" multiline="true"/>
                                 <zk switch="${item.resourceType}">
                                     <zk case="ConfigMap">
                                         <toolbarbutton label="Click to see ConfigMap" onClick="@command('showAdditionalInfo', item=item)" hflex="1"/>
@@ -147,10 +121,10 @@
                                         <label value="${item.additionalInfo}" multiline="true"/>
                                     </zk>
                                 </zk>
-                                <label value="${item.resourceName}"></label>
-                                <label value="${item.namespace}"></label>
-                                <label value="${item.resourceType}"></label>
-                                <label value="${item.creationTime}"></label>
+                                <label value="${item.resourceName}"/>
+                                <label value="${item.namespace}"/>
+                                <label value="${item.resourceType}"/>
+                                <label value="${item.creationTime}"/>
                                 <toolbarbutton label="Raw/Yaml/Json" onClick="@command('showFullDefinition', item=item)" hflex="1"/>
                             </row>
                         </template>
@@ -159,9 +133,9 @@
                         <footer id="searchGridTotalItemsFooter" span="8" align="right" label="@load(searchVM.totalItems)"/>
                     </foot>
                 </grid>
-            </center>
-        </borderlayout>
-    </div>
+            </groupbox>
+        </center>
+    </borderlayout>
     <popup id="namespacesTooltip">
         All visible namespaces.
     </popup>
@@ -172,5 +146,4 @@
     <popup id="skipNativeEnvVarsTooltip">
         Don't collect all environment variables from pod. Saves execution time. IMPORTANT! Only environment variables from Kubernetes resources will be shown.
     </popup>
-
 </zk>

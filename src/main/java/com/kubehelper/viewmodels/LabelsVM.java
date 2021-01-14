@@ -92,6 +92,9 @@ import static com.kubehelper.common.Resource.SERVICE_ACCOUNT;
 import static com.kubehelper.common.Resource.STATEFUL_SET;
 
 /**
+ * View Model for searching, grouping and filtering of labels and visualize results in table.
+ * ViewModel initializes ..kubehelper/pages/labels.zul
+ *
  * @author JDev
  */
 @VariableResolver(DelegatingVariableResolver.class)
@@ -102,9 +105,6 @@ public class LabelsVM implements EventListener {
     private boolean isSearchButtonPressed;
 
     private int centerLayoutHeight = 700;
-
-    @Wire
-    private Footer labelsGridTotalItemsFooter;
 
     private Set<Resource> selectedResources = new HashSet<>() {{
         add(CONFIG_MAP);
@@ -122,7 +122,7 @@ public class LabelsVM implements EventListener {
     private ListModelList<LabelsModel.GroupedLabel> groupedLabels = new ListModelList<>();
     private ListModelList<LabelsModel.GroupedLabelColumn> groupedLabelColumns = new ListModelList<>();
 
-    private LabelsModel labelsModel;
+    private LabelsModel model;
 
     @WireVariable
     private CommonService commonService;
@@ -130,18 +130,22 @@ public class LabelsVM implements EventListener {
     @WireVariable
     private LabelsService labelsService;
 
+    @Wire
+    private Footer labelsGridTotalItemsFooter;
+
     @Init
     @NotifyChange("*")
     public void init() {
-        labelsModel = (LabelsModel) Global.ACTIVE_MODELS.computeIfAbsent(Global.LABELS_MODEL, (k) -> Global.NEW_MODELS.get(Global.LABELS_MODEL));
+        model = (LabelsModel) Global.ACTIVE_MODELS.computeIfAbsent(Global.LABELS_MODEL, (k) -> Global.NEW_MODELS.get(Global.LABELS_MODEL));
         onInitPreparations();
     }
 
     /**
-     * Creates CheckBox components Dynamically after UI render.
+     * Calls after UI render and creates kube resources checkboxes.
      * <p>
      * Explanation:
-     * We need Selectors.wireComponents() in order to be able to @Wire GUI components.
+     * Selectors.wireComponents() in order to be able to @Wire GUI components.
+     * Selectors.wireEventListeners() in order to be able to work with listeners and events.
      */
     @AfterCompose
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) {
@@ -153,15 +157,15 @@ public class LabelsVM implements EventListener {
     @Listen("onAfterSize=#centerLayoutLabelsID")
     public void onAfterSizeCenter(AfterSizeEvent event) {
         centerLayoutHeight = event.getHeight();
-        BindUtils.postNotifyChange( this, ".");
+        BindUtils.postNotifyChange(this, ".");
     }
 
     @Command
     @NotifyChange({"totalItems", "searchResults", "filter", "groupedLabels", "groupedLabelsDetails", "totalGroupedItems"})
     public void search() {
-        labelsModel.setFilter(new LabelsFilter());
-        labelsService.search(labelsModel, selectedResources);
-        labelsModel.groupSearchResults();
+        model.setFilter(new LabelsFilter());
+        labelsService.search(model, selectedResources);
+        model.groupSearchResults();
         clearAllFilterComboboxes();
         isSearchButtonPressed = true;
         onInitPreparations();
@@ -189,16 +193,16 @@ public class LabelsVM implements EventListener {
      * Prepare view for result depends on filters or new searches
      */
     private void onInitPreparations() {
-        labelsModel.setNamespaces(labelsModel.getNamespaces().isEmpty() ? commonService.getAllNamespaces() : labelsModel.getNamespaces());
-        if (labelsModel.getFilter().isFilterActive() && !labelsModel.getSearchResults().isEmpty()) {
+        model.setNamespaces(model.getNamespaces().isEmpty() ? commonService.getAllNamespaces() : model.getNamespaces());
+        if (model.getFilter().isFilterActive() && !model.getSearchResults().isEmpty()) {
             filterSearches();
         } else {
-            searchResults = new ListModelList<>(labelsModel.getSearchResults());
-            groupedLabels = new ListModelList<>(labelsModel.getGroupedLabels());
+            searchResults = new ListModelList<>(model.getSearchResults());
+            groupedLabels = new ListModelList<>(model.getGroupedLabels());
             groupedLabelColumns = new ListModelList<>();
         }
         sortResultsByNamespace();
-        logger.info("Found {} namespaces.", labelsModel.getNamespaces());
+        logger.debug("Found {} namespaces.", model.getNamespaces());
     }
 
     private void sortResultsByNamespace() {
@@ -212,7 +216,7 @@ public class LabelsVM implements EventListener {
     @NotifyChange({"totalItems", "searchResults", "totalGroupedItems", "groupedLabels", "groupedLabelsFilter", "groupedLabelColumnsFilter"})
     public void filterSearches() {
         searchResults.clear();
-        for (LabelResult searchResult : labelsModel.getSearchResults()) {
+        for (LabelResult searchResult : model.getSearchResults()) {
             if (StringUtils.containsIgnoreCase(searchResult.getName(), getFilter().getName()) &&
                     commonService.checkEqualsFilter(searchResult.getResourceProperty(), getFilter().getSelectedResourcePropertyFilter()) &&
                     commonService.checkEqualsFilter(searchResult.getResourceType(), getFilter().getSelectedResourceTypeFilter()) &&
@@ -222,11 +226,10 @@ public class LabelsVM implements EventListener {
                 searchResults.add(searchResult);
             }
         }
-        labelsModel.reGroupSearchResultsAfterFilter(searchResults);
-        groupedLabels = new ListModelList<>(labelsModel.getGroupedLabels());
+        model.reGroupSearchResultsAfterFilter(searchResults);
+        groupedLabels = new ListModelList<>(model.getGroupedLabels());
         groupedLabelColumns = new ListModelList<>();
-        labelsModel.setGroupedFilter(new LabelsGroupedFilter())
-                .setGroupedColumnsFilter(new LabelsGroupedColumnsFilter());
+        model.setGroupedFilter(new LabelsGroupedFilter()).setGroupedColumnsFilter(new LabelsGroupedColumnsFilter());
         sortResultsByNamespace();
     }
 
@@ -238,8 +241,8 @@ public class LabelsVM implements EventListener {
     public void filterGroupedLabels() {
         groupedLabels.clear();
         groupedLabelColumns.clear();
-        labelsModel.getGroupedLabelsColumns().clear();
-        for (LabelsModel.GroupedLabel groupedLabel : labelsModel.getGroupedLabels()) {
+        model.getGroupedLabelsColumns().clear();
+        for (LabelsModel.GroupedLabel groupedLabel : model.getGroupedLabels()) {
             if (StringUtils.containsIgnoreCase(groupedLabel.getName(), getGroupedLabelsFilter().getName()) &&
                     StringUtils.containsIgnoreCase(groupedLabel.getAmount(), getGroupedLabelsFilter().getAmount())) {
                 groupedLabels.add(groupedLabel);
@@ -255,7 +258,7 @@ public class LabelsVM implements EventListener {
     @NotifyChange({"totalGroupedLabelsColumnsItems", "groupedLabelColumns"})
     public void filterGroupedLabelsColumns() {
         groupedLabelColumns.clear();
-        for (LabelsModel.GroupedLabelColumn glc : labelsModel.getGroupedLabelsColumns()) {
+        for (LabelsModel.GroupedLabelColumn glc : model.getGroupedLabelsColumns()) {
             if (commonService.checkEqualsFilter(glc.getResourceProperty(), getGroupedLabelColumnsFilter().getSelectedResourcePropertyFilter()) &&
                     commonService.checkEqualsFilter(glc.getResourceType(), getGroupedLabelColumnsFilter().getSelectedResourceTypeFilter()) &&
                     commonService.checkEqualsFilter(glc.getResourceName(), getGroupedLabelColumnsFilter().getSelectedResourceNameFilter()) &&
@@ -273,16 +276,8 @@ public class LabelsVM implements EventListener {
     @Command
     @NotifyChange("*")
     public void clearAll() {
-        labelsModel.setSearchResults(new ArrayList<>())
-                .setFilter(new LabelsFilter())
-                .setGroupedFilter(new LabelsGroupedFilter())
-                .setGroupedColumnsFilter(new LabelsGroupedColumnsFilter())
-                .setNamespaces(commonService.getAllNamespaces())
-                .setSelectedNamespace("all")
-                .setSearchExceptions(new ArrayList<>())
-                .setGroupedLabels(new ArrayList<>())
-                .setGroupedLabelsColumns(new ArrayList<>())
-                .setClickedLabelsGroup("");
+        model = new LabelsModel();
+        Global.ACTIVE_MODELS.replace(Global.LABELS_MODEL, model);
         searchResults = new ListModelList<>();
         groupedLabels = new ListModelList<>();
         groupedLabelColumns = new ListModelList<>();
@@ -407,9 +402,30 @@ public class LabelsVM implements EventListener {
     @Command
     @NotifyChange({"groupedLabelColumns", "totalGroupedLabelsColumnsItems", "clickedLabelsGroup", "groupedLabelColumnsFilter"})
     public void showGroupedLabelItems(@BindingParam("clickedItem") LabelsModel.GroupedLabel item) {
-        labelsModel.fillGroupedLabelsColumnsForGroup(item);
+        model.fillGroupedLabelsColumnsForGroup(item);
         clearAllGroupedItemsFilterComboboxes();
-        groupedLabelColumns = new ListModelList<>(labelsModel.getGroupedLabelsColumns());
+        groupedLabelColumns = new ListModelList<>(model.getGroupedLabelsColumns());
+    }
+
+    /**
+     * Returns search results for grid and shows Notification if nothing was found or/and error window if some errors has occurred while parsing the results.
+     *
+     * @return - search results
+     */
+    public ListModelList<LabelResult> getSearchResults() {
+        if (isSearchButtonPressed && searchResults.isEmpty()) {
+            Notification.show("Nothing found.", "info", labelsGridTotalItemsFooter, "before_end", 2000);
+        }
+        if (isSearchButtonPressed && !searchResults.isEmpty()) {
+            Notification.show(String.format("Found %s items", searchResults.size()), "info", labelsGridTotalItemsFooter, "before_end", 2000);
+        }
+        if (isSearchButtonPressed && model.hasSearchErrors()) {
+            Window window = (Window) Executions.createComponents(Global.PATH_TO_ERROR_RESOURCE_ZUL, null, Map.of("errors", model.getSearchExceptions()));
+            window.doModal();
+            model.setSearchExceptions(new ArrayList<>());
+        }
+        isSearchButtonPressed = false;
+        return searchResults;
     }
 
 
@@ -425,40 +441,40 @@ public class LabelsVM implements EventListener {
     }
 
     public boolean isSkipKubeNamespaces() {
-        return labelsModel.isSkipKubeNamespaces();
+        return model.isSkipKubeNamespaces();
     }
 
     public void setSkipKubeNamespaces(boolean skipKubeNamespaces) {
-        this.labelsModel.setSkipKubeNamespaces(skipKubeNamespaces);
+        this.model.setSkipKubeNamespaces(skipKubeNamespaces);
     }
 
     public boolean isSkipHashLabels() {
-        return labelsModel.isSkipHashLabels();
+        return model.isSkipHashLabels();
     }
 
     public void setSkipHashLabels(boolean skipHashLabels) {
-        this.labelsModel.setSkipHashLabels(skipHashLabels);
+        this.model.setSkipHashLabels(skipHashLabels);
     }
 
     public String getSelectedNamespace() {
-        return labelsModel.getSelectedNamespace();
+        return model.getSelectedNamespace();
     }
 
     public LabelsVM setSelectedNamespace(String selectedNamespace) {
-        this.labelsModel.setSelectedNamespace(selectedNamespace);
+        this.model.setSelectedNamespace(selectedNamespace);
         return this;
     }
 
     public LabelsFilter getFilter() {
-        return labelsModel.getFilter();
+        return model.getFilter();
     }
 
     public LabelsGroupedFilter getGroupedLabelsFilter() {
-        return labelsModel.getGroupedFilter();
+        return model.getGroupedFilter();
     }
 
     public LabelsGroupedColumnsFilter getGroupedLabelColumnsFilter() {
-        return labelsModel.getGroupedColumnsFilter();
+        return model.getGroupedColumnsFilter();
     }
 
     public String getTotalItems() {
@@ -475,29 +491,9 @@ public class LabelsVM implements EventListener {
 
 
     public String getClickedLabelsGroup() {
-        return "Group Items for: " + labelsModel.getClickedLabelsGroup();
+        return "Group Items for: " + model.getClickedLabelsGroup();
     }
 
-    /**
-     * Returns search results for grid and shows Notification if nothing was found or/and error window if some errors has occurred while parsing the results.
-     *
-     * @return - search results
-     */
-    public ListModelList<LabelResult> getSearchResults() {
-        if (isSearchButtonPressed && searchResults.isEmpty()) {
-            Notification.show("Nothing found.", "info", labelsGridTotalItemsFooter, "before_end", 2000);
-        }
-        if (isSearchButtonPressed && !searchResults.isEmpty()) {
-            Notification.show("Found: " + searchResults.size() + " items", "info", labelsGridTotalItemsFooter, "before_end", 2000);
-        }
-        if (isSearchButtonPressed && labelsModel.hasSearchErrors()) {
-            Window window = (Window) Executions.createComponents(Global.PATH_TO_ERROR_RESOURCE_ZUL, null, Map.of("errors", labelsModel.getSearchExceptions()));
-            window.doModal();
-            labelsModel.setSearchExceptions(new ArrayList<>());
-        }
-        isSearchButtonPressed = false;
-        return searchResults;
-    }
 
     public List<LabelsModel.GroupedLabel> getGroupedLabels() {
         return groupedLabels;
@@ -508,11 +504,11 @@ public class LabelsVM implements EventListener {
     }
 
     public List<LabelResult> getGroupedLabelDetail(String name) {
-        return labelsModel.getGroupedLabelDetail(name);
+        return model.getGroupedLabelDetail(name);
     }
 
     public List<String> getNamespaces() {
-        return labelsModel.getNamespaces();
+        return model.getNamespaces();
     }
 
     public String getMainGridHeight() {

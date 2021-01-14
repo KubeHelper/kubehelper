@@ -57,8 +57,8 @@ import java.util.Arrays;
 import java.util.Map;
 
 /**
- * Class for displaying Kube Helper dashboard Cluster and nodes metrics.
- * ViewModel initializes ..kubehelper/pages/dashboard.zul
+ * View Model for displaying Kube Helper config.
+ * ViewModel initializes ..kubehelper/pages/config.zul
  *
  * @author JDev
  */
@@ -93,6 +93,14 @@ public class ConfigsVM {
         configsService.checkConfigLocation(configsModel);
     }
 
+    /**
+     * Calls after UI render.
+     * <p>
+     * Explanation:
+     * Selectors.wireComponents() in order to be able to @Wire GUI components.
+     * Selectors.wireEventListeners() in order to be able to work with listeners and events.
+     * Clients.evalJavaScript - call client highlightConfig method.
+     */
     @AfterCompose
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) {
         Selectors.wireComponents(view, this, false);

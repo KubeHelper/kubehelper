@@ -1,6 +1,6 @@
 <zk>
     <borderlayout id="cronJobsTemplate" viewModel="@id('cronJobsVM') @init('com.kubehelper.viewmodels.CronJobsVM')" width="100%" height="100%">
-        <center id="centerLayoutCronJobs" margins="0,3,3,3" title="Cron Jobs" border="none">
+        <center id="centerLayoutCronJobs" title="Cron Jobs" border="none">
             <tabbox id="cronJobsTabbox" width="100%" sclass="nav_tabs" style="border: none" onSelect="@command('onSelectMainCronJobsTabs')">
                 <tabs id="tabs">
                     <tab label="Jobs" id="cronJobs"/>
@@ -9,7 +9,7 @@
                 <tabpanels>
                     <tabpanel>
                         <groupbox id="commandsGrBox" height="@load(cronJobsVM.commandsGridHeight)" closable="false">
-                            <caption iconSclass="z-icon-terminal" label="Possible commands"/>
+                            <caption iconSclass="z-icon-terminal" label="Commands"/>
                             <grid id="commandsGrid" model="@load(cronJobsVM.commandsResults)" vflex="1">
                                 <auxhead id="commandsGridAuxHead">
                                     <auxheader>
@@ -174,7 +174,7 @@
                                 <hbox width="100%" align="center" pack="end" spacing="1em" style="vertical-align: middle;">
                                     <slider id="cronJobsReportsFontSizeSlider" curpos="@load(cronJobsVM.cronJobsReportsFontSize)" minpos="5" maxpos="30" mold="sphere" step="1"
                                             onScroll="@command('cronJobsReportsChangeFontSize')"/>
-                                    <checkbox label="Word Wrap" checked="@bind(cronJobsVM.wordWrapCommandsInReport)" onCheck="@command('wordWrapCommandsInReports')"/>
+                                    <checkbox label="Word Wrap" checked="@bind(cronJobsVM.wordWrapInReport)" onCheck="@command('wordWrapInReports')"/>
                                     <button iconSclass="fas fa-sync-alt" onClick="@command('refreshReports')"/>
                                 </hbox>
                             </north>

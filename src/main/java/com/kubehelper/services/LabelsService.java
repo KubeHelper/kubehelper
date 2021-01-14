@@ -116,87 +116,77 @@ public class LabelsService {
     /**
      * Searches string selected kubernetes resources by selected namespace.
      *
-     * @param searchModel - search model
+     * @param model - labels model
      */
-    public void search(LabelsModel searchModel, Set<Resource> selectedResources) {
-        searchModel.getSearchResults().clear();
-        searchModel.getSearchExceptions().clear();
-
-//        PolicyV1beta1PodSecurityPolicyList policyV1beta1PodSecurityPolicyList = kubeAPI.getPolicyV1beta1PodSecurityPolicyList();
-//        V1PodList v1PodsList = kubeAPI.getV1PodsList(searchModel.getSelectedNamespace());
-//        V1beta1PodDisruptionBudgetList v1beta1PodDisruptionBudgetsList = kubeAPI.getV1beta1PodDisruptionBudgetsList(searchModel.getSelectedNamespace());
-//        V1NetworkPolicyList v1NetworkPolicyList = kubeAPI.getV1NetworkPolicyList(searchModel.getSelectedNamespace());
-//        V1beta1PodDisruptionBudgetList podDisruptionBudgetsList = kubeAPI.getV1beta1PodDisruptionBudgetsList(searchModel.getSelectedNamespace());
-//
-//
-//        kubeAPI.testApis();
-//        V1PodSecurityContext
+    public void search(LabelsModel model, Set<Resource> selectedResources) {
+        model.getSearchResults().clear();
+        model.getSearchExceptions().clear();
 
         try {
 
             if (selectedResources.contains(POD)) {
-                searchInPods(searchModel);
+                searchInPods(model);
             }
             if (selectedResources.contains(CONFIG_MAP)) {
-                searchInConfigMaps(searchModel);
+                searchInConfigMaps(model);
             }
             if (selectedResources.contains(SERVICE)) {
-                searchInServices(searchModel);
+                searchInServices(model);
             }
             if (selectedResources.contains(NAMESPACE)) {
-                searchInNamespaces(searchModel);
+                searchInNamespaces(model);
             }
             if (selectedResources.contains(PERSISTENT_VOLUME)) {
-                searchInPersistentVolumes(searchModel);
+                searchInPersistentVolumes(model);
             }
             if (selectedResources.contains(PERSISTENT_VOLUME_CLAIM)) {
-                searchInPersistentVolumeClaims(searchModel);
+                searchInPersistentVolumeClaims(model);
             }
             if (selectedResources.contains(SECRET)) {
-                searchInSecrets(searchModel);
+                searchInSecrets(model);
             }
             if (selectedResources.contains(SERVICE_ACCOUNT)) {
-                searchInServiceAccounts(searchModel);
+                searchInServiceAccounts(model);
             }
             if (selectedResources.contains(DAEMON_SET)) {
-                searchInDaemonSets(searchModel);
+                searchInDaemonSets(model);
             }
             if (selectedResources.contains(DEPLOYMENT)) {
-                searchInDeployments(searchModel);
+                searchInDeployments(model);
             }
             if (selectedResources.contains(REPLICA_SET)) {
-                searchInReplicaSets(searchModel);
+                searchInReplicaSets(model);
             }
             if (selectedResources.contains(STATEFUL_SET)) {
-                searchInStatefulSets(searchModel);
+                searchInStatefulSets(model);
             }
             if (selectedResources.contains(JOB)) {
-                searchInJobs(searchModel);
+                searchInJobs(model);
             }
             if (selectedResources.contains(CLUSTER_ROLE_BINDING)) {
-                searchInClusterRoleBindings(searchModel);
+                searchInClusterRoleBindings(model);
             }
             if (selectedResources.contains(CLUSTER_ROLE)) {
-                searchInClusterRoles(searchModel);
+                searchInClusterRoles(model);
             }
             if (selectedResources.contains(ROLE_BINDING)) {
-                searchInRoleBindings(searchModel);
+                searchInRoleBindings(model);
             }
             if (selectedResources.contains(ROLE)) {
-                searchInRoles(searchModel);
+                searchInRoles(model);
             }
             if (selectedResources.contains(NETWORK_POLICY)) {
-                searchInNetworkPolicies(searchModel);
+                searchInNetworkPolicies(model);
             }
             if (selectedResources.contains(POD_DISRUPTION_BUDGET)) {
-                searchInPodDistributionBudgets(searchModel);
+                searchInPodDistributionBudgets(model);
             }
             if (selectedResources.contains(POD_SECURITY_POLICY)) {
-                searchInPodSecurityPolicies(searchModel);
+                searchInPodSecurityPolicies(model);
             }
 
         } catch (RuntimeException e) {
-            searchModel.addSearchException(e);
+            model.addSearchException(e);
             logger.error(e.getMessage(), e);
         }
     }
@@ -205,20 +195,20 @@ public class LabelsService {
     /**
      * Searches labels in Pods by selected namespace.
      *
-     * @param searchModel - search model
+     * @param model - labels model
      */
-    private void searchInPods(LabelsModel searchModel) {
-        V1PodList podsList = kubeAPI.getV1PodsList(searchModel.getSelectedNamespace(), searchModel);
+    private void searchInPods(LabelsModel model) {
+        V1PodList podsList = kubeAPI.getV1PodsList(model.getSelectedNamespace(), model);
         for (V1Pod pod : podsList.getItems()) {
             try {
                 V1ObjectMeta meta = pod.getMetadata();
-                if (!skipKubeNamespace(searchModel, meta)) {
-                    Optional.ofNullable(meta.getLabels()).ifPresent(map -> addSearchResultsToModel(map, meta, POD, LABEL, searchModel, ""));
-                    Optional.ofNullable(meta.getAnnotations()).ifPresent(map -> addSearchResultsToModel(map, meta, POD, ANNOTATION, searchModel, ""));
-                    Optional.ofNullable(pod.getSpec().getNodeSelector()).ifPresent(map -> addSearchResultsToModel(map, meta, POD, NODE_SELECTOR, searchModel, ""));
+                if (!skipKubeNamespace(model, meta)) {
+                    Optional.ofNullable(meta.getLabels()).ifPresent(map -> addSearchResultsToModel(map, meta, POD, LABEL, model, ""));
+                    Optional.ofNullable(meta.getAnnotations()).ifPresent(map -> addSearchResultsToModel(map, meta, POD, ANNOTATION, model, ""));
+                    Optional.ofNullable(pod.getSpec().getNodeSelector()).ifPresent(map -> addSearchResultsToModel(map, meta, POD, NODE_SELECTOR, model, ""));
                 }
             } catch (RuntimeException e) {
-                searchModel.addSearchException(e);
+                model.addSearchException(e);
                 logger.error(e.getMessage(), e);
             }
         }
@@ -227,19 +217,19 @@ public class LabelsService {
     /**
      * Searches labels in ConfigMaps by selected namespace.
      *
-     * @param searchModel - search model
+     * @param model - labels model
      */
-    private void searchInConfigMaps(LabelsModel searchModel) {
-        V1ConfigMapList configMapsList = kubeAPI.getV1ConfigMapsList(searchModel.getSelectedNamespace(), searchModel);
+    private void searchInConfigMaps(LabelsModel model) {
+        V1ConfigMapList configMapsList = kubeAPI.getV1ConfigMapsList(model.getSelectedNamespace(), model);
         for (V1ConfigMap configMap : configMapsList.getItems()) {
             try {
                 V1ObjectMeta meta = configMap.getMetadata();
-                if (!skipKubeNamespace(searchModel, meta)) {
-                    Optional.ofNullable(meta.getLabels()).ifPresent(map -> addSearchResultsToModel(map, meta, CONFIG_MAP, LABEL, searchModel, ""));
-                    Optional.ofNullable(meta.getAnnotations()).ifPresent(map -> addSearchResultsToModel(map, meta, CONFIG_MAP, ANNOTATION, searchModel, ""));
+                if (!skipKubeNamespace(model, meta)) {
+                    Optional.ofNullable(meta.getLabels()).ifPresent(map -> addSearchResultsToModel(map, meta, CONFIG_MAP, LABEL, model, ""));
+                    Optional.ofNullable(meta.getAnnotations()).ifPresent(map -> addSearchResultsToModel(map, meta, CONFIG_MAP, ANNOTATION, model, ""));
                 }
             } catch (RuntimeException e) {
-                searchModel.addSearchException(e);
+                model.addSearchException(e);
                 logger.error(e.getMessage(), e);
             }
         }
@@ -248,20 +238,20 @@ public class LabelsService {
     /**
      * Searches labels in Services by selected namespace.
      *
-     * @param searchModel - search model
+     * @param model - labels model
      */
-    private void searchInServices(LabelsModel searchModel) {
-        V1ServiceList servicesList = kubeAPI.getV1ServicesList(searchModel.getSelectedNamespace(), searchModel);
+    private void searchInServices(LabelsModel model) {
+        V1ServiceList servicesList = kubeAPI.getV1ServicesList(model.getSelectedNamespace(), model);
         for (V1Service service : servicesList.getItems()) {
             try {
                 V1ObjectMeta meta = service.getMetadata();
-                if (!skipKubeNamespace(searchModel, meta)) {
-                    Optional.ofNullable(meta.getLabels()).ifPresent(map -> addSearchResultsToModel(map, meta, SERVICE, LABEL, searchModel, ""));
-                    Optional.ofNullable(meta.getAnnotations()).ifPresent(map -> addSearchResultsToModel(map, meta, SERVICE, ANNOTATION, searchModel, ""));
-                    Optional.ofNullable(service.getSpec().getSelector()).ifPresent(map -> addSearchResultsToModel(map, meta, SERVICE, SELECTOR, searchModel, ""));
+                if (!skipKubeNamespace(model, meta)) {
+                    Optional.ofNullable(meta.getLabels()).ifPresent(map -> addSearchResultsToModel(map, meta, SERVICE, LABEL, model, ""));
+                    Optional.ofNullable(meta.getAnnotations()).ifPresent(map -> addSearchResultsToModel(map, meta, SERVICE, ANNOTATION, model, ""));
+                    Optional.ofNullable(service.getSpec().getSelector()).ifPresent(map -> addSearchResultsToModel(map, meta, SERVICE, SELECTOR, model, ""));
                 }
             } catch (RuntimeException e) {
-                searchModel.addSearchException(e);
+                model.addSearchException(e);
                 logger.error(e.getMessage(), e);
             }
         }
@@ -270,19 +260,19 @@ public class LabelsService {
     /**
      * Searches labels in Namespaces by selected namespace.
      *
-     * @param searchModel - search model
+     * @param model - labels model
      */
-    private void searchInNamespaces(LabelsModel searchModel) {
-        V1NamespaceList namespacesList = kubeAPI.getV1NamespacesList(searchModel);
+    private void searchInNamespaces(LabelsModel model) {
+        V1NamespaceList namespacesList = kubeAPI.getV1NamespacesList(model);
         for (V1Namespace namespace : namespacesList.getItems()) {
             try {
                 V1ObjectMeta meta = namespace.getMetadata();
-                if (!skipKubeNamespace(searchModel, meta)) {
-                    Optional.ofNullable(namespace.getMetadata().getLabels()).ifPresent(map -> addSearchResultsToModel(map, meta, NAMESPACE, LABEL, searchModel, ""));
-                    Optional.ofNullable(namespace.getMetadata().getAnnotations()).ifPresent(map -> addSearchResultsToModel(map, meta, NAMESPACE, ANNOTATION, searchModel, ""));
+                if (!skipKubeNamespace(model, meta)) {
+                    Optional.ofNullable(namespace.getMetadata().getLabels()).ifPresent(map -> addSearchResultsToModel(map, meta, NAMESPACE, LABEL, model, ""));
+                    Optional.ofNullable(namespace.getMetadata().getAnnotations()).ifPresent(map -> addSearchResultsToModel(map, meta, NAMESPACE, ANNOTATION, model, ""));
                 }
             } catch (RuntimeException e) {
-                searchModel.addSearchException(e);
+                model.addSearchException(e);
                 logger.error(e.getMessage(), e);
             }
         }
@@ -291,17 +281,17 @@ public class LabelsService {
     /**
      * Searches labels in PersistentVolumes by selected namespace.
      *
-     * @param searchModel - search model
+     * @param model - labels model
      */
-    private void searchInPersistentVolumes(LabelsModel searchModel) {
-        V1PersistentVolumeList persistentVolumesList = kubeAPI.getV1PersistentVolumesList(searchModel);
+    private void searchInPersistentVolumes(LabelsModel model) {
+        V1PersistentVolumeList persistentVolumesList = kubeAPI.getV1PersistentVolumesList(model);
         for (V1PersistentVolume pv : persistentVolumesList.getItems()) {
             try {
                 V1ObjectMeta meta = pv.getMetadata();
-                Optional.ofNullable(meta.getLabels()).ifPresent(map -> addSearchResultsToModel(map, meta, PERSISTENT_VOLUME, LABEL, searchModel, ""));
-                Optional.ofNullable(meta.getAnnotations()).ifPresent(map -> addSearchResultsToModel(map, meta, PERSISTENT_VOLUME, ANNOTATION, searchModel, ""));
+                Optional.ofNullable(meta.getLabels()).ifPresent(map -> addSearchResultsToModel(map, meta, PERSISTENT_VOLUME, LABEL, model, ""));
+                Optional.ofNullable(meta.getAnnotations()).ifPresent(map -> addSearchResultsToModel(map, meta, PERSISTENT_VOLUME, ANNOTATION, model, ""));
             } catch (RuntimeException e) {
-                searchModel.addSearchException(e);
+                model.addSearchException(e);
                 logger.error(e.getMessage(), e);
             }
         }
@@ -310,21 +300,21 @@ public class LabelsService {
     /**
      * Searches labels in PersistentVolumeClaims by selected namespace.
      *
-     * @param searchModel - search model
+     * @param model - labels model
      */
-    private void searchInPersistentVolumeClaims(LabelsModel searchModel) {
-        V1PersistentVolumeClaimList persistentVolumeClaimsList = kubeAPI.getV1PersistentVolumeClaimsList(searchModel.getSelectedNamespace(), searchModel);
+    private void searchInPersistentVolumeClaims(LabelsModel model) {
+        V1PersistentVolumeClaimList persistentVolumeClaimsList = kubeAPI.getV1PersistentVolumeClaimsList(model.getSelectedNamespace(), model);
         for (V1PersistentVolumeClaim pvc : persistentVolumeClaimsList.getItems()) {
             try {
                 V1ObjectMeta meta = pvc.getMetadata();
-                if (!skipKubeNamespace(searchModel, meta)) {
-                    Optional.ofNullable(meta.getLabels()).ifPresent(map -> addSearchResultsToModel(map, meta, PERSISTENT_VOLUME_CLAIM, LABEL, searchModel, ""));
-                    Optional.ofNullable(meta.getAnnotations()).ifPresent(map -> addSearchResultsToModel(map, meta, PERSISTENT_VOLUME_CLAIM, ANNOTATION, searchModel, ""));
-                    Optional.ofNullable(pvc.getSpec().getSelector()).ifPresent(selector -> addSearchResultsToModel(selector.getMatchLabels(), meta, PERSISTENT_VOLUME_CLAIM, SELECTOR, searchModel,
+                if (!skipKubeNamespace(model, meta)) {
+                    Optional.ofNullable(meta.getLabels()).ifPresent(map -> addSearchResultsToModel(map, meta, PERSISTENT_VOLUME_CLAIM, LABEL, model, ""));
+                    Optional.ofNullable(meta.getAnnotations()).ifPresent(map -> addSearchResultsToModel(map, meta, PERSISTENT_VOLUME_CLAIM, ANNOTATION, model, ""));
+                    Optional.ofNullable(pvc.getSpec().getSelector()).ifPresent(selector -> addSearchResultsToModel(selector.getMatchLabels(), meta, PERSISTENT_VOLUME_CLAIM, SELECTOR, model,
                             getMatchExpressions(selector.getMatchExpressions())));
                 }
             } catch (RuntimeException e) {
-                searchModel.addSearchException(e);
+                model.addSearchException(e);
                 logger.error(e.getMessage(), e);
             }
         }
@@ -333,19 +323,19 @@ public class LabelsService {
     /**
      * Searches labels in ServiceAccounts by selected namespace.
      *
-     * @param searchModel - search model
+     * @param model - labels model
      */
-    private void searchInServiceAccounts(LabelsModel searchModel) {
-        V1ServiceAccountList serviceAccountsList = kubeAPI.getV1ServiceAccountsList(searchModel.getSelectedNamespace(), searchModel);
+    private void searchInServiceAccounts(LabelsModel model) {
+        V1ServiceAccountList serviceAccountsList = kubeAPI.getV1ServiceAccountsList(model.getSelectedNamespace(), model);
         for (V1ServiceAccount serviceAccount : serviceAccountsList.getItems()) {
             try {
                 V1ObjectMeta meta = serviceAccount.getMetadata();
-                if (!skipKubeNamespace(searchModel, meta)) {
-                    Optional.ofNullable(meta.getLabels()).ifPresent(map -> addSearchResultsToModel(map, meta, SERVICE_ACCOUNT, LABEL, searchModel, ""));
-                    Optional.ofNullable(meta.getAnnotations()).ifPresent(map -> addSearchResultsToModel(map, meta, SERVICE_ACCOUNT, ANNOTATION, searchModel, ""));
+                if (!skipKubeNamespace(model, meta)) {
+                    Optional.ofNullable(meta.getLabels()).ifPresent(map -> addSearchResultsToModel(map, meta, SERVICE_ACCOUNT, LABEL, model, ""));
+                    Optional.ofNullable(meta.getAnnotations()).ifPresent(map -> addSearchResultsToModel(map, meta, SERVICE_ACCOUNT, ANNOTATION, model, ""));
                 }
             } catch (RuntimeException e) {
-                searchModel.addSearchException(e);
+                model.addSearchException(e);
                 logger.error(e.getMessage(), e);
             }
         }
@@ -354,19 +344,19 @@ public class LabelsService {
     /**
      * Searches labels in Secrets by selected namespace.
      *
-     * @param searchModel - search model
+     * @param model - labels model
      */
-    private void searchInSecrets(LabelsModel searchModel) {
-        V1SecretList secretsList = kubeAPI.getV1SecretsList(searchModel.getSelectedNamespace(), searchModel);
+    private void searchInSecrets(LabelsModel model) {
+        V1SecretList secretsList = kubeAPI.getV1SecretsList(model.getSelectedNamespace(), model);
         for (V1Secret secret : secretsList.getItems()) {
             try {
                 V1ObjectMeta meta = secret.getMetadata();
-                if (!skipKubeNamespace(searchModel, meta)) {
-                    Optional.ofNullable(meta.getLabels()).ifPresent(map -> addSearchResultsToModel(map, meta, SECRET, LABEL, searchModel, ""));
-                    Optional.ofNullable(meta.getAnnotations()).ifPresent(map -> addSearchResultsToModel(map, meta, SECRET, ANNOTATION, searchModel, ""));
+                if (!skipKubeNamespace(model, meta)) {
+                    Optional.ofNullable(meta.getLabels()).ifPresent(map -> addSearchResultsToModel(map, meta, SECRET, LABEL, model, ""));
+                    Optional.ofNullable(meta.getAnnotations()).ifPresent(map -> addSearchResultsToModel(map, meta, SECRET, ANNOTATION, model, ""));
                 }
             } catch (RuntimeException e) {
-                searchModel.addSearchException(e);
+                model.addSearchException(e);
                 logger.error(e.getMessage(), e);
             }
         }
@@ -375,21 +365,21 @@ public class LabelsService {
     /**
      * Searches labels in DaemonSets by selected namespace.
      *
-     * @param searchModel - search model
+     * @param model - labels model
      */
-    private void searchInDaemonSets(LabelsModel searchModel) {
-        V1DaemonSetList setsList = kubeAPI.getV1DaemonSetList(searchModel.getSelectedNamespace(), searchModel);
+    private void searchInDaemonSets(LabelsModel model) {
+        V1DaemonSetList setsList = kubeAPI.getV1DaemonSetList(model.getSelectedNamespace(), model);
         for (V1DaemonSet set : setsList.getItems()) {
             try {
                 V1ObjectMeta meta = set.getMetadata();
-                if (!skipKubeNamespace(searchModel, meta)) {
-                    Optional.ofNullable(meta.getLabels()).ifPresent(map -> addSearchResultsToModel(map, meta, DAEMON_SET, LABEL, searchModel, ""));
-                    Optional.ofNullable(meta.getAnnotations()).ifPresent(map -> addSearchResultsToModel(map, meta, DAEMON_SET, ANNOTATION, searchModel, ""));
-                    Optional.ofNullable(set.getSpec().getSelector()).ifPresent(selector -> addSearchResultsToModel(selector.getMatchLabels(), meta, DAEMON_SET, SELECTOR, searchModel,
+                if (!skipKubeNamespace(model, meta)) {
+                    Optional.ofNullable(meta.getLabels()).ifPresent(map -> addSearchResultsToModel(map, meta, DAEMON_SET, LABEL, model, ""));
+                    Optional.ofNullable(meta.getAnnotations()).ifPresent(map -> addSearchResultsToModel(map, meta, DAEMON_SET, ANNOTATION, model, ""));
+                    Optional.ofNullable(set.getSpec().getSelector()).ifPresent(selector -> addSearchResultsToModel(selector.getMatchLabels(), meta, DAEMON_SET, SELECTOR, model,
                             getMatchExpressions(selector.getMatchExpressions())));
                 }
             } catch (RuntimeException e) {
-                searchModel.addSearchException(e);
+                model.addSearchException(e);
                 logger.error(e.getMessage(), e);
             }
         }
@@ -399,21 +389,21 @@ public class LabelsService {
      * Searches labels in Deployments by selected namespace.
      * D
      *
-     * @param searchModel - search model
+     * @param model - labels model
      */
-    private void searchInDeployments(LabelsModel searchModel) {
-        V1DeploymentList deploymentsList = kubeAPI.getV1DeploymentList(searchModel.getSelectedNamespace(), searchModel);
+    private void searchInDeployments(LabelsModel model) {
+        V1DeploymentList deploymentsList = kubeAPI.getV1DeploymentList(model.getSelectedNamespace(), model);
         for (V1Deployment deployment : deploymentsList.getItems()) {
             try {
                 V1ObjectMeta meta = deployment.getMetadata();
-                if (!skipKubeNamespace(searchModel, meta)) {
-                    Optional.ofNullable(meta.getLabels()).ifPresent(map -> addSearchResultsToModel(map, meta, DEPLOYMENT, LABEL, searchModel, ""));
-                    Optional.ofNullable(meta.getAnnotations()).ifPresent(map -> addSearchResultsToModel(map, meta, DEPLOYMENT, ANNOTATION, searchModel, ""));
-                    Optional.ofNullable(deployment.getSpec().getSelector()).ifPresent(selector -> addSearchResultsToModel(selector.getMatchLabels(), meta, DEPLOYMENT, SELECTOR, searchModel,
+                if (!skipKubeNamespace(model, meta)) {
+                    Optional.ofNullable(meta.getLabels()).ifPresent(map -> addSearchResultsToModel(map, meta, DEPLOYMENT, LABEL, model, ""));
+                    Optional.ofNullable(meta.getAnnotations()).ifPresent(map -> addSearchResultsToModel(map, meta, DEPLOYMENT, ANNOTATION, model, ""));
+                    Optional.ofNullable(deployment.getSpec().getSelector()).ifPresent(selector -> addSearchResultsToModel(selector.getMatchLabels(), meta, DEPLOYMENT, SELECTOR, model,
                             getMatchExpressions(selector.getMatchExpressions())));
                 }
             } catch (RuntimeException e) {
-                searchModel.addSearchException(e);
+                model.addSearchException(e);
                 logger.error(e.getMessage(), e);
             }
         }
@@ -423,21 +413,21 @@ public class LabelsService {
     /**
      * Searches labels in ReplicaSets by selected namespace.
      *
-     * @param searchModel - search model
+     * @param model - labels model
      */
-    private void searchInReplicaSets(LabelsModel searchModel) {
-        V1ReplicaSetList replicaSetsList = kubeAPI.getV1ReplicaSetList(searchModel.getSelectedNamespace(), searchModel);
+    private void searchInReplicaSets(LabelsModel model) {
+        V1ReplicaSetList replicaSetsList = kubeAPI.getV1ReplicaSetList(model.getSelectedNamespace(), model);
         for (V1ReplicaSet replicaSet : replicaSetsList.getItems()) {
             try {
                 V1ObjectMeta meta = replicaSet.getMetadata();
-                if (!skipKubeNamespace(searchModel, meta)) {
-                    Optional.ofNullable(meta.getLabels()).ifPresent(map -> addSearchResultsToModel(map, meta, REPLICA_SET, LABEL, searchModel, ""));
-                    Optional.ofNullable(meta.getAnnotations()).ifPresent(map -> addSearchResultsToModel(map, meta, REPLICA_SET, ANNOTATION, searchModel, ""));
-                    Optional.ofNullable(replicaSet.getSpec().getSelector()).ifPresent(selector -> addSearchResultsToModel(selector.getMatchLabels(), meta, REPLICA_SET, SELECTOR, searchModel,
+                if (!skipKubeNamespace(model, meta)) {
+                    Optional.ofNullable(meta.getLabels()).ifPresent(map -> addSearchResultsToModel(map, meta, REPLICA_SET, LABEL, model, ""));
+                    Optional.ofNullable(meta.getAnnotations()).ifPresent(map -> addSearchResultsToModel(map, meta, REPLICA_SET, ANNOTATION, model, ""));
+                    Optional.ofNullable(replicaSet.getSpec().getSelector()).ifPresent(selector -> addSearchResultsToModel(selector.getMatchLabels(), meta, REPLICA_SET, SELECTOR, model,
                             getMatchExpressions(selector.getMatchExpressions())));
                 }
             } catch (RuntimeException e) {
-                searchModel.addSearchException(e);
+                model.addSearchException(e);
                 logger.error(e.getMessage(), e);
             }
         }
@@ -446,21 +436,21 @@ public class LabelsService {
     /**
      * Searches labels in StatefulSets by selected namespace.
      *
-     * @param searchModel - search model
+     * @param model - labels model
      */
-    private void searchInStatefulSets(LabelsModel searchModel) {
-        V1StatefulSetList statefulSetstList = kubeAPI.getV1StatefulSetList(searchModel.getSelectedNamespace(), searchModel);
+    private void searchInStatefulSets(LabelsModel model) {
+        V1StatefulSetList statefulSetstList = kubeAPI.getV1StatefulSetList(model.getSelectedNamespace(), model);
         for (V1StatefulSet statefulSet : statefulSetstList.getItems()) {
             try {
                 V1ObjectMeta meta = statefulSet.getMetadata();
-                if (!skipKubeNamespace(searchModel, meta)) {
-                    Optional.ofNullable(meta.getLabels()).ifPresent(map -> addSearchResultsToModel(map, meta, STATEFUL_SET, LABEL, searchModel, ""));
-                    Optional.ofNullable(meta.getAnnotations()).ifPresent(map -> addSearchResultsToModel(map, meta, STATEFUL_SET, ANNOTATION, searchModel, ""));
-                    Optional.ofNullable(statefulSet.getSpec().getSelector()).ifPresent(selector -> addSearchResultsToModel(selector.getMatchLabels(), meta, STATEFUL_SET, SELECTOR, searchModel,
+                if (!skipKubeNamespace(model, meta)) {
+                    Optional.ofNullable(meta.getLabels()).ifPresent(map -> addSearchResultsToModel(map, meta, STATEFUL_SET, LABEL, model, ""));
+                    Optional.ofNullable(meta.getAnnotations()).ifPresent(map -> addSearchResultsToModel(map, meta, STATEFUL_SET, ANNOTATION, model, ""));
+                    Optional.ofNullable(statefulSet.getSpec().getSelector()).ifPresent(selector -> addSearchResultsToModel(selector.getMatchLabels(), meta, STATEFUL_SET, SELECTOR, model,
                             getMatchExpressions(selector.getMatchExpressions())));
                 }
             } catch (RuntimeException e) {
-                searchModel.addSearchException(e);
+                model.addSearchException(e);
                 logger.error(e.getMessage(), e);
             }
         }
@@ -469,21 +459,21 @@ public class LabelsService {
     /**
      * Searches labels in Jobs by selected namespace.
      *
-     * @param searchModel - search model
+     * @param model - labels model
      */
-    private void searchInJobs(LabelsModel searchModel) {
-        V1JobList jobsList = kubeAPI.getV1JobList(searchModel.getSelectedNamespace(), searchModel);
+    private void searchInJobs(LabelsModel model) {
+        V1JobList jobsList = kubeAPI.getV1JobList(model.getSelectedNamespace(), model);
         for (V1Job job : jobsList.getItems()) {
             try {
                 V1ObjectMeta meta = job.getMetadata();
-                if (!skipKubeNamespace(searchModel, meta)) {
-                    Optional.ofNullable(meta.getLabels()).ifPresent(map -> addSearchResultsToModel(map, meta, JOB, LABEL, searchModel, ""));
-                    Optional.ofNullable(meta.getAnnotations()).ifPresent(map -> addSearchResultsToModel(map, meta, JOB, ANNOTATION, searchModel, ""));
-                    Optional.ofNullable(job.getSpec().getSelector()).ifPresent(selector -> addSearchResultsToModel(selector.getMatchLabels(), meta, JOB, SELECTOR, searchModel,
+                if (!skipKubeNamespace(model, meta)) {
+                    Optional.ofNullable(meta.getLabels()).ifPresent(map -> addSearchResultsToModel(map, meta, JOB, LABEL, model, ""));
+                    Optional.ofNullable(meta.getAnnotations()).ifPresent(map -> addSearchResultsToModel(map, meta, JOB, ANNOTATION, model, ""));
+                    Optional.ofNullable(job.getSpec().getSelector()).ifPresent(selector -> addSearchResultsToModel(selector.getMatchLabels(), meta, JOB, SELECTOR, model,
                             getMatchExpressions(selector.getMatchExpressions())));
                 }
             } catch (RuntimeException e) {
-                searchModel.addSearchException(e);
+                model.addSearchException(e);
                 logger.error(e.getMessage(), e);
             }
         }
@@ -492,19 +482,19 @@ public class LabelsService {
     /**
      * Searches labels in ClusterRoleBindings by selected namespace.
      *
-     * @param searchModel - search model
+     * @param model - labels model
      */
-    private void searchInClusterRoleBindings(LabelsModel searchModel) {
-        V1beta1ClusterRoleBindingList clusterRoleBindingsList = kubeAPI.getV1ClusterRolesBindingsList(searchModel);
+    private void searchInClusterRoleBindings(LabelsModel model) {
+        V1beta1ClusterRoleBindingList clusterRoleBindingsList = kubeAPI.getV1ClusterRolesBindingsList(model);
         for (V1beta1ClusterRoleBinding binding : clusterRoleBindingsList.getItems()) {
             try {
                 V1ObjectMeta meta = binding.getMetadata();
-                if (!skipKubeNamespace(searchModel, meta)) {
-                    Optional.ofNullable(meta.getLabels()).ifPresent(map -> addSearchResultsToModel(map, meta, CLUSTER_ROLE_BINDING, LABEL, searchModel, ""));
-                    Optional.ofNullable(meta.getAnnotations()).ifPresent(map -> addSearchResultsToModel(map, meta, CLUSTER_ROLE_BINDING, ANNOTATION, searchModel, ""));
+                if (!skipKubeNamespace(model, meta)) {
+                    Optional.ofNullable(meta.getLabels()).ifPresent(map -> addSearchResultsToModel(map, meta, CLUSTER_ROLE_BINDING, LABEL, model, ""));
+                    Optional.ofNullable(meta.getAnnotations()).ifPresent(map -> addSearchResultsToModel(map, meta, CLUSTER_ROLE_BINDING, ANNOTATION, model, ""));
                 }
             } catch (RuntimeException e) {
-                searchModel.addSearchException(e);
+                model.addSearchException(e);
                 logger.error(e.getMessage(), e);
             }
         }
@@ -513,19 +503,19 @@ public class LabelsService {
     /**
      * Searches labels in ClusterRoles by selected namespace.
      *
-     * @param searchModel - search model
+     * @param model - labels model
      */
-    private void searchInClusterRoles(LabelsModel searchModel) {
-        V1beta1ClusterRoleList clusterRolesList = kubeAPI.getV1ClusterRolesList(searchModel);
+    private void searchInClusterRoles(LabelsModel model) {
+        V1beta1ClusterRoleList clusterRolesList = kubeAPI.getV1ClusterRolesList(model);
         for (V1beta1ClusterRole clusterRole : clusterRolesList.getItems()) {
             try {
                 V1ObjectMeta meta = clusterRole.getMetadata();
-                if (!skipKubeNamespace(searchModel, meta)) {
-                    Optional.ofNullable(meta.getLabels()).ifPresent(map -> addSearchResultsToModel(map, meta, CLUSTER_ROLE, LABEL, searchModel, ""));
-                    Optional.ofNullable(meta.getAnnotations()).ifPresent(map -> addSearchResultsToModel(map, meta, CLUSTER_ROLE, ANNOTATION, searchModel, ""));
+                if (!skipKubeNamespace(model, meta)) {
+                    Optional.ofNullable(meta.getLabels()).ifPresent(map -> addSearchResultsToModel(map, meta, CLUSTER_ROLE, LABEL, model, ""));
+                    Optional.ofNullable(meta.getAnnotations()).ifPresent(map -> addSearchResultsToModel(map, meta, CLUSTER_ROLE, ANNOTATION, model, ""));
                 }
             } catch (RuntimeException e) {
-                searchModel.addSearchException(e);
+                model.addSearchException(e);
                 logger.error(e.getMessage(), e);
             }
         }
@@ -534,19 +524,19 @@ public class LabelsService {
     /**
      * Searches labels in RoleBindings by selected namespace.
      *
-     * @param searchModel - search model
+     * @param model - labels model
      */
-    private void searchInRoleBindings(LabelsModel searchModel) {
-        V1beta1RoleBindingList v1RolesBindingsList = kubeAPI.getV1RolesBindingList(searchModel.getSelectedNamespace(), searchModel);
+    private void searchInRoleBindings(LabelsModel model) {
+        V1beta1RoleBindingList v1RolesBindingsList = kubeAPI.getV1RolesBindingList(model.getSelectedNamespace(), model);
         for (V1beta1RoleBinding binding : v1RolesBindingsList.getItems()) {
             try {
                 V1ObjectMeta meta = binding.getMetadata();
-                if (!skipKubeNamespace(searchModel, meta)) {
-                    Optional.ofNullable(meta.getLabels()).ifPresent(map -> addSearchResultsToModel(map, meta, ROLE_BINDING, LABEL, searchModel, ""));
-                    Optional.ofNullable(meta.getAnnotations()).ifPresent(map -> addSearchResultsToModel(map, meta, ROLE_BINDING, ANNOTATION, searchModel, ""));
+                if (!skipKubeNamespace(model, meta)) {
+                    Optional.ofNullable(meta.getLabels()).ifPresent(map -> addSearchResultsToModel(map, meta, ROLE_BINDING, LABEL, model, ""));
+                    Optional.ofNullable(meta.getAnnotations()).ifPresent(map -> addSearchResultsToModel(map, meta, ROLE_BINDING, ANNOTATION, model, ""));
                 }
             } catch (RuntimeException e) {
-                searchModel.addSearchException(e);
+                model.addSearchException(e);
                 logger.error(e.getMessage(), e);
             }
         }
@@ -555,19 +545,19 @@ public class LabelsService {
     /**
      * Searches labels in Roles by selected namespace.
      *
-     * @param searchModel - search model
+     * @param model - labels model
      */
-    private void searchInRoles(LabelsModel searchModel) {
-        V1beta1RoleList clusterRolesList = kubeAPI.getV1RolesList(searchModel.getSelectedNamespace(), searchModel);
+    private void searchInRoles(LabelsModel model) {
+        V1beta1RoleList clusterRolesList = kubeAPI.getV1RolesList(model.getSelectedNamespace(), model);
         for (V1beta1Role clusterRole : clusterRolesList.getItems()) {
             try {
                 V1ObjectMeta meta = clusterRole.getMetadata();
-                if (!skipKubeNamespace(searchModel, meta)) {
-                    Optional.ofNullable(meta.getLabels()).ifPresent(map -> addSearchResultsToModel(map, meta, ROLE, LABEL, searchModel, ""));
-                    Optional.ofNullable(meta.getAnnotations()).ifPresent(map -> addSearchResultsToModel(map, meta, ROLE, ANNOTATION, searchModel, ""));
+                if (!skipKubeNamespace(model, meta)) {
+                    Optional.ofNullable(meta.getLabels()).ifPresent(map -> addSearchResultsToModel(map, meta, ROLE, LABEL, model, ""));
+                    Optional.ofNullable(meta.getAnnotations()).ifPresent(map -> addSearchResultsToModel(map, meta, ROLE, ANNOTATION, model, ""));
                 }
             } catch (RuntimeException e) {
-                searchModel.addSearchException(e);
+                model.addSearchException(e);
                 logger.error(e.getMessage(), e);
             }
         }
@@ -576,21 +566,21 @@ public class LabelsService {
     /**
      * Searches labels in NetworkPolicies by selected namespace.
      *
-     * @param searchModel - search model
+     * @param model - labels model
      */
-    private void searchInNetworkPolicies(LabelsModel searchModel) {
-        V1NetworkPolicyList networkPolicyList = kubeAPI.getV1NetworkPolicyList(searchModel.getSelectedNamespace(), searchModel);
+    private void searchInNetworkPolicies(LabelsModel model) {
+        V1NetworkPolicyList networkPolicyList = kubeAPI.getV1NetworkPolicyList(model.getSelectedNamespace(), model);
         for (V1NetworkPolicy networkPolicy : networkPolicyList.getItems()) {
             try {
                 V1ObjectMeta meta = networkPolicy.getMetadata();
-                if (!skipKubeNamespace(searchModel, meta)) {
-                    Optional.ofNullable(meta.getLabels()).ifPresent(map -> addSearchResultsToModel(map, meta, NETWORK_POLICY, LABEL, searchModel, ""));
-                    Optional.ofNullable(meta.getAnnotations()).ifPresent(map -> addSearchResultsToModel(map, meta, NETWORK_POLICY, ANNOTATION, searchModel, ""));
-                    Optional.ofNullable(networkPolicy.getSpec().getPodSelector()).ifPresent(selector -> addSearchResultsToModel(selector.getMatchLabels(), meta, NETWORK_POLICY, SELECTOR, searchModel,
+                if (!skipKubeNamespace(model, meta)) {
+                    Optional.ofNullable(meta.getLabels()).ifPresent(map -> addSearchResultsToModel(map, meta, NETWORK_POLICY, LABEL, model, ""));
+                    Optional.ofNullable(meta.getAnnotations()).ifPresent(map -> addSearchResultsToModel(map, meta, NETWORK_POLICY, ANNOTATION, model, ""));
+                    Optional.ofNullable(networkPolicy.getSpec().getPodSelector()).ifPresent(selector -> addSearchResultsToModel(selector.getMatchLabels(), meta, NETWORK_POLICY, SELECTOR, model,
                             getMatchExpressions(selector.getMatchExpressions())));
                 }
             } catch (RuntimeException e) {
-                searchModel.addSearchException(e);
+                model.addSearchException(e);
                 logger.error(e.getMessage(), e);
             }
         }
@@ -599,21 +589,21 @@ public class LabelsService {
     /**
      * Searches labels in PodDistributionBudgets by selected namespace.
      *
-     * @param searchModel - search model
+     * @param model - labels model
      */
-    private void searchInPodDistributionBudgets(LabelsModel searchModel) {
-        V1beta1PodDisruptionBudgetList podDisruptionBudgetsList = kubeAPI.getV1beta1PodDisruptionBudgetsList(searchModel.getSelectedNamespace(), searchModel);
+    private void searchInPodDistributionBudgets(LabelsModel model) {
+        V1beta1PodDisruptionBudgetList podDisruptionBudgetsList = kubeAPI.getV1beta1PodDisruptionBudgetsList(model.getSelectedNamespace(), model);
         for (V1beta1PodDisruptionBudget budget : podDisruptionBudgetsList.getItems()) {
             try {
                 V1ObjectMeta meta = budget.getMetadata();
-                if (!skipKubeNamespace(searchModel, meta)) {
-                    Optional.ofNullable(meta.getLabels()).ifPresent(map -> addSearchResultsToModel(map, meta, POD_DISRUPTION_BUDGET, LABEL, searchModel, ""));
-                    Optional.ofNullable(meta.getAnnotations()).ifPresent(map -> addSearchResultsToModel(map, meta, POD_DISRUPTION_BUDGET, ANNOTATION, searchModel, ""));
-                    Optional.ofNullable(budget.getSpec().getSelector()).ifPresent(selector -> addSearchResultsToModel(selector.getMatchLabels(), meta, POD_DISRUPTION_BUDGET, SELECTOR, searchModel,
+                if (!skipKubeNamespace(model, meta)) {
+                    Optional.ofNullable(meta.getLabels()).ifPresent(map -> addSearchResultsToModel(map, meta, POD_DISRUPTION_BUDGET, LABEL, model, ""));
+                    Optional.ofNullable(meta.getAnnotations()).ifPresent(map -> addSearchResultsToModel(map, meta, POD_DISRUPTION_BUDGET, ANNOTATION, model, ""));
+                    Optional.ofNullable(budget.getSpec().getSelector()).ifPresent(selector -> addSearchResultsToModel(selector.getMatchLabels(), meta, POD_DISRUPTION_BUDGET, SELECTOR, model,
                             getMatchExpressions(selector.getMatchExpressions())));
                 }
             } catch (RuntimeException e) {
-                searchModel.addSearchException(e);
+                model.addSearchException(e);
                 logger.error(e.getMessage(), e);
             }
         }
@@ -622,19 +612,19 @@ public class LabelsService {
     /**
      * Searches labels in PodSecurityPolicies by selected namespace.
      *
-     * @param searchModel - search model
+     * @param model - labels model
      */
-    private void searchInPodSecurityPolicies(LabelsModel searchModel) {
-        V1beta1PodSecurityPolicyList podSecurityPolicyList = kubeAPI.getPolicyV1beta1PodSecurityPolicyList(searchModel);
+    private void searchInPodSecurityPolicies(LabelsModel model) {
+        V1beta1PodSecurityPolicyList podSecurityPolicyList = kubeAPI.getPolicyV1beta1PodSecurityPolicyList(model);
         for (V1beta1PodSecurityPolicy policy : podSecurityPolicyList.getItems()) {
             try {
                 V1ObjectMeta meta = policy.getMetadata();
-                if (!skipKubeNamespace(searchModel, meta)) {
-                    Optional.ofNullable(meta.getLabels()).ifPresent(map -> addSearchResultsToModel(map, meta, POD_SECURITY_POLICY, LABEL, searchModel, ""));
-                    Optional.ofNullable(meta.getAnnotations()).ifPresent(map -> addSearchResultsToModel(map, meta, POD_SECURITY_POLICY, ANNOTATION, searchModel, ""));
+                if (!skipKubeNamespace(model, meta)) {
+                    Optional.ofNullable(meta.getLabels()).ifPresent(map -> addSearchResultsToModel(map, meta, POD_SECURITY_POLICY, LABEL, model, ""));
+                    Optional.ofNullable(meta.getAnnotations()).ifPresent(map -> addSearchResultsToModel(map, meta, POD_SECURITY_POLICY, ANNOTATION, model, ""));
                 }
             } catch (RuntimeException e) {
-                searchModel.addSearchException(e);
+                model.addSearchException(e);
                 logger.error(e.getMessage(), e);
             }
         }
@@ -645,30 +635,30 @@ public class LabelsService {
      * Add search result to model.
      *
      * @param map              - labels, annotations or selectors map
-     * @param metadata         - resource metadata
+     * @param meta             - resource meta
      * @param resource         - @{@link Resource}
      * @param resourceProperty - {@link ResourceProperty}
-     * @param searchModel      - @{@link LabelsModel}
+     * @param model            - @{@link LabelsModel}
      * @param additionalInfo   - additional information
      */
-    private void addSearchResultsToModel(Map<String, String> map, V1ObjectMeta metadata, Resource resource, ResourceProperty resourceProperty, LabelsModel searchModel, String additionalInfo) {
+    private void addSearchResultsToModel(Map<String, String> map, V1ObjectMeta meta, Resource resource, ResourceProperty resourceProperty, LabelsModel model, String additionalInfo) {
         for (Map.Entry<String, String> entry : map.entrySet()) {
-            if (searchModel.isSkipHashLabels() && entry.getKey().endsWith("-hash")) {
+            if (model.isSkipHashLabels() && entry.getKey().endsWith("-hash")) {
                 continue;
             }
-            LabelResult newSearchResult = new LabelResult(searchModel.getSearchResults().size() + 1)
+            LabelResult newSearchResult = new LabelResult(model.getSearchResults().size() + 1)
                     .setName(entry.getKey() + "=" + entry.getValue())
-                    .setNamespace(metadata.getNamespace() == null ? "N/A" : metadata.getNamespace())
+                    .setNamespace(meta.getNamespace() == null ? "N/A" : meta.getNamespace())
                     .setResourceType(resource)
-                    .setResourceName(metadata.getName())
+                    .setResourceName(meta.getName())
                     .setResourceProperty(resourceProperty)
                     .setAdditionalInfo(additionalInfo);
-            searchModel.addSearchResult(newSearchResult);
+            model.addSearchResult(newSearchResult);
         }
     }
 
-    private boolean skipKubeNamespace(LabelsModel searchModel, V1ObjectMeta meta) {
-        return searchModel.isSkipKubeNamespaces() && StringUtils.isNotBlank(meta.getNamespace()) && meta.getNamespace().startsWith("kube-");
+    private boolean skipKubeNamespace(LabelsModel model, V1ObjectMeta meta) {
+        return model.isSkipKubeNamespaces() && StringUtils.isNotBlank(meta.getNamespace()) && meta.getNamespace().startsWith("kube-");
     }
 
 

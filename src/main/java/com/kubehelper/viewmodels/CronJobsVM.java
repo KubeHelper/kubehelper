@@ -69,7 +69,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
- * Class for displaying and creating of cron jobs. And View of reports from cron jobs.
+ * View Model for displaying and creating of cron jobs. And View of reports from cron jobs.
  * ViewModel initializes ..kubehelper/pages/cron.zul
  *
  * @author JDev
@@ -92,7 +92,7 @@ public class CronJobsVM implements EventListener<Event> {
     private String cronJobEmail = "";
     private String cronJobDescription = "";
 
-    private boolean wordWrapCommandsInReport;
+    private boolean wordWrapInReport;
 
     private CronJobsModel model;
 
@@ -122,6 +122,13 @@ public class CronJobsVM implements EventListener<Event> {
         commandsResults = new ListModelList<>(model.getCommandsResults());
     }
 
+    /**
+     * Calls after UI render.
+     * <p>
+     * Explanation:
+     * Selectors.wireComponents() in order to be able to @Wire GUI components.
+     * Selectors.wireEventListeners() in order to be able to work with listeners and events.
+     */
     @AfterCompose
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) {
         Selectors.wireComponents(view, this, false);
@@ -369,18 +376,18 @@ public class CronJobsVM implements EventListener<Event> {
 
 
     /**
-     * Refreshes commands history output div.
+     * Refreshes cron jobs reports output div.
      */
     public void refreshReportsOutput() {
         Div cronJobsReportBlock = (Div) Path.getComponent("//indexPage/templateInclude/cronJobsReportOutputId");
         cronJobsReportBlock.getChildren().clear();
-        String style = wordWrapCommandsInReport ? "style=\"white-space: pre-wrap; word-break: keep-all;\"" : "";
+        String style = wordWrapInReport ? "style=\"white-space: pre-wrap; word-break: keep-all;\"" : "";
         cronJobsReportBlock.appendChild(new Html("<pre " + style + "><code>" + model.getSelectedReportRaw() + "</code></pre>"));
         BindUtils.postNotifyChange(this, ".");
     }
 
     /**
-     * Checks if in commands model exists runtime exceptions and shows notification.
+     * Checks if in cron jobs model exists runtime exceptions and shows notification.
      */
     private void checkRuntimeNotificationExceptions() {
         if (StringUtils.isNotBlank(model.getRuntimeNotificationExceptions())) {
@@ -409,8 +416,8 @@ public class CronJobsVM implements EventListener<Event> {
      * @param sources   - Set with labels(keys) for toolbarbuttons.
      */
     private void createReportsToolbarButtons(String toolbarId, List<String> sources) {
-        Vbox commandsSourcesToolbar = (Vbox) Path.getComponent("//indexPage/templateInclude/" + toolbarId);
-        commandsSourcesToolbar.getChildren().clear();
+        Vbox reportsSourcesToolbar = (Vbox) Path.getComponent("//indexPage/templateInclude/" + toolbarId);
+        reportsSourcesToolbar.getChildren().clear();
         sources.forEach(key -> {
             Toolbarbutton toolbarbutton = new Toolbarbutton(key);
             toolbarbutton.setId(getCommandToolbarButtonId(key));
@@ -418,7 +425,7 @@ public class CronJobsVM implements EventListener<Event> {
             toolbarbutton.setStyle("text-align: left;");
             toolbarbutton.addEventListener("onClick", this);
             toolbarbutton.setHflex("1");
-            commandsSourcesToolbar.appendChild(toolbarbutton);
+            reportsSourcesToolbar.appendChild(toolbarbutton);
         });
     }
 
@@ -506,7 +513,7 @@ public class CronJobsVM implements EventListener<Event> {
     }
 
     @Command
-    public void wordWrapCommandsInReports() {
+    public void wordWrapInReports() {
 
     }
 
@@ -634,16 +641,16 @@ public class CronJobsVM implements EventListener<Event> {
         return model.getSelectedReportLabel();
     }
 
-    public void setSelectedCronJobsReportLabel(String selectedCommandsHistory) {
-        model.setSelectedReportLabel(selectedCommandsHistory);
+    public void setSelectedCronJobsReportLabel(String selectedReport) {
+        model.setSelectedReportLabel(selectedReport);
     }
 
-    public boolean isWordWrapCommandsInReport() {
-        return wordWrapCommandsInReport;
+    public boolean isWordWrapInReport() {
+        return wordWrapInReport;
     }
 
-    public void setWordWrapCommandsInReport(boolean wordWrapCommandsInReport) {
-        this.wordWrapCommandsInReport = wordWrapCommandsInReport;
+    public void setWordWrapInReport(boolean wordWrapInReport) {
+        this.wordWrapInReport = wordWrapInReport;
     }
 
     public int getCronJobsReportsFontSize() {

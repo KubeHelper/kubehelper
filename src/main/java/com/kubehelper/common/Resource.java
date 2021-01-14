@@ -19,6 +19,7 @@ package com.kubehelper.common;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.StringJoiner;
 
 /**
  * @author JDev
@@ -119,10 +120,9 @@ public enum Resource {
 
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("Resource{");
-        sb.append("name='").append(name).append('\'');
-        sb.append(", kind='").append(kind).append('\'');
-        sb.append('}');
-        return sb.toString();
+        return new StringJoiner(", ", Resource.class.getSimpleName() + "[", "]")
+                .add("name='" + name + "'")
+                .add("kind='" + kind + "'")
+                .toString();
     }
 }

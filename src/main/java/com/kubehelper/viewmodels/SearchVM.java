@@ -91,6 +91,9 @@ import static com.kubehelper.common.Resource.SERVICE_ACCOUNT;
 import static com.kubehelper.common.Resource.STATEFUL_SET;
 
 /**
+ * View Model for searching for text in resources and visualize results in table.
+ * ViewModel initializes ..kubehelper/pages/search.zul
+ *
  * @author JDev
  */
 @VariableResolver(DelegatingVariableResolver.class)
@@ -100,8 +103,7 @@ public class SearchVM implements EventListener {
 
     private boolean isSearchButtonPressed;
 
-    @Wire
-    private Footer searchGridTotalItemsFooter;
+    private int centerLayoutHeight = 700;
 
     private Set<Resource> selectedResources = new HashSet<>() {{
         add(CONFIG_MAP);
@@ -119,7 +121,7 @@ public class SearchVM implements EventListener {
             PERSISTENT_VOLUME_CLAIM, PERSISTENT_VOLUME, CLUSTER_ROLE_BINDING, CLUSTER_ROLE, ROLE_BINDING, ROLE, NETWORK_POLICY, POD_DISRUPTION_BUDGET, POD_SECURITY_POLICY);
     private ListModelList<SearchResult> searchResults = new ListModelList<>();
 
-    private SearchModel searchModel;
+    private SearchModel model;
 
     @WireVariable
     private CommonService commonService;
@@ -127,18 +129,19 @@ public class SearchVM implements EventListener {
     @WireVariable
     private SearchService searchService;
 
-    private int centerLayoutHeight = 700;
+    @Wire
+    private Footer searchGridTotalItemsFooter;
 
     @Init
     @NotifyChange("*")
     public void init() {
-        searchModel = (SearchModel) Global.ACTIVE_MODELS.computeIfAbsent(Global.SEARCH_MODEL, (k) -> Global.NEW_MODELS.get(Global.SEARCH_MODEL));
+        model = (SearchModel) Global.ACTIVE_MODELS.computeIfAbsent(Global.SEARCH_MODEL, (k) -> Global.NEW_MODELS.get(Global.SEARCH_MODEL));
         onInitPreparations();
     }
 
-    @Listen("onAfterSize=#centerLayoutSearchID")
+    @Listen("onAfterSize=#centerLayoutSearchGrBox")
     public void onAfterSizeCenter(AfterSizeEvent event) {
-        centerLayoutHeight = event.getHeight() - 3;
+        centerLayoutHeight = event.getHeight() - 10;
         BindUtils.postNotifyChange(this, ".");
     }
 
@@ -147,7 +150,8 @@ public class SearchVM implements EventListener {
      * Creates CheckBox components Dynamically after UI render.
      * <p>
      * Explanation:
-     * We need Selectors.wireComponents() in order to be able to @Wire GUI components.
+     * Selectors.wireComponents() in order to be able to @Wire GUI components.
+     * Selectors.wireEventListeners() in order to be able to work with listeners and events.
      */
     @AfterCompose
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) {
@@ -156,12 +160,15 @@ public class SearchVM implements EventListener {
         createKubeResourcesCheckboxes();
     }
 
+    /**
+     * Searches for a string in selected resources.
+     */
     @Command
     @NotifyChange({"totalItems", "searchResults", "filter"})
     public void search() {
-        searchModel.setFilter(new SearchFilter());
-        searchService.search(searchModel, selectedResources);
+        model.setFilter(new SearchFilter());
         clearAllFilterComboboxes();
+        searchService.search(model, selectedResources);
         isSearchButtonPressed = true;
         onInitPreparations();
     }
@@ -188,14 +195,14 @@ public class SearchVM implements EventListener {
      * Prepare view for result depends on filters or new searches
      */
     private void onInitPreparations() {
-        searchModel.setNamespaces(searchModel.getNamespaces().isEmpty() ? commonService.getAllNamespaces() : searchModel.getNamespaces());
-        if (searchModel.getFilter().isFilterActive() && !searchModel.getSearchResults().isEmpty()) {
+        model.setNamespaces(model.getNamespaces().isEmpty() ? commonService.getAllNamespaces() : model.getNamespaces());
+        if (model.getFilter().isFilterActive() && !model.getSearchResults().isEmpty()) {
             filterSearches();
         } else {
-            searchResults = new ListModelList<>(searchModel.getSearchResults());
+            searchResults = new ListModelList<>(model.getSearchResults());
         }
         sortResultsByNamespace();
-        logger.info("Found {} namespaces.", searchModel.getNamespaces());
+        logger.debug("Found {} namespaces.", model.getNamespaces());
     }
 
     private void sortResultsByNamespace() {
@@ -209,7 +216,7 @@ public class SearchVM implements EventListener {
     @NotifyChange({"totalItems", "searchResults"})
     public void filterSearches() {
         searchResults.clear();
-        for (SearchResult searchResult : searchModel.getSearchResults()) {
+        for (SearchResult searchResult : model.getSearchResults()) {
             if (StringUtils.containsIgnoreCase(searchResult.getFoundString(), getFilter().getFoundString()) &&
                     StringUtils.containsIgnoreCase(searchResult.getCreationTime(), getFilter().getCreationTime()) &&
                     StringUtils.containsIgnoreCase(searchResult.getAdditionalInfo(), getFilter().getAdditionalInfo()) &&
@@ -228,12 +235,8 @@ public class SearchVM implements EventListener {
     @Command
     @NotifyChange("*")
     public void clearAll() {
-        searchModel.setSearchResults(new ListModelList<>())
-                .setFilter(new SearchFilter())
-                .setNamespaces(commonService.getAllNamespaces())
-                .setSelectedNamespace("all")
-                .setSearchString("")
-                .setSearchExceptions(new ArrayList<>());
+        model = new SearchModel();
+        Global.ACTIVE_MODELS.replace(Global.SEARCH_MODEL, model);
         searchResults = new ListModelList<>();
         clearAllFilterComboboxes();
     }
@@ -315,6 +318,11 @@ public class SearchVM implements EventListener {
         window.doModal();
     }
 
+    /**
+     * Shows full resource definition in popup window.
+     *
+     * @param item - @{@link SearchResult} item.
+     */
     @Command
     public void showFullDefinition(@BindingParam("item") SearchResult item) {
         Resource resource = item.getRawResourceType() == ENV_VARIABLE ? POD : item.getRawResourceType();
@@ -334,48 +342,6 @@ public class SearchVM implements EventListener {
         return Map.of("resource", resource, "name", name, "title", title, "namespace", namespace, "content", content);
     }
 
-
-    public boolean isSkipKubeNamespaces() {
-        return searchModel.isSkipKubeNamespaces();
-    }
-
-    public void setSkipKubeNamespaces(boolean skipKubeNamespaces) {
-        this.searchModel.setSkipKubeNamespaces(skipKubeNamespaces);
-    }
-
-    public boolean isSkipNativeEnvVars() {
-        return searchModel.isSkipNativeEnvVars();
-    }
-
-    public void setSkipNativeEnvVars(boolean skipNativeEnvVars) {
-        this.searchModel.setSkipNativeEnvVars(skipNativeEnvVars);
-    }
-
-    public String getSelectedNamespace() {
-        return searchModel.getSelectedNamespace();
-    }
-
-    public SearchVM setSelectedNamespace(String selectedNamespace) {
-        this.searchModel.setSelectedNamespace(selectedNamespace);
-        return this;
-    }
-
-    public String getSearchString() {
-        return this.searchModel.getSearchString();
-    }
-
-    public void setSearchString(String searchString) {
-        this.searchModel.setSearchString(searchString);
-    }
-
-    public SearchFilter getFilter() {
-        return searchModel.getFilter();
-    }
-
-    public String getTotalItems() {
-        return String.format("Total Items: %d", searchResults.size());
-    }
-
     /**
      * Returns search results for grid and shows Notification if nothing was found or/and error window if some errors has occurred while parsing the results.
      *
@@ -386,19 +352,62 @@ public class SearchVM implements EventListener {
             Notification.show("Nothing found.", "info", searchGridTotalItemsFooter, "before_end", 2000);
         }
         if (isSearchButtonPressed && !searchResults.isEmpty()) {
-            Notification.show("Found: " + searchResults.size() + " items", "info", searchGridTotalItemsFooter, "before_end", 2000);
+            Notification.show(String.format("Found %s items", searchResults.size()), "info", searchGridTotalItemsFooter, "before_end", 2000);
         }
-        if (isSearchButtonPressed && searchModel.hasSearchErrors()) {
-            Window window = (Window) Executions.createComponents(Global.PATH_TO_ERROR_RESOURCE_ZUL, null, Map.of("errors", searchModel.getSearchExceptions()));
+        if (isSearchButtonPressed && model.hasSearchErrors()) {
+            Window window = (Window) Executions.createComponents(Global.PATH_TO_ERROR_RESOURCE_ZUL, null, Map.of("errors", model.getSearchExceptions()));
             window.doModal();
-            searchModel.setSearchExceptions(new ArrayList<>());
+            model.setSearchExceptions(new ArrayList<>());
         }
         isSearchButtonPressed = false;
         return searchResults;
     }
 
+
+    public boolean isSkipKubeNamespaces() {
+        return model.isSkipKubeNamespaces();
+    }
+
+    public void setSkipKubeNamespaces(boolean skipKubeNamespaces) {
+        this.model.setSkipKubeNamespaces(skipKubeNamespaces);
+    }
+
+    public boolean isSkipNativeEnvVars() {
+        return model.isSkipNativeEnvVars();
+    }
+
+    public void setSkipNativeEnvVars(boolean skipNativeEnvVars) {
+        this.model.setSkipNativeEnvVars(skipNativeEnvVars);
+    }
+
+    public String getSelectedNamespace() {
+        return model.getSelectedNamespace();
+    }
+
+    public SearchVM setSelectedNamespace(String selectedNamespace) {
+        this.model.setSelectedNamespace(selectedNamespace);
+        return this;
+    }
+
+    public String getSearchString() {
+        return this.model.getSearchString();
+    }
+
+    public void setSearchString(String searchString) {
+        this.model.setSearchString(searchString);
+    }
+
+    public SearchFilter getFilter() {
+        return model.getFilter();
+    }
+
+    public String getTotalItems() {
+        return String.format("Total Items: %d", searchResults.size());
+    }
+
+
     public List<String> getNamespaces() {
-        return searchModel.getNamespaces();
+        return model.getNamespaces();
     }
 
     public String getMainGridHeight() {

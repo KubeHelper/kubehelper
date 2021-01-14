@@ -66,10 +66,6 @@ public class Config {
         return cacheManager;
     }
 
-//    @PostConstruct
-//    public void initCache() {
-//    }
-
     public void setGitUrl(String gitUrl) {
         cacheManager.getCache(CONFIGS_CACHE).put(GIT_URL, gitUrl);
     }
