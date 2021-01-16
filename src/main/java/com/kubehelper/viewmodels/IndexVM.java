@@ -71,14 +71,14 @@ public class IndexVM {
     public void init() {
 //        pageModel = new DashboardModel();
 //        pageModel = new SearchModel();
-        pageModel = Global.ACTIVE_MODELS.computeIfAbsent(Global.DASHBOARD_MODEL, (k) -> Global.NEW_MODELS.get(Global.DASHBOARD_MODEL));
+//        pageModel = Global.ACTIVE_MODELS.computeIfAbsent(Global.DASHBOARD_MODEL, (k) -> Global.NEW_MODELS.get(Global.DASHBOARD_MODEL));
 //        pageModel = Global.ACTIVE_MODELS.computeIfAbsent(Global.EVENTS_MODEL, (k) -> Global.NEW_MODELS.get(Global.EVENTS_MODEL));
 //        pageModel = Global.ACTIVE_MODELS.computeIfAbsent(Global.IPS_AND_PORTS_MODEL, (k) -> Global.NEW_MODELS.get(Global.IPS_AND_PORTS_MODEL));
 //        pageModel = Global.ACTIVE_MODELS.computeIfAbsent(Global.SEARCH_MODEL, (k) -> Global.NEW_MODELS.get(Global.SEARCH_MODEL));
 //        pageModel = Global.ACTIVE_MODELS.computeIfAbsent(Global.SECURITY_MODEL, (k) -> Global.NEW_MODELS.get(Global.SECURITY_MODEL));
 //        pageModel = Global.ACTIVE_MODELS.computeIfAbsent(Global.COMMANDS_MODEL, (k) -> Global.NEW_MODELS.get(Global.COMMANDS_MODEL));
 //        pageModel = Global.ACTIVE_MODELS.computeIfAbsent(Global.CRON_JOBS_MODEL, (k) -> Global.NEW_MODELS.get(Global.CRON_JOBS_MODEL));
-//        pageModel = Global.ACTIVE_MODELS.computeIfAbsent(Global.CONFIGS_MODEL, (k) -> Global.NEW_MODELS.get(Global.CONFIGS_MODEL));
+        pageModel = Global.ACTIVE_MODELS.computeIfAbsent(Global.CONFIGS_MODEL, (k) -> Global.NEW_MODELS.get(Global.CONFIGS_MODEL));
 //        pageModel = Global.ACTIVE_MODELS.computeIfAbsent(Global.LABELS_MODEL, (k) -> Global.NEW_MODELS.get(Global.LABELS_MODEL));
         currentModelName = pageModel.getName();
     }

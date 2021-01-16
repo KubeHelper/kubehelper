@@ -536,15 +536,15 @@ public class CronJobsVM implements EventListener<Event> {
 
 
     public String getCommandsGridHeight() {
-        return centerLayoutHeight * 0.3 + "px";
+        return centerLayoutHeight * 0.31 + "px";
     }
 
     public String getNewCronJobBoxHeight() {
-        return centerLayoutHeight * 0.19 + "px";
+        return centerLayoutHeight * 0.15 + "px";
     }
 
     public String getCronJobsListGroupBoxHeight() {
-        return centerLayoutHeight > 1200 ? centerLayoutHeight * 0.455 + "px" : centerLayoutHeight * 0.44 + "px";
+        return centerLayoutHeight > 1200 ? centerLayoutHeight * 0.46 + "px" : centerLayoutHeight * 0.42 + "px";
     }
 
     public CommandsFilter getFilter() {

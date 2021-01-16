@@ -512,7 +512,11 @@ public class LabelsVM implements EventListener {
     }
 
     public String getMainGridHeight() {
-        return centerLayoutHeight - 43 + "px";
+        return centerLayoutHeight - 80 + "px";
+    }
+
+    public String getMainGridGrBoxHeight() {
+        return centerLayoutHeight - 40 + "px";
     }
 
     public String getMainGridGroupedHeight() {

@@ -3,31 +3,31 @@
         <north title="Ips Ports" collapsible="true" border="none">
             <groupbox id="labelsConfigGroupBox" width="100%" closable="false">
                 <caption iconSclass="z-icon-sliders" label="Search configuration"/>
-                <!--                <vbox height="100%" width="100%">-->
-                <hbox id="menuHbox" height="100%" width="100%" align="stretch">
-                    <cell id="clearAllCell" width="10%" tooltip="clearAllTooltip" valign="middle">
-                        <button id="clearAll" iconSclass="z-icon-eraser" width="100%" label="Clear all" onClick="@command('clearAll')"/>
-                    </cell>
-                    <separator width="15px" orient="vertical" bar="true"/>
-                    <cell id="namespacesCell" width="20%" valign="middle">
-<!--                        <hlayout id="menuHlayout" valign="middle">-->
-                            <label value="Namespace: "/>
-                            <combobox tooltip="namespacesTooltip" id="namespacesCBox" hflex="1" model="@load(ipsAndPortsVM.namespaces)"
-                                      selectedItem="@bind(ipsAndPortsVM.selectedNamespace)" readonly="true">
-                                <template name="model">
-                                    <comboitem label="@load(each)"/>
-                                </template>
-                            </combobox>
-<!--                        </hlayout>-->
-                    </cell>
-                    <cell width="59%">
-                    </cell>
-                    <cell id="cellGetBtn" width="10%" valign="middle">
-                        <button id="getIpsBtn" label="Search" iconSclass="z-icon-search" onClick="@command('search')" width="100%"/>
-                    </cell>
-                </hbox>
-                <separator width="100%" orient="horizontal" bar="false"/>
-                <!--                </vbox>-->
+                <vbox height="100%" width="100%">
+                    <hbox id="menuHbox" height="100%" width="100%" align="stretch">
+                        <cell id="clearAllCell" width="10%" tooltip="clearAllTooltip" valign="middle">
+                            <button id="clearAll" iconSclass="z-icon-eraser" width="100%" label="Clear all" onClick="@command('clearAll')"/>
+                        </cell>
+                        <separator width="15px" orient="vertical" bar="true"/>
+                        <cell id="namespacesCell" width="20%" valign="middle">
+                            <hlayout id="menuHlayout" valign="middle">
+                                <label value="Namespace: "/>
+                                <combobox tooltip="namespacesTooltip" id="namespacesCBox" hflex="1" model="@load(ipsAndPortsVM.namespaces)"
+                                          selectedItem="@bind(ipsAndPortsVM.selectedNamespace)" readonly="true">
+                                    <template name="model">
+                                        <comboitem label="@load(each)"/>
+                                    </template>
+                                </combobox>
+                            </hlayout>
+                        </cell>
+                        <cell width="59%">
+                        </cell>
+                        <cell id="cellGetBtn" width="10%" valign="middle">
+                            <button id="getIpsBtn" label="Search" iconSclass="z-icon-search" onClick="@command('search')" width="100%"/>
+                        </cell>
+                    </hbox>
+                    <separator width="100%" orient="horizontal" bar="false"/>
+                </vbox>
             </groupbox>
         </north>
         <center id="centerLayoutIpsAndPortsID" vflex="1" border="none">

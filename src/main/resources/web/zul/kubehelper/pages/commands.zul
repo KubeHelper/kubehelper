@@ -19,7 +19,7 @@
                     <tab label="Commands Management" id="commandsManagement"/>
                     <tab label="Commands History" id="commandsHistory"/>
                 </tabs>
-                <tabpanels>
+                <tabpanels id="commandsTabPanels">
                     <tabpanel>
                         <grid id="commandsGridID" model="@load(commandsVM.commandsResults)" height="@load(commandsVM.commandsGridHeight)">
                             <auxhead id="commandsGridAuxHead">
@@ -103,17 +103,6 @@
                                     <vbox width="100%" height="50%" pack="end">
                                         <button id="runCommandBtn" iconSclass="fas fa-terminal" onClick="@command('run')" width="100%"/>
                                     </vbox>
-                                    <!--                                    <vbox width="100%" pack="end">-->
-                                    <!--                                        <hbox width="100%" pack="center">-->
-                                    <!--                                            <label value="Shell: "/>-->
-                                    <!--                                            <combobox model="@load(commandsVM.shells)" selectedItem="@bind(commandsVM.selectedShell)" readonly="true">-->
-                                    <!--                                                <template name="model">-->
-                                    <!--                                                    <comboitem label="@load(each)"/>-->
-                                    <!--                                                </template>-->
-                                    <!--                                            </combobox>-->
-                                    <!--                                        </hbox>-->
-                                    <!--                                        <button id="runCommandBtn" iconSclass="fas fa-terminal" onClick="@command('run')" width="100%"/>-->
-                                    <!--                                    </vbox>-->
                                 </cell>
                             </hbox>
                         </groupbox>

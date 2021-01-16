@@ -568,7 +568,7 @@ public class SecurityVM {
 
     public ListModelList<RBACResult> getRbacsResults() {
         showNotificationAndExceptions(isGetRBACsButtonPressed, rbacsResults, rbacsGridFooter);
-        isGetPodsSecurityContextsButtonPressed = false;
+        isGetRBACsButtonPressed = false;
         return rbacsResults;
     }
 
@@ -718,7 +718,11 @@ public class SecurityVM {
     }
 
     public String getRolesGridHeight() {
-        return centerLayoutHeight * 0.45 + "px";
+        return centerLayoutHeight * 0.3 + "px";
+    }
+
+    public String getRolesGridGrBoxHeight() {
+        return centerLayoutHeight * 0.3 + 40 + "px";
     }
 
     public String getSubjectsGridHeight() {
@@ -726,27 +730,56 @@ public class SecurityVM {
     }
 
     public String getRoleRulesGridHeight() {
-        return centerLayoutHeight * 0.35 + "px";
+
+        return centerLayoutHeight > 1200 ? centerLayoutHeight * 0.34 + "px" : centerLayoutHeight * 0.32 + "px";
+    }
+
+    public String getSubjectsGridGrBoxHeight() {
+        return centerLayoutHeight * 0.15 + 40 + "px";
+    }
+
+    public String getRoleRulesGridGrBoxHeight() {
+        return centerLayoutHeight > 1200 ? centerLayoutHeight * 0.34 + 40 + "px" : centerLayoutHeight * 0.32 + 40 + "px";
     }
 
     public String getRbacsGridHeight() {
-        return centerLayoutHeight + "px";
+        return centerLayoutHeight - 155 + "px";
     }
 
     public String getPodsSecurityContextsGridHeight() {
-        return centerLayoutHeight + "px";
+        return centerLayoutHeight - 155 + "px";
     }
 
     public String getContainersSecurityContextsGridHeight() {
-        return centerLayoutHeight + "px";
+        return centerLayoutHeight - 155 + "px";
     }
 
     public String getServiceAccountsGridHeight() {
-        return centerLayoutHeight + "px";
+        return centerLayoutHeight - 155 + "px";
     }
 
     public String getPodsSecurityPoliciesGridHeight() {
-        return centerLayoutHeight + "px";
+        return centerLayoutHeight - 155 + "px";
+    }
+
+    public String getRbacsGridGrBoxHeight() {
+        return centerLayoutHeight - 115 + "px";
+    }
+
+    public String getPodsSecurityContextsGridGrBoxHeight() {
+        return centerLayoutHeight - 115 + "px";
+    }
+
+    public String getContainersSecurityContextsGridGrBoxHeight() {
+        return centerLayoutHeight - 115 + "px";
+    }
+
+    public String getServiceAccountsGridGrBoxHeight() {
+        return centerLayoutHeight - 115 + "px";
+    }
+
+    public String getPodsSecurityPoliciesGridGrBoxHeight() {
+        return centerLayoutHeight - 115 + "px";
     }
 
     public boolean isSkipKubeNamespaces() {

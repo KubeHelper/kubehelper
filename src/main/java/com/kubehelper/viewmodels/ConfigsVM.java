@@ -43,11 +43,14 @@ import org.zkoss.zk.ui.event.AfterSizeEvent;
 import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
+import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zk.ui.util.Notification;
 import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zkplus.spring.SpringUtil;
+import org.zkoss.zul.Hbox;
+import org.zkoss.zul.Vlayout;
 import org.zkoss.zul.Window;
 
 import java.io.File;
@@ -80,9 +83,10 @@ public class ConfigsVM {
     @WireVariable("kubeHelperCache")
     private KubeHelperCache cache;
 
-    private String gitRepoLocationPath = "/Volumes/MAC_WORK/tmp/kubehelper/git";
-//    private boolean autoSyncEnabled;
+    private String gitRepoLocationPath;
 
+    @Wire("#mainConfigLayout")
+    private Vlayout notificationContainer;
 
     @Init
     public void init() {
@@ -124,7 +128,7 @@ public class ConfigsVM {
         commonService.checkAndStartJobsFromConfig(model, config);
         if (checkExceptions()) {
             commonService.updateConfigFile(model);
-            Notification.show("The configurations was successfully saved.", "info", null, "before_end", 4000);
+            Notification.show("The configurations was successfully saved.", "info", notificationContainer, "top_right", 4000);
         }
         BindUtils.postNotifyChange(this, ".");
         Clients.evalJavaScript("highlightConfig();");
@@ -134,7 +138,7 @@ public class ConfigsVM {
     @Command
     public void cloneGitRepo() {
         if (StringUtils.isBlank(getGitUrl())) {
-            Notification.show("Please enter a valid git url in order to clone the repository.", "error", null, "before_end", 5000);
+            Notification.show("Please enter a valid git url in order to clone the repository.", "error", notificationContainer, "top_right", 5000);
             return;
         }
         try {
@@ -158,11 +162,11 @@ public class ConfigsVM {
             }
             cloneCommand.setCredentialsProvider(new UsernamePasswordCredentialsProvider(cache.getGitUsername(), cache.getGitPassword())).call();
         } catch (GitAPIException e) {
-            model.addException("Git clone Error. Error:" + e.getMessage(), e);
+            model.addException("Git clone Error. Error: " + e.getMessage(), e);
             logger.error(e.getMessage(), e);
         }
         if (checkExceptions()) {
-            Notification.show(String.format("The repository %s was successfully cloned.", cache.getGitUrl()), "info", null, "before_end", 4000);
+            Notification.show(String.format("The repository %s was successfully cloned. ", cache.getGitUrl()), "info", notificationContainer, "top_right", 4000);
         }
     }
 

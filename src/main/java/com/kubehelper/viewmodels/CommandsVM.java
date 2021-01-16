@@ -64,6 +64,7 @@ import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.Slider;
 import org.zkoss.zul.Tabbox;
+import org.zkoss.zul.Tabpanels;
 import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Toolbarbutton;
 import org.zkoss.zul.Vbox;
@@ -112,9 +113,6 @@ public class CommandsVM implements EventListener<Event> {
     private CommonService commonService;
 
     @WireVariable
-    private KubeHelperCache config;
-
-    @WireVariable
     private CommandsService commandsService;
 
     @Wire
@@ -131,6 +129,9 @@ public class CommandsVM implements EventListener<Event> {
 
     @Wire
     private Button minusBtn;
+
+    @Wire("#commandsTabPanels")
+    private Tabpanels notificationContainer;
 
     @Init
     @NotifyChange("*")
@@ -208,7 +209,7 @@ public class CommandsVM implements EventListener<Event> {
      */
     private void checkRuntimeNotificationExceptions() {
         if (StringUtils.isNotBlank(commandsModel.getRuntimeNotificationExceptions())) {
-            Notification.show(commandsModel.getRuntimeNotificationExceptions(), "error", commandOutputGrBox, "before_end", 5000);
+            Notification.show(commandsModel.getRuntimeNotificationExceptions(), "error", notificationContainer, "bottom_right", 5000);
         }
     }
 
@@ -234,7 +235,7 @@ public class CommandsVM implements EventListener<Event> {
     @NotifyChange({"executedCommandOutput"})
     public void run() {
         if (StringUtils.isBlank(commandsModel.getCommandToExecuteEditable())) {
-            Notification.show("Please select or put the command for execute.", "info", commandOutputGrBox, "bottom_right", 3000);
+            Notification.show("Please select or put the command for execute.", "warning", notificationContainer, "top_right", 3000);
             return;
         }
         commandsService.run(commandsModel);
@@ -280,9 +281,6 @@ public class CommandsVM implements EventListener<Event> {
     @Command
     public void synchronizeCommandToExecute() {
         commandsModel.setCommandToExecute(getCommandWithoutUnnecessaryWhitespaces(commandsModel.getCommandToExecuteEditable()));
-//        if (isHotReplacementEnabled()) {
-//            commandsService.commandHotReplacement(commandsModel);
-//        }
         BindUtils.postNotifyChange(this, "commandToExecute", "commandToExecuteEditable");
     }
 
@@ -298,22 +296,12 @@ public class CommandsVM implements EventListener<Event> {
 
 
     /**
-     * Changes resources in comboxex depend on namespace in commands window.
-     */
-//    @Command
-//    public void changeResourcesInComboxexDependOnNamespace() {
-//        commandsService.fetchResourcesDependsOnNamespace(commandsModel);
-//        BindUtils.postNotifyChange(this, "namespacedPods", "namespacedDeployments", "namespacedStatefulSets", "namespacedReplicaSets", "namespacedDaemonSets", "namespacedConfigMaps", "namespacedServices", "namespacedJobs");
-//        Notification.show(String.format("New resources for %s namespace, successfully fetched.", commandsModel.getSelectedNamespace()), "info", commandOutputGrBox, "bottom_right", 2000);
-//    }
-
-    /**
      * Shows popup window with executed command output.
      */
     @Command
     public void commandOutputFullSize() {
         if (StringUtils.isAnyEmpty(commandsModel.getCommandToExecute(), commandsModel.getExecutedCommandOutput())) {
-            Notification.show("Cannot open full screen mode if command is not executed.", "warning", commandOutputGrBox, "bottom_right", 3000);
+            Notification.show("Cannot open full screen mode if command is not executed.", "warning", notificationContainer, "top_right", 3000);
             return;
         }
         Map<String, String> params = Map.of("title", "Command Output", "command", commandsModel.getCommandToExecute(), "commandOutput", commandsModel.getExecutedCommandOutput());
@@ -328,7 +316,7 @@ public class CommandsVM implements EventListener<Event> {
      */
     public ListModelList<CommandsResult> getCommandsResults() {
         if (isOnInit && commandsResults.isEmpty()) {
-            Notification.show("Nothing found.", "info", commandsGridFooter, "bottom_right", 2000);
+            Notification.show("Nothing found.", "info", commandsGridFooter, "before_end", 2000);
         }
         if (isOnInit && !commandsResults.isEmpty()) {
             Notification.show("Loaded: " + commandsResults.size() + " items", "info", commandsGridFooter, "before_end", 2000);
@@ -350,7 +338,7 @@ public class CommandsVM implements EventListener<Event> {
         highlightBlock.getChildren().clear();
 
         if (StringUtils.isBlank(commandsModel.getExecutedCommandOutput())) {
-            Notification.show("Command execution output is empty.", "info", commandOutputGrBox, "bottom_right", 3000);
+            Notification.show("Command execution output is empty.", "info", commandOutputGrBox, "before_end", 3000);
         }
 
         highlightBlock.appendChild(new Html("<pre><code>" + commandsModel.getExecutedCommandOutput() + "</code></pre>"));
@@ -386,7 +374,7 @@ public class CommandsVM implements EventListener<Event> {
     public void saveCommands(@BindingParam("commands") String commands) {
         commandsService.updateCommands(commandsModel, commands);
         if (checkExceptions()) {
-            Notification.show(String.format("The Commands %s was successfully saved.", commandsModel.getSelectedCommandsSourceLabel()), "info", null, "before_end", 4000);
+            Notification.show(String.format("The Commands %s was successfully saved.", commandsModel.getSelectedCommandsSourceLabel()), "info", notificationContainer, "bottom_right", 4000);
         }
         BindUtils.postNotifyChange(this, ".");
     }
@@ -415,7 +403,7 @@ public class CommandsVM implements EventListener<Event> {
     public void addNewCommandsFile(@BindingParam("newCommandsFilePath") String newCommandsFilePath) {
         commandsService.addNewCommandsFile(commandsModel, newCommandsFilePath);
         if (checkExceptions()) {
-            Notification.show(String.format("The Commands %s was successfully created.", newCommandsFilePath), "info", null, "bottom_left", 5000);
+            Notification.show(String.format("The Commands %s was successfully created.", newCommandsFilePath), "info", notificationContainer, "bottom_right", 5000);
             refreshCommandsManagement();
         }
     }
@@ -428,11 +416,11 @@ public class CommandsVM implements EventListener<Event> {
                     if (Messagebox.ON_OK.equals(e.getName())) {
                         if (Files.deleteIfExists(Paths.get(commandsModel.getSelectedSourceFileResult().getFilePath()))) {
                             Notification.show(String.format("The Commands file %s was successfully deleted.",
-                                    commandsModel.getSelectedSourceFileResult().getFilePath()), "info", null, "bottom_left", 3000);
+                                    commandsModel.getSelectedSourceFileResult().getFilePath()), "info", notificationContainer, "bottom_right", 3000);
                             refreshCommandsManagement();
                         } else {
                             Notification.show(String.format("An error occurred while deleting the file %s.",
-                                    commandsModel.getSelectedSourceFileResult().getFilePath()), "warning", null, "bottom_left", 3000);
+                                    commandsModel.getSelectedSourceFileResult().getFilePath()), "warning", notificationContainer, "bottom_right", 3000);
                         }
                     }
                 }
@@ -507,7 +495,7 @@ public class CommandsVM implements EventListener<Event> {
         commandsModel.setCommandsSources(new HashMap<>());
         commandsService.prepareCommandsManagement(commandsModel);
         redrawCommandsToolbarbuttons("commandsSourcesToolbarID", commandsModel.getCommandsSourcesNamesSortedList(), getCommandToolbarButtonId(commandsModel.getSelectedCommandsSourceLabel()));
-        Notification.show("Commands management state has been updated.", "info", null, "bottom_right", 3000);
+//        Notification.show("Commands management state has been updated.", "info", notificationContainer, "top_right", 3000);
         BindUtils.postNotifyChange(this, ".");
     }
 
@@ -647,7 +635,7 @@ public class CommandsVM implements EventListener<Event> {
     }
 
     public String getCommandOutputHeight() {
-        return centerLayoutHeight * 0.515 + "px";
+        return centerLayoutHeight > 1200 ? centerLayoutHeight * 0.49 + "px" : centerLayoutHeight * 0.46 + "px";
     }
 
     public String getExecutedCommandOutput() {
@@ -803,7 +791,7 @@ public class CommandsVM implements EventListener<Event> {
     }
 
     public String getCommandsManagementSrcPanelHeight() {
-        return centerLayoutHeight - 95 + "px";
+        return centerLayoutHeight - 75 + "px";
     }
 
     public String getCommandsManagementCss() {
@@ -827,7 +815,7 @@ public class CommandsVM implements EventListener<Event> {
     }
 
     public String getCommandsHistorySrcPanelHeight() {
-        return centerLayoutHeight - 95 + "px";
+        return centerLayoutHeight - 75 + "px";
     }
 
     public String getCommandsHistoryHeight() {

@@ -69,9 +69,9 @@
                             </grid>
                         </groupbox>
 
-                        <groupbox id="newCronJobGrBox" closable="false" width="100%" height="@load(cronJobsVM.newCronJobBoxHeight)">
+                        <groupbox id="newCronJobGrBox" closable="false" width="100%">
                             <caption iconSclass="fas fa-plus" label="New cron job"/>
-                            <hbox width="100%" align="center" pack="stretch" vflex="min">
+                            <hbox width="100%" align="center" pack="stretch" height="@load(cronJobsVM.newCronJobBoxHeight)">
                                 <cell width="89.5%" align="left">
                                     <hbox width="100%" align="start" pack="stretch">
                                         <cell width="50%" align="center">
