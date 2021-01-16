@@ -80,7 +80,8 @@ public class DashboardVM {
         model = (DashboardModel) Global.ACTIVE_MODELS.computeIfAbsent(Global.DASHBOARD_MODEL, (k) -> Global.NEW_MODELS.get(Global.DASHBOARD_MODEL));
         dashboardService.showDashboard(model);
         commonService.checkConfigAndFileLocation(model);
-        commonService.checkAndStartJobsFromConfig(model);
+        String configString = commonService.getResourceAsStringByPath(Global.PATH_TO_CONFIG_FILE);
+        commonService.checkAndStartJobsFromConfig(model, configString);
         checkExceptions();
     }
 

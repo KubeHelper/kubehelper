@@ -50,7 +50,7 @@
                          style="overflow: auto;font-family: Courier, Monaco, monospace;display: flex;line-height: 1.3; font-size: 14px;cursor: text;"
                          onSaveConfigEvent="@command('saveConfig', config=event.data.config)">
                         <!--                    <textbox id="configMainDivId" class='highlightConfig' rows="1000" width="100%" value="@bind(configsVM.config)"/>-->
-                        <n:div id="configContentDivId" width="100%" height="100%" class="input" contenteditable="true">
+                        <n:div id="configContentDivId" style="white-space: pre;word-wrap: normal;" width="100%" height="100%" class="input" contenteditable="true">
                             <n:pre>
                                 <n:code class="toml">${configsVM.config}</n:code>
                             </n:pre>

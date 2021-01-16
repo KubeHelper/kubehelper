@@ -35,6 +35,7 @@ import io.fabric8.kubernetes.client.internal.SerializationUtils;
 import io.kubernetes.client.openapi.ApiException;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
 import io.kubernetes.client.openapi.models.V1NamespaceList;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -389,23 +390,47 @@ public class CommonService {
      *
      * @param model - @{@link DashboardModel}
      */
-    public void checkAndStartJobsFromConfig(PageModel model) {
+    public void checkAndStartJobsFromConfig(PageModel model, String configString) {
         try {
-            Global.config = new KubeHelperConfig(getResourceAsStringByPath(Global.PATH_TO_CONFIG_FILE), model);
+            Global.config = new KubeHelperConfig(configString, model);
 
             //check if config has new jobs for start and starts if active otherwise add new job to jobs list
             for (CronJobResult cronJob : Global.config.getCronJobsResults(cronJobsReportsPath)) {
-                if (!Global.CRON_JOBS.containsKey(cronJob.getName())) {
-                    if (cronJob.isActive()) {
-                        schedulerService.startCronJob(cronJob, model);
-                    } else {
-                        Global.CRON_JOBS.put(cronJob.getName(),  new KubeHelperScheduledFuture(cronJob, null));
-                    }
+
+                //if job exists and inactive and will be active over config changes
+                if (Global.CRON_JOBS.containsKey(cronJob.getName()) && !Global.CRON_JOBS.get(cronJob.getName()).isActive() && cronJob.isActive()) {
+                    schedulerService.rerunCronJob(cronJob);
+                }
+
+                //if job does not exists/new active job from config
+                if (!Global.CRON_JOBS.containsKey(cronJob.getName()) && cronJob.isActive()) {
+                    schedulerService.startCronJob(cronJob, model);
+                }
+
+                //if not exists and not active cron job
+                if (!Global.CRON_JOBS.containsKey(cronJob.getName()) && !cronJob.isActive()) {
+                    Global.CRON_JOBS.put(cronJob.getName(), new KubeHelperScheduledFuture(cronJob, null));
                 }
             }
+            checkDifferencesBetweenActiveAndConfigJobs();
         } catch (RuntimeException e) {
             model.addException("An error occurred while reading configurations file. Error: " + e.getMessage(), e);
             logger.error("An error occurred while reading configurations file. Error: " + e.getMessage());
+        }
+    }
+
+    private void checkDifferencesBetweenActiveAndConfigJobs() {
+        List<String> configJobs = Global.config.getCronJobsResults(cronJobsReportsPath).stream().map(CronJobResult::getName).collect(Collectors.toList());
+        List<String> activeJobs = new ArrayList<>(Global.CRON_JOBS.keySet());
+        List<String> differences = new ArrayList<>(CollectionUtils.disjunction(activeJobs, configJobs));
+        if (!differences.isEmpty()) {
+            differences.forEach(jobName -> {
+                try {
+                    Objects.nonNull(Global.CRON_JOBS.remove(jobName));
+                } catch (RuntimeException e) {
+                    logger.error("An error occurred while stopping cron job. Error: " + e.getMessage());
+                }
+            });
         }
     }
 

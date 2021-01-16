@@ -17,9 +17,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package com.kubehelper.services;
 
-import com.kubehelper.domain.models.ConfigsModel;
-import com.moandjiezana.toml.Toml;
-import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,10 +24,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.io.File;
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  *The config service contains method to validate and store configuration.
@@ -59,60 +52,4 @@ public class ConfigsService {
 //        reportEntryTemplate = commonService.getClasspathResourceAsStringByPath(historyEntryTemplateSrcPath);
     }
 
-    /**
-     * Search for custom kubehelper config.
-     *
-     * @param configsModel - config model.
-     * @return - found set with path to custom config.
-     */
-    private Set<String> checkCustomKubeHelperConfig(ConfigsModel configsModel) {
-        Set<String> customConfig = new HashSet<>();
-        try {
-            customConfig = commonService.getFilesPathsByDirAndExtension(customConfigLocationSearchPath, 10, "kubehelper-config.toml");
-        } catch (IOException e) {
-            configsModel.addException("An error occurred while searching for custom configuration. Error " + e.getMessage(), e);
-            logger.error("An error occurred while searching for custom configuration. Error " + e.getMessage());
-        }
-        return customConfig;
-    }
-
-    /**
-     * Updates config after user input.
-     * 1. Validate
-     * 2. Search for custom config, if exist, than overwrite.
-     * 2. If custom config does not exists than overwrite default config. overwrite.
-     *
-     * @param configsModel - configs model.
-     */
-    public void updateConfig(ConfigsModel configsModel) {
-
-        //validate
-        try {
-            new Toml().read(configsModel.getConfig());
-        } catch (IllegalStateException e) {
-            configsModel.addException("Configuration file is not valid. Error: " + e.getMessage(), e);
-            logger.error("Configuration file is not valid. Error " + e.getMessage());
-            return;
-        }
-
-        //search custom config
-        Set<String> customConfigPath = checkCustomKubeHelperConfig(configsModel);
-        if (!customConfigPath.isEmpty()) {
-            try {
-                FileUtils.writeStringToFile(new File(customConfigPath.stream().findFirst().get()), configsModel.getConfig());
-                return;
-            } catch (IOException e) {
-                configsModel.addException("An error occurred while updating config file. Error: " + e.getMessage(), e);
-                logger.error("An error occurred while updating config file. Error " + e.getMessage());
-            }
-        }
-
-        //overwrite default config
-        try {
-            FileUtils.writeStringToFile(new File(defaultConfigFilePath), configsModel.getConfig());
-        } catch (IOException e) {
-            configsModel.addException("An error occurred while updating default config file. Error: " + e.getMessage(), e);
-            logger.error("An error occurred while updating default config file. Error " + e.getMessage());
-        }
-    }
 }

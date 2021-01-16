@@ -104,7 +104,7 @@ public class CronJobsService {
     }
 
     public void removeCronJob(CronJobResult job, CronJobsModel model) {
-        Global.config.deleteCronjob(job.getName());
+        Global.config.removeCronjob(job.getName());
         commonService.updateConfigFile(model);
     }
 

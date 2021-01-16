@@ -43,6 +43,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ScheduledFuture;
 
 /**
@@ -100,9 +101,9 @@ public class SchedulerService {
     /**
      * Builds cron report. Report from template and parameters.
      *
-     * @param name - cron job name.
+     * @param name    - cron job name.
      * @param command - cron job command.
-     * @param output - report output.
+     * @param output  - report output.
      * @return - build string report for this run.
      */
     private String buildReport(String name, String command, String output) {
@@ -167,7 +168,9 @@ public class SchedulerService {
             }
 
             //add cron run count
-            Global.CRON_JOBS.get(job.getName()).addRun();
+            if (Objects.nonNull(Global.CRON_JOBS.get(job.getName()))) {
+                Global.CRON_JOBS.get(job.getName()).addRun();
+            }
         };
     }
 }

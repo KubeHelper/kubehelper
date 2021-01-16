@@ -120,7 +120,7 @@ public class KubeHelperConfig {
      *
      * @param name - job name.
      */
-    public void deleteCronjob(String name) {
+    public void removeCronjob(String name) {
         Iterator<CronJob> iterator = cron_job.iterator();
         while (iterator.hasNext()) {
             CronJob next = iterator.next();

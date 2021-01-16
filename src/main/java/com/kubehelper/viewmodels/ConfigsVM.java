@@ -29,6 +29,7 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.env.Environment;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.AfterCompose;
 import org.zkoss.bind.annotation.BindingParam;
@@ -39,7 +40,6 @@ import org.zkoss.bind.annotation.Init;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.AfterSizeEvent;
-import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
@@ -47,6 +47,7 @@ import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zk.ui.util.Notification;
 import org.zkoss.zkplus.spring.DelegatingVariableResolver;
+import org.zkoss.zkplus.spring.SpringUtil;
 import org.zkoss.zul.Window;
 
 import java.io.File;
@@ -67,8 +68,9 @@ public class ConfigsVM {
 
     private int centerLayoutHeight = 700;
 
-    private ConfigsModel configsModel;
+    private ConfigsModel model;
 
+    //    TODO REMOVE
     @WireVariable
     private ConfigsService configsService;
 
@@ -78,17 +80,16 @@ public class ConfigsVM {
     @WireVariable("kubeHelperCache")
     private KubeHelperCache cache;
 
-    //TODO fix value
-//    @Value("${kubehelper.git.repo.location.path}")
     private String gitRepoLocationPath = "/Volumes/MAC_WORK/tmp/kubehelper/git";
-
-    private boolean autoSyncEnabled;
+//    private boolean autoSyncEnabled;
 
 
     @Init
     public void init() {
-        configsModel = new ConfigsModel();
-        configsModel.setConfig(commonService.getResourceAsStringByPath(Global.PATH_TO_CONFIG_FILE));
+        model = new ConfigsModel();
+        model.setConfig(commonService.getResourceAsStringByPath(Global.PATH_TO_CONFIG_FILE));
+        Environment env = SpringUtil.getApplicationContext().getEnvironment();
+        gitRepoLocationPath = env.getProperty("kubehelper.git.repo.location.path");
     }
 
     /**
@@ -112,12 +113,17 @@ public class ConfigsVM {
         BindUtils.postNotifyChange(this, ".");
     }
 
+    /**
+     * Saves updated config into Global.config, into file and starts/stops cron jobs.
+     *
+     * @param config - config string from client.
+     */
     @Command
     public void saveConfig(@BindingParam("config") String config) {
-        configsModel.setConfig(config);
-        //TODO parse config to toml and do what in changed commands is
-        configsService.updateConfig(configsModel);
+        model.setConfig(config);
+        commonService.checkAndStartJobsFromConfig(model, config);
         if (checkExceptions()) {
+            commonService.updateConfigFile(model);
             Notification.show("The configurations was successfully saved.", "info", null, "before_end", 4000);
         }
         BindUtils.postNotifyChange(this, ".");
@@ -152,7 +158,7 @@ public class ConfigsVM {
             }
             cloneCommand.setCredentialsProvider(new UsernamePasswordCredentialsProvider(cache.getGitUsername(), cache.getGitPassword())).call();
         } catch (GitAPIException e) {
-            configsModel.addException("Git clone Error. Error:" + e.getMessage(), e);
+            model.addException("Git clone Error. Error:" + e.getMessage(), e);
             logger.error(e.getMessage(), e);
         }
         if (checkExceptions()) {
@@ -171,33 +177,19 @@ public class ConfigsVM {
     }
 
 
-    public boolean isAutoSyncEnabled() {
-        return autoSyncEnabled;
-    }
-
-    public ConfigsVM setAutoSyncEnabled(boolean autoSyncEnabled) {
-        this.autoSyncEnabled = autoSyncEnabled;
-        return this;
-    }
-
     public String getConfig() {
         checkExceptions();
-        return configsModel.getConfig();
+        return model.getConfig();
     }
 
     private boolean checkExceptions() {
-        if (configsModel.hasValidationErrors()) {
-            Window window = (Window) Executions.createComponents(Global.PATH_TO_ERROR_RESOURCE_ZUL, null, Map.of("errors", configsModel.getValidationExceptions()));
+        if (model.hasValidationErrors()) {
+            Window window = (Window) Executions.createComponents(Global.PATH_TO_ERROR_RESOURCE_ZUL, null, Map.of("errors", model.getValidationExceptions()));
             window.doModal();
-            configsModel.setValidationExceptions(new ArrayList<>());
+            model.setValidationExceptions(new ArrayList<>());
             return false;
         }
         return true;
-    }
-
-    public void setConfig(Event config) {
-        config.getTarget();
-//        configsModel.setConfig(config);
     }
 
 

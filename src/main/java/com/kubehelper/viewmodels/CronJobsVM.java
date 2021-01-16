@@ -192,11 +192,6 @@ public class CronJobsVM implements EventListener<Event> {
         updateActiveCronJobsUI();
     }
 
-    @Command
-    public void editCronJob() {
-
-    }
-
 
     /**
      * Updates active cron job view after create/rerun/remove action.
