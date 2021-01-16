@@ -80,11 +80,11 @@ public class CronJobsService {
         job.buildReportsFolderPath(cronJobsReportsPath);
 
         File reportsFolder = new File(job.getReportsFolderPath());
-        if (reportsFolder.exists() && reportsFolder.isDirectory()) {
+        if (reportsFolder.exists() && reportsFolder.isDirectory() || Global.CRON_JOBS.containsKey(job.getName())) {
             model.addException(new RuntimeException("Cron job with this name already exists or existed. Please choose another name."));
             return;
         }
-        schedulerService.startCronJob(job);
+        schedulerService.startCronJob(job, model);
     }
 
     /**
@@ -92,8 +92,20 @@ public class CronJobsService {
      *
      * @param job - {@link CronJobResult}.
      */
-    public void rerunCronJob(CronJobResult job) {
+    public void rerunCronJob(CronJobResult job, CronJobsModel model) {
         schedulerService.rerunCronJob(job);
+        Global.config.markCronjobAsActive(job.getName());
+        commonService.updateConfigFile(model);
+    }
+
+    public void stopCronJob(CronJobResult job, CronJobsModel model) {
+        Global.config.markCronjobAsInactive(job.getName());
+        commonService.updateConfigFile(model);
+    }
+
+    public void removeCronJob(CronJobResult job, CronJobsModel model) {
+        Global.config.deleteCronjob(job.getName());
+        commonService.updateConfigFile(model);
     }
 
     /**
@@ -109,10 +121,10 @@ public class CronJobsService {
                     .setCommand(scheduler.getCommand())
                     .setExpression(scheduler.getExpression())
                     .setDescription(scheduler.getDescription())
-                    .setEmail(scheduler.getEmail())
                     .setShell(scheduler.getShell())
                     .setRuns(scheduler.getRuns())
-                    .setDone(scheduler.isDone());
+                    .setDone(scheduler.isDone())
+                    .buildReportsFolderPath(cronJobsReportsPath);
             activeCronJobs.add(jobResult);
         });
         return activeCronJobs;
@@ -195,11 +207,16 @@ public class CronJobsService {
         try {
             List<File> reportsGroups = Arrays.stream(new File(cronJobsReportsPath).listFiles()).filter(File::isDirectory).sorted(Comparator.comparing(File::getName)).collect(Collectors.toList());
             if (CollectionUtils.isNotEmpty(reportsGroups)) {
+                //set cron jobs reports groups
+                model.setCronJobsReportsGroups(reportsGroups.stream().map(File::getName).collect(Collectors.toList()));
+
+                //set selected folder
                 String selectedReportsFolder = reportsGroups.get(0).getName();
-                model.setCronJobsReports(new HashMap<>());
                 model.setSelectedReportsFolder(selectedReportsFolder);
+
+                //get all reports feom group
                 Set<String> filesPathsByDirAndExtension = commonService.getFilesPathsByDirAndExtension(reportsGroups.get(0).getAbsolutePath(), 2, ".txt");
-                setNewReportsFromSelectedFolder(model, filesPathsByDirAndExtension);
+                addNewReportsFromSelectedFolder(model, filesPathsByDirAndExtension);
             }
         } catch (IOException e) {
             model.addNotificationException("Cannot Prepare Reports: Error: " + e.getMessage());
@@ -214,22 +231,30 @@ public class CronJobsService {
      */
     public void changeReportsFolder(CronJobsModel model) {
         try {
-            model.setCronJobsReports(new HashMap<>());
-            Set<String> filesPathsByDirAndExtension = commonService.getFilesPathsByDirAndExtension(model.getSelectedReportsFolder(), 2, ".txt");
-            setNewReportsFromSelectedFolder(model, filesPathsByDirAndExtension);
+            Set<String> filesPathsByDirAndExtension = commonService.getFilesPathsByDirAndExtension(cronJobsReportsPath + model.getSelectedReportsFolder(), 2, ".txt");
+            addNewReportsFromSelectedFolder(model, filesPathsByDirAndExtension);
         } catch (IOException e) {
             model.addNotificationException("Cannot Prepare Reports: Error: " + e.getMessage());
             logger.debug(e.getMessage(), e);
         }
     }
 
-    private void setNewReportsFromSelectedFolder(CronJobsModel model, Set<String> filesPathsByDirAndExtension) {
+    /**
+     * Adds to model new reports from selected group.
+     *
+     * @param model                       - cron jobs model @{@link CronJobsModel}.
+     * @param filesPathsByDirAndExtension - a set with files from selected group.
+     */
+    private void addNewReportsFromSelectedFolder(CronJobsModel model, Set<String> filesPathsByDirAndExtension) {
+
+        //clear and get meta from files
         model.setCronJobsReports(new HashMap<>());
         filesPathsByDirAndExtension.forEach(file -> {
             model.addReportSource(Files.getNameWithoutExtension(file), file);
         });
         model.sortCronJobsReportsAlphabeticallyAsc();
 
+        //set first active
         Optional<Map.Entry<String, FileSourceResult>> first = model.getCronJobsReports().entrySet().stream().findFirst();
         if (first.isPresent()) {
             model.setSelectedReportRaw(commonService.getResourceAsStringByPath(first.get().getValue().getFilePath()));

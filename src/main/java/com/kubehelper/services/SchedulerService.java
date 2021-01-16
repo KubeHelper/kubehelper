@@ -19,6 +19,7 @@ package com.kubehelper.services;
 
 import com.kubehelper.common.Global;
 import com.kubehelper.domain.core.KubeHelperScheduledFuture;
+import com.kubehelper.domain.models.PageModel;
 import com.kubehelper.domain.results.CronJobResult;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -60,10 +61,6 @@ public class SchedulerService {
     @Autowired
     private CommonService commonService;
 
-    @Autowired
-    private SenderService senderService;
-
-
     @Value("${kubehelper.report.template.src.path}")
     private String reportTemplateSrcPath;
 
@@ -83,19 +80,35 @@ public class SchedulerService {
      *
      * @param job - @{@link CronJobResult} object.
      */
-    public void startCronJob(CronJobResult job) {
-        ScheduledFuture<?> schedule = threadPoolTaskScheduler.schedule(getRunnableTask(job), new CronTrigger(job.getExpression()));
+    public void startCronJob(CronJobResult job, PageModel model) {
+        ScheduledFuture schedule = threadPoolTaskScheduler.schedule(getRunnableTask(job), new CronTrigger(job.getExpression()));
+
         Global.CRON_JOBS.put(job.getName(), new KubeHelperScheduledFuture(job, schedule));
-//        TODO write to config toml
-        //TODO add to toml boolean config isStart by default
+
+        //add cron job to config
+        Global.config.addNewCronJob(job);
+
+        //update config file with new values
+        commonService.updateConfigFile(model);
     }
 
     public void rerunCronJob(CronJobResult job) {
         ScheduledFuture<?> scheduledFuture = threadPoolTaskScheduler.schedule(getRunnableTask(job), new CronTrigger(job.getExpression()));
         Global.CRON_JOBS.get(job.getName()).setScheduledFuture(scheduledFuture);
+    }
 
-//        TODO write to config toml
-        //TODO add to toml boolean config isStart by default
+    /**
+     * Builds cron report. Report from template and parameters.
+     *
+     * @param name - cron job name.
+     * @param command - cron job command.
+     * @param output - report output.
+     * @return - build string report for this run.
+     */
+    private String buildReport(String name, String command, String output) {
+        String time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss yyyy-MM-dd"));
+        Map<String, String> replaceMap = Map.of("name", name, "time", time, "command", command, "output", output);
+        return new StringSubstitutor(replaceMap).replace(reportTemplate);
     }
 
     /**
@@ -153,27 +166,8 @@ public class SchedulerService {
                 }
             }
 
-            //send email with report
-            if (StringUtils.isNotBlank(job.getEmail())) {
-                senderService.sendEmail(job.getEmail(), reportContent);
-            }
-
             //add cron run count
             Global.CRON_JOBS.get(job.getName()).addRun();
         };
-    }
-
-    /**
-     * Builds cron report. Report from template and parameters.
-     *
-     * @param name - cron job name.
-     * @param command - cron job command.
-     * @param output - report output.
-     * @return - build string report for this run.
-     */
-    private String buildReport(String name, String command, String output) {
-        String time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss yyyy-MM-dd"));
-        Map<String, String> replaceMap = Map.of("name", name, "time", time, "command", command, "output", output);
-        return new StringSubstitutor(replaceMap).replace(reportTemplate);
     }
 }

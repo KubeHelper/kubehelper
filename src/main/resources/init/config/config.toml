@@ -1,74 +1,23 @@
 [git]
-url = "kubectl get pods -A --field-selector=status.phase!=Running | grep -v Complete"
-user = "Predefined"
-password = "Simple command description1"
+url = "https://github.com/JWebDev/kubehelper.git" #(Optional) - Git url for sync config
+user = "kubehelper" #(Optional) - If the repository is protected we need username
+password = "pass" #(Optional) - If the repository is protected we need password
+branch = "default branch" #(Optional) - By default will be sync with default branch
+email = "journame@yourcompany.com" #(Optional) - Email for commit
 
-[Command2]
-group = "Predefined2"
-description = "Simple command description2"
-command = "kubectl get pods -A --field-selector = status.phase = Running | grep -v Complete"
+#list of cron jobs
+[[cron-job]]
+name = "your_job-name" #(*Mandatory, Unique) - Cron job name. Should contains only letters, numbers, '_' and '-'.
+isActive = true #(*Mandatory) - If the flag is active, the job will start automatically after the application starts. Possible states: [true|false]
+expression = "*/20 * * * * *" #(*Mandatory) - Cron job expression. Every 20 seconds.
+command = "kubectl get pods -A --field-selector = status.phase = Running | grep -v Complete" #(*Mandatory) - Cron job command
+shell = "bash" #(*Mandatory) - execution shell
+description = "my always active cron job" #(Optional) - Cron Job description text
 
-[Command3]
-group = "Predefined3"
-description = "Simple command description3"
-command = """ kubectl get no -o json | \
-              jq -r '.items | sort_by(.status.capacity.memory)[]|[.metadata.name,.status.capacity.memory]| @tsv' """
-
-[Command4]
-group = "Predefined4"
-description = "Simple command description4"
-command = """ kubectl get pods -A --field-selector = status.phase! = Running\
-              | grep -v Complete \
-              | grep -v Complete \
-              | grep -v Complete \
-              | grep -v Complete """
-
-[Command5]
-group = "Predefined5"
-description = "Simple command description5"
-command = "kubectl get pods -A --field-selector=status.phase!=Running | grep -v Complete"
-
-[Command6]
-group = "Predefined6"
-description = "Simple command description6"
-command = "kubectl get pods -A --field-selector = status.phase = Running | grep -v Complete"
-
-[Command7]
-group = "Predefined7"
-description = "Simple command description7"
-command = """ kubectl get no -o json | \
-              jq -r '.items | sort_by(.status.capacity.memory)[]|[.metadata.name,.status.capacity.memory]| @tsv' """
-
-[Command8]
-group = "Predefined8"
-description = "Simple command description8"
-command = """ kubectl get pods -A --field-selector = status.phase! = Running\
-              | grep -v Complete \
-              | grep -v Complete \
-              | grep -v Complete \
-              | grep -v Complete """
-
-[Command9]
-group = "Predefined9"
-description = "Simple command description9"
-command = "kubectl get pods -A --field-selector=status.phase!=Running | grep -v Complete"
-
-[Command10]
-group = "Predefined10"
-description = "Simple command description10"
-command = "kubectl get pods -A --field-selector = status.phase = Running | grep -v Complete"
-
-[Command11]
-group = "Predefined11"
-description = "Simple command description11"
-command = """ kubectl get no -o json | \
-              jq -r '.items | sort_by(.status.capacity.memory)[]|[.metadata.name,.status.capacity.memory]| @tsv' """
-
-[Command12]
-group = "Predefined12"
-description = "Simple command description12"
-command = """ kubectl get pods -A --field-selector = status.phase! = Running\
-              | grep -v Complete \
-              | grep -v Complete \
-              | grep -v Complete \
-              | grep -v Complete """
+[[cron-job]]
+name = "your_job-name2" #(*Mandatory Unique) - Cron job name. Should contains only letters, numbers, '_' and '-'.
+isActive = false #(*Mandatory) - If the flag is active, the job will start automatically after the application starts. Possible states: [true|false]
+expression = " * */5 * * * *" #(*Mandatory) - Cron job expression. Every 5 minutes.
+command = "kubectl get pods -A --field-selector = status.phase = Running | grep -v Complete" #(*Mandatory) - Cron job command
+shell = "bash" #(*Mandatory) - execution shell
+description = "my always inactove cron job" #(Optional) - Cron Job description text

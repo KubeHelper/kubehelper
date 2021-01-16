@@ -60,6 +60,7 @@ public class CronJobsModel implements PageModel {
 
     //  REPORTS ================
     private Map<String, FileSourceResult> cronJobsReports = new HashMap<>();
+    private List<String> cronJobsReportsGroups = new ArrayList<>();
 
     private String selectedReportLabel = "";
     private String selectedReportRaw = "";
@@ -102,7 +103,16 @@ public class CronJobsModel implements PageModel {
         cronJobsReports = ImmutableSortedMap.copyOf(cronJobsReports, Comparator.comparing(file -> file));
     }
 
-//    public List<FileSourceResult> getCronJobsReportsObjectsForJob() {
+    public List<String> getCronJobsReportsGroups() {
+        return cronJobsReportsGroups;
+    }
+
+    public CronJobsModel setCronJobsReportsGroups(List<String> cronJobsReportsGroups) {
+        this.cronJobsReportsGroups = cronJobsReportsGroups;
+        return this;
+    }
+
+    //    public List<FileSourceResult> getCronJobsReportsObjectsForJob() {
 //        return cronJobsReports.values().stream().collect(Collectors.toList());
 //    }
 

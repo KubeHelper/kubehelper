@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package com.kubehelper.viewmodels;
 
 import com.kubehelper.common.Global;
-import com.kubehelper.configs.Config;
+import com.kubehelper.configs.KubeHelperCache;
 import com.kubehelper.domain.filters.CommandsFilter;
 import com.kubehelper.domain.models.CommandsModel;
 import com.kubehelper.domain.results.CommandsResult;
@@ -44,6 +44,7 @@ import org.zkoss.zk.ui.event.AfterSizeEvent;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
+import org.zkoss.zk.ui.event.KeyEvent;
 import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
@@ -63,6 +64,7 @@ import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.Slider;
 import org.zkoss.zul.Tabbox;
+import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Toolbarbutton;
 import org.zkoss.zul.Vbox;
 import org.zkoss.zul.Window;
@@ -110,7 +112,7 @@ public class CommandsVM implements EventListener<Event> {
     private CommonService commonService;
 
     @WireVariable
-    private Config config;
+    private KubeHelperCache config;
 
     @WireVariable
     private CommandsService commandsService;
@@ -206,7 +208,7 @@ public class CommandsVM implements EventListener<Event> {
      */
     private void checkRuntimeNotificationExceptions() {
         if (StringUtils.isNotBlank(commandsModel.getRuntimeNotificationExceptions())) {
-            Notification.show(commandsModel.getRuntimeNotificationExceptions(), "error", null, "bottom_right", 5000);
+            Notification.show(commandsModel.getRuntimeNotificationExceptions(), "error", commandOutputGrBox, "before_end", 5000);
         }
     }
 

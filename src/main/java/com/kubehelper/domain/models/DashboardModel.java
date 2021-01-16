@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package com.kubehelper.domain.models;
 
 import com.kubehelper.common.Global;
+import com.kubehelper.common.KubeHelperException;
 import com.kubehelper.domain.results.ClusterResult;
 import com.kubehelper.domain.results.NodeResult;
 
@@ -35,7 +36,9 @@ public class DashboardModel implements PageModel {
     private ClusterResult clusterResult = new ClusterResult();
     private List<NodeResult> nodesResults = new ArrayList<>();
 
-    public void addNodeResult(NodeResult nodeResult){
+    private List<KubeHelperException> exceptions = new ArrayList<>();
+
+    public void addNodeResult(NodeResult nodeResult) {
         this.nodesResults.add(nodeResult);
     }
 
@@ -51,6 +54,7 @@ public class DashboardModel implements PageModel {
 
     @Override
     public void addException(String message, Exception exception) {
+        this.exceptions.add(new KubeHelperException(message, exception));
     }
 
     public ClusterResult getClusterResult() {
@@ -64,5 +68,18 @@ public class DashboardModel implements PageModel {
 
     public List<NodeResult> getNodesResults() {
         return nodesResults;
+    }
+
+    public List<KubeHelperException> getExceptions() {
+        return exceptions;
+    }
+
+    public DashboardModel setExceptions(List<KubeHelperException> exceptions) {
+        this.exceptions = exceptions;
+        return this;
+    }
+
+    public boolean hasExceptions() {
+        return !exceptions.isEmpty();
     }
 }

@@ -26,12 +26,19 @@ import io.kubernetes.client.openapi.apis.NetworkingV1Api;
 import io.kubernetes.client.openapi.apis.PolicyV1beta1Api;
 import io.kubernetes.client.openapi.apis.RbacAuthorizationV1beta1Api;
 import io.kubernetes.client.util.Config;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.concurrent.ConcurrentMapCache;
+import org.springframework.cache.support.SimpleCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Objects;
+
+import static com.kubehelper.common.Global.CONFIGS_CACHE;
 
 /**
  * Kube helper beans/configs.
@@ -91,6 +98,17 @@ public class CustomConfig {
         ThreadPoolTaskScheduler threadPoolTaskScheduler = new ThreadPoolTaskScheduler();
         threadPoolTaskScheduler.setThreadNamePrefix("kubeHelperTask-");
         return threadPoolTaskScheduler;
+    }
+
+    @Bean
+    public CacheManager cacheManager() {
+        SimpleCacheManager cacheManager = new SimpleCacheManager();
+        if (Objects.nonNull(cacheManager.getCache(CONFIGS_CACHE))) {
+            cacheManager.setCaches(Arrays.asList(cacheManager.getCache(CONFIGS_CACHE)));
+        } else {
+            cacheManager.setCaches(Arrays.asList(new ConcurrentMapCache(CONFIGS_CACHE)));
+        }
+        return cacheManager;
     }
 
 }

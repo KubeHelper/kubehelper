@@ -29,6 +29,7 @@ import org.zkoss.bind.annotation.ContextParam;
 import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.zk.ui.Component;
+import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Path;
 import org.zkoss.zk.ui.event.AfterSizeEvent;
 import org.zkoss.zk.ui.select.Selectors;
@@ -49,7 +50,9 @@ import org.zkoss.zul.Listitem;
 import org.zkoss.zul.Panel;
 import org.zkoss.zul.Panelchildren;
 import org.zkoss.zul.Vlayout;
+import org.zkoss.zul.Window;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 /**
@@ -63,7 +66,7 @@ public class DashboardVM {
 
     private int centerLayoutHeight = 700;
 
-    private DashboardModel dashboardModel;
+    private DashboardModel model;
 
     @WireVariable
     private DashboardService dashboardService;
@@ -74,8 +77,11 @@ public class DashboardVM {
 
     @Init
     public void init() {
-        dashboardModel = (DashboardModel) Global.ACTIVE_MODELS.computeIfAbsent(Global.DASHBOARD_MODEL, (k) -> Global.NEW_MODELS.get(Global.DASHBOARD_MODEL));
-        dashboardService.showDashboard(dashboardModel);
+        model = (DashboardModel) Global.ACTIVE_MODELS.computeIfAbsent(Global.DASHBOARD_MODEL, (k) -> Global.NEW_MODELS.get(Global.DASHBOARD_MODEL));
+        dashboardService.showDashboard(model);
+        commonService.checkConfigAndFileLocation(model);
+        commonService.checkAndStartJobsFromConfig(model);
+        checkExceptions();
     }
 
     /**
@@ -98,8 +104,18 @@ public class DashboardVM {
         BindUtils.postNotifyChange(this, ".");
     }
 
+    private boolean checkExceptions() {
+        if (model.hasExceptions()) {
+            Window window = (Window) Executions.createComponents(Global.PATH_TO_ERROR_RESOURCE_ZUL, null, Map.of("errors", model.getExceptions()));
+            window.doModal();
+            model.setExceptions(new ArrayList<>());
+            return false;
+        }
+        return true;
+    }
+
     public ClusterResult getClusterResult() {
-        return dashboardModel.getClusterResult();
+        return model.getClusterResult();
     }
 
     /**
@@ -108,12 +124,12 @@ public class DashboardVM {
     private void createDashboard() {
         Vlayout mainDashboardVLayout = (Vlayout) Path.getComponent("//indexPage/templateInclude/mainDashboardVLayout");
         Hbox hbox = buildNewHbox();
-        for (int i = 0; i < dashboardModel.getNodesResults().size(); i++) {
-            NodeResult node = dashboardModel.getNodesResults().get(i);
+        for (int i = 0; i < model.getNodesResults().size(); i++) {
+            NodeResult node = model.getNodesResults().get(i);
 
             hbox.appendChild(createNodePanel(node));
-            if (hbox.getChildren().size() == 2 || i == dashboardModel.getNodesResults().size() - 1) {
-                if (i % 2 == 0 && i == dashboardModel.getNodesResults().size() - 1) {
+            if (hbox.getChildren().size() == 2 || i == model.getNodesResults().size() - 1) {
+                if (i % 2 == 0 && i == model.getNodesResults().size() - 1) {
                     hbox.appendChild(buildNewCell());
                 }
                 mainDashboardVLayout.appendChild(hbox);
@@ -168,8 +184,8 @@ public class DashboardVM {
     /**
      * Creates Listbox for node.
      *
-     * @param name - name.
-     * @param listBoxData - listbox Data.
+     * @param name            - name.
+     * @param listBoxData     - listbox Data.
      * @param totalImagesSize - total images size.
      * @return - {@link Listbox} for node Hbox.
      */
@@ -219,7 +235,7 @@ public class DashboardVM {
     /**
      * Builds new panel with title and state open/closed.
      *
-     * @param title - panel title.
+     * @param title  - panel title.
      * @param isOpen - true if panel will be open.
      * @return - {@link Panel}
      */

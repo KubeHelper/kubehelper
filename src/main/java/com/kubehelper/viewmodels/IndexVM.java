@@ -77,8 +77,8 @@ public class IndexVM {
 //        pageModel = Global.ACTIVE_MODELS.computeIfAbsent(Global.SEARCH_MODEL, (k) -> Global.NEW_MODELS.get(Global.SEARCH_MODEL));
 //        pageModel = Global.ACTIVE_MODELS.computeIfAbsent(Global.SECURITY_MODEL, (k) -> Global.NEW_MODELS.get(Global.SECURITY_MODEL));
 //        pageModel = Global.ACTIVE_MODELS.computeIfAbsent(Global.COMMANDS_MODEL, (k) -> Global.NEW_MODELS.get(Global.COMMANDS_MODEL));
-        pageModel = Global.ACTIVE_MODELS.computeIfAbsent(Global.CRON_JOBS_MODEL, (k) -> Global.NEW_MODELS.get(Global.CRON_JOBS_MODEL));
-//        pageModel = Global.ACTIVE_MODELS.computeIfAbsent(Global.CONFIGS_MODEL, (k) -> Global.NEW_MODELS.get(Global.CONFIGS_MODEL));
+//        pageModel = Global.ACTIVE_MODELS.computeIfAbsent(Global.CRON_JOBS_MODEL, (k) -> Global.NEW_MODELS.get(Global.CRON_JOBS_MODEL));
+        pageModel = Global.ACTIVE_MODELS.computeIfAbsent(Global.CONFIGS_MODEL, (k) -> Global.NEW_MODELS.get(Global.CONFIGS_MODEL));
 //        pageModel = Global.ACTIVE_MODELS.computeIfAbsent(Global.LABELS_MODEL, (k) -> Global.NEW_MODELS.get(Global.LABELS_MODEL));
         currentModelName = pageModel.getName();
     }

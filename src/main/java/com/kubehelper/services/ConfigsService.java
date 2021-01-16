@@ -59,41 +59,6 @@ public class ConfigsService {
 //        reportEntryTemplate = commonService.getClasspathResourceAsStringByPath(historyEntryTemplateSrcPath);
     }
 
-
-    /**
-     * Checks, creates and search for config.
-     * 1. Searches for custom kubehelper config. If not found then.
-     * 2. Searches for default kubehelper config. If not found then.
-     * 3. Creates new default config from predefined config.
-     *
-     * @param configsModel - configs model.
-     */
-    public void checkConfigLocation(ConfigsModel configsModel) {
-
-        //search for custom kubehelper config
-        Set<String> customConfigPath = checkCustomKubeHelperConfig(configsModel);
-        if (!customConfigPath.isEmpty()) {
-            configsModel.setConfig(commonService.getResourceAsStringByPath(customConfigPath.stream().findFirst().get()));
-            return;
-        }
-
-        //look for default kubehelper config
-        if (new File(defaultConfigFilePath).exists()) {
-            configsModel.setConfig(commonService.getResourceAsStringByPath(defaultConfigFilePath));
-            return;
-        }
-
-        //create new default config from predefined config
-        try {
-            String predefinedConfig = commonService.getClasspathResourceAsStringByPath(predefinedConfigPath);
-            FileUtils.writeStringToFile(new File(defaultConfigFilePath), predefinedConfig);
-            configsModel.setConfig(predefinedConfig);
-        } catch (IOException e) {
-            configsModel.addException("An error occurred while creating of default config file. Error " + e.getMessage(), e);
-            logger.error("An error occurred while creating of default config file. Error " + e.getMessage());
-        }
-    }
-
     /**
      * Search for custom kubehelper config.
      *

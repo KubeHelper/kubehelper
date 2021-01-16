@@ -30,18 +30,21 @@ public class CronJobResult {
     private String command = "";
     private String shell = "";
     private int runs;
-    private String email = "";
     private String description = "";
     private String reportsFolderPath = "";
+    private boolean isActive;
     private boolean isDone;
 
+    public CronJobResult() {
+    }
 
     public CronJobResult(int id) {
         this.id = id;
     }
 
-    public void buildReportsFolderPath(String root) {
+    public CronJobResult buildReportsFolderPath(String root) {
         reportsFolderPath = root + name;
+        return this;
     }
 
     public int getId() {
@@ -84,15 +87,6 @@ public class CronJobResult {
         return this;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
-    public CronJobResult setEmail(String email) {
-        this.email = email;
-        return this;
-    }
-
     public String getDescription() {
         return description;
     }
@@ -120,6 +114,15 @@ public class CronJobResult {
         return this;
     }
 
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public CronJobResult setActive(boolean active) {
+        isActive = active;
+        return this;
+    }
+
     public boolean isDone() {
         return isDone;
     }
@@ -138,9 +141,9 @@ public class CronJobResult {
                 .add("command='" + command + "'")
                 .add("shell='" + shell + "'")
                 .add("runs=" + runs)
-                .add("email='" + email + "'")
                 .add("description='" + description + "'")
                 .add("reportsFolderPath='" + reportsFolderPath + "'")
+                .add("isActive=" + isActive)
                 .add("isDone=" + isDone)
                 .toString();
     }

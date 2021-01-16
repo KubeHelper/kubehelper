@@ -21,23 +21,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.cache.concurrent.ConcurrentMapCache;
-import org.springframework.cache.support.SimpleCacheManager;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+import static com.kubehelper.common.Global.CONFIGS_CACHE;
+
 /**
  * @author JDev
  */
 @Configuration
 @EnableCaching
-public class Config {
-
-    private final String CONFIGS_CACHE = "configs";
+public class KubeHelperCache {
 
     @Autowired
     private CacheManager cacheManager;
@@ -55,16 +52,6 @@ public class Config {
     public static String GIT_PASSWORD = "gitPassword";
     public static String GIT_EMAIL = "gitEmail";
 
-    @Bean
-    public CacheManager cacheManager() {
-        SimpleCacheManager cacheManager = new SimpleCacheManager();
-        if (Objects.nonNull(cacheManager.getCache(CONFIGS_CACHE))) {
-            cacheManager.setCaches(Arrays.asList(cacheManager.getCache(CONFIGS_CACHE)));
-        } else {
-            cacheManager.setCaches(Arrays.asList(new ConcurrentMapCache(CONFIGS_CACHE)));
-        }
-        return cacheManager;
-    }
 
     public void setGitUrl(String gitUrl) {
         cacheManager.getCache(CONFIGS_CACHE).put(GIT_URL, gitUrl);

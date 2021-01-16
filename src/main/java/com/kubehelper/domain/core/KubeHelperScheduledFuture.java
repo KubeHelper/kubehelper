@@ -35,7 +35,7 @@ public class KubeHelperScheduledFuture {
     private String command = "";
     private String shell = "";
     private int runs;
-    private String email = "";
+    private boolean isActive;
     private String description = "";
     private String reportsFolderPath = "";
     private ScheduledFuture<?> scheduledFuture;
@@ -46,18 +46,22 @@ public class KubeHelperScheduledFuture {
         this.expression = jobResult.getExpression();
         this.command = jobResult.getCommand();
         this.shell = jobResult.getShell();
-        this.email = jobResult.getEmail();
         this.description = jobResult.getDescription();
         this.reportsFolderPath = jobResult.getReportsFolderPath();
         this.scheduledFuture = scheduledFuture;
+        this.isActive = jobResult.isActive();
     }
 
     public boolean isDone() {
-        return scheduledFuture.isDone();
+        return scheduledFuture == null ? true : scheduledFuture.isDone();
+    }
+
+    public boolean isActive() {
+        return isActive;
     }
 
     public boolean shutdownCronJob() {
-        return scheduledFuture.cancel(true);
+        return scheduledFuture == null ? false : scheduledFuture.cancel(true);
     }
 
     public void addRun() {
@@ -88,21 +92,12 @@ public class KubeHelperScheduledFuture {
         return runs;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
     public String getDescription() {
         return description;
     }
 
     public String getReportsFolderPath() {
         return reportsFolderPath;
-    }
-
-
-    public ScheduledFuture<?> getScheduledFuture() {
-        return scheduledFuture;
     }
 
     public KubeHelperScheduledFuture setScheduledFuture(ScheduledFuture<?> scheduledFuture) {

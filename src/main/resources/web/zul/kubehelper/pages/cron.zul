@@ -69,22 +69,20 @@
                             </grid>
                         </groupbox>
 
-                        <groupbox id="newCronJobGrBox" closable="false" height="@load(cronJobsVM.newCronJobBoxHeight)">
+                        <groupbox id="newCronJobGrBox" closable="false" width="100%" height="@load(cronJobsVM.newCronJobBoxHeight)">
                             <caption iconSclass="fas fa-plus" label="New cron job"/>
-
-                            <hbox width="100%" align="center" pack="stretch" vflex="1">
+                            <hbox width="100%" align="center" pack="stretch" vflex="min">
                                 <cell width="89.5%" align="left">
-                                    <hbox width="100%" align="center" pack="stretch">
+                                    <hbox width="100%" align="start" pack="stretch">
                                         <cell width="50%" align="center">
                                             <vbox hflex="1" pack="stretch">
                                                 <textbox value="@bind(cronJobsVM.cronJobName)" width="100%" placeholder="*Job Name"/>
-                                                <textbox value="@bind(cronJobsVM.cronJobExpression)" width="100%" placeholder="*Cron Expression. Example: '0 0 8-10 * * *' "/>
-                                                <textbox value="@bind(cronJobsVM.cronJobEmail)" width="100%" placeholder="Email for send cron job reports"/>
+                                                <textbox value="@bind(cronJobsVM.cronJobExpression)" width="100%" placeholder="*Cron Expression. Example: '*/20 * * * * *' "/>
                                             </vbox>
                                         </cell>
                                         <separator orient="vertical"></separator>
                                         <cell width="50%" align="left">
-                                            <textbox value="@bind(cronJobsVM.cronJobDescription)" width="100%" rows="4" placeholder="Job description"
+                                            <textbox value="@bind(cronJobsVM.cronJobDescription)" width="100%" rows="2" placeholder="Job description"
                                                      style="font-size: 13px;line-height: 1.4;margin-bottom: 2px;"/>
                                         </cell>
                                     </hbox>
@@ -113,15 +111,14 @@
 
                         <groupbox id="cronJobsListGrBox" width="100%" height="@load(cronJobsVM.cronJobsListGroupBoxHeight)" closable="false">
                             <caption iconSclass="fas fa-history" label="Active cron jobs"/>
-                            <listbox model="@load(cronJobsVM.activeCronJobs)" vflex="1">
+                            <listbox model="@load(cronJobsVM.activeCronJobs)" height="100%">
                                 <listhead menupopup="auto">
                                     <listheader label="Name" hflex="1" sort="auto(name)"/>
-                                    <listheader label="Expression" hflex="2" sort="auto(expression)"/>
+                                    <listheader label="Expression" hflex="1" sort="auto(expression)"/>
                                     <listheader label="Command" hflex="4" sort="auto(command)"/>
                                     <listheader label="Shell" hflex="min" sort="auto(shell)"/>
                                     <listheader label="Runs" hflex="min" sort="auto(runs)"/>
-                                    <listheader label="Email" hflex="1" sort="auto(email)"/>
-                                    <listheader label="Description" hflex="4" sort="auto(description)"/>
+                                    <listheader label="Description" hflex="2" sort="auto(description)"/>
                                     <listheader label="Edit" hflex="min"/>
                                     <listheader label="Stop" hflex="min"/>
                                     <listheader label="Rerun" hflex="min"/>
@@ -143,9 +140,6 @@
                                         </listcell>
                                         <listcell>
                                             <label value="${cron.runs}" style="cursor: auto;"/>
-                                        </listcell>
-                                        <listcell>
-                                            <label value="${cron.email}" multiline="true" style="cursor: auto;"/>
                                         </listcell>
                                         <listcell>
                                             <label value="${cron.description}" multiline="true" style="cursor: auto;"/>
@@ -194,7 +188,7 @@
                             <west title="Reports" collapsible="true" splittable="true" autoscroll="true" size="7%" maxsize="200">
                                 <div vflex="1">
                                     <combobox hflex="1" mold="rounded" model="@load(cronJobsVM.allCronJobsReportsGroups)"
-                                              selectedItem="@bind(cronJobsVM.selectedReportsFolder)"
+                                              selectedItem="@bind(cronJobsVM.selectedReportsFolder)" readonly="true"
                                               onChange="@command('changeReportsFolder')">
                                         <template name="model">
                                             <comboitem label="@load(each)"/>

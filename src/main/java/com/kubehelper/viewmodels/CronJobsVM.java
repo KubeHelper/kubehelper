@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package com.kubehelper.viewmodels;
 
 import com.kubehelper.common.Global;
-import com.kubehelper.configs.Config;
 import com.kubehelper.domain.filters.CommandsFilter;
 import com.kubehelper.domain.models.CronJobsModel;
 import com.kubehelper.domain.results.CommandsResult;
@@ -66,7 +65,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
@@ -90,7 +88,6 @@ public class CronJobsVM implements EventListener<Event> {
 
     private String cronJobName = "";
     private String cronJobExpression = "";
-    private String cronJobEmail = "";
     private String cronJobDescription = "";
 
     private boolean wordWrapInReport;
@@ -104,9 +101,6 @@ public class CronJobsVM implements EventListener<Event> {
 
     @WireVariable
     private CommonService commonService;
-
-    @WireVariable
-    private Config config;
 
     @Wire("#cronJobsTabbox")
     private Tabbox notificationContainer;
@@ -186,13 +180,12 @@ public class CronJobsVM implements EventListener<Event> {
         }
 
         //TODO change after test
-        CronJobResult cronJobResult = new CronJobResult(1)
+        CronJobResult cronJobResult = new CronJobResult(Global.CRON_JOBS.size() + 1)
                 .setName(cronJobName)
                 .setCommand(model.getCommandToExecute())
                 .setExpression("*/20 * * * * *")
 //                .setPeriod(cronJobExpression)
                 .setDescription(cronJobDescription)
-                .setEmail(cronJobEmail)
                 .setShell("bash");
         cronJobsService.startCronJob(model, cronJobResult);
         checkExceptions();
@@ -225,7 +218,7 @@ public class CronJobsVM implements EventListener<Event> {
      */
     @Command
     public void rerunCronJob(@BindingParam("job") CronJobResult job) {
-        cronJobsService.rerunCronJob(job);
+        cronJobsService.rerunCronJob(job, model);
         Notification.show(String.format("Cron Job %s was Started again.", job.getName()), "info", notificationContainer, "top_right", 3000);
         updateActiveCronJobsUI();
     }
@@ -243,6 +236,8 @@ public class CronJobsVM implements EventListener<Event> {
                     if (Messagebox.ON_OK.equals(e.getName())) {
                         if (Global.CRON_JOBS.get(job.getName()).shutdownCronJob()) {
                             Notification.show(String.format("Cron Job %s was stopped.", job.getName()), "info", notificationContainer, "top_right", 3000);
+                            //                            TODO to test
+                            cronJobsService.stopCronJob(job, model);
                         } else {
                             Notification.show(String.format("An error occurred while stopping the cron job. Please look in the application log.", job.getName()), "error", notificationContainer, "top_right", 5000);
                         }
@@ -270,6 +265,7 @@ public class CronJobsVM implements EventListener<Event> {
                         }
                         //remove job from jobs list
                         if (Objects.nonNull(Global.CRON_JOBS.remove(job.getName()))) {
+                            cronJobsService.removeCronJob(job, model);
                             Notification.show(String.format("Cron Job %s was deleted.", job.getName()), "info", notificationContainer, "top_right", 3000);
                         } else {
                             Notification.show(String.format("An error occurred while stopping the cron job. Please look in the application log.", job.getName()), "error", notificationContainer, "top_right", 5000);
@@ -343,16 +339,18 @@ public class CronJobsVM implements EventListener<Event> {
             return true;
         }
 
+        if (Global.CRON_JOBS.containsKey(cronJobName)) {
+            Notification.show(String.format("Can't create cron job %s. The job with name %s already exists.", cronJobName, cronJobName),
+                    "error", notificationContainer, "top_right", 5000);
+            return true;
+        }
+
         if (!Pattern.matches("^[a-zA-Z0-9_-]*$", cronJobName)) {
             Notification.show(String.format("Can't create cron job %s. The job name should contain only: letters, numbers, '-' and '_'", cronJobName),
                     "error", notificationContainer, "top_right", 5000);
             return true;
         }
 
-        if (StringUtils.isNotBlank(cronJobEmail) && !Pattern.matches("^(.+)@(\\S+)$", cronJobEmail)) {
-            Notification.show(String.format("Can't create cron job %s. The cron job email is invalid.", cronJobName), "error", notificationContainer, "top_right", 5000);
-            return true;
-        }
         return false;
     }
 
@@ -494,6 +492,9 @@ public class CronJobsVM implements EventListener<Event> {
         enableDisableMenuItem(newToolbarbuttonId, true, "bold;");
     }
 
+    /**
+     * Changes report groups folder.
+     */
     @Command
     public void changeReportsFolder() {
         cronJobsService.changeReportsFolder(model);
@@ -503,6 +504,9 @@ public class CronJobsVM implements EventListener<Event> {
         }
     }
 
+    /**
+     * Refreshes all reports as by first start.
+     */
     @Command
     public void refreshReports() {
         cronJobsService.prepareCronJobsReports(model);
@@ -512,11 +516,19 @@ public class CronJobsVM implements EventListener<Event> {
         }
     }
 
+    /**
+     * Do wordWrap for reports output.
+     */
     @Command
     public void wordWrapInReports() {
         refreshReportsOutput();
     }
 
+    /**
+     * Changes font size at report view.
+     *
+     * @param ctxEvent - Context event.
+     */
     @Command
     public void cronJobsReportsChangeFontSize(BindContext ctxEvent) {
         Slider fontSlider = (Slider) ctxEvent.getComponent();
@@ -529,15 +541,15 @@ public class CronJobsVM implements EventListener<Event> {
 
 
     public String getCommandsGridHeight() {
-        return centerLayoutHeight * 0.4 + "px";
+        return centerLayoutHeight * 0.3 + "px";
     }
 
     public String getNewCronJobBoxHeight() {
-        return centerLayoutHeight * 0.185 + "px";
+        return centerLayoutHeight * 0.19 + "px";
     }
 
     public String getCronJobsListGroupBoxHeight() {
-        return centerLayoutHeight > 1200 ? centerLayoutHeight * 0.46 + "px" : centerLayoutHeight * 0.41 + "px";
+        return centerLayoutHeight > 1200 ? centerLayoutHeight * 0.455 + "px" : centerLayoutHeight * 0.44 + "px";
     }
 
     public CommandsFilter getFilter() {
@@ -598,15 +610,6 @@ public class CronJobsVM implements EventListener<Event> {
         return this;
     }
 
-    public String getCronJobEmail() {
-        return cronJobEmail;
-    }
-
-    public CronJobsVM setCronJobEmail(String cronJobEmail) {
-        this.cronJobEmail = cronJobEmail;
-        return this;
-    }
-
     public String getCronJobDescription() {
         return cronJobDescription;
     }
@@ -620,7 +623,7 @@ public class CronJobsVM implements EventListener<Event> {
 
 
     public String getCronJobsReportsSrcPanelHeight() {
-        return centerLayoutHeight - 95 + "px";
+        return centerLayoutHeight - 100 + "px";
     }
 
     public String getCronJobsReportsHeight() {
@@ -631,8 +634,8 @@ public class CronJobsVM implements EventListener<Event> {
         return String.format(cronJobsReportsCss, cronJobsReportsFontSize);
     }
 
-    public Set<String> getAllCronJobsReportsGroups() {
-        return model.getCronJobsReports().keySet();
+    public List<String> getAllCronJobsReportsGroups() {
+        return model.getCronJobsReportsGroups();
     }
 
     public String getSelectedCronJobsReportRaw() {

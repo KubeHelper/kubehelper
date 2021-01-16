@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package com.kubehelper.viewmodels;
 
 import com.kubehelper.common.Global;
-import com.kubehelper.configs.Config;
+import com.kubehelper.configs.KubeHelperCache;
 import com.kubehelper.domain.models.ConfigsModel;
 import com.kubehelper.services.CommonService;
 import com.kubehelper.services.ConfigsService;
@@ -43,12 +43,10 @@ import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
-import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zk.ui.util.Notification;
 import org.zkoss.zkplus.spring.DelegatingVariableResolver;
-import org.zkoss.zul.Button;
 import org.zkoss.zul.Window;
 
 import java.io.File;
@@ -77,8 +75,8 @@ public class ConfigsVM {
     @WireVariable
     private CommonService commonService;
 
-    @WireVariable
-    private Config config;
+    @WireVariable("kubeHelperCache")
+    private KubeHelperCache cache;
 
     //TODO fix value
 //    @Value("${kubehelper.git.repo.location.path}")
@@ -90,7 +88,7 @@ public class ConfigsVM {
     @Init
     public void init() {
         configsModel = new ConfigsModel();
-        configsService.checkConfigLocation(configsModel);
+        configsModel.setConfig(commonService.getResourceAsStringByPath(Global.PATH_TO_CONFIG_FILE));
     }
 
     /**
@@ -123,6 +121,7 @@ public class ConfigsVM {
             Notification.show("The configurations was successfully saved.", "info", null, "before_end", 4000);
         }
         BindUtils.postNotifyChange(this, ".");
+        Clients.evalJavaScript("highlightConfig();");
     }
 
 
@@ -133,31 +132,31 @@ public class ConfigsVM {
             return;
         }
         try {
-            if (StringUtils.isAllEmpty(config.getGitUsername(), config.getGitPassword(), config.getGitBranch())) {
-                Git.cloneRepository().setURI(config.getGitUrl())
+            if (StringUtils.isAllEmpty(cache.getGitUsername(), cache.getGitPassword(), cache.getGitBranch())) {
+                Git.cloneRepository().setURI(cache.getGitUrl())
                         .setDirectory(new File(gitRepoLocationPath))
                         .call();
                 return;
-            } else if (StringUtils.isAllEmpty(config.getGitUsername(), config.getGitPassword())) {
-                Git.cloneRepository().setURI(config.getGitUrl())
+            } else if (StringUtils.isAllEmpty(cache.getGitUsername(), cache.getGitPassword())) {
+                Git.cloneRepository().setURI(cache.getGitUrl())
                         .setDirectory(new File(gitRepoLocationPath))
-                        .setBranchesToClone(Arrays.asList("refs/heads/" + config.getGitBranch()))
-                        .setBranch(config.getGitBranch())
+                        .setBranchesToClone(Arrays.asList("refs/heads/" + cache.getGitBranch()))
+                        .setBranch(cache.getGitBranch())
                         .call();
                 return;
             }
 
-            CloneCommand cloneCommand = Git.cloneRepository().setURI(config.getGitUrl());
+            CloneCommand cloneCommand = Git.cloneRepository().setURI(cache.getGitUrl());
             if (!StringUtils.isBlank(getGitBranch())) {
-                cloneCommand.setBranchesToClone(Arrays.asList("refs/heads/" + config.getGitBranch())).setBranch(config.getGitBranch());
+                cloneCommand.setBranchesToClone(Arrays.asList("refs/heads/" + cache.getGitBranch())).setBranch(cache.getGitBranch());
             }
-            cloneCommand.setCredentialsProvider(new UsernamePasswordCredentialsProvider(config.getGitUsername(), config.getGitPassword())).call();
+            cloneCommand.setCredentialsProvider(new UsernamePasswordCredentialsProvider(cache.getGitUsername(), cache.getGitPassword())).call();
         } catch (GitAPIException e) {
             configsModel.addException("Git clone Error. Error:" + e.getMessage(), e);
             logger.error(e.getMessage(), e);
         }
         if (checkExceptions()) {
-            Notification.show(String.format("The repository %s was successfully cloned.", config.getGitUrl()), "info", null, "before_end", 4000);
+            Notification.show(String.format("The repository %s was successfully cloned.", cache.getGitUrl()), "info", null, "before_end", 4000);
         }
     }
 
@@ -203,43 +202,43 @@ public class ConfigsVM {
 
 
     public void setGitUrl(String gitUrl) {
-        config.setGitUrl(gitUrl);
+        cache.setGitUrl(gitUrl);
     }
 
     public String getGitUrl() {
-        return config.getGitUrl();
+        return cache.getGitUrl();
     }
 
     public void setGitBranch(String gitBranch) {
-        config.setGitBranch(gitBranch);
+        cache.setGitBranch(gitBranch);
     }
 
     public String getGitBranch() {
-        return config.getGitBranch();
+        return cache.getGitBranch();
     }
 
     public void setGitUsername(String gitUsername) {
-        config.setGitUsername(gitUsername);
+        cache.setGitUsername(gitUsername);
     }
 
     public String getGitUsername() {
-        return config.getGitUsername();
+        return cache.getGitUsername();
     }
 
     public void setGitPassword(String gitPassword) {
-        config.setGitPassword(gitPassword);
+        cache.setGitPassword(gitPassword);
     }
 
     public String getGitPassword() {
-        return config.getGitPassword();
+        return cache.getGitPassword();
     }
 
     public void setGitEmail(String gitEmail) {
-        config.setGitEmail(gitEmail);
+        cache.setGitEmail(gitEmail);
     }
 
     public String getGitEmail() {
-        return config.getGitEmail();
+        return cache.getGitEmail();
     }
 
 }

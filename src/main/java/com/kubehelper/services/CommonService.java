@@ -18,9 +18,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package com.kubehelper.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.kubehelper.common.Global;
 import com.kubehelper.common.Resource;
-import com.kubehelper.configs.Config;
-import com.kubehelper.domain.models.ConfigsModel;
+import com.kubehelper.configs.KubeHelperCache;
+import com.kubehelper.domain.core.KubeHelperConfig;
+import com.kubehelper.domain.core.KubeHelperScheduledFuture;
+import com.kubehelper.domain.models.DashboardModel;
+import com.kubehelper.domain.models.PageModel;
+import com.kubehelper.domain.results.CronJobResult;
+import com.moandjiezana.toml.TomlWriter;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.KubernetesResource;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
@@ -29,10 +35,9 @@ import io.fabric8.kubernetes.client.internal.SerializationUtils;
 import io.kubernetes.client.openapi.ApiException;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
 import io.kubernetes.client.openapi.models.V1NamespaceList;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.errors.GitAPIException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +46,6 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
-import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zul.Messagebox;
 
 import java.io.BufferedReader;
@@ -56,6 +60,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -70,20 +75,37 @@ import java.util.stream.Stream;
 @Service
 public class CommonService {
 
+    private static Logger logger = LoggerFactory.getLogger(CommonService.class);
+
+    private KubernetesClient fabric8Client = new DefaultKubernetesClient();
+
+    private TomlWriter tomlWriter = new TomlWriter.Builder().indentValuesBy(2).indentTablesBy(4).build();
+
     private ProcessBuilder processBuilder = new ProcessBuilder();
 
     @Autowired
     private CoreV1Api api;
 
     @Autowired
-    private Config config;
+    private KubeHelperCache config;
 
-    private KubernetesClient fabric8Client = new DefaultKubernetesClient();
+    @Autowired
+    private SchedulerService schedulerService;
 
-    private static Logger logger = LoggerFactory.getLogger(CommonService.class);
+    @Value("${kubehelper.predefined.config.path}")
+    private String predefinedConfigPath;
+
+    @Value("${kubehelper.default.config.file.path}")
+    private String defaultConfigFilePath;
+
+    @Value("${kubehelper.custom.config.location.search.path}")
+    private String customConfigLocationSearchPath;
 
     @Value("${kubehelper.git.repo.location.path}")
     private String gitRepoLocationPath;
+
+    @Value("${kubehelper.cron.jobs.reports.path}")
+    private String cronJobsReportsPath;
 
 
     /**
@@ -149,7 +171,7 @@ public class CommonService {
         return "";
     }
 
-    
+
     /**
      * Reads file to string by path.
      *
@@ -307,5 +329,97 @@ public class CommonService {
 
     public void pushGitRepo() {
 
+    }
+
+
+    /**
+     * Checks, creates and search for config.
+     * 1. Searches for custom kubehelper config. If not found then.
+     * 2. Searches for default kubehelper config. If not found then.
+     * 3. Creates new default config from predefined config.
+     *
+     * @param model - @{@link DashboardModel}.
+     */
+    public void checkConfigAndFileLocation(DashboardModel model) {
+
+        //search for custom kubehelper config
+        Set<String> customConfigPath = checkCustomKubeHelperConfig(model);
+        if (!customConfigPath.isEmpty()) {
+            Global.PATH_TO_CONFIG_FILE = customConfigPath.stream().findFirst().get();
+            return;
+        }
+
+        //look for default kubehelper config
+        if (new File(defaultConfigFilePath).exists()) {
+            Global.PATH_TO_CONFIG_FILE = defaultConfigFilePath;
+            return;
+        }
+
+        //create new default config from predefined config
+        try {
+            String predefinedConfig = getClasspathResourceAsStringByPath(predefinedConfigPath);
+            FileUtils.writeStringToFile(new File(defaultConfigFilePath), predefinedConfig);
+            Global.PATH_TO_CONFIG_FILE = defaultConfigFilePath;
+        } catch (IOException e) {
+            model.addException("An error occurred while creating of default config file. Error " + e.getMessage(), e);
+            logger.error("An error occurred while creating of default config file. Error " + e.getMessage());
+        }
+
+    }
+
+    /**
+     * Search for custom kubehelper config.
+     *
+     * @param model - @{@link DashboardModel}.
+     * @return - found set with path to custom config.
+     */
+    private Set<String> checkCustomKubeHelperConfig(DashboardModel model) {
+        Set<String> customConfig = new HashSet<>();
+        try {
+            customConfig = getFilesPathsByDirAndExtension(customConfigLocationSearchPath, 10, "kubehelper-config.toml");
+        } catch (IOException e) {
+            model.addException("An error occurred while searching for custom configuration. Error " + e.getMessage(), e);
+            logger.error("An error occurred while searching for custom configuration. Error " + e.getMessage());
+        }
+        return customConfig;
+    }
+
+    /**
+     * If config will be updated from git or manually, then The state of the config file will be synchronized with the application.
+     *
+     * @param model - @{@link DashboardModel}
+     */
+    public void checkAndStartJobsFromConfig(PageModel model) {
+        try {
+            Global.config = new KubeHelperConfig(getResourceAsStringByPath(Global.PATH_TO_CONFIG_FILE), model);
+
+            //check if config has new jobs for start and starts if active otherwise add new job to jobs list
+            for (CronJobResult cronJob : Global.config.getCronJobsResults(cronJobsReportsPath)) {
+                if (!Global.CRON_JOBS.containsKey(cronJob.getName())) {
+                    if (cronJob.isActive()) {
+                        schedulerService.startCronJob(cronJob, model);
+                    } else {
+                        Global.CRON_JOBS.put(cronJob.getName(),  new KubeHelperScheduledFuture(cronJob, null));
+                    }
+                }
+            }
+        } catch (RuntimeException e) {
+            model.addException("An error occurred while reading configurations file. Error: " + e.getMessage(), e);
+            logger.error("An error occurred while reading configurations file. Error: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Updates(overwrites) config file. For example, activate/deactivate/new cron job.
+     *
+     * @param model - @{@link PageModel} to collect exceptions
+     */
+    public void updateConfigFile(PageModel model) {
+        try {
+            tomlWriter.write(Global.config, new File(Global.PATH_TO_CONFIG_FILE));
+        } catch (IOException e) {
+            model.addException("An error occurred while writing new cron job state to the configurations file. Error: " + e.getMessage(), e);
+            logger.error("An error occurred while writing new cron job state to the configurations file. Error: " + e.getMessage());
+        }
     }
 }

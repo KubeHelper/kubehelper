@@ -2,8 +2,8 @@
         mode="highlighted" width="1200px" height="@load(commandOutputVM.mainWindowHeight)" position="center,top" closable="true" maximizable="true" action="show: slideDown;hide: slideUp">
     <panel width="100%" height="100%">
         <panelchildren>
-            <hbox width="100%" pack="end" align="center">
-                <cell width="80%">
+            <hbox width="100%" pack="start" align="center">
+                <cell width="90%">
                     <label value="@bind(commandOutputVM.command)" width="100%" style="font-family: Courier, Monaco, monospace;color: red;font-size: 12px;" multiline="true"/>
                 </cell>
                 <cell width="10%">

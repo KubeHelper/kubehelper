@@ -17,6 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package com.kubehelper.common;
 
+import com.kubehelper.domain.core.KubeHelperConfig;
 import com.kubehelper.domain.core.KubeHelperScheduledFuture;
 import com.kubehelper.domain.models.CommandsModel;
 import com.kubehelper.domain.models.ConfigsModel;
@@ -37,21 +38,25 @@ import java.util.Map;
  */
 public class Global {
 
-    public static String DASHBOARD_MODEL = "dashboard";
-    public static String SEARCH_MODEL = "search";
-    public static String SECURITY_MODEL = "security";
-    public static String LABELS_MODEL = "labels";
-    public static String COMMANDS_MODEL = "commands";
-    public static String IPS_AND_PORTS_MODEL = "ipsAndPorts";
-    public static String CRON_JOBS_MODEL = "cronJobs";
-    public static String CONFIGS_MODEL = "configs";
-    public static String VERSIONS_MODEL = "versions";
+    public static final String DASHBOARD_MODEL = "dashboard";
+    public static final String SEARCH_MODEL = "search";
+    public static final String SECURITY_MODEL = "security";
+    public static final String LABELS_MODEL = "labels";
+    public static final String COMMANDS_MODEL = "commands";
+    public static final String IPS_AND_PORTS_MODEL = "ipsAndPorts";
+    public static final String CRON_JOBS_MODEL = "cronJobs";
+    public static final String CONFIGS_MODEL = "configs";
+    public static final String VERSIONS_MODEL = "versions";
+
+    public static final String CONFIGS_CACHE = "configs";
 
     public static String AUTH_EXCEPTION_MESSAGE = "";
     public static String PATH_TO_RAW_RESOURCE_ZUL = "~./zul/kubehelper/components/raw-resource.zul";
     public static String PATH_TO_ERROR_RESOURCE_ZUL = "~./zul/kubehelper/components/errors.zul";
+    public static String PATH_TO_CONFIG_FILE = "";
 
     public static HashMap<String, KubeHelperScheduledFuture> CRON_JOBS = new HashMap<>();
+    public static KubeHelperConfig config;
 
     public static Map<String, PageModel> ACTIVE_MODELS = new HashMap<>() {
     };

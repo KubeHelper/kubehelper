@@ -19,7 +19,7 @@
             <vbox height="100%" width="100%">
                 <hbox height="100%" width="100%" align="stretch" spacing="10">
                     <cell width="30%" tooltip="Git URL">
-                        <textbox width="100%" placeholder="https://github.com/JWebDev/kubehelper.git" value="@bind(configsVM.gitUrl)" onOK="@command('cloneCommands')" type="url"/>
+                        <textbox width="100%" placeholder="https://github.com/JWebDev/kubehelper.git" value="@bind(configsVM.gitUrl)" type="url"/>
                     </cell>
                     <cell width="10%" tooltip="Branch">
                         <textbox placeholder="develop" width="100%" value="@bind(configsVM.gitBranch)"/>
