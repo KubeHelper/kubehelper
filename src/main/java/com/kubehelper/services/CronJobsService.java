@@ -159,6 +159,9 @@ public class CronJobsService {
         try {
             Set<String> userCommandFiles = commonService.getFilesPathsByDirAndExtension(userCommandsLocationSearchPath, 10, ".toml");
             for (String filePath : userCommandFiles) {
+                if (filePath.endsWith(Global.CONFIG_FILENAME)) {
+                    continue;
+                }
                 commands.put(Files.getNameWithoutExtension(filePath), new Toml().read(commonService.getResourceAsStringByPath(filePath)));
             }
         } catch (IOException e) {

@@ -19,6 +19,7 @@ package com.kubehelper.services;
 
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.io.Files;
+import com.kubehelper.common.Global;
 import com.kubehelper.common.Resource;
 import com.kubehelper.domain.models.CommandsModel;
 import com.kubehelper.domain.results.CommandsResult;
@@ -140,6 +141,9 @@ public class CommandsService {
         try {
             Set<String> userCommandFiles = commonService.getFilesPathsByDirAndExtension(userCommandsLocationSearchPath, 10, ".toml");
             for (String filePath : userCommandFiles) {
+                if (filePath.endsWith(Global.CONFIG_FILENAME)) {
+                    continue;
+                }
                 commands.put(Files.getNameWithoutExtension(filePath), new Toml().read(commonService.getResourceAsStringByPath(filePath)));
             }
         } catch (IOException | IllegalStateException e) {
@@ -274,7 +278,12 @@ public class CommandsService {
             //search for user commands
             Set<String> filesPathsByDirAndExtension = commonService.getFilesPathsByDirAndExtension(userCommandsLocationSearchPath, 10, ".toml");
             commandsModel.setCommandsSources(new HashMap<>());
-            filesPathsByDirAndExtension.forEach(filePath -> commandsModel.addCommandSource(Files.getNameWithoutExtension(filePath), filePath));
+            for (String filePath : filesPathsByDirAndExtension) {
+                if (filePath.endsWith(Global.CONFIG_FILENAME)) {
+                    continue;
+                }
+                commandsModel.addCommandSource(Files.getNameWithoutExtension(filePath), filePath);
+            }
 
             //get predefined commands
             org.springframework.core.io.Resource[] resources = commonService.getFilesPathsFromClasspathByDirAndExtension(predefinedCommandsPath, ".toml");

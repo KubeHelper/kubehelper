@@ -49,6 +49,7 @@ public class Global {
     public static final String VERSIONS_MODEL = "versions";
 
     public static final String CONFIGS_CACHE = "configs";
+    public static final String CONFIG_FILENAME = "kubehelper-config.toml";
 
     public static String AUTH_EXCEPTION_MESSAGE = "";
     public static String PATH_TO_RAW_RESOURCE_ZUL = "~./zul/kubehelper/components/raw-resource.zul";

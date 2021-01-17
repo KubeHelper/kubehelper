@@ -60,7 +60,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -370,7 +369,7 @@ public class CommonService {
     private Set<String> checkCustomKubeHelperConfig(DashboardModel model) {
         Set<String> customConfig = new HashSet<>();
         try {
-            customConfig = getFilesPathsByDirAndExtension(customConfigLocationSearchPath, 10, "kubehelper-config.toml");
+            customConfig = getFilesPathsByDirAndExtension(customConfigLocationSearchPath, 10, Global.CONFIG_FILENAME);
         } catch (IOException e) {
             model.addException("An error occurred while searching for custom configuration. Error " + e.getMessage(), e);
             logger.error("An error occurred while searching for custom configuration. Error " + e.getMessage());
