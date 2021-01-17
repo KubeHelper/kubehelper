@@ -25,8 +25,8 @@
                         <textbox placeholder="develop" width="100%" value="@bind(configsVM.gitBranch)"/>
                     </cell>
                     <separator width="1%" orient="vertical"></separator>
-                    <cell width="9%" tooltip="Username" valign="middle">
-                        <textbox width="100%" placeholder="Username" value="@bind(configsVM.gitUsername)"/>
+                    <cell width="9%" tooltip="User" valign="middle">
+                        <textbox placeholder="User" width="100%" value="@bind(configsVM.gitUser)"/>
                     </cell>
                     <separator width="1%" orient="vertical"></separator>
                     <cell width="9%" tooltip="Password" valign="middle">

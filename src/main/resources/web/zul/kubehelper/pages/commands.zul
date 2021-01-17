@@ -151,19 +151,11 @@
                                         <caption iconSclass="z-icon-list" label="@load(commandsVM.selectedCommandsSourceLabel)"/>
                                         <panelchildren style="overflow: auto;font-family: Courier, Monaco, monospace;font-size: 14px;line-height: 1.5;">
                                             <div width="100%" height="100%" style="overflow:auto;font-family: Courier, Monaco, monospace;line-height: 1.3;padding-left: 0.2em">
-                                                <!--                                                TODO     contenteditable="${commandsVM.contentEditable}"       -->
-                                                <!--                                                class='highlightComManagement'-->
-                                                <!--                                                <n:div width="100%" height="100%" class="input" contenteditable="true">-->
-                                                <!--                                                    <n:pre>-->
-                                                <!--                                                        <n:code class="toml">${commandsVM.selectedCommandsSourceRaw}</n:code>-->
-                                                <!--                                                    </n:pre>-->
-                                                <!--                                                </n:div>-->
                                                 <div id="commandsManagementOutputId" width="100%" height="100%" class='highlightComManagement' style="@load(commandsVM.commandsManagementCss)"
                                                      onSaveCommandsEvent="@command('saveCommands', commands=event.data.commands)">
 
                                                 </div>
                                             </div>
-                                            <!--                                            <html id="selectedCommandsRawId">"<![CDATA[<pre><code>${commandsVM.selectedCommandsSourceRaw}</code></pre>]]>"</html>-->
                                         </panelchildren>
                                     </panel>
                                 </div>

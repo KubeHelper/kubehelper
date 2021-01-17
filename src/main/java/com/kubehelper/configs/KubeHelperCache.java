@@ -48,7 +48,7 @@ public class KubeHelperCache {
 
     public static String GIT_URL = "gitUrl";
     public static String GIT_BRANCH = "gitBranch";
-    public static String GIT_USERNAME = "gitUsername";
+    public static String GIT_USERNAME = "gitUser";
     public static String GIT_PASSWORD = "gitPassword";
     public static String GIT_EMAIL = "gitEmail";
 
@@ -62,11 +62,11 @@ public class KubeHelperCache {
         return Objects.isNull(value) ? "" : (String) value.get();
     }
 
-    public void setGitUsername(String gitUsername) {
-        cacheManager.getCache(CONFIGS_CACHE).put(GIT_USERNAME, gitUsername);
+    public void setGitUser(String gitUser) {
+        cacheManager.getCache(CONFIGS_CACHE).put(GIT_USERNAME, gitUser);
     }
 
-    public String getGitUsername() {
+    public String getGitUser() {
         Cache.ValueWrapper value = cacheManager.getCache(CONFIGS_CACHE).get(GIT_USERNAME);
         return Objects.isNull(value) ? "" : (String) value.get();
     }
@@ -97,4 +97,5 @@ public class KubeHelperCache {
     public void setGitBranch(String gitBranch) {
         cacheManager.getCache(CONFIGS_CACHE).put(GIT_BRANCH, gitBranch);
     }
+
 }

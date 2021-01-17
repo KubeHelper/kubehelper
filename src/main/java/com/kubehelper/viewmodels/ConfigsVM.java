@@ -21,11 +21,20 @@ import com.kubehelper.common.Global;
 import com.kubehelper.configs.KubeHelperCache;
 import com.kubehelper.domain.models.ConfigsModel;
 import com.kubehelper.services.CommonService;
-import com.kubehelper.services.ConfigsService;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.jgit.api.CheckoutCommand;
 import org.eclipse.jgit.api.CloneCommand;
+import org.eclipse.jgit.api.CreateBranchCommand;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.ListBranchCommand;
+import org.eclipse.jgit.api.PullCommand;
+import org.eclipse.jgit.api.PullResult;
+import org.eclipse.jgit.api.PushCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.errors.ConfigInvalidException;
+import org.eclipse.jgit.lib.Ref;
+import org.eclipse.jgit.lib.StoredConfig;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,13 +58,14 @@ import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zk.ui.util.Notification;
 import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zkplus.spring.SpringUtil;
-import org.zkoss.zul.Hbox;
-import org.zkoss.zul.Vlayout;
+import org.zkoss.zul.Div;
 import org.zkoss.zul.Window;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -73,10 +83,6 @@ public class ConfigsVM {
 
     private ConfigsModel model;
 
-    //    TODO REMOVE
-    @WireVariable
-    private ConfigsService configsService;
-
     @WireVariable
     private CommonService commonService;
 
@@ -85,8 +91,8 @@ public class ConfigsVM {
 
     private String gitRepoLocationPath;
 
-    @Wire("#mainConfigLayout")
-    private Vlayout notificationContainer;
+    @Wire("#configBlockId")
+    private Div notificationContainer;
 
     @Init
     public void init() {
@@ -135,49 +141,154 @@ public class ConfigsVM {
     }
 
 
+    /**
+     * Clones git repo with commands and configs.
+     */
     @Command
     public void cloneGitRepo() {
         if (StringUtils.isBlank(getGitUrl())) {
             Notification.show("Please enter a valid git url in order to clone the repository.", "error", notificationContainer, "top_right", 5000);
             return;
         }
+
+        CloneCommand cloneCommand = Git.cloneRepository().setURI(cache.getGitUrl()).setDirectory(new File(gitRepoLocationPath));
+
         try {
-            if (StringUtils.isAllEmpty(cache.getGitUsername(), cache.getGitPassword(), cache.getGitBranch())) {
-                Git.cloneRepository().setURI(cache.getGitUrl())
-                        .setDirectory(new File(gitRepoLocationPath))
-                        .call();
+            //checkout public repo with default branch
+            if (StringUtils.isAllEmpty(cache.getGitUser(), cache.getGitPassword(), cache.getGitBranch())) {
+                cloneCommand.call();
+                showSuccessfullyClonedNotification();
                 return;
-            } else if (StringUtils.isAllEmpty(cache.getGitUsername(), cache.getGitPassword())) {
-                Git.cloneRepository().setURI(cache.getGitUrl())
-                        .setDirectory(new File(gitRepoLocationPath))
-                        .setBranchesToClone(Arrays.asList("refs/heads/" + cache.getGitBranch()))
+                //checkout public repo with defined branch
+            } else if (StringUtils.isAllEmpty(cache.getGitUser(), cache.getGitPassword())) {
+                cloneCommand.setBranchesToClone(Arrays.asList("refs/heads/" + cache.getGitBranch()))
                         .setBranch(cache.getGitBranch())
                         .call();
+                showSuccessfullyClonedNotification();
                 return;
             }
 
-            CloneCommand cloneCommand = Git.cloneRepository().setURI(cache.getGitUrl());
+            //clone private repo with branch and credentials
             if (!StringUtils.isBlank(getGitBranch())) {
                 cloneCommand.setBranchesToClone(Arrays.asList("refs/heads/" + cache.getGitBranch())).setBranch(cache.getGitBranch());
             }
-            cloneCommand.setCredentialsProvider(new UsernamePasswordCredentialsProvider(cache.getGitUsername(), cache.getGitPassword())).call();
+
+            cloneCommand.setCredentialsProvider(new UsernamePasswordCredentialsProvider(cache.getGitUser(), cache.getGitPassword())).call();
+            showSuccessfullyClonedNotification();
         } catch (GitAPIException e) {
-            model.addException("Git clone Error. Error: " + e.getMessage(), e);
+            Notification.show(String.format("Git clone Error. Error: %s", e.getMessage()), "error", notificationContainer, "top_right", 5000);
             logger.error(e.getMessage(), e);
         }
-        if (checkExceptions()) {
-            Notification.show(String.format("The repository %s was successfully cloned. ", cache.getGitUrl()), "info", notificationContainer, "top_right", 4000);
+    }
+
+    /**
+     * Pull changes from remote.
+     */
+    @Command
+    public void pullGitRepo() {
+        PullResult result;
+        Git git;
+
+        try {
+            git = Git.open(new File(gitRepoLocationPath));
+        } catch (IOException e) {
+            Notification.show(String.format("Cannot build git object in folder %s . The folder may not be empty. Error: %s", gitRepoLocationPath, e.getMessage()), "error", notificationContainer,
+                    "top_right", 5000);
+            logger.error(e.getMessage(), e);
+            return;
+        }
+
+        try {
+            PullCommand pullCommand = git.pull();
+            //set credentials if not empty
+            if (StringUtils.isNoneBlank(getGitUser(), getGitPassword())) {
+                pullCommand.setCredentialsProvider(new UsernamePasswordCredentialsProvider(getGitUser(), getGitPassword()));
+            }
+
+            // if pull repo is other than default
+            if (StringUtils.isNotBlank(getGitBranch()) && !getGitBranch().equals(git.getRepository().getBranch())) {
+                CheckoutCommand checkout = git.checkout();
+
+                //check if branch exists locally. If not then create new branch to pull from remote.
+                if (isLocalBranchNotExists(git, getGitBranch())) {
+                    checkout.setCreateBranch(true);
+                }
+                //pull changes from remote
+                checkout.setName(cache.getGitBranch())
+                        .setUpstreamMode(CreateBranchCommand.SetupUpstreamMode.SET_UPSTREAM)
+                        .setStartPoint("origin/" + cache.getGitBranch()).call();
+            }
+
+            //pull
+            result = pullCommand.call();
+        } catch (GitAPIException | IOException e) {
+            Notification.show(String.format("Cannot pull from repository %s in folder %s. Error: %s", cache.getGitUrl(), gitRepoLocationPath, e.getMessage()), "error", notificationContainer,
+                    "top_right", 5000);
+            logger.error(e.getMessage(), e);
+            return;
+        }
+        if (result.isSuccessful()) {
+            Notification.show(String.format("Pull from repository %s was successful. Pull result: %s", cache.getGitUrl(), result.toString()), "info", notificationContainer,
+                    "top_right",
+                    5000);
+        } else {
+            Notification.show(String.format("Pull from repository %s was unsuccessful. Pull result: ", cache.getGitUrl(), result.toString()), "error", notificationContainer,
+                    "top_right", 5000);
         }
     }
 
-    @Command
-    public void pullGitRepo() {
-        commonService.pullGitRepo();
-    }
-
+    /**
+     * Push to git repo.
+     */
     @Command
     public void pushGitRepo() {
-        commonService.pushGitRepo();
+        PushCommand pushCommand;
+        Git git;
+
+        try {
+            git = Git.open(new File(gitRepoLocationPath));
+        } catch (IOException e) {
+            Notification.show(String.format("Cannot build git object in folder %s . The folder may not be empty. Error: %s", gitRepoLocationPath, e.getMessage()), "error", notificationContainer,
+                    "top_right", 5000);
+            logger.error(e.getMessage(), e);
+            return;
+        }
+        try {
+            //set user and email if they exists
+            setGitUserAndEmail(git);
+            //add akk and commit
+            git.add().addFilepattern(".").call();
+            git.commit().setMessage("Kube Helper commit").call();
+            pushCommand = git.push();
+
+            //push with credentials
+            pushCommand.setRemote("origin").setCredentialsProvider(new UsernamePasswordCredentialsProvider(cache.getGitUser(), cache.getGitPassword())).call();
+        } catch (GitAPIException | IOException | ConfigInvalidException e) {
+            Notification.show(String.format("Cannot push to repository %s in folder %s. Error: %s", cache.getGitUrl(), gitRepoLocationPath, e.getMessage()), "error", notificationContainer,
+                    "top_right", 5000);
+            logger.error(e.getMessage(), e);
+            return;
+        }
+        //success notification
+        Notification.show(String.format("Push to repository %s was successful. Pull pushCommand: %s", cache.getGitUrl(), pushCommand.toString()), "info", notificationContainer, "top_right",
+                5000);
+    }
+
+    /**
+     * Set user and email for push if exists.
+     *
+     * @param git - git object.
+     * @throws IOException            - IOException
+     * @throws ConfigInvalidException - ConfigInvalidException
+     */
+    private void setGitUserAndEmail(Git git) throws IOException, ConfigInvalidException {
+        StoredConfig config = git.getRepository().getConfig();
+        if (StringUtils.isNotBlank(getGitUser()) || StringUtils.isNotBlank(getGitEmail())) {
+            config.load();
+            config.setString("user", null, "name", getGitUser());
+            config.setString("user", null, "email", getGitEmail());
+            config.save();
+        }
     }
 
 
@@ -186,6 +297,30 @@ public class ConfigsVM {
         return model.getConfig();
     }
 
+    /**
+     * If the git needs to pull from a branch that is different from the default branch, then you need to create a local branch. This function checks if a local branch exists.
+     *
+     * @param git    - git object.
+     * @param branch - new or existed branch.
+     * @return - true if local branch doe not exists.
+     */
+    private boolean isLocalBranchNotExists(Git git, String branch) {
+        List<Ref> branches = null;
+        boolean isBranchNotExists = true;
+        try {
+            branches = git.branchList().setListMode(ListBranchCommand.ListMode.ALL).call();
+        } catch (GitAPIException e) {
+            logger.error(e.getMessage(), e);
+        }
+
+        return CollectionUtils.isNotEmpty(branches) ? !branches.stream().filter(ref -> ref.getName().endsWith("refs/heads/" + branch)).findFirst().isPresent() : isBranchNotExists;
+    }
+
+    /**
+     * Check exceptions at model and shows in popup.
+     *
+     * @return - true if model has no exceptions.
+     */
     private boolean checkExceptions() {
         if (model.hasValidationErrors()) {
             Window window = (Window) Executions.createComponents(Global.PATH_TO_ERROR_RESOURCE_ZUL, null, Map.of("errors", model.getValidationExceptions()));
@@ -194,6 +329,14 @@ public class ConfigsVM {
             return false;
         }
         return true;
+    }
+
+    /**
+     * Shows success clone message.
+     */
+    private void showSuccessfullyClonedNotification() {
+        Notification.show(String.format("The repository %s was successfully cloned into %s. Default branch %s", getGitUrl(), gitRepoLocationPath, getGitBranch()), "info",
+                notificationContainer, "top_right", 5000);
     }
 
 
@@ -213,12 +356,12 @@ public class ConfigsVM {
         return cache.getGitBranch();
     }
 
-    public void setGitUsername(String gitUsername) {
-        cache.setGitUsername(gitUsername);
+    public void setGitUser(String gitUser) {
+        cache.setGitUser(gitUser);
     }
 
-    public String getGitUsername() {
-        return cache.getGitUsername();
+    public String getGitUser() {
+        return cache.getGitUser();
     }
 
     public void setGitPassword(String gitPassword) {

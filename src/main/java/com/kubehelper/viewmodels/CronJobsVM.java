@@ -231,7 +231,6 @@ public class CronJobsVM implements EventListener<Event> {
                     if (Messagebox.ON_OK.equals(e.getName())) {
                         if (Global.CRON_JOBS.get(job.getName()).shutdownCronJob()) {
                             Notification.show(String.format("Cron Job %s was stopped.", job.getName()), "info", notificationContainer, "top_right", 3000);
-                            //                            TODO to test
                             cronJobsService.stopCronJob(job, model);
                         } else {
                             Notification.show(String.format("An error occurred while stopping the cron job. Please look in the application log.", job.getName()), "error", notificationContainer, "top_right", 5000);
