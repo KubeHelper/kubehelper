@@ -41,7 +41,7 @@ import java.util.Optional;
  */
 public class SecurityModel implements PageModel {
 
-    private String templateUrl = "~./zul/kubehelper/pages/security.zul";
+    private final String templateUrl = "~./zul/kubehelper/pages/security.zul";
     public static String NAME = Global.SECURITY_MODEL;
 
     private String selectedRolesNamespace = "all";
@@ -109,9 +109,7 @@ public class SecurityModel implements PageModel {
 
     public void addRoleSubjects(String roleName, Resource resource, List<V1beta1Subject> subjects) {
         Optional<RoleResult> role = findRole(roleName, resource);
-        if (role.isPresent()) {
-            role.get().addRoleSubjects(subjects);
-        }
+        role.ifPresent(roleResult -> roleResult.addRoleSubjects(subjects));
     }
 
     private Optional<RoleResult> findRole(String name, Resource resource) {

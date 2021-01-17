@@ -42,11 +42,11 @@ public class ClusterResult {
     }
 
     public void addTotalCpu(String nodeCpus) {
-        totalCpus += Integer.valueOf(nodeCpus);
+        totalCpus += Integer.parseInt(nodeCpus);
     }
 
     public void addTotalCpuTime(String nodeCpuTime) {
-        totalCpusTime += Integer.valueOf(nodeCpuTime);
+        totalCpusTime += Integer.parseInt(nodeCpuTime);
     }
 
     public void addTotalMemory(long nodeMemory) {
@@ -58,7 +58,7 @@ public class ClusterResult {
     }
 
     public void addTotalAllowedPods(String allowedPods) {
-        totalAllowedPods += Integer.valueOf(allowedPods);
+        totalAllowedPods += Integer.parseInt(allowedPods);
     }
 
 

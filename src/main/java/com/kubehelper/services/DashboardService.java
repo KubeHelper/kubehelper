@@ -113,12 +113,12 @@ public class DashboardService {
     }
 
     private String calculateImagesTotalSize(List<ContainerImage> images) {
-        return FileUtils.byteCountToDisplaySize(images.stream().mapToLong(image -> image.getSizeBytes()).sum());
+        return FileUtils.byteCountToDisplaySize(images.stream().mapToLong(ContainerImage::getSizeBytes).sum());
     }
 
     private String getJoinedNodeImagesList(List<ContainerImage> images) {
         return images.stream().
-                map(image -> getParsedContainerImage(image)).
+                map(this::getParsedContainerImage).
                 collect(Collectors.joining("\n"));
     }
 
@@ -136,28 +136,26 @@ public class DashboardService {
 
     private String getJoinedAddressesList(List<NodeAddress> addresses) {
         return addresses.stream().
-                map(address -> getParsedAddress(address)).
+                map(this::getParsedAddress).
                 collect(Collectors.joining("\n"));
     }
 
     private String getParsedAddress(NodeAddress nodeAddress) {
-        return new StringBuilder()
-                .append("address=").append(nodeAddress.getAddress()).append(", ")
-                .append("type=").append(nodeAddress.getType()).toString();
+        return "address=" + nodeAddress.getAddress() + ", " +
+                "type=" + nodeAddress.getType();
     }
 
     private String getJoinedTaintList(List<Taint> taints) {
         return taints.stream().
-                map(taint -> getParsedTaint(taint)).
+                map(this::getParsedTaint).
                 collect(Collectors.joining("\n"));
     }
 
     private String getParsedTaint(Taint taint) {
-        return new StringBuilder()
-                .append("effect=").append(taint.getEffect()).append("\n")
-                .append("key=").append(taint.getKey()).append("\n")
-                .append("timeAdded=").append(taint.getTimeAdded()).append("\n")
-                .append("value=").append(taint.getValue()).toString();
+        return "effect=" + taint.getEffect() + "\n" +
+                "key=" + taint.getKey() + "\n" +
+                "timeAdded=" + taint.getTimeAdded() + "\n" +
+                "value=" + taint.getValue();
     }
 
     private String getJoinedQuantitiesMap(Map<String, Quantity> allocatables) {
@@ -167,26 +165,25 @@ public class DashboardService {
     }
 
     private String getParsedQuantity(String key, Quantity quantity) {
-        return new StringBuilder().append(key).append(" = ")
-                .append("[amount=").append(quantity.getAmount()).append(", ")
-                .append("format=").append(StringUtils.isBlank(quantity.getFormat()) ? "null" : quantity.getFormat()).append("]").toString();
+        return key + " = " +
+                "[amount=" + quantity.getAmount() + ", " +
+                "format=" + (StringUtils.isBlank(quantity.getFormat()) ? "null" : quantity.getFormat()) + "]";
     }
 
 
     private String getJoinedConditionsList(List<NodeCondition> conditions) {
         return conditions.stream().
-                map(condition -> getParsedNodeCondition(condition)).
+                map(this::getParsedNodeCondition).
                 collect(Collectors.joining("\n"));
     }
 
     private String getParsedNodeCondition(NodeCondition condition) {
-        return new StringBuilder()
-                .append("lastHeartbeatTime=").append(condition.getLastHeartbeatTime()).append("\n")
-                .append("lastTransitionTime=").append(condition.getLastTransitionTime()).append("\n")
-                .append("message=").append(condition.getMessage()).append("\n")
-                .append("reason=").append(condition.getReason()).append("\n")
-                .append("status=").append(condition.getStatus()).append("\n")
-                .append("type=").append(condition.getType()).toString();
+        return "lastHeartbeatTime=" + condition.getLastHeartbeatTime() + "\n" +
+                "lastTransitionTime=" + condition.getLastTransitionTime() + "\n" +
+                "message=" + condition.getMessage() + "\n" +
+                "reason=" + condition.getReason() + "\n" +
+                "status=" + condition.getStatus() + "\n" +
+                "type=" + condition.getType();
     }
 
 }

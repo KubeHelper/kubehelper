@@ -35,7 +35,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Objects;
 
 import static com.kubehelper.common.Global.CONFIGS_CACHE;
@@ -104,9 +104,9 @@ public class CustomConfig {
     public CacheManager cacheManager() {
         SimpleCacheManager cacheManager = new SimpleCacheManager();
         if (Objects.nonNull(cacheManager.getCache(CONFIGS_CACHE))) {
-            cacheManager.setCaches(Arrays.asList(cacheManager.getCache(CONFIGS_CACHE)));
+            cacheManager.setCaches(Collections.singletonList(cacheManager.getCache(CONFIGS_CACHE)));
         } else {
-            cacheManager.setCaches(Arrays.asList(new ConcurrentMapCache(CONFIGS_CACHE)));
+            cacheManager.setCaches(Collections.singletonList(new ConcurrentMapCache(CONFIGS_CACHE)));
         }
         return cacheManager;
     }

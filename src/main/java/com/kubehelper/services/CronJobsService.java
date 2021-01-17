@@ -249,9 +249,7 @@ public class CronJobsService {
 
         //clear and get meta from files
         model.setCronJobsReports(new HashMap<>());
-        filesPathsByDirAndExtension.forEach(file -> {
-            model.addReportSource(Files.getNameWithoutExtension(file), file);
-        });
+        filesPathsByDirAndExtension.forEach(file -> model.addReportSource(Files.getNameWithoutExtension(file), file));
         model.sortCronJobsReportsAlphabeticallyAsc();
 
         //set first active

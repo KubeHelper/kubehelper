@@ -34,10 +34,6 @@ public class KubeHelperException extends Exception {
         super(message, exception);
     }
 
-    public String getMessage() {
-        return super.getMessage();
-    }
-
     public String getStack() {
         return ExceptionUtils.getStackTrace(super.getCause());
     }

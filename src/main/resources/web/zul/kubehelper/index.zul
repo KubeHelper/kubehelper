@@ -7,29 +7,29 @@
 <!--<?link href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/atom-one-dark.min.css" rel="stylesheet" type="text/css"?>-->
 <?link href="~./css/all.css" rel="stylesheet" type="text/css"?>
 <zk>
-    <style>
-        .z-auxheader{
-        background-color:#326ce5;
-        border-left:1px solid #f68f2a;
-        border-bottom:1px solid #f68f2a;
-        padding:0;
-        position:relative;
-        overflow:hidden;
-        white-space:nowrap
-        }
-        .z-column{
-        background: #326ce5;
-        border-left: 1px solid #f68f2a;
-        border-bottom: 1px solid #f68f2a;
-        padding:0;
-        position:relative;
-        overflow:hidden;
-        white-space:nowrap;
-        }
-        <!--        .z-column-hover .z-column-content{-->
-        <!--        background: #FFFFFF;-->
-        <!--        }-->
-    </style>
+    <!--    <style>-->
+    <!--        .z-auxheader{-->
+    <!--        background-color:#326ce5;-->
+    <!--        border-left:1px solid #f68f2a;-->
+    <!--        border-bottom:1px solid #f68f2a;-->
+    <!--        padding:0;-->
+    <!--        position:relative;-->
+    <!--        overflow:hidden;-->
+    <!--        white-space:nowrap-->
+    <!--        }-->
+    <!--        .z-column{-->
+    <!--        background: #326ce5;-->
+    <!--        border-left: 1px solid #f68f2a;-->
+    <!--        border-bottom: 1px solid #f68f2a;-->
+    <!--        padding:0;-->
+    <!--        position:relative;-->
+    <!--        overflow:hidden;-->
+    <!--        white-space:nowrap;-->
+    <!--        }-->
+    <!--        &lt;!&ndash;        .z-column-hover .z-column-content{&ndash;&gt;-->
+    <!--        &lt;!&ndash;        background: #FFFFFF;&ndash;&gt;-->
+    <!--        &lt;!&ndash;        }&ndash;&gt;-->
+    <!--    </style>-->
     <script type="text/javascript" defer="true">hljs.initHighlightingOnLoad();</script>
     <div id="indexWindow" viewModel="@id('indexVM') @init('com.kubehelper.viewmodels.IndexVM')" height="100%" width="100%">
         <borderlayout>
@@ -87,7 +87,7 @@
                                                tooltiptext="https://github.com/JWebDev/kubehelper/stargazers" href="https://github.com/JWebDev/kubehelper/stargazers" target="_blank"/>
                                 <separator orient="horizontal"/>
                                 <button iconSclass="z-icon-heartbeat" height="50px" width="100%" label="Donate" dir="reverse"
-                                style="font-size: 18px;font-weight: bold;" onClick="@command('donate')"/>
+                                        style="font-size: 18px;font-weight: bold;" onClick="@command('donate')"/>
                                 <separator orient="horizontal"/>
                             </panelchildren>
                         </panel>

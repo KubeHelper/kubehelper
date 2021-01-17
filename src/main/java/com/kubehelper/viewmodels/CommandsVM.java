@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package com.kubehelper.viewmodels;
 
 import com.kubehelper.common.Global;
-import com.kubehelper.configs.KubeHelperCache;
 import com.kubehelper.domain.filters.CommandsFilter;
 import com.kubehelper.domain.models.CommandsModel;
 import com.kubehelper.domain.results.CommandsResult;
@@ -44,7 +43,6 @@ import org.zkoss.zk.ui.event.AfterSizeEvent;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
-import org.zkoss.zk.ui.event.KeyEvent;
 import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
@@ -65,7 +63,6 @@ import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.Slider;
 import org.zkoss.zul.Tabbox;
 import org.zkoss.zul.Tabpanels;
-import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Toolbarbutton;
 import org.zkoss.zul.Vbox;
 import org.zkoss.zul.Window;
@@ -92,13 +89,10 @@ public class CommandsVM implements EventListener<Event> {
     private String activeTab = "commands";
     private boolean isOnInit = true;
 
-    private final String commandsOutputFontSizeCss = "font-size: %spx;";
     private int commandsOutputFontSize = 14;
 
-    private final String commandsHistoryCss = "font-size: %spx;";
     private int commandsHistoryFontSize = 14;
 
-    private final String commandsManagementCss = "font-size: %spx;";
     private int commandsManagementFontSize = 14;
 
     private boolean wordWrapCommandsInHistory;
@@ -361,16 +355,6 @@ public class CommandsVM implements EventListener<Event> {
     //  COMMANDS MANAGEMENT METHODS ================
 
     @Command
-    public void pullGitRepo() {
-        commonService.pullGitRepo();
-    }
-
-    @Command
-    public void pushGitRepo() {
-        commonService.pushGitRepo();
-    }
-
-    @Command
     public void saveCommands(@BindingParam("commands") String commands) {
         commandsService.updateCommands(commandsModel, commands);
         if (checkExceptions()) {
@@ -623,7 +607,7 @@ public class CommandsVM implements EventListener<Event> {
     }
 
     public String getCommandsOutputFontSizeCss() {
-        return String.format(commandsOutputFontSizeCss, commandsOutputFontSize);
+        return String.format("font-size: %spx;", commandsOutputFontSize);
     }
 
     public String getCommandsGridHeight() {
@@ -795,7 +779,7 @@ public class CommandsVM implements EventListener<Event> {
     }
 
     public String getCommandsManagementCss() {
-        return String.format(commandsManagementCss, commandsManagementFontSize);
+        return String.format("font-size: %spx;", commandsManagementFontSize);
     }
 
 
@@ -855,7 +839,7 @@ public class CommandsVM implements EventListener<Event> {
     }
 
     public String getCommandsHistoryCss() {
-        return String.format(commandsHistoryCss, commandsHistoryFontSize);
+        return String.format("font-size: %spx;", commandsHistoryFontSize);
     }
 
 }

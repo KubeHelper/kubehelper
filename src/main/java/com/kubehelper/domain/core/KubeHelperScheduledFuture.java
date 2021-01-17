@@ -53,7 +53,7 @@ public class KubeHelperScheduledFuture {
     }
 
     public boolean isDone() {
-        return scheduledFuture == null ? true : scheduledFuture.isDone();
+        return scheduledFuture == null || scheduledFuture.isDone();
     }
 
     public boolean isActive() {
@@ -61,7 +61,7 @@ public class KubeHelperScheduledFuture {
     }
 
     public boolean shutdownCronJob() {
-        return scheduledFuture == null ? false : scheduledFuture.cancel(true);
+        return scheduledFuture != null && scheduledFuture.cancel(true);
     }
 
     public void addRun() {

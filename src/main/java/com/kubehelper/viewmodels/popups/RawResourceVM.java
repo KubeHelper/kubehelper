@@ -58,9 +58,6 @@ public class RawResourceVM implements EventListener<Event> {
 
     private static Logger logger = LoggerFactory.getLogger(RawResourceVM.class);
 
-    private final String nonConvertibleKubernetesObjectWarning = "This art of Kubernetes object cannot be converted to %s format.";
-    private final String nonConvertibleKubeHelperObjectWarning = "This ist Kube Helper Custom Object which does not support convert to %s.";
-    private final String tabPanelFontSize = "font-size: %spx;";
     private int fontSize = 14;
 
     private int mainWindowHeight = 900;
@@ -183,7 +180,7 @@ public class RawResourceVM implements EventListener<Event> {
      */
     private boolean isCustomResource(String block) {
         if (resource == KUBE_HELPER_CUSTOM) {
-            Notification.show(String.format(nonConvertibleKubeHelperObjectWarning, block), "warning", null, "top_center", 4000);
+            Notification.show(String.format("This ist Kube Helper Custom Object which does not support convert to %s.", block), "warning", null, "top_center", 4000);
             return true;
         }
         return false;
@@ -198,7 +195,7 @@ public class RawResourceVM implements EventListener<Event> {
      */
     private boolean isResourceEmpty(String content, String block) {
         if (StringUtils.isBlank(content)) {
-            Notification.show(String.format(nonConvertibleKubernetesObjectWarning, block), "warning", null, "top_center", 4000);
+            Notification.show(String.format("This art of Kubernetes object cannot be converted to %s format.", block), "warning", null, "top_center", 4000);
             return true;
         }
         logger.debug(String.format("Resource %s name=%s, namespace=%s was successfully parsed to %s.", resource, name, namespace, block));
@@ -228,7 +225,7 @@ public class RawResourceVM implements EventListener<Event> {
     }
 
     public String getTabPanelFontSize() {
-        return String.format(tabPanelFontSize, fontSize);
+        return String.format("font-size: %spx;", fontSize);
     }
 
     public int getFontSize() {

@@ -61,6 +61,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -115,7 +116,7 @@ public class CommonService {
      * @return - list with namespaces.
      */
     public List<String> getAllNamespaces() {
-        return getAllNamespaces(new ArrayList<>(Arrays.asList("all")));
+        return getAllNamespaces(new ArrayList<>(Collections.singletonList("all")));
     }
 
     /**
@@ -128,7 +129,7 @@ public class CommonService {
     }
 
     private List<String> getAllNamespaces(List<String> initNamespaces) {
-        V1NamespaceList v1NamespacesList = null;
+        V1NamespaceList v1NamespacesList;
         try {
             v1NamespacesList = api.listNamespace(null, false, null, null, null, 0, null, 30, false);
             v1NamespacesList.getItems().forEach(v1Namespace -> initNamespaces.add(v1Namespace.getMetadata().getName()));
@@ -201,7 +202,7 @@ public class CommonService {
     public Set<String> getFilesPathsByDirAndExtension(String dir, int depth, String extension) throws IOException {
         try (Stream<Path> stream = java.nio.file.Files.walk(Paths.get(dir), depth)) {
             return stream
-                    .map(path -> path.toString()).filter(f -> f.endsWith(extension))
+                    .map(Path::toString).filter(f -> f.endsWith(extension))
                     .collect(Collectors.toSet());
         }
     }
@@ -316,20 +317,12 @@ public class CommonService {
      *
      * @param inputStream - inputStream and errorStream
      * @return - readed string.
-     * @throws IOException
+     * @throws IOException - IOException
      */
     private String readOutput(InputStream inputStream) throws IOException {
         try (BufferedReader output = new BufferedReader(new InputStreamReader(inputStream))) {
             return output.lines().map(line -> line = line + "\n").reduce("", String::concat);
         }
-    }
-
-
-    public void pullGitRepo() {
-    }
-
-    public void pushGitRepo() {
-
     }
 
 
@@ -426,7 +419,7 @@ public class CommonService {
         if (!differences.isEmpty()) {
             differences.forEach(jobName -> {
                 try {
-                    Objects.nonNull(Global.CRON_JOBS.remove(jobName));
+                    Global.CRON_JOBS.remove(jobName);
                 } catch (RuntimeException e) {
                     logger.error("An error occurred while stopping cron job. Error: " + e.getMessage());
                 }

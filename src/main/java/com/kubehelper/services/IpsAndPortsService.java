@@ -165,8 +165,8 @@ public class IpsAndPortsService {
             StringJoiner ipsJoiner = new StringJoiner(LS);
 
             //compose service ips
-            Optional.ofNullable(service.getSpec().getClusterIP()).ifPresent(clusterIp -> ipsJoiner.add(clusterIp));
-            Optional.ofNullable(service.getSpec().getLoadBalancerIP()).ifPresent(lbIp -> ipsJoiner.add(lbIp));
+            Optional.ofNullable(service.getSpec().getClusterIP()).ifPresent(ipsJoiner::add);
+            Optional.ofNullable(service.getSpec().getLoadBalancerIP()).ifPresent(ipsJoiner::add);
             Optional.ofNullable(service.getSpec().getExternalIPs()).ifPresent(externalIps -> {
                 StringJoiner externalIpsJoiner = new StringJoiner(",");
                 for (String externalIp : externalIps) {
@@ -181,11 +181,11 @@ public class IpsAndPortsService {
                     StringJoiner portsJoiner = getStringsJoiner();
                     Optional.ofNullable(port.getNodePort()).ifPresent(concatIntegerWithPort("NodePort: ", portsJoiner));
                     Optional.ofNullable(port.getPort()).ifPresent(concatIntegerWithPort("Port: ", portsJoiner));
-                    Optional.ofNullable(port.getTargetPort()).ifPresent(concatIntOrStringWithPort("TargetPort: ", portsJoiner));
+                    Optional.ofNullable(port.getTargetPort()).ifPresent(concatIntOrStringWithPort(portsJoiner));
                     StringJoiner portsNamesJoiner = getStringsJoiner();
                     Optional.ofNullable(port.getName()).ifPresent(concatStringLabelWithPort("name: ", portsNamesJoiner));
                     Optional.ofNullable(port.getProtocol()).ifPresent(concatStringLabelWithPort("protocol: ", portsNamesJoiner));
-                    servicePortsBuilder.append("[ " + portsJoiner.toString() + " " + portsNamesJoiner.toString() + " ]" + LS);
+                    servicePortsBuilder.append("[ ").append(portsJoiner.toString()).append(" ").append(portsNamesJoiner.toString()).append(" ]").append(LS);
                 }
             });
 
@@ -272,8 +272,8 @@ public class IpsAndPortsService {
         return port -> tmpPortsJoiner.add(prefix + port);
     }
 
-    private Consumer<IntOrString> concatIntOrStringWithPort(String prefix, StringJoiner tmpPortsJoiner) {
-        return port -> tmpPortsJoiner.add(prefix + port);
+    private Consumer<IntOrString> concatIntOrStringWithPort(StringJoiner tmpPortsJoiner) {
+        return port -> tmpPortsJoiner.add("TargetPort: " + port);
     }
 
 }

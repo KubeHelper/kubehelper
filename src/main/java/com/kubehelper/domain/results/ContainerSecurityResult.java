@@ -39,10 +39,6 @@ public class ContainerSecurityResult {
     private String seLinuxOptions = "null";
     private String windowsOptions = "null";
 
-//    private String userAtContainer = "null";
-//    private String userAtContainerPermissions = "null";
-//    private String runCommand = "null";
-
     private String namespace = "null";
     private String creationTime = "null";
     private String fullDefinition = "null";

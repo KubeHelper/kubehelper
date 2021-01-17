@@ -42,7 +42,7 @@ import java.util.stream.Collectors;
  */
 public class CommandsModel implements PageModel {
 
-    private String templateUrl = "~./zul/kubehelper/pages/commands.zul";
+    private final String templateUrl = "~./zul/kubehelper/pages/commands.zul";
 
     public static String NAME = Global.COMMANDS_MODEL;
     private List<KubeHelperException> buildExceptions = new ArrayList<>();
@@ -72,7 +72,7 @@ public class CommandsModel implements PageModel {
     private Set<String> selectedJobs = new HashSet<>();
 
     private String selectedShell = "bash";
-    private List<String> shells = Arrays.asList("bash", "sh", "fish", "zsh", "ksh");
+    private final List<String> shells = Arrays.asList("bash", "sh", "fish", "zsh", "ksh");
 
     private String commandToExecute = "";
     private String commandToExecuteEditable = "";
@@ -86,7 +86,7 @@ public class CommandsModel implements PageModel {
     //  COMMANDS HISTORY ================
     private Map<String, FileSourceResult> commandsHistories = new HashMap<>();
 
-    private List<String> commandsHistoryRanges = Arrays.asList("This Week", "This Month", "This Year", "All");
+    private final List<String> commandsHistoryRanges = Arrays.asList("This Week", "This Month", "This Year", "All");
 
     private String selectedCommandsHistoryLabel = "";
     private String selectedCommandsHistoryRaw = "";
@@ -449,7 +449,7 @@ public class CommandsModel implements PageModel {
     }
 
     public List<String> getCommandsHistoriesSortedList() {
-        return commandsHistories.keySet().stream().collect(Collectors.toList());
+        return new ArrayList<>(commandsHistories.keySet());
     }
 
     public CommandsModel setCommandsHistories(Map<String, FileSourceResult> commandsHistories) {

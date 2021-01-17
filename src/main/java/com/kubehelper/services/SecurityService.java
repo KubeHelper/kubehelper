@@ -29,6 +29,7 @@ import com.kubehelper.domain.results.RoleRuleResult;
 import com.kubehelper.domain.results.ServiceAccountResult;
 import io.kubernetes.client.openapi.models.V1Container;
 import io.kubernetes.client.openapi.models.V1ObjectMeta;
+import io.kubernetes.client.openapi.models.V1ObjectReference;
 import io.kubernetes.client.openapi.models.V1Pod;
 import io.kubernetes.client.openapi.models.V1PodList;
 import io.kubernetes.client.openapi.models.V1PodSecurityContext;
@@ -159,27 +160,23 @@ public class SecurityService {
     }
 
     private void buildRoleAndRoleBindingWithSubjects(List<V1beta1PolicyRule> rules, List<V1beta1Subject> subjects, V1ObjectMeta roleMeta, SecurityModel model, Resource role) {
-        subjects.forEach(subject -> {
-            rules.forEach(rule -> {
-                if (Optional.ofNullable(rule.getResources()).isPresent()) {
-                    rule.getResources().forEach(resource -> {
-                        rule.getVerbs().forEach(verb -> {
-                            buildRBACResultWithSubject(model, roleMeta, subject, resource, verb, role);
-                        });
+        subjects.forEach(subject -> rules.forEach(rule -> {
+            if (Optional.ofNullable(rule.getResources()).isPresent()) {
+                rule.getResources().forEach(resource -> {
+                    rule.getVerbs().forEach(verb -> {
+                        buildRBACResultWithSubject(model, roleMeta, subject, resource, verb, role);
                     });
-                }
-            });
-        });
+                });
+            }
+        }));
     }
 
     private void buildRoleAndRoleBindingWithoutSubjects(List<V1beta1PolicyRule> rules, V1ObjectMeta roleMeta, SecurityModel model, Resource role) {
         rules.forEach(rule -> {
             if (Optional.ofNullable(rule.getResources()).isPresent()) {
-                rule.getResources().forEach(resource -> {
-                    rule.getVerbs().forEach(verb -> {
-                        buildRBACResultWithoutSubject(model, roleMeta, "N/A", resource, verb, role);
-                    });
-                });
+                rule.getResources().forEach(resource -> rule.getVerbs().forEach(verb -> {
+                    buildRBACResultWithoutSubject(model, roleMeta, resource, verb, role);
+                }));
             }
         });
     }
@@ -200,14 +197,14 @@ public class SecurityService {
         model.addRBACResult(rbacResult);
     }
 
-    private void buildRBACResultWithoutSubject(SecurityModel model, V1ObjectMeta roleMeta, String subject, String resource, String verb, Resource role) {
+    private void buildRBACResultWithoutSubject(SecurityModel model, V1ObjectMeta roleMeta, String resource, String verb, Resource role) {
         if (skipKubeNamespace(model, roleMeta.getNamespace())) {
             return;
         }
         RBACResult rbacResult = new RBACResult(model.getRbacsResults().size() + 1)
                 .setResourceName(resource)
-                .setSubjectKind(subject)
-                .setSubjectName(subject)
+                .setSubjectKind("N/A")
+                .setSubjectName("N/A")
                 .setRoleName(roleMeta.getName())
                 .setResourceType(role)
                 .setNamespace(roleMeta.getNamespace() == null ? "N/A" : roleMeta.getNamespace())
@@ -289,15 +286,13 @@ public class SecurityService {
 
     private void addRoleRulesToRoleResult(RoleResult roleResult, List<V1beta1PolicyRule> rules) {
         List<RoleRuleResult> roleRules = new ArrayList<>();
-        rules.forEach(rule -> {
-            roleRules.add(new RoleRuleResult(roleRules.size() + 1)
-                    .setApiGroups(rule.getApiGroups())
-                    .setResources(rule.getResources())
-                    .setNonResourceURLs(rule.getNonResourceURLs())
-                    .setVerbs(rule.getVerbs())
-                    .setResourceNames(rule.getResourceNames())
-                    .setFullDefinition(rule.toString()));
-        });
+        rules.forEach(rule -> roleRules.add(new RoleRuleResult(roleRules.size() + 1)
+                .setApiGroups(rule.getApiGroups())
+                .setResources(rule.getResources())
+                .setNonResourceURLs(rule.getNonResourceURLs())
+                .setVerbs(rule.getVerbs())
+                .setResourceNames(rule.getResourceNames())
+                .setFullDefinition(rule.toString())));
         roleResult.addRoleRules(roleRules);
     }
 
@@ -391,7 +386,7 @@ public class SecurityService {
                         .setResourceName(sa.getMetadata().getName())
                         .setKind(sa.getKind())
                         .setNamespace(sa.getMetadata().getNamespace())
-                        .setSecrets(Strings.join(sa.getSecrets().stream().map(secret -> secret.getName()).collect(Collectors.toList()), ','))
+                        .setSecrets(Strings.join(sa.getSecrets().stream().map(V1ObjectReference::getName).collect(Collectors.toList()), ','))
                         .setCreationTime(getParsedCreationTime(sa.getMetadata().getCreationTimestamp()))
                         .setFullDefinition(sa.toString());
                 model.addServiceAccountResult(saResult);

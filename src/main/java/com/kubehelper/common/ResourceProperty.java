@@ -34,7 +34,7 @@ public enum ResourceProperty {
 
     private String value;
 
-    private static final Map<ResourceProperty, String> resourcePropertiesMap = new HashMap<ResourceProperty, String>();
+    private static final Map<ResourceProperty, String> resourcePropertiesMap = new HashMap<>();
 
     static {
         for (ResourceProperty rp : values()) {

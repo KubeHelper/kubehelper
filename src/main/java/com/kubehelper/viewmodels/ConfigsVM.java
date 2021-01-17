@@ -64,7 +64,7 @@ import org.zkoss.zul.Window;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -161,7 +161,7 @@ public class ConfigsVM {
                 return;
                 //checkout public repo with defined branch
             } else if (StringUtils.isAllEmpty(cache.getGitUser(), cache.getGitPassword())) {
-                cloneCommand.setBranchesToClone(Arrays.asList("refs/heads/" + cache.getGitBranch()))
+                cloneCommand.setBranchesToClone(Collections.singletonList("refs/heads/" + cache.getGitBranch()))
                         .setBranch(cache.getGitBranch())
                         .call();
                 showSuccessfullyClonedNotification();
@@ -170,7 +170,7 @@ public class ConfigsVM {
 
             //clone private repo with branch and credentials
             if (!StringUtils.isBlank(getGitBranch())) {
-                cloneCommand.setBranchesToClone(Arrays.asList("refs/heads/" + cache.getGitBranch())).setBranch(cache.getGitBranch());
+                cloneCommand.setBranchesToClone(Collections.singletonList("refs/heads/" + cache.getGitBranch())).setBranch(cache.getGitBranch());
             }
 
             cloneCommand.setCredentialsProvider(new UsernamePasswordCredentialsProvider(cache.getGitUser(), cache.getGitPassword())).call();
@@ -232,7 +232,7 @@ public class ConfigsVM {
                     "top_right",
                     5000);
         } else {
-            Notification.show(String.format("Pull from repository %s was unsuccessful. Pull result: ", cache.getGitUrl(), result.toString()), "error", notificationContainer,
+            Notification.show(String.format("Pull from repository %s was unsuccessful. Pull result: %s", cache.getGitUrl(), result.toString()), "error", notificationContainer,
                     "top_right", 5000);
         }
     }
@@ -306,14 +306,13 @@ public class ConfigsVM {
      */
     private boolean isLocalBranchNotExists(Git git, String branch) {
         List<Ref> branches = null;
-        boolean isBranchNotExists = true;
         try {
             branches = git.branchList().setListMode(ListBranchCommand.ListMode.ALL).call();
         } catch (GitAPIException e) {
             logger.error(e.getMessage(), e);
         }
 
-        return CollectionUtils.isNotEmpty(branches) ? !branches.stream().filter(ref -> ref.getName().endsWith("refs/heads/" + branch)).findFirst().isPresent() : isBranchNotExists;
+        return CollectionUtils.isNotEmpty(branches) ? !branches.stream().filter(ref -> ref.getName().endsWith("refs/heads/" + branch)).findFirst().isPresent() : true;
     }
 
     /**

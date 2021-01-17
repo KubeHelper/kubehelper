@@ -105,14 +105,12 @@ public class DashboardVM {
         BindUtils.postNotifyChange(this, ".");
     }
 
-    private boolean checkExceptions() {
+    private void checkExceptions() {
         if (model.hasExceptions()) {
             Window window = (Window) Executions.createComponents(Global.PATH_TO_ERROR_RESOURCE_ZUL, null, Map.of("errors", model.getExceptions()));
             window.doModal();
             model.setExceptions(new ArrayList<>());
-            return false;
         }
-        return true;
     }
 
     public ClusterResult getClusterResult() {
@@ -207,19 +205,19 @@ public class DashboardVM {
         listHead.appendChild(valueHeader);
         listBox.appendChild(listHead);
 
-        listBoxData.entrySet().forEach(listEntry -> {
+        listBoxData.forEach((key, value) -> {
             Listitem listItem = new Listitem();
             Listcell keyCell = new Listcell();
             Listcell valueCell = new Listcell();
             Label valueLabel = new Label();
-            valueLabel.setValue(listEntry.getValue());
+            valueLabel.setValue(value);
             valueLabel.setMultiline(true);
-            keyCell.setLabel(listEntry.getKey());
+            keyCell.setLabel(key);
             keyCell.setStyle("font-weight: bold;");
             valueCell.appendChild(valueLabel);
             listItem.appendChild(keyCell);
 
-            if ("images".equals(listEntry.getKey())) {
+            if ("images".equals(key)) {
                 valueCell.getChildren().clear();
                 Panel imagesPanel = buildNewPanel("Images [" + totalImagesSize + "]", false);
                 Panelchildren panelchildren = new Panelchildren();

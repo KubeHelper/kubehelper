@@ -28,6 +28,7 @@ import com.kubehelper.domain.results.LabelResult;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +38,7 @@ import java.util.Map;
  */
 public class LabelsModel implements PageModel {
 
-    private String templateUrl = "~./zul/kubehelper/pages/labels.zul";
+    private final String templateUrl = "~./zul/kubehelper/pages/labels.zul";
     public static String NAME = Global.LABELS_MODEL;
     private String selectedNamespace = "all";
     private List<String> namespaces = new ArrayList<>();
@@ -73,7 +74,7 @@ public class LabelsModel implements PageModel {
                 groupedSearchResults.get(searchResult.getName()).add(searchResult);
                 incrementFoundSearchResult(searchResult.getName());
             } else {
-                groupedSearchResults.put(searchResult.getName(), new ArrayList<>(Arrays.asList(searchResult)));
+                groupedSearchResults.put(searchResult.getName(), new ArrayList<>(Collections.singletonList(searchResult)));
                 groupedLabels.add(new GroupedLabel(groupedLabels.size() + 1).setName(searchResult.getName()).setAmount("1"));
             }
         }
@@ -87,7 +88,7 @@ public class LabelsModel implements PageModel {
                 groupedSearchResults.get(searchResult.getName()).add(searchResult);
                 incrementFoundSearchResult(searchResult.getName());
             } else {
-                groupedSearchResults.put(searchResult.getName(), new ArrayList<>(Arrays.asList(searchResult)));
+                groupedSearchResults.put(searchResult.getName(), new ArrayList<>(Collections.singletonList(searchResult)));
                 groupedLabels.add(new GroupedLabel(groupedLabels.size() + 1).setName(searchResult.getName()).setAmount("1"));
             }
         }
@@ -129,7 +130,7 @@ public class LabelsModel implements PageModel {
     private void incrementFoundSearchResult(String name) {
         for (GroupedLabel groupedLabel : groupedLabels) {
             if (groupedLabel.getName().equals(name)) {
-                groupedLabel.setAmount(String.valueOf(Integer.valueOf(groupedLabel.getAmount()) + 1));
+                groupedLabel.setAmount(String.valueOf(Integer.parseInt(groupedLabel.getAmount()) + 1));
                 break;
             }
         }

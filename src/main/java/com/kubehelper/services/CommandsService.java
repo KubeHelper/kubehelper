@@ -26,12 +26,6 @@ import com.kubehelper.domain.results.FileSourceResult;
 import com.moandjiezana.toml.Toml;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -280,9 +274,7 @@ public class CommandsService {
             //search for user commands
             Set<String> filesPathsByDirAndExtension = commonService.getFilesPathsByDirAndExtension(userCommandsLocationSearchPath, 10, ".toml");
             commandsModel.setCommandsSources(new HashMap<>());
-            filesPathsByDirAndExtension.forEach(filePath -> {
-                commandsModel.addCommandSource(Files.getNameWithoutExtension(filePath), filePath);
-            });
+            filesPathsByDirAndExtension.forEach(filePath -> commandsModel.addCommandSource(Files.getNameWithoutExtension(filePath), filePath));
 
             //get predefined commands
             org.springframework.core.io.Resource[] resources = commonService.getFilesPathsFromClasspathByDirAndExtension(predefinedCommandsPath, ".toml");
@@ -363,9 +355,7 @@ public class CommandsService {
         try {
             Set<String> filesPathsByDirAndExtension = commonService.getFilesPathsByDirAndExtension(commandsHistoryPath, 2, ".txt");
             commandsModel.setCommandsHistories(new HashMap<>());
-            filesPathsByDirAndExtension.forEach(file -> {
-                commandsModel.addHistorySource(Files.getNameWithoutExtension(file), file);
-            });
+            filesPathsByDirAndExtension.forEach(file -> commandsModel.addHistorySource(Files.getNameWithoutExtension(file), file));
             commandsModel.sortMapByDateDesc();
             Optional<Map.Entry<String, FileSourceResult>> first = commandsModel.getCommandsHistories().entrySet().stream().findFirst();
             if (first.isPresent()) {
@@ -455,7 +445,7 @@ public class CommandsService {
                     lineToRemove = true;
                 }
             }
-            commandsModel.setSelectedCommandsHistoryRaw(lines.stream().collect(Collectors.joining("\n")));
+            commandsModel.setSelectedCommandsHistoryRaw(String.join("\n", lines));
         } else {
             commandsModel.setSelectedCommandsHistoryRaw(commandsModel.getCommandsRawHistoryBuffer());
         }

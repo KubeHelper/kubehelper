@@ -62,7 +62,7 @@ public class KubeHelperConfig {
         }
 
         if (!notUniqueJobsCheck.isEmpty()) {
-            model.addException(String.format("Some cron jobs has the same name, duplicates were ignored and removed from the config. Duplicated cron jobs: ", notUniqueJobsCheck.toString()),
+            model.addException(String.format("Some cron jobs has the same name, duplicates were ignored and removed from the config. Duplicated cron jobs: %s", notUniqueJobsCheck.toString()),
                     new RuntimeException("Non Unique Cron jobs detected."));
         }
     }

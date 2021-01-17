@@ -69,8 +69,6 @@ public class IndexVM {
 
     @Init
     public void init() {
-//        pageModel = new DashboardModel();
-//        pageModel = new SearchModel();
 //        pageModel = Global.ACTIVE_MODELS.computeIfAbsent(Global.DASHBOARD_MODEL, (k) -> Global.NEW_MODELS.get(Global.DASHBOARD_MODEL));
 //        pageModel = Global.ACTIVE_MODELS.computeIfAbsent(Global.EVENTS_MODEL, (k) -> Global.NEW_MODELS.get(Global.EVENTS_MODEL));
 //        pageModel = Global.ACTIVE_MODELS.computeIfAbsent(Global.IPS_AND_PORTS_MODEL, (k) -> Global.NEW_MODELS.get(Global.IPS_AND_PORTS_MODEL));

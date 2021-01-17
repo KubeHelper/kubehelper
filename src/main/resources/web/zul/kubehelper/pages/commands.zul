@@ -132,11 +132,6 @@
                         <borderlayout width="100%" height="@load(commandsVM.commandsManagementHeight)">
                             <north>
                                 <hbox height="100%" width="100%" align="center" pack="end">
-                                    <button id="pullBtn" label="Pull" iconSclass="z-icon-cloud-download" onClick="@command('pullGitRepo')"/>
-                                    <button id="pushBtn" label="Push" iconSclass="z-icon-cloud-upload" onClick="@command('pushGitRepo')"/>
-                                    <separator orient="horizontal"/>
-                                    <separator orient="horizontal"/>
-                                    <separator orient="horizontal"/>
                                     <button id="plusBtn" iconSclass="fas fa-plus" onClick="@command('addNewCommandsFileWindow')"/>
                                     <separator orient="horizontal"/>
                                     <button id="minusBtn" iconSclass="fas fa-minus" onClick="@command('deleteCommandsFile')"></button>

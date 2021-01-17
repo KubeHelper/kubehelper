@@ -30,7 +30,7 @@ import java.util.List;
  */
 public class DashboardModel implements PageModel {
 
-    private String templateUrl = "~./zul/kubehelper/pages/dashboard.zul";
+    private final String templateUrl = "~./zul/kubehelper/pages/dashboard.zul";
     public static String NAME = Global.DASHBOARD_MODEL;
 
     private ClusterResult clusterResult = new ClusterResult();

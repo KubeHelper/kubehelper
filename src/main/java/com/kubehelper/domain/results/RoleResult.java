@@ -49,9 +49,7 @@ public class RoleResult {
 
     public void addRoleSubjects(List<V1beta1Subject> kubeSubjects) {
         if (kubeSubjects != null) {
-            kubeSubjects.forEach(s -> {
-                subjects.add(convertSubject(s));
-            });
+            kubeSubjects.forEach(s -> subjects.add(convertSubject(s)));
         }
     }
 

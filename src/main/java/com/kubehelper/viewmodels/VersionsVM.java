@@ -88,9 +88,7 @@ public class VersionsVM {
      */
     private void onInitPreparations() {
         List<UtilResult> utilsResults = versionsModel.getUtilsResults();
-        utilsResults.forEach(util -> {
-            util.setVersion(commonService.executeCommand("bash", util.getVersionCheckCommand()));
-        });
+        utilsResults.forEach(util -> util.setVersion(commonService.executeCommand("bash", util.getVersionCheckCommand())));
         versionsResults = new ListModelList<>(utilsResults);
     }
 

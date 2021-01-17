@@ -40,7 +40,7 @@ import java.util.stream.Collectors;
  */
 public class CronJobsModel implements PageModel {
 
-    private String templateUrl = "~./zul/kubehelper/pages/cron.zul";
+    private final String templateUrl = "~./zul/kubehelper/pages/cron.zul";
     public static String NAME = Global.CRON_JOBS_MODEL;
 
     private List<KubeHelperException> exceptions = new ArrayList<>();
@@ -111,10 +111,6 @@ public class CronJobsModel implements PageModel {
         this.cronJobsReportsGroups = cronJobsReportsGroups;
         return this;
     }
-
-    //    public List<FileSourceResult> getCronJobsReportsObjectsForJob() {
-//        return cronJobsReports.values().stream().collect(Collectors.toList());
-//    }
 
     public List<String> getCronJobsReportsForJob() {
         return cronJobsReports.keySet().stream().sorted().collect(Collectors.toList());

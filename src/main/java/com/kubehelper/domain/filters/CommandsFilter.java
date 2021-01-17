@@ -27,7 +27,7 @@ import java.util.List;
  */
 public class CommandsFilter {
 
-    private String description = "", group = "", command = "", name = "";
+    private String description = "", command = "", name = "";
 
     private String selectedGroupFilter = "";
     private String selectedFileFilter = "";
@@ -49,7 +49,7 @@ public class CommandsFilter {
     }
 
     public boolean isFilterActive() {
-        return StringUtils.isNoneBlank(description, group, command, name, selectedGroupFilter, selectedFileFilter);
+        return StringUtils.isNoneBlank(description, command, name, selectedGroupFilter, selectedFileFilter);
     }
 
     public String getDescription() {

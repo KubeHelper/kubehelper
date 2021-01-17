@@ -30,7 +30,7 @@ import java.util.List;
  */
 public class IpsAndPortsModel implements PageModel {
 
-    private String templateUrl = "~./zul/kubehelper/pages/ipsandports.zul";
+    private final String templateUrl = "~./zul/kubehelper/pages/ipsandports.zul";
 
     public static String NAME = Global.IPS_AND_PORTS_MODEL;
     private String selectedNamespace = "all";

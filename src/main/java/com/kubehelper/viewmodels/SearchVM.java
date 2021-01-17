@@ -185,9 +185,7 @@ public class SearchVM implements EventListener {
         selectedResources = isResourcesCheckBoxChecked ? EnumSet.allOf(Resource.class) : new HashSet<>();
         Vbox checkboxesVLayout = (Vbox) Path.getComponent("//indexPage/templateInclude/kubeResourcesVBox");
         for (int i = 0; i < checkboxesVLayout.getChildren().size(); i++) {
-            checkboxesVLayout.getChildren().get(i).getChildren().forEach(cBox -> {
-                ((Checkbox) cBox).setChecked(isResourcesCheckBoxChecked);
-            });
+            checkboxesVLayout.getChildren().get(i).getChildren().forEach(cBox -> ((Checkbox) cBox).setChecked(isResourcesCheckBoxChecked));
         }
     }
 
@@ -288,7 +286,7 @@ public class SearchVM implements EventListener {
     @Override
     public void onEvent(Event event) {
         //Add or remove selected resource to selectedResources model.
-        String resourceId = ((Checkbox) event.getTarget()).getId();
+        String resourceId = event.getTarget().getId();
         String resourceName = resourceId.substring(0, resourceId.lastIndexOf("_"));
         if (selectedResources.contains(Resource.valueOf(resourceName))) {
             selectedResources.remove(Resource.valueOf(resourceName));

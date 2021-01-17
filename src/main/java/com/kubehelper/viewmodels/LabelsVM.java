@@ -183,9 +183,7 @@ public class LabelsVM implements EventListener {
         selectedResources = isResourcesCheckBoxChecked ? EnumSet.allOf(Resource.class) : new HashSet<>();
         Vbox checkboxesVLayout = (Vbox) Path.getComponent("//indexPage/templateInclude/kubeResourcesVBox");
         for (int i = 0; i < checkboxesVLayout.getChildren().size(); i++) {
-            checkboxesVLayout.getChildren().get(i).getChildren().forEach(cBox -> {
-                ((Checkbox) cBox).setChecked(isResourcesCheckBoxChecked);
-            });
+            checkboxesVLayout.getChildren().get(i).getChildren().forEach(cBox -> ((Checkbox) cBox).setChecked(isResourcesCheckBoxChecked));
         }
     }
 
@@ -347,7 +345,7 @@ public class LabelsVM implements EventListener {
     @Override
     public void onEvent(Event event) {
         //Add or remove selected resource to selectedResources model.
-        String resourceId = ((Checkbox) event.getTarget()).getId();
+        String resourceId = event.getTarget().getId();
         String resourceName = resourceId.substring(0, resourceId.lastIndexOf("_"));
         if (selectedResources.contains(Resource.valueOf(resourceName))) {
             selectedResources.remove(Resource.valueOf(resourceName));
@@ -426,18 +424,6 @@ public class LabelsVM implements EventListener {
         }
         isSearchButtonPressed = false;
         return searchResults;
-    }
-
-
-    public boolean isLabelLengthNormal(String label) {
-
-        int length = label.substring(label.indexOf("=")).length();
-        return true;
-    }
-
-    public boolean isLabelLengthTooBig(String label) {
-        int length = label.substring(label.indexOf("=")).length();
-        return true;
     }
 
     public boolean isSkipKubeNamespaces() {

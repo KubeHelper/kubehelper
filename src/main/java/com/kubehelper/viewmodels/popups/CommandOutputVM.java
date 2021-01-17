@@ -50,7 +50,6 @@ public class CommandOutputVM implements EventListener<Event> {
 
     private static Logger logger = LoggerFactory.getLogger(CommandOutputVM.class);
 
-    private final String fontSizeCss = "font-size: %spx;";
     private int fontSize = 14;
 
     private int mainWindowHeight = 900;
@@ -133,7 +132,7 @@ public class CommandOutputVM implements EventListener<Event> {
     }
 
     public String getFontSizeCss() {
-        return String.format(fontSizeCss, fontSize);
+        return String.format("font-size: %spx;", fontSize);
     }
 
 }

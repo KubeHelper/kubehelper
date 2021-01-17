@@ -83,7 +83,6 @@ public class CronJobsVM implements EventListener<Event> {
 
     private String activeTab = "cronJobs";
 
-    private final String cronJobsReportsCss = "font-size: %spx;";
     private int cronJobsReportsFontSize = 14;
 
     private String cronJobName = "";
@@ -160,7 +159,7 @@ public class CronJobsVM implements EventListener<Event> {
         activeTab = tabbox.getSelectedTab().getId();
         if ("cronJobsReports".equals(tabbox.getSelectedTab().getId()) && StringUtils.isBlank(model.getSelectedReportRaw())) {
             cronJobsService.prepareCronJobsReports(model);
-            redrawReportsToolbarbuttons("cronJobsReportsToolbarID", model.getCronJobsReportsForJob(), getCommandToolbarButtonId(model.getSelectedReportLabel()));
+            redrawReportsToolbarbuttons(model.getCronJobsReportsForJob(), getCommandToolbarButtonId(model.getSelectedReportLabel()));
             refreshReportsOutput();
         }
         checkRuntimeNotificationExceptions();
@@ -233,7 +232,8 @@ public class CronJobsVM implements EventListener<Event> {
                             Notification.show(String.format("Cron Job %s was stopped.", job.getName()), "info", notificationContainer, "top_right", 3000);
                             cronJobsService.stopCronJob(job, model);
                         } else {
-                            Notification.show(String.format("An error occurred while stopping the cron job. Please look in the application log.", job.getName()), "error", notificationContainer, "top_right", 5000);
+                            Notification.show(String.format("An error occurred while stopping the cron job %s. Please look in the application log.", job.getName()), "error", notificationContainer,
+                                    "top_right", 5000);
                         }
                         updateActiveCronJobsUI();
                     }
@@ -262,7 +262,8 @@ public class CronJobsVM implements EventListener<Event> {
                             cronJobsService.removeCronJob(job, model);
                             Notification.show(String.format("Cron Job %s was deleted.", job.getName()), "info", notificationContainer, "top_right", 3000);
                         } else {
-                            Notification.show(String.format("An error occurred while stopping the cron job. Please look in the application log.", job.getName()), "error", notificationContainer, "top_right", 5000);
+                            Notification.show(String.format("An error occurred while stopping the cron job %s. Please look in the application log.", job.getName()), "error", notificationContainer,
+                                    "top_right", 5000);
                         }
                         updateActiveCronJobsUI();
                     }
@@ -391,12 +392,11 @@ public class CronJobsVM implements EventListener<Event> {
     /**
      * Recreates and prepares toolbarbuttons after refresh or first start.
      *
-     * @param toolbarId             - toolbar id.
      * @param entries               - set with button labels.
      * @param activeToolbarButtonId - sets active toolbarbutton if report exists.
      */
-    private void redrawReportsToolbarbuttons(String toolbarId, List<String> entries, String activeToolbarButtonId) {
-        createReportsToolbarButtons(toolbarId, entries);
+    private void redrawReportsToolbarbuttons(List<String> entries, String activeToolbarButtonId) {
+        createReportsToolbarButtons("cronJobsReportsToolbarID", entries);
         if (StringUtils.isNotBlank(model.getSelectedReportLabel())) {
             enableDisableMenuItem(activeToolbarButtonId, true, "bold;");
         }
@@ -493,7 +493,7 @@ public class CronJobsVM implements EventListener<Event> {
     public void changeReportsFolder() {
         cronJobsService.changeReportsFolder(model);
         if (checkExceptions()) {
-            redrawReportsToolbarbuttons("cronJobsReportsToolbarID", model.getCronJobsReportsForJob(), getCommandToolbarButtonId(model.getSelectedReportLabel()));
+            redrawReportsToolbarbuttons(model.getCronJobsReportsForJob(), getCommandToolbarButtonId(model.getSelectedReportLabel()));
             refreshReportsOutput();
         }
     }
@@ -505,7 +505,7 @@ public class CronJobsVM implements EventListener<Event> {
     public void refreshReports() {
         cronJobsService.prepareCronJobsReports(model);
         if (checkExceptions()) {
-            redrawReportsToolbarbuttons("cronJobsReportsToolbarID", model.getCronJobsReportsForJob(), getCommandToolbarButtonId(model.getSelectedReportLabel()));
+            redrawReportsToolbarbuttons(model.getCronJobsReportsForJob(), getCommandToolbarButtonId(model.getSelectedReportLabel()));
             refreshReportsOutput();
         }
     }
@@ -625,7 +625,7 @@ public class CronJobsVM implements EventListener<Event> {
     }
 
     public String getCronJobsReportsCss() {
-        return String.format(cronJobsReportsCss, cronJobsReportsFontSize);
+        return String.format("font-size: %spx;", cronJobsReportsFontSize);
     }
 
     public List<String> getAllCronJobsReportsGroups() {
