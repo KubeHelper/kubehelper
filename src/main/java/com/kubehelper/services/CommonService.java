@@ -378,14 +378,27 @@ public class CommonService {
     }
 
     /**
+     * Parse config
      * If config will be updated from git or manually, then The state of the config file will be synchronized with the application.
      *
      * @param model - @{@link DashboardModel}
      */
-    public void checkAndStartJobsFromConfig(PageModel model, String configString) {
+    public void readAndValidateConfig(PageModel model, String configString) {
         try {
             Global.config = new KubeHelperConfig(configString, model);
+        } catch (RuntimeException e) {
+            model.addException("An error occurred while reading configurations file. Error: " + e.getMessage(), e);
+            logger.error("An error occurred while reading configurations file. Error: " + e.getMessage());
+        }
+    }
 
+    /**
+     * If config will be updated from git or manually, then The state of the config file will be synchronized with the application.
+     *
+     * @param model - @{@link DashboardModel}
+     */
+    public void checkAndStartJobsFromConfig(PageModel model) {
+        try {
             //check if config has new jobs for start and starts if active otherwise add new job to jobs list
             for (CronJobResult cronJob : Global.config.getCronJobsResults(cronJobsReportsPath)) {
 
@@ -406,9 +419,18 @@ public class CommonService {
             }
             checkDifferencesBetweenActiveAndConfigJobs();
         } catch (RuntimeException e) {
-            model.addException("An error occurred while reading configurations file. Error: " + e.getMessage(), e);
-            logger.error("An error occurred while reading configurations file. Error: " + e.getMessage());
+            model.addException("An error occurred while starting cron jobs. Error: " + e.getMessage(), e);
+            logger.error("An error occurred while starting cron jobs. Error: " + e.getMessage());
         }
+    }
+
+    /**
+     * If config will be updated from git or manually, then The state of the config file will be synchronized with the application.
+     *
+     * @param model - @{@link DashboardModel}
+     */
+    public void checkGitSettingsFromConfig(PageModel model, String configString) {
+
     }
 
     private void checkDifferencesBetweenActiveAndConfigJobs() {

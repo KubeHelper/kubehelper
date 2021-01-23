@@ -79,9 +79,15 @@ public class DashboardVM {
     public void init() {
         model = (DashboardModel) Global.ACTIVE_MODELS.computeIfAbsent(Global.DASHBOARD_MODEL, (k) -> Global.NEW_MODELS.get(Global.DASHBOARD_MODEL));
         dashboardService.showDashboard(model);
+
         commonService.checkConfigAndFileLocation(model);
         String configString = commonService.getResourceAsStringByPath(Global.PATH_TO_CONFIG_FILE);
-        commonService.checkAndStartJobsFromConfig(model, configString);
+
+        commonService.readAndValidateConfig(model, configString);
+        if (checkExceptions())
+            return;
+
+        commonService.checkAndStartJobsFromConfig(model);
         checkExceptions();
     }
 
@@ -105,12 +111,14 @@ public class DashboardVM {
         BindUtils.postNotifyChange(this, ".");
     }
 
-    private void checkExceptions() {
+    private boolean checkExceptions() {
         if (model.hasExceptions()) {
             Window window = (Window) Executions.createComponents(Global.PATH_TO_ERROR_RESOURCE_ZUL, null, Map.of("errors", model.getExceptions()));
             window.doModal();
             model.setExceptions(new ArrayList<>());
+            return true;
         }
+        return false;
     }
 
     public ClusterResult getClusterResult() {

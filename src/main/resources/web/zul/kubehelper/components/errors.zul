@@ -8,7 +8,7 @@
         <listitem forEach="${arg.errors}" popup="stack_${each.hash}, position=end_before">
             <listcell label="${each.message}">
                 <popup id="stack_${each.hash}">
-                    <label id="error_stack_label_${each.hash}" multiline="true" value="${each.stack}"/>
+                    <label id="error_stack_label_${each.hash}" multiline="true" value="${each.stack}" style="cursor: auto;"/>
                 </popup>
             </listcell>
         </listitem>

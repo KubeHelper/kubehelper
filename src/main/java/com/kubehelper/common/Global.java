@@ -58,6 +58,7 @@ public class Global {
 
     public static HashMap<String, KubeHelperScheduledFuture> CRON_JOBS = new HashMap<>();
     public static KubeHelperConfig config;
+    public static String configString;
 
     public static Map<String, PageModel> ACTIVE_MODELS = new HashMap<>() {
     };

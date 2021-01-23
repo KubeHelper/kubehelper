@@ -17,14 +17,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 package com.kubehelper.domain.core;
 
+import com.kubehelper.common.Global;
 import com.kubehelper.domain.models.PageModel;
 import com.kubehelper.domain.results.CronJobResult;
 import com.moandjiezana.toml.Toml;
+import com.moandjiezana.toml.TomlWriter;
+import org.apache.commons.lang3.StringUtils;
 
+import java.io.IOException;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -41,16 +48,18 @@ public class KubeHelperConfig {
         List<String> notUniqueJobsCheck = new ArrayList<>();
 
         //get git config
-        try {
-            git = configToml.getTable("git").to(Git.class);
-        } catch (RuntimeException ex) {
-            throw new RuntimeException("reading the git configuration: " + ex.getMessage());
-        }
+        getGitConfig(configToml);
 
         //get unique cron jobs, non unique jobs were ignored
         try {
             for (Toml job : configToml.getTables("cron_job")) {
                 CronJob newJob = job.to(CronJob.class);
+
+                //Validate Cron job
+                if (isCronJobNotValid(newJob, model)) {
+                    continue;
+                }
+
                 if (cron_job.contains(newJob)) {
                     notUniqueJobsCheck.add(newJob.name);
                     continue;
@@ -65,6 +74,43 @@ public class KubeHelperConfig {
             model.addException(String.format("Some cron jobs has the same name, duplicates were ignored and removed from the config. Duplicated cron jobs: %s", notUniqueJobsCheck.toString()),
                     new RuntimeException("Non Unique Cron jobs detected."));
         }
+
+        //convert parsed config Object to visualize in config panel.
+        convertParsedConfigToString(model);
+    }
+
+    private void convertParsedConfigToString(PageModel model) {
+        Writer writer = new StringWriter();
+        try {
+            TomlWriter tomlWriter = new TomlWriter.Builder().indentValuesBy(2).indentTablesBy(4).build();
+            tomlWriter.write(this, writer);
+            Global.configString = writer.toString();
+        } catch (IOException e) {
+            model.addException(" parsing to the configurations object to configuration string. Error: " + e.getMessage(), e);
+            throw new RuntimeException(" parsing to the configurations object to configuration string: " + e.getMessage());
+        }
+    }
+
+    private void getGitConfig(Toml configToml) {
+        try {
+            git = configToml.getTable("git").to(Git.class);
+        } catch (RuntimeException ex) {
+            throw new RuntimeException("reading the git configuration: " + ex.getMessage());
+        }
+    }
+
+    private boolean isCronJobNotValid(CronJob newJob, PageModel model) {
+        if (StringUtils.isAnyBlank(newJob.name, newJob.expression, newJob.command)) {
+            model.addException("Cron job %s is not valid. Name, expression and command are required fields.", new RuntimeException("Cron Job validation Exception"));
+            return true;
+        }
+
+        if (!Pattern.matches("^[a-zA-Z0-9_-]*$", newJob.name)) {
+            model.addException(String.format("Cron job %s is not valid. The job name should contain only: letters, numbers, '-' and '_'", newJob.name), new RuntimeException("Cron Job validation Exception"));
+            return true;
+        }
+
+        return false;
     }
 
     public Git getGit() {
@@ -153,11 +199,31 @@ public class KubeHelperConfig {
         }
     }
 
-    private class Git {
+    public class Git {
         private String url = "";
         private String branch = "";
         private String user = "";
         private String password = "";
         private String email = "";
+
+        public String getUrl() {
+            return url;
+        }
+
+        public String getBranch() {
+            return branch;
+        }
+
+        public String getUser() {
+            return user;
+        }
+
+        public String getPassword() {
+            return password;
+        }
+
+        public String getEmail() {
+            return email;
+        }
     }
 }

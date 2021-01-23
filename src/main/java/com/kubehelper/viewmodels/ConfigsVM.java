@@ -67,6 +67,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * View Model for displaying Kube Helper config.
@@ -97,7 +98,7 @@ public class ConfigsVM {
     @Init
     public void init() {
         model = new ConfigsModel();
-        model.setConfig(commonService.getResourceAsStringByPath(Global.PATH_TO_CONFIG_FILE));
+        model.setConfig(Global.configString);
         Environment env = SpringUtil.getApplicationContext().getEnvironment();
         gitRepoLocationPath = env.getProperty("kubehelper.git.repo.location.path");
     }
@@ -131,11 +132,16 @@ public class ConfigsVM {
     @Command
     public void saveConfig(@BindingParam("config") String config) {
         model.setConfig(config);
-        commonService.checkAndStartJobsFromConfig(model, config);
-        if (checkExceptions()) {
-            commonService.updateConfigFile(model);
-            Notification.show("The configurations was successfully saved.", "info", notificationContainer, "top_right", 4000);
-        }
+
+        commonService.readAndValidateConfig(model, config);
+        if (checkExceptions()) return;
+
+        commonService.checkAndStartJobsFromConfig(model);
+        if (checkExceptions()) return;
+
+        commonService.updateConfigFile(model);
+        Notification.show("The configurations was successfully saved.", "info", notificationContainer, "top_right", 4000);
+
         BindUtils.postNotifyChange(this, ".");
         Clients.evalJavaScript("highlightConfig();");
     }
@@ -293,7 +299,6 @@ public class ConfigsVM {
 
 
     public String getConfig() {
-        checkExceptions();
         return model.getConfig();
     }
 
@@ -325,9 +330,9 @@ public class ConfigsVM {
             Window window = (Window) Executions.createComponents(Global.PATH_TO_ERROR_RESOURCE_ZUL, null, Map.of("errors", model.getValidationExceptions()));
             window.doModal();
             model.setValidationExceptions(new ArrayList<>());
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
 
     /**
@@ -344,7 +349,7 @@ public class ConfigsVM {
     }
 
     public String getGitUrl() {
-        return cache.getGitUrl();
+        return Objects.nonNull(Global.config) && StringUtils.isNotBlank(Global.config.getGit().getUrl()) ? Global.config.getGit().getUrl() : cache.getGitUrl();
     }
 
     public void setGitBranch(String gitBranch) {
@@ -352,7 +357,7 @@ public class ConfigsVM {
     }
 
     public String getGitBranch() {
-        return cache.getGitBranch();
+        return Objects.nonNull(Global.config) && StringUtils.isNotBlank(Global.config.getGit().getBranch()) ? Global.config.getGit().getBranch() : cache.getGitBranch();
     }
 
     public void setGitUser(String gitUser) {
@@ -360,7 +365,7 @@ public class ConfigsVM {
     }
 
     public String getGitUser() {
-        return cache.getGitUser();
+        return Objects.nonNull(Global.config) && StringUtils.isNotBlank(Global.config.getGit().getUser()) ? Global.config.getGit().getUser() : cache.getGitUser();
     }
 
     public void setGitPassword(String gitPassword) {
@@ -368,7 +373,7 @@ public class ConfigsVM {
     }
 
     public String getGitPassword() {
-        return cache.getGitPassword();
+        return Objects.nonNull(Global.config) && StringUtils.isNotBlank(Global.config.getGit().getPassword()) ? Global.config.getGit().getPassword() : cache.getGitPassword();
     }
 
     public void setGitEmail(String gitEmail) {
@@ -376,7 +381,7 @@ public class ConfigsVM {
     }
 
     public String getGitEmail() {
-        return cache.getGitEmail();
+        return Objects.nonNull(Global.config) && StringUtils.isNotBlank(Global.config.getGit().getEmail()) ? Global.config.getGit().getEmail() : cache.getGitEmail();
     }
 
 }
