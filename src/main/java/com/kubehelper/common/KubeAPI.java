@@ -191,28 +191,6 @@ public class KubeAPI {
         return new V1beta1RoleBindingList();
     }
 
-    public V1beta1RoleBinding getV1RoleBinding(String roleName, String namespace, PageModel model) {
-        try {
-            return rbacAuthorizationV1beta1Api.readNamespacedRoleBinding(roleName, namespace, null);
-        } catch (ApiException e) {
-            String errorMessage = String.format("Error at getV1RoleBinding: roleName=%s, namespace=%s. Message: %s", roleName, namespace, e.getMessage());
-            model.addException(errorMessage, e);
-            logger.error(errorMessage, e);
-        }
-        return null;
-    }
-
-    public V1beta1ClusterRoleBinding getV1ClusterRoleBinding(String roleName, PageModel model) {
-        try {
-            return rbacAuthorizationV1beta1Api.readClusterRoleBinding(roleName, null);
-        } catch (ApiException e) {
-            String errorMessage = String.format("Error at getV1ClusterRoleBinding: roleName=%s. Message: %s", roleName, e.getMessage());
-            model.addException(errorMessage, e);
-            logger.error(errorMessage, e);
-        }
-        return null;
-    }
-
 
     public V1NetworkPolicyList getV1NetworkPolicyList(String selectedNamespace, PageModel model) {
         try {

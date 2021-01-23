@@ -27,6 +27,11 @@ import com.kubehelper.domain.results.RBACResult;
 import com.kubehelper.domain.results.RoleResult;
 import com.kubehelper.domain.results.RoleRuleResult;
 import com.kubehelper.domain.results.ServiceAccountResult;
+import io.fabric8.kubernetes.api.model.rbac.ClusterRoleBinding;
+import io.fabric8.kubernetes.api.model.rbac.RoleBinding;
+import io.fabric8.kubernetes.api.model.rbac.Subject;
+import io.fabric8.kubernetes.client.DefaultKubernetesClient;
+import io.fabric8.kubernetes.client.KubernetesClient;
 import io.kubernetes.client.openapi.models.V1Container;
 import io.kubernetes.client.openapi.models.V1ObjectMeta;
 import io.kubernetes.client.openapi.models.V1ObjectReference;
@@ -48,7 +53,6 @@ import io.kubernetes.client.openapi.models.V1beta1Role;
 import io.kubernetes.client.openapi.models.V1beta1RoleBinding;
 import io.kubernetes.client.openapi.models.V1beta1RoleBindingList;
 import io.kubernetes.client.openapi.models.V1beta1RoleList;
-import io.kubernetes.client.openapi.models.V1beta1Subject;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.util.Strings;
 import org.joda.time.DateTime;
@@ -78,6 +82,8 @@ public class SecurityService {
 
     @Autowired
     private KubeAPI kubeAPI;
+
+    private KubernetesClient fabricClient = new DefaultKubernetesClient();
 
     public void getRoles(SecurityModel model) {
         model.getRolesResults().clear();
@@ -129,9 +135,10 @@ public class SecurityService {
         try {
             V1beta1ClusterRoleList rolesList = kubeAPI.getV1ClusterRolesList(model);
             for (V1beta1ClusterRole role : rolesList.getItems()) {
-                V1beta1ClusterRoleBinding roleBinding = kubeAPI.getV1ClusterRoleBinding(role.getMetadata().getName(), model);
-                if (Objects.nonNull(roleBinding) && Objects.nonNull(roleBinding.getSubjects())) {
-                    buildRoleAndRoleBindingWithSubjects(role.getRules(), roleBinding.getSubjects(), role.getMetadata(), model, CLUSTER_ROLE);
+                Optional<ClusterRoleBinding> roleBinding =
+                        fabricClient.rbac().clusterRoleBindings().list().getItems().stream().filter(crb -> role.getMetadata().getName().equals(crb.getMetadata().getName())).findFirst();
+                if (roleBinding.isPresent() && Objects.nonNull(roleBinding.get().getSubjects())) {
+                    buildRoleAndRoleBindingWithSubjects(role.getRules(), roleBinding.get().getSubjects(), role.getMetadata(), model, CLUSTER_ROLE);
                 } else {
                     buildRoleAndRoleBindingWithoutSubjects(role.getRules(), role.getMetadata(), model, CLUSTER_ROLE);
                 }
@@ -146,9 +153,11 @@ public class SecurityService {
         try {
             V1beta1RoleList rolesList = kubeAPI.getV1RolesList(model.getSelectedRBACsNamespace(), model);
             for (V1beta1Role role : rolesList.getItems()) {
-                V1beta1RoleBinding roleBinding = kubeAPI.getV1RoleBinding(role.getMetadata().getName(), role.getMetadata().getNamespace() == null ? "default" : role.getMetadata().getNamespace(), model);
-                if (Objects.nonNull(roleBinding) && Objects.nonNull(roleBinding.getSubjects())) {
-                    buildRoleAndRoleBindingWithSubjects(role.getRules(), roleBinding.getSubjects(), role.getMetadata(), model, ROLE);
+                String namespace = role.getMetadata().getNamespace() == null ? "default" : role.getMetadata().getNamespace();
+                Optional<RoleBinding> roleBinding =
+                        fabricClient.rbac().roleBindings().inNamespace(namespace).list().getItems().stream().filter(crb -> role.getMetadata().getName().equals(crb.getMetadata().getName())).findFirst();
+                if (roleBinding.isPresent() && Objects.nonNull(roleBinding.get().getSubjects())) {
+                    buildRoleAndRoleBindingWithSubjects(role.getRules(), roleBinding.get().getSubjects(), role.getMetadata(), model, ROLE);
                 } else {
                     buildRoleAndRoleBindingWithoutSubjects(role.getRules(), role.getMetadata(), model, ROLE);
                 }
@@ -159,7 +168,7 @@ public class SecurityService {
         }
     }
 
-    private void buildRoleAndRoleBindingWithSubjects(List<V1beta1PolicyRule> rules, List<V1beta1Subject> subjects, V1ObjectMeta roleMeta, SecurityModel model, Resource role) {
+    private void buildRoleAndRoleBindingWithSubjects(List<V1beta1PolicyRule> rules, List<Subject> subjects, V1ObjectMeta roleMeta, SecurityModel model, Resource role) {
         subjects.forEach(subject -> rules.forEach(rule -> {
             if (Optional.ofNullable(rule.getResources()).isPresent()) {
                 rule.getResources().forEach(resource -> {
@@ -181,7 +190,7 @@ public class SecurityService {
         });
     }
 
-    private void buildRBACResultWithSubject(SecurityModel model, V1ObjectMeta roleMeta, V1beta1Subject subject, String resource, String verb, Resource role) {
+    private void buildRBACResultWithSubject(SecurityModel model, V1ObjectMeta roleMeta, Subject subject, String resource, String verb, Resource role) {
         if (skipKubeNamespace(model, subject.getNamespace())) {
             return;
         }
@@ -269,9 +278,9 @@ public class SecurityService {
     /**
      * Add new found variable/text/string to search result.
      *
-     * @param meta      - kubernetes resource/object meta
-     * @param model - security model
-     * @param resource      - kubernetes @{@link Resource}
+     * @param meta     - kubernetes resource/object meta
+     * @param model    - security model
+     * @param resource - kubernetes @{@link Resource}
      */
     private void addRoleResultToModel(V1ObjectMeta meta, SecurityModel model, Resource resource, String fullDefinition, List<V1beta1PolicyRule> rules) {
         RoleResult newRoleResult = new RoleResult(model.getRolesResults().size() + 1)
