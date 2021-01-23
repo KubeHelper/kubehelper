@@ -101,7 +101,7 @@ public class CommandsVM implements EventListener<Event> {
 
     private ListModelList<CommandsResult> commandsResults = new ListModelList<>();
 
-    private CommandsModel commandsModel;
+    private CommandsModel model;
 
     @WireVariable
     private CommonService commonService;
@@ -130,7 +130,7 @@ public class CommandsVM implements EventListener<Event> {
     @Init
     @NotifyChange("*")
     public void init() {
-        commandsModel = new CommandsModel();
+        model = new CommandsModel();
         onInitPreparations();
     }
 
@@ -158,11 +158,11 @@ public class CommandsVM implements EventListener<Event> {
      * Parse predefined and user commands an pull namespaces.
      */
     private void onInitPreparations() {
-        commandsService.parsePredefinedCommands(commandsModel);
-        commandsService.parseUserCommands(commandsModel);
-        commandsResults = new ListModelList<>(commandsModel.getCommandsResults());
-        commandsModel.setNamespaces(commandsModel.getNamespaces().isEmpty() ? Set.copyOf(commonService.getAllNamespacesWithoutAll()) : commandsModel.getNamespaces());
-        logger.debug("Found {} namespaces.", commandsModel.getNamespaces());
+        commandsService.parsePredefinedCommands(model);
+        commandsService.parseUserCommands(model);
+        commandsResults = new ListModelList<>(model.getCommandsResults());
+        model.setNamespaces(model.getNamespaces().isEmpty() ? Set.copyOf(commonService.getAllNamespacesWithoutAll()) : model.getNamespaces());
+        logger.debug("Found {} namespaces.", model.getNamespaces());
         checkRuntimeNotificationExceptions();
     }
 
@@ -185,14 +185,14 @@ public class CommandsVM implements EventListener<Event> {
     @Command
     public void onSelectMainCommandsTabs(@ContextParam(ContextType.COMPONENT) Tabbox tabbox) {
         activeTab = tabbox.getSelectedTab().getId();
-        if ("commandsHistory".equals(activeTab) && StringUtils.isBlank(commandsModel.getSelectedCommandsHistoryRaw())) {
-            commandsService.prepareCommandsHistory(commandsModel);
-            redrawCommandsToolbarbuttons("commandsHistoriesToolbarID", commandsModel.getCommandsHistoriesSortedList(), getCommandToolbarButtonId(commandsModel.getSelectedCommandsHistoryLabel()));
+        if ("commandsHistory".equals(activeTab) && StringUtils.isBlank(model.getSelectedCommandsHistoryRaw())) {
+            commandsService.prepareCommandsHistory(model);
+            redrawCommandsToolbarbuttons("commandsHistoriesToolbarID", model.getCommandsHistoriesSortedList(), getCommandToolbarButtonId(model.getSelectedCommandsHistoryLabel()));
             refreshHistoryOutput();
-        } else if ("commandsManagement".equals(activeTab) && StringUtils.isBlank(commandsModel.getSelectedCommandsSourceRaw())) {
-            commandsService.prepareCommandsManagement(commandsModel);
-            redrawCommandsToolbarbuttons("commandsSourcesToolbarID", commandsModel.getCommandsSourcesNamesSortedList(), getCommandToolbarButtonId(commandsModel.getSelectedCommandsSourceLabel()));
-            refreshCommandsManagementOutput(commandsModel.getSelectedCommandsSourceLabel());
+        } else if ("commandsManagement".equals(activeTab) && StringUtils.isBlank(model.getSelectedCommandsSourceRaw())) {
+            commandsService.prepareCommandsManagement(model);
+            redrawCommandsToolbarbuttons("commandsSourcesToolbarID", model.getCommandsSourcesNamesSortedList(), getCommandToolbarButtonId(model.getSelectedCommandsSourceLabel()));
+            refreshCommandsManagementOutput(model.getSelectedCommandsSourceLabel());
             disableEnableMainControlButtons();
         }
         checkRuntimeNotificationExceptions();
@@ -202,8 +202,8 @@ public class CommandsVM implements EventListener<Event> {
      * Checks if in commands model exists runtime exceptions and shows notification.
      */
     private void checkRuntimeNotificationExceptions() {
-        if (StringUtils.isNotBlank(commandsModel.getRuntimeNotificationExceptions())) {
-            Notification.show(commandsModel.getRuntimeNotificationExceptions(), "error", notificationContainer, "bottom_right", 5000);
+        if (StringUtils.isNotBlank(model.getRuntimeNotificationExceptions())) {
+            Notification.show(model.getRuntimeNotificationExceptions(), "error", notificationContainer, "bottom_right", 5000);
         }
     }
 
@@ -216,7 +216,7 @@ public class CommandsVM implements EventListener<Event> {
      */
     private void redrawCommandsToolbarbuttons(String toolbarId, List<String> entries, String activeToolbarButtonId) {
         createCommandsToolbarButtons(toolbarId, entries);
-        if (StringUtils.isNotBlank(commandsModel.getSelectedCommandsHistoryLabel()) || StringUtils.isNotBlank(commandsModel.getSelectedCommandsSourceLabel())) {
+        if (StringUtils.isNotBlank(model.getSelectedCommandsHistoryLabel()) || StringUtils.isNotBlank(model.getSelectedCommandsSourceLabel())) {
             enableDisableMenuItem(activeToolbarButtonId, true, "bold;");
         }
     }
@@ -228,11 +228,11 @@ public class CommandsVM implements EventListener<Event> {
     @Command
     @NotifyChange({"executedCommandOutput"})
     public void run() {
-        if (StringUtils.isBlank(commandsModel.getCommandToExecuteEditable())) {
+        if (StringUtils.isBlank(model.getCommandToExecuteEditable())) {
             Notification.show("Please select or put the command for execute.", "warning", notificationContainer, "top_right", 3000);
             return;
         }
-        commandsService.run(commandsModel);
+        commandsService.run(model);
         highlightCommandOutputBlock();
     }
 
@@ -244,7 +244,7 @@ public class CommandsVM implements EventListener<Event> {
     @NotifyChange({"commandsTotalItems", "commandsResults"})
     public void filterCommands() {
         commandsResults.clear();
-        for (CommandsResult commandeResult : commandsModel.getCommandsResults()) {
+        for (CommandsResult commandeResult : model.getCommandsResults()) {
             if (commonService.checkEqualsFilter(commandeResult.getGroup(), getFilter().getSelectedGroupFilter()) &&
                     commonService.checkEqualsFilter(commandeResult.getFile(), getFilter().getSelectedFileFilter()) &&
                     StringUtils.containsIgnoreCase(commandeResult.getName(), getFilter().getName()) &&
@@ -264,8 +264,8 @@ public class CommandsVM implements EventListener<Event> {
     @Command
     @NotifyChange({"commandToExecute", "commandToExecuteEditable"})
     public void showFullCommand(@BindingParam("clickedItem") CommandsResult item) {
-        commandsModel.setCommandToExecute(getCommandWithoutUnnecessaryWhitespaces(item.getCommand()));
-        commandsModel.setCommandToExecuteEditable(item.getCommand());
+        model.setCommandToExecute(getCommandWithoutUnnecessaryWhitespaces(item.getCommand()));
+        model.setCommandToExecuteEditable(item.getCommand());
     }
 
 
@@ -274,9 +274,15 @@ public class CommandsVM implements EventListener<Event> {
      */
     @Command
     public void synchronizeCommandToExecute() {
-        commandsModel.setCommandToExecute(getCommandWithoutUnnecessaryWhitespaces(commandsModel.getCommandToExecuteEditable()));
+        String command = getCommandWithoutUnnecessaryWhitespaces(model.getCommandToExecuteEditable());
+        if (StringUtils.isNotBlank(model.getSelectedNamespace())) {
+            command = command.replace("$MY_NAMESPACE", model.getSelectedNamespace());
+        }
+        model.setCommandToExecute(command);
+
         BindUtils.postNotifyChange(this, "commandToExecute", "commandToExecuteEditable");
     }
+    
 
     /**
      * Replaces \n with spaces in commad.
@@ -294,11 +300,11 @@ public class CommandsVM implements EventListener<Event> {
      */
     @Command
     public void commandOutputFullSize() {
-        if (StringUtils.isAnyEmpty(commandsModel.getCommandToExecute(), commandsModel.getExecutedCommandOutput())) {
+        if (StringUtils.isAnyEmpty(model.getCommandToExecute(), model.getExecutedCommandOutput())) {
             Notification.show("Cannot open full screen mode if command is not executed.", "warning", notificationContainer, "top_right", 3000);
             return;
         }
-        Map<String, String> params = Map.of("title", "Command Output", "command", commandsModel.getCommandToExecute(), "commandOutput", commandsModel.getExecutedCommandOutput());
+        Map<String, String> params = Map.of("title", "Command Output", "command", model.getCommandToExecute(), "commandOutput", model.getExecutedCommandOutput());
         Window window = (Window) Executions.createComponents("~./zul/kubehelper/components/command-output-window.zul", null, params);
         window.doModal();
     }
@@ -315,10 +321,10 @@ public class CommandsVM implements EventListener<Event> {
         if (isOnInit && !commandsResults.isEmpty()) {
             Notification.show("Loaded: " + commandsResults.size() + " items", "info", commandsGridFooter, "before_end", 2000);
         }
-        if (isOnInit && commandsModel.hasBuildErrors()) {
-            Window window = (Window) Executions.createComponents(Global.PATH_TO_ERROR_RESOURCE_ZUL, null, Map.of("errors", commandsModel.getBuildExceptions()));
+        if (isOnInit && model.hasBuildErrors()) {
+            Window window = (Window) Executions.createComponents(Global.PATH_TO_ERROR_RESOURCE_ZUL, null, Map.of("errors", model.getBuildExceptions()));
             window.doModal();
-            commandsModel.setBuildExceptions(new ArrayList<>());
+            model.setBuildExceptions(new ArrayList<>());
         }
         isOnInit = false;
         return commandsResults;
@@ -331,11 +337,11 @@ public class CommandsVM implements EventListener<Event> {
         Div highlightBlock = (Div) Path.getComponent("//indexPage/templateInclude/commandOutputId");
         highlightBlock.getChildren().clear();
 
-        if (StringUtils.isBlank(commandsModel.getExecutedCommandOutput())) {
+        if (StringUtils.isBlank(model.getExecutedCommandOutput())) {
             Notification.show("Command execution output is empty.", "info", commandOutputGrBox, "before_end", 3000);
         }
 
-        highlightBlock.appendChild(new Html("<pre><code>" + commandsModel.getExecutedCommandOutput() + "</code></pre>"));
+        highlightBlock.appendChild(new Html("<pre><code>" + model.getExecutedCommandOutput() + "</code></pre>"));
         BindUtils.postNotifyChange(this, ".");
     }
 
@@ -356,9 +362,9 @@ public class CommandsVM implements EventListener<Event> {
 
     @Command
     public void saveCommands(@BindingParam("commands") String commands) {
-        commandsService.updateCommands(commandsModel, commands);
+        commandsService.updateCommands(model, commands);
         if (checkExceptions()) {
-            Notification.show(String.format("The Commands %s was successfully saved.", commandsModel.getSelectedCommandsSourceLabel()), "info", notificationContainer, "bottom_right", 4000);
+            Notification.show(String.format("The Commands %s was successfully saved.", model.getSelectedCommandsSourceLabel()), "info", notificationContainer, "bottom_right", 4000);
         }
         BindUtils.postNotifyChange(this, ".");
     }
@@ -369,9 +375,9 @@ public class CommandsVM implements EventListener<Event> {
     public void refreshCommandsManagementOutput(String label) {
         Div historyOutputBlock = (Div) Path.getComponent("//indexPage/templateInclude/commandsManagementOutputId");
         historyOutputBlock.getChildren().clear();
-        boolean isReadonly = !commandsModel.getCommandsSources().get(label).isReadonly();
+        boolean isReadonly = !model.getCommandsSources().get(label).isReadonly();
         String preDiv = "<div id = \"editableCommandsManagementOutputId\" width=\"100%\" height=\"100%\" class=\"input\" contenteditable=\"" + isReadonly + "\">" +
-                "<pre><code class=\"toml\">" + commandsModel.getSelectedCommandsSourceRaw() + "</code></pre></div>";
+                "<pre><code class=\"toml\">" + model.getSelectedCommandsSourceRaw() + "</code></pre></div>";
         historyOutputBlock.appendChild(new Html(preDiv));
         Clients.evalJavaScript("highlightCommandManagement();");
         BindUtils.postNotifyChange(this, ".");
@@ -385,7 +391,7 @@ public class CommandsVM implements EventListener<Event> {
 
     @GlobalCommand
     public void addNewCommandsFile(@BindingParam("newCommandsFilePath") String newCommandsFilePath) {
-        commandsService.addNewCommandsFile(commandsModel, newCommandsFilePath);
+        commandsService.addNewCommandsFile(model, newCommandsFilePath);
         if (checkExceptions()) {
             Notification.show(String.format("The Commands %s was successfully created.", newCommandsFilePath), "info", notificationContainer, "bottom_right", 5000);
             refreshCommandsManagement();
@@ -394,17 +400,17 @@ public class CommandsVM implements EventListener<Event> {
 
     @Command
     public void deleteCommandsFile() {
-        Messagebox.show(String.format("Are you sure you want to delete the file %s with commands?", commandsModel.getSelectedSourceFileResult().getFilePath()),
+        Messagebox.show(String.format("Are you sure you want to delete the file %s with commands?", model.getSelectedSourceFileResult().getFilePath()),
                 "Confirmation", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION,
                 (EventListener) e -> {
                     if (Messagebox.ON_OK.equals(e.getName())) {
-                        if (Files.deleteIfExists(Paths.get(commandsModel.getSelectedSourceFileResult().getFilePath()))) {
+                        if (Files.deleteIfExists(Paths.get(model.getSelectedSourceFileResult().getFilePath()))) {
                             Notification.show(String.format("The Commands file %s was successfully deleted.",
-                                    commandsModel.getSelectedSourceFileResult().getFilePath()), "info", notificationContainer, "bottom_right", 3000);
+                                    model.getSelectedSourceFileResult().getFilePath()), "info", notificationContainer, "bottom_right", 3000);
                             refreshCommandsManagement();
                         } else {
                             Notification.show(String.format("An error occurred while deleting the file %s.",
-                                    commandsModel.getSelectedSourceFileResult().getFilePath()), "warning", notificationContainer, "bottom_right", 3000);
+                                    model.getSelectedSourceFileResult().getFilePath()), "warning", notificationContainer, "bottom_right", 3000);
                         }
                     }
                 }
@@ -422,7 +428,7 @@ public class CommandsVM implements EventListener<Event> {
      */
     @Command
     public void showOnlyCommandsInHistory(@ContextParam(ContextType.COMPONENT) Checkbox checkbox) {
-        commandsService.showOnlyCommandsInHistory(commandsModel, checkbox.isChecked());
+        commandsService.showOnlyCommandsInHistory(model, checkbox.isChecked());
         refreshHistoryOutput();
     }
 
@@ -444,7 +450,7 @@ public class CommandsVM implements EventListener<Event> {
         Div historyOutputBlock = (Div) Path.getComponent("//indexPage/templateInclude/historyOutputId");
         historyOutputBlock.getChildren().clear();
         String style = wordWrapCommandsInHistory ? "style=\"white-space: pre-wrap; word-break: keep-all;\"" : "";
-        historyOutputBlock.appendChild(new Html("<pre " + style + "><code>" + commandsModel.getSelectedCommandsHistoryRaw() + "</code></pre>"));
+        historyOutputBlock.appendChild(new Html("<pre " + style + "><code>" + model.getSelectedCommandsHistoryRaw() + "</code></pre>"));
         BindUtils.postNotifyChange(this, ".");
     }
 
@@ -454,7 +460,7 @@ public class CommandsVM implements EventListener<Event> {
      */
     @Command
     public void changeHistoryRaw() {
-        commandsService.changeHistoryRaw(commandsModel);
+        commandsService.changeHistoryRaw(model);
         refreshHistoryOutput();
     }
 
@@ -464,9 +470,9 @@ public class CommandsVM implements EventListener<Event> {
      */
     @Command
     public void refreshHistory() {
-        commandsModel.setCommandsHistories(new HashMap<>());
-        commandsService.prepareCommandsHistory(commandsModel);
-        redrawCommandsToolbarbuttons("commandsHistoriesToolbarID", commandsModel.getCommandsHistoriesSortedList(), getCommandToolbarButtonId(commandsModel.getSelectedCommandsHistoryLabel()));
+        model.setCommandsHistories(new HashMap<>());
+        commandsService.prepareCommandsHistory(model);
+        redrawCommandsToolbarbuttons("commandsHistoriesToolbarID", model.getCommandsHistoriesSortedList(), getCommandToolbarButtonId(model.getSelectedCommandsHistoryLabel()));
         refreshHistoryOutput();
         BindUtils.postNotifyChange(this, ".");
     }
@@ -476,9 +482,9 @@ public class CommandsVM implements EventListener<Event> {
      */
     @Command
     public void refreshCommandsManagement() {
-        commandsModel.setCommandsSources(new HashMap<>());
-        commandsService.prepareCommandsManagement(commandsModel);
-        redrawCommandsToolbarbuttons("commandsSourcesToolbarID", commandsModel.getCommandsSourcesNamesSortedList(), getCommandToolbarButtonId(commandsModel.getSelectedCommandsSourceLabel()));
+        model.setCommandsSources(new HashMap<>());
+        commandsService.prepareCommandsManagement(model);
+        redrawCommandsToolbarbuttons("commandsSourcesToolbarID", model.getCommandsSourcesNamesSortedList(), getCommandToolbarButtonId(model.getSelectedCommandsSourceLabel()));
 //        Notification.show("Commands management state has been updated.", "info", notificationContainer, "top_right", 3000);
         BindUtils.postNotifyChange(this, ".");
     }
@@ -508,15 +514,15 @@ public class CommandsVM implements EventListener<Event> {
         String label = ((Toolbarbutton) event.getTarget()).getLabel();
         String oldToolbarbuttonId = null;
         if ("commandsHistory".equals(activeTab)) {
-            oldToolbarbuttonId = getCommandToolbarButtonId(commandsModel.getSelectedCommandsHistoryLabel());
-            commandsModel.setSelectedCommandsHistoryLabel(label);
+            oldToolbarbuttonId = getCommandToolbarButtonId(model.getSelectedCommandsHistoryLabel());
+            model.setSelectedCommandsHistoryLabel(label);
             refreshHistoryRangeCombobox();
-            commandsService.changeHistoryRaw(commandsModel);
+            commandsService.changeHistoryRaw(model);
             refreshHistoryOutput();
         } else if ("commandsManagement".equals(activeTab)) {
-            oldToolbarbuttonId = getCommandToolbarButtonId(commandsModel.getSelectedCommandsSourceLabel());
-            commandsModel.setSelectedCommandsSourceLabel(label);
-            commandsService.changeCommandsManagementRaw(commandsModel);
+            oldToolbarbuttonId = getCommandToolbarButtonId(model.getSelectedCommandsSourceLabel());
+            model.setSelectedCommandsSourceLabel(label);
+            commandsService.changeCommandsManagementRaw(model);
             refreshCommandsManagementOutput(label);
             disableEnableMainControlButtons();
         }
@@ -526,14 +532,14 @@ public class CommandsVM implements EventListener<Event> {
     }
 
     public void disableEnableMainControlButtons() {
-        boolean isDisable = commandsModel.getCommandsSources().get(commandsModel.getSelectedCommandsSourceLabel()).isReadonly();
+        boolean isDisable = model.getCommandsSources().get(model.getSelectedCommandsSourceLabel()).isReadonly();
         saveBtn.setDisabled(isDisable);
         minusBtn.setDisabled(isDisable);
     }
 
     private void refreshHistoryRangeCombobox() {
         commandsHistoryRangesCbox.setValue("");
-        commandsModel.setSelectedCommandsHistoryRange("");
+        model.setSelectedCommandsHistoryRange("");
     }
 
 
@@ -573,10 +579,10 @@ public class CommandsVM implements EventListener<Event> {
     }
 
     private boolean checkExceptions() {
-        if (commandsModel.hasBuildErrors()) {
-            Window window = (Window) Executions.createComponents(Global.PATH_TO_ERROR_RESOURCE_ZUL, null, Map.of("errors", commandsModel.getBuildExceptions()));
+        if (model.hasBuildErrors()) {
+            Window window = (Window) Executions.createComponents(Global.PATH_TO_ERROR_RESOURCE_ZUL, null, Map.of("errors", model.getBuildExceptions()));
             window.doModal();
-            commandsModel.setBuildExceptions(new ArrayList<>());
+            model.setBuildExceptions(new ArrayList<>());
             return false;
         }
         return true;
@@ -587,7 +593,7 @@ public class CommandsVM implements EventListener<Event> {
 
 
     public CommandsFilter getFilter() {
-        return commandsModel.getFilter();
+        return model.getFilter();
     }
 
     public String getCommandsTotalItems() {
@@ -595,11 +601,11 @@ public class CommandsVM implements EventListener<Event> {
     }
 
     public String getCommandToExecute() {
-        return commandsModel.getCommandToExecute();
+        return model.getCommandToExecute();
     }
 
     public void setCommandToExecute(String commandToExecute) {
-        commandsModel.setCommandToExecute(commandToExecute);
+        model.setCommandToExecute(commandToExecute);
     }
 
     public int getCommandsOutputFontSize() {
@@ -623,135 +629,135 @@ public class CommandsVM implements EventListener<Event> {
     }
 
     public String getExecutedCommandOutput() {
-        return commandsModel.getExecutedCommandOutput();
+        return model.getExecutedCommandOutput();
     }
 
     public String getCommandToExecuteEditable() {
-        return commandsModel.getCommandToExecuteEditable();
+        return model.getCommandToExecuteEditable();
     }
 
     public void setCommandToExecuteEditable(String commandToExecuteEditable) {
-        commandsModel.setCommandToExecuteEditable(commandToExecuteEditable);
+        model.setCommandToExecuteEditable(commandToExecuteEditable);
     }
 
     public Set<String> getNamespaces() {
-        return commandsModel.getNamespaces();
+        return model.getNamespaces();
     }
 
     public Set<String> getNamespacedPods() {
-        return commandsModel.getNamespacedPods();
+        return model.getNamespacedPods();
     }
 
     public Set<String> getNamespacedDeployments() {
-        return commandsModel.getNamespacedDeployments();
+        return model.getNamespacedDeployments();
     }
 
     public Set<String> getNamespacedStatefulSets() {
-        return commandsModel.getNamespacedStatefulSets();
+        return model.getNamespacedStatefulSets();
     }
 
     public Set<String> getNamespacedReplicaSets() {
-        return commandsModel.getNamespacedReplicaSets();
+        return model.getNamespacedReplicaSets();
     }
 
     public Set<String> getNamespacedDaemonSets() {
-        return commandsModel.getNamespacedDaemonSets();
+        return model.getNamespacedDaemonSets();
     }
 
     public Set<String> getNamespacedConfigMaps() {
-        return commandsModel.getNamespacedConfigMaps();
+        return model.getNamespacedConfigMaps();
     }
 
     public Set<String> getNamespacedServices() {
-        return commandsModel.getNamespacedServices();
+        return model.getNamespacedServices();
     }
 
     public Set<String> getNamespacedJobs() {
-        return commandsModel.getNamespacedJobs();
+        return model.getNamespacedJobs();
     }
 
     public String getSelectedNamespace() {
-        return commandsModel.getSelectedNamespace();
+        return model.getSelectedNamespace();
     }
 
     public void setSelectedNamespace(String selectedNamespace) {
-        commandsModel.setSelectedNamespace(selectedNamespace);
+        model.setSelectedNamespace(selectedNamespace);
     }
 
     public Set<String> getSelectedDeployments() {
-        return commandsModel.getSelectedDeployments();
+        return model.getSelectedDeployments();
     }
 
     public Set<String> getSelectedStatefulSets() {
-        return commandsModel.getSelectedStatefulSets();
+        return model.getSelectedStatefulSets();
     }
 
     public Set<String> getSelectedReplicaSets() {
-        return commandsModel.getSelectedReplicaSets();
+        return model.getSelectedReplicaSets();
     }
 
     public Set<String> getSelectedDaemonSets() {
-        return commandsModel.getSelectedDaemonSets();
+        return model.getSelectedDaemonSets();
     }
 
     public Set<String> getSelectedConfigMaps() {
-        return commandsModel.getSelectedConfigMaps();
+        return model.getSelectedConfigMaps();
     }
 
     public Set<String> getSelectedServices() {
-        return commandsModel.getSelectedServices();
+        return model.getSelectedServices();
     }
 
     public Set<String> getSelectedJobs() {
-        return commandsModel.getSelectedJobs();
+        return model.getSelectedJobs();
     }
 
     public Set<String> getSelectedPods() {
-        return commandsModel.getSelectedPods();
+        return model.getSelectedPods();
     }
 
     public void setSelectedPods(Set<String> selectedPods) {
-        commandsModel.setSelectedPods(selectedPods);
+        model.setSelectedPods(selectedPods);
     }
 
     public void setSelectedDeployments(Set<String> selectedDeployments) {
-        commandsModel.setSelectedDeployments(selectedDeployments);
+        model.setSelectedDeployments(selectedDeployments);
     }
 
     public void setSelectedStatefulSets(Set<String> selectedStatefulSets) {
-        commandsModel.setSelectedStatefulSets(selectedStatefulSets);
+        model.setSelectedStatefulSets(selectedStatefulSets);
     }
 
     public void setSelectedReplicaSets(Set<String> selectedReplicaSets) {
-        commandsModel.setSelectedReplicaSets(selectedReplicaSets);
+        model.setSelectedReplicaSets(selectedReplicaSets);
     }
 
     public void setSelectedDaemonSets(Set<String> selectedDaemonSets) {
-        commandsModel.setSelectedDaemonSets(selectedDaemonSets);
+        model.setSelectedDaemonSets(selectedDaemonSets);
     }
 
     public void setSelectedConfigMaps(Set<String> selectedConfigMaps) {
-        commandsModel.setSelectedConfigMaps(selectedConfigMaps);
+        model.setSelectedConfigMaps(selectedConfigMaps);
     }
 
     public void setSelectedServices(Set<String> selectedServices) {
-        commandsModel.setSelectedServices(selectedServices);
+        model.setSelectedServices(selectedServices);
     }
 
     public void setSelectedJobs(Set<String> selectedJobs) {
-        commandsModel.setSelectedJobs(selectedJobs);
+        model.setSelectedJobs(selectedJobs);
     }
 
     public String getSelectedShell() {
-        return commandsModel.getSelectedShell();
+        return model.getSelectedShell();
     }
 
     public void setSelectedShell(String selectedShell) {
-        commandsModel.setSelectedShell(selectedShell);
+        model.setSelectedShell(selectedShell);
     }
 
     public List<String> getShells() {
-        return commandsModel.getShells();
+        return model.getShells();
     }
 
 
@@ -759,15 +765,15 @@ public class CommandsVM implements EventListener<Event> {
 
 
     public String getSelectedCommandsSourceRaw() {
-        return commandsModel.getSelectedCommandsSourceRaw();
+        return model.getSelectedCommandsSourceRaw();
     }
 
     public String getSelectedCommandsSourceLabel() {
-        return commandsModel.getSelectedCommandsSourceLabel();
+        return model.getSelectedCommandsSourceLabel();
     }
 
     public void setSelectedCommandsSourceLabel(String selectedCommandsSource) {
-        commandsModel.setSelectedCommandsSourceLabel(selectedCommandsSource);
+        model.setSelectedCommandsSourceLabel(selectedCommandsSource);
     }
 
     public String getCommandsManagementHeight() {
@@ -787,15 +793,15 @@ public class CommandsVM implements EventListener<Event> {
 
 
     public String getSelectedCommandsHistoryRaw() {
-        return commandsModel.getSelectedCommandsSourceRaw();
+        return model.getSelectedCommandsSourceRaw();
     }
 
     public String getSelectedCommandsHistoryLabel() {
-        return commandsModel.getSelectedCommandsHistoryLabel();
+        return model.getSelectedCommandsHistoryLabel();
     }
 
     public void setSelectedCommandsHistoryLabel(String selectedCommandsHistory) {
-        commandsModel.setSelectedCommandsHistoryLabel(selectedCommandsHistory);
+        model.setSelectedCommandsHistoryLabel(selectedCommandsHistory);
     }
 
     public String getCommandsHistorySrcPanelHeight() {
@@ -807,23 +813,23 @@ public class CommandsVM implements EventListener<Event> {
     }
 
     public String getSelectedCommandsHistoryRange() {
-        return commandsModel.getSelectedCommandsHistoryRange();
+        return model.getSelectedCommandsHistoryRange();
     }
 
     public void setSelectedCommandsHistoryRange(String selectedCommandsHistoryRange) {
-        commandsModel.setSelectedCommandsHistoryRange(selectedCommandsHistoryRange);
+        model.setSelectedCommandsHistoryRange(selectedCommandsHistoryRange);
     }
 
     public List<String> getCommandsHistoryRanges() {
-        return commandsModel.getCommandsHistoryRanges();
+        return model.getCommandsHistoryRanges();
     }
 
     public boolean isShowOnlyCommandsInHistory() {
-        return commandsModel.isShowOnlyCommandsInHistory();
+        return model.isShowOnlyCommandsInHistory();
     }
 
     public void setShowOnlyCommandsInHistory(boolean showOnlyCommandsInHistory) {
-        commandsModel.setShowOnlyCommandsInHistory(showOnlyCommandsInHistory);
+        model.setShowOnlyCommandsInHistory(showOnlyCommandsInHistory);
     }
 
     public boolean isWordWrapCommandsInHistory() {

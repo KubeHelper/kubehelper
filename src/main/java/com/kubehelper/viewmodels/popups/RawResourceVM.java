@@ -45,7 +45,9 @@ import org.zkoss.zul.Slider;
 import org.zkoss.zul.Tab;
 import org.zkoss.zul.Tabbox;
 
+import static com.kubehelper.common.Resource.KUBE_HELPER_CONTAINER_SECURITY_CONTEXT;
 import static com.kubehelper.common.Resource.KUBE_HELPER_CUSTOM;
+import static com.kubehelper.common.Resource.KUBE_HELPER_POD_SECURITY_CONTEXT;
 
 /**
  * Class for displaying resource raw sources in java/yaml/json formats.
@@ -128,7 +130,7 @@ public class RawResourceVM implements EventListener<Event> {
         if ("onScroll".equals(event.getName())) {
             Slider fontSlider = (Slider) event.getTarget();
             fontSize = fontSlider.getCurpos();
-            BindUtils.postNotifyChange( this, "tabPanelFontSize");
+            BindUtils.postNotifyChange(this, "tabPanelFontSize");
         } else if ("onSelect".equals(event.getName())) {
             Tab tab = (Tab) event.getTarget();
             switch (tab.getId()) {
@@ -179,7 +181,7 @@ public class RawResourceVM implements EventListener<Event> {
      * @return - true if resource is custom and cannot be converted to kubernetes resource.
      */
     private boolean isCustomResource(String block) {
-        if (resource == KUBE_HELPER_CUSTOM) {
+        if (resource == KUBE_HELPER_CUSTOM || resource == KUBE_HELPER_CONTAINER_SECURITY_CONTEXT || resource == KUBE_HELPER_POD_SECURITY_CONTEXT) {
             Notification.show(String.format("This ist Kube Helper Custom Object which does not support convert to %s.", block), "warning", null, "top_center", 4000);
             return true;
         }
@@ -212,7 +214,7 @@ public class RawResourceVM implements EventListener<Event> {
     private void highlightBlock(String blockId, String blockClass, String content) {
         Div highlightBlock = (Div) Path.getComponent("/rawResourceWindowID/" + blockId);
         highlightBlock.appendChild(new Html("<pre><code class=" + blockClass + ">" + content + "</code></pre>"));
-        BindUtils.postNotifyChange( this, ".");
+        BindUtils.postNotifyChange(this, ".");
         Clients.evalJavaScript(String.format("highlightBlock('%s');", blockClass));
     }
 

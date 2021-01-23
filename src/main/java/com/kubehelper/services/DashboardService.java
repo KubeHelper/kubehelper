@@ -63,12 +63,7 @@ public class DashboardService {
             NodeList nodesList = client.nodes().list();
             clusterResult.setTotalNodes(nodesList.getItems().size());
 
-            clusterResult.setTotalPods(client.pods().list().getItems().size());
-
-            //TODO check pods in cluster
-            client.pods().list().getItems().forEach(pod -> {
-                logger.info(String.format("POD: %s", pod.getMetadata().getName()));
-            });
+            clusterResult.setTotalPods(client.pods().inAnyNamespace().list().getItems().size());
 
             nodesList.getItems().forEach(node -> {
                 NodeResult nodeResult = new NodeResult(dashboardModel.getNodesResults().size() + 1)

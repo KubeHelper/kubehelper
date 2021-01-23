@@ -88,8 +88,23 @@
                                              style="font-family: Courier, Monaco, monospace;color: blue;font-size: 13px;line-height: 1.4;margin-bottom: 2px;">
                                     </textbox>
                                     <separator orient="horizontal"></separator>
-                                    <textbox value="@bind(commandsVM.commandToExecute)" width="100%"
-                                             style="font-family: Courier, Monaco, monospace;color: red;font-size: 12px;" readonly="true"/>
+                                    <hbox width="100%" align="start" pack="stretch">
+                                        <cell width="12%" valign="bottom">
+                                            <label value="Namespace: "/>
+                                            <combobox hflex="1" model="@load(commandsVM.namespaces)" selectedItem="@bind(commandsVM.selectedNamespace)" readonly="true"
+                                                      onChange="@command('synchronizeCommandToExecute')">
+                                                <template name="model">
+                                                    <comboitem label="@load(each)"/>
+                                                </template>
+                                            </combobox>
+                                        </cell>
+                                        <cell width="0.5%" valign="bottom">
+                                        </cell>
+                                        <cell width="87.5%" valign="bottom">
+                                            <textbox value="@bind(commandsVM.commandToExecute)" width="100%"
+                                                     style="font-family: Courier, Monaco, monospace;color: red;font-size: 12px;" readonly="true"/>
+                                        </cell>
+                                    </hbox>
                                 </cell>
                                 <cell width="10%" valign="middle">
                                     <hbox width="100%" height="50%" align="start" pack="stretch">

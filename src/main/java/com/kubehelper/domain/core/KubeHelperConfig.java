@@ -50,7 +50,16 @@ public class KubeHelperConfig {
         //get git config
         getGitConfig(configToml);
 
-        //get unique cron jobs, non unique jobs were ignored
+        if (Objects.nonNull(configToml.getTables("cron_job"))) {
+            parseCronJobs(model, configToml, notUniqueJobsCheck);
+        }
+
+        //convert parsed config Object to visualize in config panel.
+        convertParsedConfigToString(model);
+    }
+
+    //get unique cron jobs, non unique jobs were ignored
+    private void parseCronJobs(PageModel model, Toml configToml, List<String> notUniqueJobsCheck) {
         try {
             for (Toml job : configToml.getTables("cron_job")) {
                 CronJob newJob = job.to(CronJob.class);
@@ -74,9 +83,6 @@ public class KubeHelperConfig {
             model.addException(String.format("Some cron jobs has the same name, duplicates were ignored and removed from the config. Duplicated cron jobs: %s", notUniqueJobsCheck.toString()),
                     new RuntimeException("Non Unique Cron jobs detected."));
         }
-
-        //convert parsed config Object to visualize in config panel.
-        convertParsedConfigToString(model);
     }
 
     private void convertParsedConfigToString(PageModel model) {
