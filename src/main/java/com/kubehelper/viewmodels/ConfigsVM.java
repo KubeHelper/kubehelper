@@ -140,6 +140,9 @@ public class ConfigsVM {
         if (checkExceptions()) return;
 
         commonService.updateConfigFile(model);
+
+        commonService.updateCronJobsDetailsFromConfig();
+
         Notification.show("The configurations was successfully saved.", "info", notificationContainer, "top_right", 4000);
 
         BindUtils.postNotifyChange(this, ".");

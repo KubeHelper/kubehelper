@@ -52,6 +52,12 @@ public class KubeHelperScheduledFuture {
         this.isActive = jobResult.isActive();
     }
 
+    public void updateCronJobDetails(CronJobResult jobResult){
+        this.command = jobResult.getCommand();
+        this.shell = jobResult.getShell();
+        this.description = jobResult.getDescription();
+    }
+
     public boolean isDone() {
         return scheduledFuture == null || scheduledFuture.isDone();
     }

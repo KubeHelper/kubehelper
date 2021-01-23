@@ -426,6 +426,20 @@ public class CommonService {
 
     /**
      * If config will be updated from git or manually, then The state of the config file will be synchronized with the application.
+     * This method synchronized changes on cron jobs.
+     */
+    public void updateCronJobsDetailsFromConfig() {
+        for (CronJobResult cronJob : Global.config.getCronJobsResults(cronJobsReportsPath)) {
+
+            //if job exists then apply a updated details
+            if (Global.CRON_JOBS.containsKey(cronJob.getName())) {
+                Global.CRON_JOBS.get(cronJob.getName()).updateCronJobDetails(cronJob);
+            }
+        }
+    }
+
+    /**
+     * If config will be updated from git or manually, then The state of the config file will be synchronized with the application.
      *
      * @param model - @{@link DashboardModel}
      */
