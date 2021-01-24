@@ -2,6 +2,7 @@ FROM openjdk:14-jdk-slim
 MAINTAINER JDev
 
 EXPOSE 8080
+WORKDIR /kubehelper
 
 ENV KUBE_HELPER_UI_USERNAME='kube'
 ENV KUBE_HELPER_UI_PASSWORD='helper'
@@ -27,31 +28,21 @@ ENV PATH="/root/.krew/bin:${PATH}"
 #Install krew plugins
 RUN kubectl krew install \
     access-matrix \
-    advise-psp \
-    capture \
     deprecations \
     df-pv \
-    doctor \
-    flame \
     get-all \
     images \
     ingress-nginx \
-    kubesec-scan \
     np-viewer \
     outdated \
     popeye \
-    preflight \
     rbac-lookup \
     resource-capacity \
     rolesum \
     score \
-    sniff \
-    starboard \
-    trace \
     tree \
     view-allocations \
     view-utilization \
-    view-webhook \
     who-can
 
 RUN bash -c 'mkdir -p /kubehelper/{history,git,reports}'

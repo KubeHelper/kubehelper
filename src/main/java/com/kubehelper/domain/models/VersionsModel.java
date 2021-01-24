@@ -43,14 +43,6 @@ public class VersionsModel implements PageModel {
     private final List<String> KREW_A_MATRIX_LINKS = Collections.singletonList("https://github.com/corneliusweig/rakkess");
     private final String KREW_A_MATRIX_CHECK_VER_COMM = "kubectl krew info access-matrix | grep 'VERSION' | awk '{print $2}'";
 
-    private final String KREW_A_PSP_DESCR = "Suggests PodSecurityPolicies for cluster..";
-    private final List<String> KREW_A_PSP_LINKS = Collections.singletonList("https://github.com/sysdiglabs/kube-psp-advisor");
-    private final String KREW_A_PSP_CHECK_VER_COMM = "kubectl krew info advise-psp | grep 'VERSION' | awk '{print $2}'";
-
-    private final String KREW_CAPTURE_DESCR = "Sysdig is a powerful open source tool for container troubleshooting, performance tunning and security investigation.";
-    private final List<String> KREW_CAPTURE_LINKS = Collections.singletonList("https://github.com/sysdiglabs/kubectl-capture");
-    private final String KREW_CAPTURE_CHECK_VER_COMM = "kubectl krew info capture | grep 'VERSION' | awk '{print $2}'";
-
     private final String KREW_DEPR_DESCR = "Checks for deprecated objects in a cluster.";
     private final List<String> KREW_DEPR_LINKS = Collections.singletonList("https://github.com/rikatz/kubepug");
     private final String KREW_DEPR_CHECK_VER_COMM = "kubectl krew info deprecations | grep 'VERSION' | awk '{print $2}'";
@@ -58,14 +50,6 @@ public class VersionsModel implements PageModel {
     private final String KREW_DF_PV_DESCR = "A kubectl plugin to see df for persistent volumes.";
     private final List<String> KREW_DF_PV_LINKS = Collections.singletonList("https://github.com/yashbhutwala/kubectl-df-pv");
     private final String KREW_DF_PV_CHECK_VER_COMM = "kubectl krew info df-pv | grep 'VERSION' | awk '{print $2}'";
-
-    private final String KREW_DOCTOR_DESCR = "Scans your cluster and reports anomalies.";
-    private final List<String> KREW_DOCTOR_LINKS = Collections.singletonList("https://github.com/emirozer/kubectl-doctor");
-    private final String KREW_DOCTOR_CHECK_VER_COMM = "kubectl krew info doctor | grep 'VERSION' | awk '{print $2}'";
-
-    private final String KREW_FLAME_DESCR = "Generate CPU flame graphs from pods";
-    private final List<String> KREW_FLAME_LINKS = Collections.singletonList("https://github.com/VerizonMedia/kubectl-flame");
-    private final String KREW_FLAME_CHECK_VER_COMM = "kubectl krew info flame | grep 'VERSION' | awk '{print $2}'";
 
     private final String KREW_GET_ALL_DESCR = "Like `kubectl get all` but _really_ everything";
     private final List<String> KREW_GET_ALL_LINKS = Collections.singletonList("https://github.com/corneliusweig/ketall");
@@ -79,10 +63,6 @@ public class VersionsModel implements PageModel {
     private final List<String> KREW_INGR_NGINX_LINKS = Collections.singletonList("https://kubernetes.github.io/ingress-nginx/kubectl-plugin/");
     private final String KREW_INGR_NGINX_CHECK_VER_COMM = "kubectl krew info ingress-nginx | grep 'VERSION' | awk '{print $2}'";
 
-    private final String KREW_KUBESEC_DESCR = "Scan Kubernetes resources with kubesec.io.";
-    private final List<String> KREW_KUBESEC_LINKS = Collections.singletonList("https://github.com/controlplaneio/kubectl-kubesec");
-    private final String KREW_KUBESEC_CHECK_VER_COMM = "kubectl krew info kubesec-scan | grep 'VERSION' | awk '{print $2}'";
-
     private final String KREW_NP_VIEWER_DESCR = "Network Policies rules viewer.";
     private final List<String> KREW_NP_VIEWER_LINKS = Collections.singletonList("https://github.com/runoncloud/kubectl-np-viewer");
     private final String KREW_NP_VIEWER_CHECK_VER_COMM = "kubectl krew info np-viewer | grep 'VERSION' | awk '{print $2}'";
@@ -94,10 +74,6 @@ public class VersionsModel implements PageModel {
     private final String KREW_POPEYE_DESCR = "Scans your clusters for potential resource issues.";
     private final List<String> KREW_POPEYE_LINKS = Arrays.asList("https://popeyecli.io", "https://github.com/derailed/popeye");
     private final String KREW_POPEYE_CHECK_VER_COMM = "kubectl krew info popeye | grep 'VERSION' | awk '{print $2}'";
-
-    private final String KREW_PREFLIGHT_DESCR = "Executes application preflight tests in a cluster.";
-    private final List<String> KREW_PREFLIGHT_LINKS = Collections.singletonList("https://github.com/replicatedhq/troubleshoot");
-    private final String KREW_PREFLIGHT_CHECK_VER_COMM = "kubectl krew info preflight | grep 'VERSION' | awk '{print $2}'";
 
     private final String KREW_RBAC_DESCR = "Reverse lookup for RBAC.";
     private final List<String> KREW_RBAC_LINKS = Collections.singletonList("https://github.com/FairwindsOps/rbac-lookup");
@@ -115,18 +91,6 @@ public class VersionsModel implements PageModel {
     private final List<String> KREW_SCORE_LINKS = Collections.singletonList("https://github.com/zegl/kube-score");
     private final String KREW_SCORE_CHECK_VER_COMM = "kubectl krew info score | grep 'VERSION' | awk '{print $2}'";
 
-    private final String KREW_SNIFF_DESCR = "Start a remote packet capture on pods using tcpdump and wireshark";
-    private final List<String> KREW_SNIFF_LINKS = Collections.singletonList("https://github.com/eldadru/ksniff");
-    private final String KREW_SNIFF_CHECK_VER_COMM = "kubectl krew info sniff | grep 'VERSION' | awk '{print $2}'";
-
-    private final String KREW_STARBOARD_DESCR = "Toolkit for finding risks in kubernetes resources.";
-    private final List<String> KREW_STARBOARD_LINKS = Collections.singletonList("https://github.com/aquasecurity/starboard");
-    private final String KREW_STARBOARD_CHECK_VER_COMM = "kubectl krew info starboard | grep 'VERSION' | awk '{print $2}'";
-
-    private final String KREW_TRACE_DESCR = "bpftrace programs in a cluster.";
-    private final List<String> KREW_TRACE_LINKS = Collections.singletonList("https://github.com/iovisor/kubectl-trace");
-    private final String KREW_TRACE_CHECK_VER_COMM = "kubectl krew info trace | grep 'VERSION' | awk '{print $2}'";
-
     private final String KREW_TREE_DESCR = "Show a tree of object hierarchies through ownerReferences.";
     private final List<String> KREW_TREE_LINKS = Collections.singletonList("https://github.com/ahmetb/kubectl-tree");
     private final String KREW_TREE_CHECK_VER_COMM = "kubectl krew info tree | grep 'VERSION' | awk '{print $2}'";
@@ -138,10 +102,6 @@ public class VersionsModel implements PageModel {
     private final String KREW_VIEW_UTIL_DESCR = "Shows cluster cpu and memory utilization.";
     private final List<String> KREW_VIEW_UTIL_LINKS = Collections.singletonList("https://github.com/etopeter/kubectl-view-utilization");
     private final String KREW_VIEW_UTIL_CHECK_VER_COMM = "kubectl krew info view-utilization | grep 'VERSION' | awk '{print $2}'";
-
-    private final String KREW_VIEW_WEBH_DESCR = "Visualize your webhook configurations.";
-    private final List<String> KREW_VIEW_WEBH_LINKS = Collections.singletonList("https://github.com/Trendyol/kubectl-view-webhook");
-    private final String KREW_VIEW_WEBH_CHECK_VER_COMM = "kubectl krew info view-webhook | grep 'VERSION' | awk '{print $2}'";
 
     private final String KREW_WHO_CAN_DESCR = "Shows who has RBAC permissions to access Kubernetes resources.";
     private final List<String> KREW_WHO_CAN_LINKS = Collections.singletonList("https://github.com/aquasecurity/kubectl-who-can");
@@ -186,31 +146,21 @@ public class VersionsModel implements PageModel {
         addUtil("kubectl", "kubectl", "kubectl version", KCTL_PLUGIN_CATEGORY, KUBECTL_UTIL_DESCR, KUBECTL_UTIL_LINKS);
         addUtil("krew", "kubectl krew", "kubectl version | grep 'GitTag\\|GitCommit'", KCTL_PLUGIN_CATEGORY, KUBECTL_KREW_DESCR, KUBECTL_KREW_LINKS);
         addUtil("access-matrix", "kubectl access-matrix", KREW_A_MATRIX_CHECK_VER_COMM, KCTL_PLUGIN_CATEGORY, KREW_A_MATRIX_DESCR, KREW_A_MATRIX_LINKS);
-        addUtil("advise-psp", "kubectl advise-psp", KREW_A_PSP_CHECK_VER_COMM, KCTL_PLUGIN_CATEGORY, KREW_A_PSP_DESCR, KREW_A_PSP_LINKS);
-        addUtil("capture", "kubectl capture", KREW_CAPTURE_CHECK_VER_COMM, KCTL_PLUGIN_CATEGORY, KREW_CAPTURE_DESCR, KREW_CAPTURE_LINKS);
         addUtil("deprecations", "kubectl deprecations", KREW_DEPR_CHECK_VER_COMM, KCTL_PLUGIN_CATEGORY, KREW_DEPR_DESCR, KREW_DEPR_LINKS);
         addUtil("df-pv", "kubectl df-pv", KREW_DF_PV_CHECK_VER_COMM, KCTL_PLUGIN_CATEGORY, KREW_DF_PV_DESCR, KREW_DF_PV_LINKS);
-        addUtil("doctor", "kubectl doctor", KREW_DOCTOR_CHECK_VER_COMM, KCTL_PLUGIN_CATEGORY, KREW_DOCTOR_DESCR, KREW_DOCTOR_LINKS);
-        addUtil("flame", "kubectl flame", KREW_FLAME_CHECK_VER_COMM, KCTL_PLUGIN_CATEGORY, KREW_FLAME_DESCR, KREW_FLAME_LINKS);
-        addUtil("ketall", "kubectl get-all", KREW_GET_ALL_CHECK_VER_COMM, KCTL_PLUGIN_CATEGORY, KREW_GET_ALL_DESCR, KREW_GET_ALL_LINKS);
+        addUtil("get-all", "kubectl get-all", KREW_GET_ALL_CHECK_VER_COMM, KCTL_PLUGIN_CATEGORY, KREW_GET_ALL_DESCR, KREW_GET_ALL_LINKS);
         addUtil("images", "kubectl images", KREW_IMAGES_CHECK_VER_COMM, KCTL_PLUGIN_CATEGORY, KREW_IMAGES_DESCR, KREW_IMAGES_LINKS);
         addUtil("ingress-nginx", "kubectl ingress-nginx", KREW_INGR_NGINX_CHECK_VER_COMM, KCTL_PLUGIN_CATEGORY, KREW_INGR_NGINX_DESCR, KREW_INGR_NGINX_LINKS);
-        addUtil("kubesec-scan", "kubectl kubesec-scan", KREW_KUBESEC_CHECK_VER_COMM, KCTL_PLUGIN_CATEGORY, KREW_KUBESEC_DESCR, KREW_KUBESEC_LINKS);
         addUtil("np-viewer", "kubectl np-viewer", KREW_NP_VIEWER_CHECK_VER_COMM, KCTL_PLUGIN_CATEGORY, KREW_NP_VIEWER_DESCR, KREW_NP_VIEWER_LINKS);
         addUtil("outdated", "kubectl outdated", KREW_OUTDATED_CHECK_VER_COMM, KCTL_PLUGIN_CATEGORY, KREW_OUTDATED_DESCR, KREW_OUTDATED_LINKS);
         addUtil("popeye", "kubectl popeye", KREW_POPEYE_CHECK_VER_COMM, KCTL_PLUGIN_CATEGORY, KREW_POPEYE_DESCR, KREW_POPEYE_LINKS);
-        addUtil("preflight", "kubectl preflight", KREW_PREFLIGHT_CHECK_VER_COMM, KCTL_PLUGIN_CATEGORY, KREW_PREFLIGHT_DESCR, KREW_PREFLIGHT_LINKS);
         addUtil("rbac-lookup", "kubectl rbac-lookup", KREW_RBAC_CHECK_VER_COMM, KCTL_PLUGIN_CATEGORY, KREW_RBAC_DESCR, KREW_RBAC_LINKS);
         addUtil("resource-capacity", "kubectl resource-capacity", KREW_RES_CAP_CHECK_VER_COMM, KCTL_PLUGIN_CATEGORY, KREW_RES_CAP_DESCR, KREW_RES_CAP_LINKS);
         addUtil("rolesum", "kubectl rolesum", KREW_ROLESUM_CHECK_VER_COMM, KCTL_PLUGIN_CATEGORY, KREW_ROLESUM_DESCR, KREW_ROLESUM_LINKS);
         addUtil("score", "kubectl score", KREW_SCORE_CHECK_VER_COMM, KCTL_PLUGIN_CATEGORY, KREW_SCORE_DESCR, KREW_SCORE_LINKS);
-        addUtil("sniff", "kubectl sniff", KREW_SNIFF_CHECK_VER_COMM, KCTL_PLUGIN_CATEGORY, KREW_SNIFF_DESCR, KREW_SNIFF_LINKS);
-        addUtil("starboard", "kubectl starboard", KREW_STARBOARD_CHECK_VER_COMM, KCTL_PLUGIN_CATEGORY, KREW_STARBOARD_DESCR, KREW_STARBOARD_LINKS);
-        addUtil("trace", "kubectl trace", KREW_TRACE_CHECK_VER_COMM, KCTL_PLUGIN_CATEGORY, KREW_TRACE_DESCR, KREW_TRACE_LINKS);
         addUtil("tree", "kubectl tree", KREW_TREE_CHECK_VER_COMM, KCTL_PLUGIN_CATEGORY, KREW_TREE_DESCR, KREW_TREE_LINKS);
         addUtil("view-allocations", "kubectl view-allocations", KREW_VIEW_ALLOC_CHECK_VER_COMM, KCTL_PLUGIN_CATEGORY, KREW_VIEW_ALLOC_DESCR, KREW_VIEW_ALLOC_LINKS);
         addUtil("view-utilization", "kubectl view-utilization", KREW_VIEW_UTIL_CHECK_VER_COMM, KCTL_PLUGIN_CATEGORY, KREW_VIEW_UTIL_DESCR, KREW_VIEW_UTIL_LINKS);
-        addUtil("view-webhook", "kubectl view-webhook", KREW_VIEW_WEBH_CHECK_VER_COMM, KCTL_PLUGIN_CATEGORY, KREW_VIEW_WEBH_DESCR, KREW_VIEW_WEBH_LINKS);
         addUtil("who-can", "kubectl who-can", KREW_WHO_CAN_CHECK_VER_COMM, KCTL_PLUGIN_CATEGORY, KREW_WHO_CAN_DESCR, KREW_WHO_CAN_LINKS);
         addUtil("jq", "jq", "jq --version", UTIL_PLUGIN_CATEGORY, UTIL_JQ_DESCR, UTIL_JQ_LINKS);
         addUtil("git", "git", "git --version", UTIL_PLUGIN_CATEGORY, UTIL_GIT_DESCR, UTIL_GIT_LINKS);

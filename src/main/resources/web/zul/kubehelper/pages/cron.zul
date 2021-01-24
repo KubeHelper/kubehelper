@@ -48,7 +48,7 @@
                                     <column hflex="1" label="Group" sort="auto(group)"/>
                                     <column hflex="5" label="Command" sort="auto(command)"/>
                                     <column hflex="1" label="Name" sort="auto(name)"/>
-                                    <column hflex="4" label="Description" sort="auto(description)"/>
+                                    <column hflex="4" label="Description" sort="auto(description)" style="cursor: auto;"/>
                                     <column hflex="1" label="File" sort="auto(file)"/>
                                 </columns>
                                 <rows>

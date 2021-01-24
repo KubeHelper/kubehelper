@@ -1,0 +1,309 @@
+[access-matrix-cluster]
+group = "kubectl access-matrix"
+description = "Review access to cluster-scoped resources."
+command = "kubectl access-matrix"
+
+[access-matrix-namespaced]
+group = "kubectl access-matrix"
+description = "Review access to namespaced resources in 'MY_NAMESPACE'."
+command = "kubectl access-matrix --namespace $MY_NAMESPACE"
+
+[access-matrix-other-user]
+group = "kubectl access-matrix"
+description = "Review access as a different user."
+command = "kubectl access-matrix --as other-user"
+
+[access-matrix-service-account]
+group = "kubectl access-matrix"
+description = "Review access as a service-account."
+command = "kubectl access-matrix --sa $MY_NAMESPACE:$MY_SERVICE_ACCOUNT"
+
+[access-matrix-verbs]
+group = "kubectl access-matrix"
+description = "Review access for different verbs."
+command = "kubectl access-matrix --verbs get,watch,patch"
+
+[access-matrix-help]
+group = "kubectl access-matrix"
+description = "access-matrix plugin help. Web: https://github.com/corneliusweig/rakkess"
+command = "kubectl access-matrix --help"
+
+[deprecations]
+group = "kubectl deprecations"
+description = "Shows all the deprecated objects in a Kubernetes cluster allowing the operator to verify them before upgrading the cluster."
+command = "kubectl deprecations"
+
+[deprecations-help]
+group = "kubectl deprecations"
+description = "deprecations plugin help. Web: https://github.com/rikatz/kubepug"
+command = "kubectl deprecations --help"
+
+[df-pv]
+group = "kubectl df-pv"
+description = "df-pv emulates Unix style df for persistent volumes."
+command = "kubectl df-pv -n $MY_NAMESPACE"
+
+[df-pv-help]
+group = "kubectl df-pv"
+description = "df-pv plugin help. Web: https://github.com/yashbhutwala/kubectl-df-pv"
+command = "kubectl df-pv --help"
+
+[get-all]
+group = "kubectl get-all"
+description = "Get all resources, excluding events and podmetrics."
+command = "kubectl get-all"
+
+[get-all-exclude]
+group = "kubectl get-all"
+description = "Get all resources, including events."
+command = "kkubectl get-all --exclude="
+
+[get-all-last-minute]
+group = "kubectl get-all"
+description = "Get all resources created in the last minute."
+command = "kubectl get-all --since 1m"
+
+[get-all-namespaced]
+group = "kubectl get-all"
+description = "Get all resources in the MY_NAMESPACE namespace."
+command = "kubectl get-all --namespace=$MY_NAMESPACE"
+
+[get-all-cluster]
+group = "kubectl get-all"
+description = "Get all cluster level resources."
+command = "kubectl get-all --only-scope=cluster"
+
+[get-all-help]
+group = "kubectl get-all"
+description = "get-all plugin help. Web: https://github.com/corneliusweig/ketall"
+command = "kubectl get-all --help"
+
+[images]
+group = "kubectl images"
+description = "Get all cluster level resources."
+command = "kubectl images -A"
+
+[images-all]
+group = "kubectl images"
+description = "Get all level resources from MY_NAMESPACE namespace."
+command = "kubectl images -n $MY_NAMESPACE"
+
+[images-regex]
+group = "kubectl images"
+description = "Display a table of images that match 'nginx' podname regex in 'MY_NAMESPACE' namespace using podName/containerImage as columns."
+command = "kubectl images -n $MY_NAMESPACE nginx -c 1,2"
+
+[images-help]
+group = "kubectl images"
+description = "images plugin help. Web: https://github.com/chenjiandongx/kubectl-images"
+command = "kubectl images --help"
+
+[ingress-nginx-backends]
+group = "kubectl ingress-nginx"
+description = "Inspect the dynamic backend information of an ingress-nginx instance."
+command = "kubectl ingress-nginx backends"
+
+[ingress-nginx-certs]
+group = "kubectl ingress-nginx"
+description = "Output the certificate data stored in an ingress-nginx pod."
+command = "kubectl ingress-nginx certs"
+
+[ingress-nginx-conf]
+group = "kubectl ingress-nginx"
+description = "Inspect the generated nginx.conf."
+command = "kubectl ingress-nginx conf"
+
+[ingress-nginx-general]
+group = "kubectl ingress-nginx"
+description = "Inspect the other dynamic ingress-nginx information."
+command = "kubectl ingress-nginx general"
+
+[ingress-nginx-info]
+group = "kubectl ingress-nginx"
+description = "Show information about the ingress-nginx service."
+command = "kubectl ingress-nginx info"
+
+[ingress-nginx-ingresses]
+group = "kubectl ingress-nginx"
+description = "Provide a short summary of all of the ingress definitions."
+command = "kubectl ingress-nginx ingresses"
+
+[ingress-nginx-lint]
+group = "kubectl ingress-nginx"
+description = "Inspect kubernetes resources for possible issues."
+command = "kubectl ingress-nginx lint"
+
+[ingress-nginx-help]
+group = "kubectl ingress-nginx"
+description = "ingress-nginx plugin help. Web: https://kubernetes.github.io/ingress-nginx/kubectl-plugin/"
+command = "kubectl ingress-nginx --help"
+
+[np-viewer-all]
+group = "kubectl np-viewer"
+description = "Selects network policies rules from all namespaces."
+command = "kubectl np-viewer -A"
+
+[np-viewer-help]
+group = "kubectl np-viewer"
+description = "np-viewer plugin help. Web: https://github.com/runoncloud/kubectl-np-viewer"
+command = "kubectl np-viewer --help"
+
+[popeye]
+group = "kubectl popeye"
+description = "Popeye scans your Kubernetes clusters and reports potential resource issues."
+command = "kubectl popeye"
+
+[popeye-namespaced]
+group = "kubectl popeye"
+description = "Popeye scans your Kubernetes clusters and reports potential resource issues for MY_NAMESPACE."
+command = "kubectl popeye -n $MY_NAMESPACE"
+
+[popeye-help]
+group = "kubectl popeye"
+description = "Popeye plugin --help. Web: https://popeyecli.io"
+command = "kubectl popeye --help"
+
+[rbac-lookup]
+group = "kubectl rbac-lookup"
+description = "rbac-lookup provides a missing Kubernetes API to view RBAC bindings by user."
+command = "kubectl rbac-lookup"
+
+[rbac-lookup-wide]
+group = "kubectl rbac-lookup"
+description = "rbac-lookup provides a missing Kubernetes API to view RBAC bindings by user, wide output."
+command = "kubectl rbac-lookup -o wide"
+
+[rbac-lookup-help]
+group = "kubectl rbac-lookup"
+description = "rbac-lookup plugin --help. Web: https://github.com/FairwindsOps/rbac-lookup"
+command = "kubectl rbac-lookup --help"
+
+[kube-capacity]
+group = "kubectl kube-capacity"
+description = "kube-capacity provides an overview of the resource requests, limits, and utilization in a Kubernetes cluster."
+command = "kubectl kube-capacity"
+
+[kube-capacity-container]
+group = "kubectl kube-capacity"
+description = "kube-capacity provides an overview of the resource requests, limits, and utilization in a Kubernetes cluster and includes containers in output"
+command = "kubectl kube-capacity -c"
+
+[kube-capacity-container-util]
+group = "kubectl kube-capacity"
+description = "kube-capacity provides an overview of the resource requests, limits, and utilization in a Kubernetes cluster and includes containers and resource utilization in output"
+command = "kubectl kube-capacity -c -u"
+
+[kube-capacity-help]
+group = "kubectl kube-capacity"
+description = "kube-capacity plugin --help. Web: https://github.com/robscott/kube-capacity"
+command = "kubectl kube-capacity --help"
+
+[rolesum]
+group = "kubectl rolesum"
+description = "Summarize RBAC roles for the specified subject from MY_NAMESPACE."
+command = "kubectl rolesum $MY_SUBJECT -n $MY_NAMESPACE"
+
+[rolesum-help]
+group = "kubectl rolesum"
+description = "rolesum plugin --help. Web: https://github.com/Ladicle/kubectl-rolesum"
+command = "kubectl rolesum --help"
+
+[tree]
+group = "kubectl tree"
+description = "Show sub-resources of the Kubernetes object."
+command = "kubectl tree $MY_SUBJECT -n $MY_NAMESPACE"
+
+[tree-help]
+group = "kubectl tree"
+description = "tree plugin --help. Web: https://github.com/ahmetb/kubectl-tree"
+command = "kubectl tree --help"
+
+[view-allocations]
+group = "kubectl view-allocations"
+description = "List allocations (cpu, memory, gpu,... X requested, limit, allocatable,...)."
+command = "kubectl view-allocations"
+
+[view-allocations-namespaced]
+group = "kubectl view-allocations"
+description = "List allocations (cpu, memory, gpu,... X requested, limit, allocatable,...) for 'MY_NAMESPACE'."
+command = "kubectl view-allocations -n $MY_NAMESPACE"
+
+[view-allocations-help]
+group = "kubectl view-allocations"
+description = "view-allocations plugin --help. Web: https://github.com/davidB/kubectl-view-allocations"
+command = "kubectl view-allocations --help"
+
+[view-utilization]
+group = "kubectl view-utilization"
+description = "Shows cluster resource utilization."
+command = "kubectl view-utilization -h"
+
+[view-utilization-namespaced]
+group = "kubectl view-utilization"
+description = "Shows cluster resource utilization for namespace 'MY_NAMESPACE'."
+command = "kubectl view-utilization -n $MY_NAMESPACE"
+
+[view-utilization-namespaces]
+group = "kubectl view-utilization"
+description = "Shows cluster resource utilization for namespaces."
+command = "kubectl view-utilization namespaces"
+
+[view-utilization-nodes]
+group = "kubectl view-utilization"
+description = "Shows cluster resource utilization for nodes."
+command = "kubectl view-utilization nodes"
+
+[view-utilization-help]
+group = "kubectl view-utilization"
+description = "view-utilization plugin --help. Web: https://github.com/etopeter/kubectl-view-utilization"
+command = "kubectl view-utilization --help"
+
+[who-can-get-pods]
+group = "kubectl who-can"
+description = "List who can get pods from any of the available namespaces."
+command = "kubectl who-can get pods --all-namespaces"
+
+[who-can-create-pods]
+group = "kubectl who-can"
+description = "List who can create pods in namespace 'MY_NAMESPACE'."
+command = "kubectl who-can create pods -n $MY_NAMESPACE"
+
+[who-can-get-pods-api]
+group = "kubectl who-can"
+description = "List who can get pods specifying the API group."
+command = "kubectl who-can get pods.metrics.k8s.io"
+
+[who-can-create-services]
+group = "kubectl who-can"
+description = "List who can create services in namespace 'MY_NAMESPACE'."
+command = "kubectl who-can create services -n $MY_NAMESPACE"
+
+[who-can-get-service-named]
+group = "kubectl who-can"
+description = "List who can get the service named 'MY_SERVICE' in namespace 'MY_NAMESPACE'."
+command = "kubectl who-can get svc/$MY_SERVICE --namespace $MY_NAMESPACE"
+
+[who-can-everything-pods]
+group = "kubectl who-can"
+description = "List who can do everything with pods in the current namespace."
+command = "kubectl who-can '*' pods"
+
+[who-can-list-everything]
+group = "kubectl who-can"
+description = "List who can list every resource in the namespace 'MY_NAMESPACE'."
+command = "kubectl who-can list '*' -n $MY_NAMESPACE"
+
+[who-can-read-pod-logs]
+group = "kubectl who-can"
+description = "List who can read pod logs."
+command = "kubectl who-can get pods --subresource=log"
+
+[who-can-access-url]
+group = "kubectl who-can"
+description = "List who can access the URL /logs/."
+command = "kubectl who-can get /logs"
+
+[who-can-help]
+group = "kubectl who-can"
+description = "who-can plugin --help. Web: https://github.com/aquasecurity/kubectl-who-can"
+command = "kubectl who-can --help"

@@ -216,6 +216,7 @@ public class CommandsVM implements EventListener<Event> {
      */
     private void redrawCommandsToolbarbuttons(String toolbarId, List<String> entries, String activeToolbarButtonId) {
         createCommandsToolbarButtons(toolbarId, entries);
+//        TODO fix nullpointer
         if (StringUtils.isNotBlank(model.getSelectedCommandsHistoryLabel()) || StringUtils.isNotBlank(model.getSelectedCommandsSourceLabel())) {
             enableDisableMenuItem(activeToolbarButtonId, true, "bold;");
         }

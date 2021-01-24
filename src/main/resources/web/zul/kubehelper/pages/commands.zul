@@ -69,7 +69,7 @@
                                         <label value="${item.group}"/>
                                         <label value="${item.command}" multiline="true"/>
                                         <label value="${item.name}" multiline="true"/>
-                                        <label value="${item.description}" multiline="true"/>
+                                        <label value="${item.description}" multiline="true" style="cursor: auto;"/>
                                         <label value="${item.file}" multiline="true"/>
                                     </row>
                                 </template>

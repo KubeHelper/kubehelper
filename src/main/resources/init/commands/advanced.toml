@@ -1,0 +1,142 @@
+[get-nodes-label-regions]
+group = "kubectl get"
+description = "Get nodes region and zone."
+command = "kubectl get nodes --label-columns failure-domain.beta.kubernetes.io/region,failure-domain.beta.kubernetes.io/zone"
+
+[get-nodes-labels]
+group = "kubectl get"
+description = "Get all nodes labels."
+command = "kubectl get nodes --show-labels"
+
+[get-scheduleable-nodes]
+group = "kubectl get"
+description = "Get scheduleable nodes."
+command = '''kubectl get nodes --output 'jsonpath={range $.items[*]}{.metadata.name} {.spec.taints[*].effect}{"\n"}{end}'
+             | awk '!/NoSchedule/{print $1}' '''
+
+[get-deployments-nameonly]
+group = "kubectl get"
+description = "Get all deployments nameonly."
+command = '''"kubectl get deployment -o=jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' -A"'''
+
+[get-deployments-nameonly-namespaced]
+group = "kubectl get"
+description = "Get all deployments nameonly in namespace 'MY_NAMESPACE'."
+command = '''"kubectl get deployment -o=jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' -n $MY_NAMESPACE"'''
+
+[get-pods-statuses]
+group = "kubectl get"
+description = "Get all pods statuses only."
+command = '''"kubectl get pods -o=jsonpath='{range .items[*]}{.status.phase}{"\n"}{end}' -A"'''
+
+[get-pods-statuses-labeled]
+group = "kubectl get"
+description = "Where is my pod running by label MY_LABEL."
+command = "kubectl get pods -A -l $MY_LABEL -o wide"
+
+[get-images-running]
+group = "kubectl get"
+description = "Get images running."
+command = ''' kubectl get pods --all-namespaces -o jsonpath="{..image}" |
+              tr -s '[[:space:]]' '\n' |
+              sort |
+              uniq -c '''
+
+[get-pods-running-from-nodenames]
+group = "kubectl get"
+description = "Get where pods are running from nodenames."
+command = "kubectl get pod -o=custom-columns=NAME:.metadata.name,STATUS:.status.phase,NODE:.spec.nodeName --all-namespaces"
+
+[get-pods-running-sort-restartcount]
+group = "kubectl get"
+description = "Get where pods are running from nodenames and sort by restart count."
+command = "kubectl get pods --sort-by='{.status.containerStatuses[:1].restartCount}'"
+
+[get-pods-not-running]
+group = "kubectl get"
+description = "Check pods which are not Runnning."
+command = "kubectl get pods --field-selector=status.phase!=Running --all-namespaces"
+
+[get-pods-not-running2]
+group = "kubectl get"
+description = "Check pods which are not Runnning."
+command = "kubectl get pods -A --field-selector=status.phase!=Running | grep -v Complete"
+
+[get-nodes-kubelet-version]
+group = "kubectl get"
+description = "Sort nodes by kubelet version."
+command = "kubectl get node --sort-by={.status.nodeInfo.kubeletVersion}"
+
+[get-nodes-ram]
+group = "kubectl get"
+description = "Gets a list of nodes with an RAM amount indication."
+command = """ kubectl get no -o json |
+              jq -r '.items | sort_by(.status.capacity.memory)[]|[.metadata.name,.status.capacity.memory]| @tsv' """
+
+[get-nodes-pod-numbers]
+group = "kubectl get"
+description = "Gets a list of nodes and the number of pods on them."
+command = """ kubectl get po -o json --all-namespaces |
+              jq '.items | group_by(.spec.nodeName) |
+              map({"nodeName": .[0].spec.nodeName, "count": length}) |
+              sort_by(.count)' """
+
+[get-pods-max-cpu]
+group = "kubectl top"
+description = "Gets pods that use maximum CPU."
+command = "kubectl top pods -A | sort --reverse --key 3 --numeric"
+
+[get-pods-max-memory]
+group = "kubectl top"
+description = "Gets pods that use maximum Memory."
+command = "kubectl top pods -A | sort --reverse --key 4 --numeric"
+
+[get-pods-running-sort-restartcount2]
+group = "kubectl get"
+description = "Sorts the list of pods by restart counts."
+command = "kubectl get pods -A --sort-by=.status.containerStatuses[0].restartCount"
+
+[get-services-selectors]
+group = "kubectl get"
+description = "Gets services seelctors in namespace 'MY_NAMESPACE'."
+command = "kubectl -n $MY_NAMESPACE get svc -o wide"
+
+[get-containers-limits-requests]
+group = "kubectl get"
+description = "Gets limits and requests for each container of each pod in namespace 'MY_NAMESPACE'."
+command = "kubectl get pods -n $MY_NAMESPACE -o=custom-columns='NAME:spec.containers[*].name,MEMREQ:spec.containers[*].resources.requests.memory,MEMLIM:spec.containers[*].resources.limits.memory,CPUREQ:spec.containers[*].resources.requests.cpu,CPULIM:spec.containers[*].resources.limits.cpu'"
+
+[get-internal-ips]
+group = "kubectl get"
+description = "Gets internal IP addresses of cluster nodes."
+command = ''' kubectl get nodes -o json |
+              jq -r '.items[].status.addresses[]? |
+              select (.type == "InternalIP") |
+              .address' |
+              paste -sd "\n" - '''
+
+[get-services-nodeport]
+group = "kubectl get"
+description = "List all services and the nodePort they occupy."
+command = ''' kubectl get --all-namespaces svc -o json |
+              jq -r '.items[] |
+              [.metadata.name,([.spec.ports[].nodePort |
+              tostring ] |
+              join("|"))]| @tsv' '''
+
+[get-pods-subnets]
+group = "kubectl get"
+description = "Gets pods subnets."
+command = '''kubectl get nodes -o jsonpath='{.items[*].spec.podCIDR}' | tr " " "\n"'''
+
+[get-pods-ips-all]
+group = "kubectl get"
+description = "Get IPs for all pods from all namespaces."
+command = ''' kubectl get pods -A -o jsonpath='{range .items[*]}{.status.podIP}{"\n"}{end}' '''
+
+[get-pods-ips-namespaces-all]
+group = "kubectl get"
+description = "Get 'namespace/pod: IP' for all pods from all namespaces."
+command = ''' kubectl get pods -A -o jsonpath='{range .items[*]}{.metadata.namespace}{"/"}{.metadata.name}{": "}{.status.podIP}{"\n"}{end}' '''
+
+

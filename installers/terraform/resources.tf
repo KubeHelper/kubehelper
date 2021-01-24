@@ -96,7 +96,7 @@ resource "kubernetes_deployment" "kube_helper_deployment" {
         automount_service_account_token = true
         #TODO change and test
         container {
-          image = "kubehelper/kube-helper:1.0"
+          image = "kubehelper/kubehelper:1.0"
           name = "kube-helper"
           image_pull_policy = "Always"
           port {

@@ -40,57 +40,8 @@ metadata:
     app: kube-helper
     ns: default
 rules:
-  - apiGroups:
-      - ""
-    resources:
-      - apiservices
-      - bindings
-      - clusterrolebindings
-      - clusterroles
-      - componentstatuses
-      - configmaps
-      - controllerrevisions
-      - cronjobs
-      - customresourcedefinitions
-      - csidrivers
-      - csinodes
-      - daemonsets
-      - deployments
-      - events
-      - endpoints
-      - horizontalpodautoscalers
-      - ingress
-      - ingressclasses
-      - jobs
-      - limitranges
-      - localsubjectaccessreviews
-      - mutatingwebhookconfigurations
-      - namespaces
-      - networkpolicies
-      - nodes
-      - pods
-      - poddisruptionbudgets
-      - podsecuritypolicies
-      - podtemplates
-      - persistentvolumes
-      - persistentvolumeclaims
-      - priorityclasses
-      - resourcequotas
-      - replicasets
-      - replicationcontrollers
-      - rolebindings
-      - roles
-      - runtimeclasses
-      - secrets
-      - selfsubjectaccessreviews
-      - selfsubjectrulesreviews
-      - subjectaccessreviews
-      - serviceaccounts
-      - services
-      - statefulsets
-      - storageclasses
-      - tokenreviews
-      - validatingwebhookconfigurations
+  - apiGroups: [ "*" ]
+    resources: [ "*" ]
     verbs: [ "get","list" ]
   - nonResourceURLs: [ "*" ]
     verbs: [ "get","list" ]

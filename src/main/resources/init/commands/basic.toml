@@ -1,0 +1,164 @@
+[auth-can-i-get-pods]
+group = "kubectl auth can-i"
+description = "Check to see if I can get pods from any of the available namespaces."
+command = "kubectl auth can-i get pods --all-namespaces"
+
+[auth-can-i-create-pods]
+group = "kubectl auth can-i"
+description = "Check to see if I can create pods in any namespace."
+command = "kubectl auth can-i create pods --all-namespaces"
+
+[auth-can-i-create-pods-namespaced]
+group = "kubectl auth can-i"
+description = "LCheck to see if I can create pods in namespace 'MY_NAMESPACE'."
+command = "kubectl auth can-i create pods -n $MY_NAMESPACE"
+
+[auth-can-i-get-pods-api]
+group = "kubectl auth can-i"
+description = "Check to see if I can list deployments in namespace 'MY_NAMESPACE'."
+command = "kubectl auth can-i list deployments.apps -n $MY_NAMESPACE"
+
+[auth-can-i-everything-namespaced]
+group = "kubectl auth can-i"
+description = "Check to see if I can do everything in namespace 'MY_NAMESPACE'."
+command = "kubectl auth can-i '*' '*' -n $MY_NAMESPACE"
+
+[auth-can-i-get-job]
+group = "kubectl auth can-i"
+description = "Check to see if I can get the job named 'MY_JOB' in namespace 'MY_NAMESPACE'."
+command = "kubectl auth can-i list jobs.batch/$MY_JOB -n $MY_NAMESPACE"
+
+[auth-can-i-read-pod-logs]
+group = "kubectl auth can-i"
+description = "Check to see if I can read pod logs."
+command = "kubectl auth can-i get pods --subresource=log"
+
+[auth-can-i-access-url]
+group = "kubectl auth can-i"
+description = "Check to see if I can access the URL /logs/."
+command = "kubectl auth can-i get /logs"
+
+[auth-can-i-allowed-actions-namespaced]
+group = "kubectl auth can-i"
+description = "List all allowed actions in namespace 'MY_NAMESPACE'"
+command = "kubectl auth can-i --list -n $MY_NAMESPACE"
+
+[auth-can-i-help]
+group = "kubectl auth can-i"
+description = "kubectl auth can-i --help. Web: https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#auth"
+command = "kubectl auth can-i --help"
+
+[describe-nodes]
+group = "kubectl describe"
+description = "Describe kubernetes nodes."
+command = "kubectl describe nodes"
+
+[describe-pod]
+group = "kubectl describe"
+description = "Describe kubernetes pod with the name 'MY_POD'."
+command = "kubectl describe pods/$MY_POD"
+
+[describe-pods]
+group = "kubectl describe"
+description = "Describe all pods."
+command = "kubectl describe pods"
+
+[describe-labeled-pods]
+group = "kubectl describe"
+description = "Describe pods by label name=MY_LABEL."
+command = "kubectl describe po -l name=$MY_LABEL"
+
+[describe-help]
+group = "kubectl describe"
+description = "kubectl describe --help. Web: https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#describe"
+command = "kubectl describe --help"
+
+[explain-pods]
+group = "kubectl explain"
+description = "Get the documentation of the resource and its fields"
+command = "kubectl explain pods"
+
+[explain-specific-field]
+group = "kubectl explain"
+description = "Get the documentation of a specific field of a resource"
+command = "kubectl explain pods.spec.containers"
+
+[explain-help]
+group = "kubectl explain"
+description = "kubectl explain --help. Web: https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#explain"
+command = "kubectl explain --help"
+
+[top-nodes]
+group = "kubectl top"
+description = "Show metrics for all nodes."
+command = "kubectl top nodes"
+
+[top-node]
+group = "kubectl top"
+description = "Show metrics for a given node 'MY_NODE'"
+command = "kubectl top node $MY_NODE"
+
+[top-pods]
+group = "kubectl top"
+description = "Show metrics for all pods."
+command = "kubectl top pods -A"
+
+[top-pods-namespaced]
+group = "kubectl top"
+description = "Show metrics for all pods in the given namespace MY_NAMESPACE"
+command = "kubectl top pods -n $MY_NAMESPACE"
+
+[top-pods-namespaced-containers]
+group = "kubectl top"
+description = "Show metrics for a given pod MY_POD in the given namespace MY_NAMESPACE"
+command = "kubectl top pod $MY_POD --containers -n $MY_NAMESPACE"
+
+[top-pods-namespaced-labeled]
+group = "kubectl top"
+description = "Show metrics for the pods defined by label 'MY_LABEL'"
+command = "kubectl top pod -l name=$MY_LABEL -A"
+
+[top-help]
+group = "kubectl top"
+description = "kubectl top --help. Web: https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#top"
+command = "kubectl top --help"
+
+[get-deployments]
+group = "kubectl get"
+description = "Get all deployments from all namespaces."
+command = "kubectl get deployments -o json -A"
+
+[get-nodes-wide]
+group = "kubectl get"
+description = "Gets nodes internal IPs and other information."
+command = "kubectl get nodes -o wide"
+
+[get-config-view]
+group = "kubectl config"
+description = "Show Merged kubeconfig settings."
+command = "kubectl config view"
+
+[get-config-first-user]
+group = "kubectl config"
+description = "Display the first user."
+command = ''' kubectl config view -o jsonpath='{.users[].name}{"\n"}' '''
+
+[get-config-users]
+group = "kubectl config"
+description = "Get a list of users."
+command = ''' kubectl config view -o jsonpath='{range .users[*]}{.name}{"\n"}{end}' '''
+
+[get-config-contexts]
+group = "kubectl config"
+description = "Display list of contexts."
+command = "kubectl config get-contexts"
+
+[get-config-current-context]
+group = "kubectl config"
+description = "Display the current-context."
+command = "kubectl config current-context"
+
+[get-config-set-context]
+group = "kubectl config"
+description = "Set the default context to my-cluster-name."
+command = "kubectl config use-context my-cluster-name"
