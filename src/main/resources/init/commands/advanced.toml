@@ -17,17 +17,17 @@ command = '''kubectl get nodes --output 'jsonpath={range $.items[*]}{.metadata.n
 [get-deployments-nameonly]
 group = "kubectl get"
 description = "Get all deployments nameonly."
-command = '''"kubectl get deployment -o=jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' -A"'''
+command = '''kubectl get deployment -o=jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' -A'''
 
 [get-deployments-nameonly-namespaced]
 group = "kubectl get"
 description = "Get all deployments nameonly in namespace 'MY_NAMESPACE'."
-command = '''"kubectl get deployment -o=jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' -n $MY_NAMESPACE"'''
+command = '''kubectl get deployment -o=jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' -n $MY_NAMESPACE'''
 
 [get-pods-statuses]
 group = "kubectl get"
 description = "Get all pods statuses only."
-command = '''"kubectl get pods -o=jsonpath='{range .items[*]}{.status.phase}{"\n"}{end}' -A"'''
+command = '''kubectl get pods -o=jsonpath='{range .items[*]}{.status.phase}{"\n"}{end}' -A'''
 
 [get-pods-statuses-labeled]
 group = "kubectl get"
@@ -138,5 +138,95 @@ command = ''' kubectl get pods -A -o jsonpath='{range .items[*]}{.status.podIP}{
 group = "kubectl get"
 description = "Get 'namespace/pod: IP' for all pods from all namespaces."
 command = ''' kubectl get pods -A -o jsonpath='{range .items[*]}{.metadata.namespace}{"/"}{.metadata.name}{": "}{.status.podIP}{"\n"}{end}' '''
+
+[get-pods-selector]
+group = "kubectl get"
+description = "Get the version label of all pods with label 'MY_LABEL'."
+command = "kubectl get pods --selector=$MY_LABEL -o jsonpath='{.items[*].metadata.labels.version}' -A"
+
+[get-configmap-value]
+group = "kubectl get"
+description = "Retrieve the value of a key with dots, e.g. 'ca.crt' from 'MY_CONFIGMAP'."
+command = ''' kubectl get configmap $MY_CONFIGMAP -o jsonpath='{.data.ca\.crt}' '''
+
+[get-pods-running]
+group = "kubectl get"
+description = "Get all running pods in the namespace 'MY_NAMESPACE'."
+command = "kubectl get pods --field-selector=status.phase=Running -n $MY_NAMESPACE"
+
+[get-nodes-selector]
+group = "kubectl get"
+description = "Get all worker nodes (use a selector to exclude results that have a label named 'node-role.kubernetes.io/master')."
+command = "kubectl get node --selector='!node-role.kubernetes.io/master'"
+
+[get-nodes-external-ips]
+group = "kubectl get"
+description = "Get ExternalIPs of all nodes."
+command = """kubectl get nodes -o jsonpath='{.items[*].status.addresses[?(@.type=="ExternalIP")].address}'"""
+
+[get-pods-labels]
+group = "kubectl get"
+description = "Show labels for all pods in the namespace 'MY_NAMESPACE'."
+command = "kubectl get pods --show-labels  -n $MY_NAMESPACE"
+
+[get-nodes-ready]
+group = "kubectl get"
+description = "Check which nodes are ready"
+command = """ kubectl get nodes -o jsonpath='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status};{end}{end}' | grep "Ready=True" """
+
+[get-secret-decoded]
+group = "kubectl get"
+description = "Output decoded secrets with name 'MY_SECRET' without external tools."
+command = ''' kubectl get secret $MY_SECRET -o go-template='{{range $k,$v := .data}}{{$k}}={{$v|base64decode}}{{"\n"}}{{end}}' '''
+
+[get-pods-use-secrets]
+group = "kubectl get"
+description = "List all Secrets currently in use by a pod."
+command = "kubectl get pods -o json | jq '.items[].spec.containers[].env[]?.valueFrom.secretKeyRef.name' | grep -v null | sort | uniq"
+
+[get-pods-cleanong]
+group = "kubectl get"
+description = "List all containerIDs of initContainer of all pods. Helpful when cleaning up stopped containers, while avoiding removal of initContainers."
+command = ''' kubectl get pods --all-namespaces -o jsonpath='{range .items[*].status.initContainerStatuses[*]}{.containerID}{'\n"}{end}' | cut -d/ -f3 '''
+
+[get-events]
+group = "kubectl get"
+description = "List Events sorted by timestamp."
+command = "kubectl get events --sort-by=.metadata.creationTimestamp"
+
+[get-nodes-keys]
+group = "kubectl get"
+description = "Produce a period-delimited tree of all keys returned for nodes. Helpful when locating a key within a complex nested JSON structure."
+command = ''' kubectl get nodes -o json | jq -c 'path(..)|[.[]|tostring]|join(".")' '''
+
+[get-pods-keys-namespaced]
+group = "kubectl get"
+description = "Produce a period-delimited tree of all keys returned for pods in the namespace 'MY_NAMESPACE'."
+command = ''' kubectl get pods -o json -n $MY_NAMESPACE | jq -c 'path(..)|[.[]|tostring]|join(".")' '''
+
+[get-pod-sort-asc-namespaced]
+group = "kubectl get"
+description = "Get ascending sorted by time pods in the namespace 'MY_NAMESPACE'."
+command = ''' kubectl get pods -o json -n infra | jq '.items | group_by(.metadata.creationTimestamp) | map({"timestamp": .[0].metadata.creationTimestamp, "count": length}) | sort_by(.count)' '''
+
+[get-pods-timed]
+group = "kubectl get"
+description = "Filter Kubernetes pods by time."
+command = ''' kubectl get pods --all-namespaces --sort-by='.metadata.creationTimestamp' -o jsonpath='{range .items[*]}{.metadata.name}, {.metadata.creationTimestamp}{"\n"}{end}' '''
+
+[get-pods-sort-desc-namespaced]
+group = "kubectl get"
+description = "Get descending sorted by time pods in the namespace 'MY_NAMESPACE'."
+command = ''' kubectl get pods -o json -n infra | jq '.items | group_by(.metadata.creationTimestamp) | map({"timestamp": .[0].metadata.creationTimestamp, "count": length}) | sort_by(.count) | reverse' '''
+
+[get-pods-each-node]
+group = "kubectl get"
+description = "Count all of the pods on each node."
+command = ''' kubectl get pods --all-namespaces -o json | jq '.items[] | .spec.nodeName' -r | sort | uniq -c '''
+
+[get-pods-each-node-json]
+group = "kubectl get"
+description = "Get a list of pods for each node. This will generate a JSON document that has a Kubernetes node name, and then a list of all of the pod names running on the node."
+command = ''' kubectl get pods --all-namespaces -o json | jq '.items | map({podName: .metadata.name, nodeName: .spec.nodeName}) | group_by(.nodeName) | map({nodeName: .[0].nodeName, pods: map(.podName)})' '''
 
 

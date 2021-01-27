@@ -128,6 +128,16 @@ group = "kubectl get"
 description = "Get all deployments from all namespaces."
 command = "kubectl get deployments -o json -A"
 
+[get-services]
+group = "kubectl get"
+description = "List Services sorted by name from all namespaces."
+command = "kubectl get services --sort-by=.metadata.name -A"
+
+[get-pv]
+group = "kubectl get"
+description = "List PersistentVolumes sorted by capacity."
+command = "kubectl get pv --sort-by=.spec.capacity.storage"
+
 [get-nodes-wide]
 group = "kubectl get"
 description = "Gets nodes internal IPs and other information."
@@ -162,3 +172,33 @@ command = "kubectl config current-context"
 group = "kubectl config"
 description = "Set the default context to my-cluster-name."
 command = "kubectl config use-context my-cluster-name"
+
+[get-api-resources-namespaced]
+group = "kubectl api-resources"
+description = "Get all namespaced resources."
+command = "kubectl api-resources --namespaced=true"
+
+[get-api-resources]
+group = "kubectl api-resources"
+description = "Get all non-namespaced resources."
+command = "kubectl api-resources --namespaced=false"
+
+[get-api-resources-name]
+group = "kubectl api-resources"
+description = "Get all resources with simple output (just the resource name)."
+command = "kubectl api-resources -o name"
+
+[get-api-resources-wide]
+group = "kubectl api-resources"
+description = "Get all resources with expanded (aka 'wide') output."
+command = "kubectl api-resources -o wide"
+
+[get-api-resources-verbs]
+group = "kubectl api-resources"
+description = "Get all resources that support the 'list' and 'get' request verbs."
+command = "kubectl api-resources --verbs=list,get"
+
+[get-api-resources-extensions]
+group = "kubectl api-resources"
+description = "Get all resources in the 'extensions' API group"
+command = "kubectl api-resources --api-group=extensions"
