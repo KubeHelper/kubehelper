@@ -6,7 +6,7 @@
                     <tab label="Roles"/>
                     <tab label="RBAC"/>
                     <tab label="Pods Security Contexts"/>
-                    <tab label="Containers"/>
+                    <tab label="Container Security Contexts"/>
                     <tab label="Service Accounts"/>
                     <tab label="Pod Security Policies"/>
                 </tabs>

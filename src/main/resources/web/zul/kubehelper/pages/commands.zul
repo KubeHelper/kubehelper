@@ -16,8 +16,8 @@
             <tabbox width="100%" sclass="nav_tabs" style="border: none" onSelect="@command('onSelectMainCommandsTabs')">
                 <tabs id="tabs">
                     <tab label="Commands" id="commands"/>
-                    <tab label="Commands Management" id="commandsManagement"/>
-                    <tab label="Commands History" id="commandsHistory"/>
+                    <tab label="Management" id="commandsManagement"/>
+                    <tab label="History" id="commandsHistory"/>
                 </tabs>
                 <tabpanels id="commandsTabPanels">
                     <tabpanel>
@@ -170,7 +170,7 @@
                                     </panel>
                                 </div>
                             </center>
-                            <west title="Commands Sources" collapsible="true" autoscroll="true" size="10%">
+                            <west title="Sources" collapsible="true" autoscroll="true" size="10%">
                                 <div vflex="1">
                                     <vbox id="commandsSourcesToolbarID">
                                     </vbox>
@@ -209,7 +209,7 @@
                                     </panel>
                                 </div>
                             </center>
-                            <west title="Commands History" collapsible="true" autoscroll="true" size="10%">
+                            <west title="History" collapsible="true" autoscroll="true" size="10%">
                                 <div vflex="1">
                                     <vbox id="commandsHistoriesToolbarID">
                                     </vbox>
