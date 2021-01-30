@@ -1,11 +1,11 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "kubehelper.fullname" . }}
+  name: {{ .Values.deployment.name }}
   labels:
     {{- include "kubehelper.labels" . | nindent 4 }}
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: 1
   selector:
     matchLabels:
       {{- include "kubehelper.selectorLabels" . | nindent 6 }}
@@ -14,33 +14,20 @@ spec:
       labels:
         {{- include "kubehelper.selectorLabels" . | nindent 8 }}
     spec:
-    {{- with .Values.imagePullSecrets }}
-      imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-    {{- end }}
-      serviceAccountName: {{ include "kubehelper.serviceAccountName" . }}
+      serviceAccountName: {{ .Values.serviceAccount.name }}
+      automountServiceAccountToken: true
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          image: "{{ .Values.image }}:{{ .Values.imageTag }}"
+          imagePullPolicy: {{ .Values.imagePullPolicy }}
           ports:
-            - name: http
-              containerPort: 80
+            - name: ui
+              containerPort: 8080
               protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: /
-              port: http
-          readinessProbe:
-            httpGet:
-              path: /
-              port: http
-          resources:
-            {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

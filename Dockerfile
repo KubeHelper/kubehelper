@@ -46,6 +46,14 @@ RUN kubectl krew install \
     who-can
 
 RUN bash -c 'mkdir -p /kubehelper/{history,git,reports}'
+#RUN groupadd kubehelper && adduser kubehelper
+#RUN addgroup -g 1000 -S kubehelper \
+#    && adduser -u 1000 -S kubehelper -G kubehelper
+#    && chown -R kubehelper:kubehelper /kubehelper \
+#    && chmod -R a+X /var/run
+
+VOLUME /kubehelper
+USER kubehelper
 
 #TODO ReMOVE AFTER
 #COPY .kube/config /root/.kube/config

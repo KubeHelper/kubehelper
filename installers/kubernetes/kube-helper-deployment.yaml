@@ -2,24 +2,20 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: kube-helper-sa
-  namespace: default
+  name: kubehelper-sa
   labels:
-    app: kube-helper
-    kubernetes.io/cluster-service: "true"
-    ns: default
+    app: kubehelper
+    app.kubernetes.io/name: kubehelper
 ---
 
 #Service
 apiVersion: v1
 kind: Service
 metadata:
-  name: kube-helper-svc
-  namespace: defaule
+  name: kubehelper-svc
   labels:
-    app: kube-helper
-    kubernetes.io/cluster-service: "true"
-    ns: default
+    app: kubehelper
+    app.kubernetes.io/name: kubehelper
 spec:
   ports:
     - name: http
@@ -27,18 +23,18 @@ spec:
       protocol: TCP
       targetPort: 8080
   selector:
-    app: kube-helper
-    ns: default
+    app: kubehelper
+    app.kubernetes.io/name: kubehelper
 ---
 
 #ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: kube-helper-cr
+  name: kubehelper-cr
   labels:
-    app: kube-helper
-    ns: default
+    app: kubehelper
+    app.kubernetes.io/name: kubehelper
 rules:
   - apiGroups: [ "*" ]
     resources: [ "*" ]
@@ -51,14 +47,14 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: kube-helper-crb
+  name: kubehelper-crb
 roleRef:
-  apiGroup: rbac.authorization.k8s.io/v1
+  apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: kube-helper-cr
+  name: kubehelper-cr
 subjects:
   - kind: ServiceAccount
-    name: kube-helper-sa
+    name: kubehelper-sa
     namespace: default
 ---
 
@@ -66,28 +62,31 @@ subjects:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: kube-helper
-  namespace: default
+  name: kubehelper-deployment
   labels:
-    app: kube-helper
-    ns: default
+    app: kubehelper
+    app.kubernetes.io/name: kubehelper
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: kube-helper
-      ns: default
+      app: kubehelper
+      app.kubernetes.io/name: kubehelper
   template:
     metadata:
       labels:
-        app: kube-helper
-        ns: default
+        app: kubehelper
+        app.kubernetes.io/name: kubehelper
     spec:
-      serviceAccountName: kube-helper-sa
+      serviceAccountName: kubehelper-sa
       automountServiceAccountToken: true
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
       containers:
-        - name: kube-helper
-          image: docker.elastic.co/kibana/kibana-oss:6.2.4
+        - name: kubehelper
+          image: kubehelper/kubehelper:1.0.0
+          imagePullPolicy: Always
           env:
             - name: KUBE_HELPER_UI_USERNAME
               value: kube
