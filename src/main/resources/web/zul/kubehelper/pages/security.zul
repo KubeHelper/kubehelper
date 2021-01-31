@@ -89,7 +89,7 @@
                                         <column hflex="min" label="Id" sort="auto(id)"/>
                                         <column hflex="3" label="Role Name" sort="auto(resourceName)"/>
                                         <column hflex="2" label="Namespace" sort="auto(namespace)"/>
-                                        <column hflex="1" label="Resource Type" sort="auto(resourceType)"/>
+                                        <column hflex="1" label="Kind" sort="auto(resourceType)"/>
                                         <column hflex="min" label="Creation Time" sort="auto(creationTime)"/>
                                         <column hflex="min" label="Raws"/>
                                     </columns>

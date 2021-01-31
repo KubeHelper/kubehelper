@@ -52,11 +52,11 @@ RUN bash -c 'mkdir -p /kubehelper/{history,git,reports}'
 #    && chown -R kubehelper:kubehelper /kubehelper \
 #    && chmod -R a+X /var/run
 
-VOLUME /kubehelper
-USER kubehelper
+#VOLUME /kubehelper
+#USER kubehelper
 
 #TODO ReMOVE AFTER
-#COPY .kube/config /root/.kube/config
+COPY .kube/config /root/.kube/config
 
 COPY target/kube-helper.jar /kubehelper/kube-helper.jar
 ENTRYPOINT ["java","-Dspring.profiles.active=prod","--enable-preview","-jar","/kubehelper/kube-helper.jar"]

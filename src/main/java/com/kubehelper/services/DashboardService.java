@@ -28,7 +28,6 @@ import io.fabric8.kubernetes.api.model.Quantity;
 import io.fabric8.kubernetes.api.model.Taint;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
-import io.fabric8.kubernetes.client.KubernetesClientException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -101,7 +100,7 @@ public class DashboardService {
             });
 
             dashboardModel.setClusterResult(clusterResult);
-        } catch (KubernetesClientException ex) {
+        } catch (Exception ex) {
             dashboardModel.addException("An error occurred while getting information about the cluster nodes." + ex.getMessage(), ex);
             logger.error(ex.getMessage(), ex);
         }

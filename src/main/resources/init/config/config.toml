@@ -1,23 +1,22 @@
 [git]
-url = "https://github.com/JWebDev/kubehelper.git" #(Optional) - Git url for sync config
-user = "kubehelper" #(Optional) - If the repository is protected we need username
-password = "pass" #(Optional) - If the repository is protected we need password
-branch = "default branch" #(Optional) - By default will be sync with default branch
-email = "journame@yourcompany.com" #(Optional) - Email for commit
+url = "https://github.com/JWebDev/kubehelper.git"
+user = "kubehelper"
+password = "pass"
+branch = "default branch"
+email = "journame@yourcompany.com"
 
-#list of cron jobs
-[[cron-job]]
-name = "your_job-name" #(*Mandatory, Unique) - Cron job name. Should contains only letters, numbers, '_' and '-'.
-isActive = true #(*Mandatory) - If the flag is active, the job will start automatically after the application starts. Possible states: [true|false]
-expression = "*/20 * * * * *" #(*Mandatory) - Cron job expression. Every 20 seconds.
-command = "kubectl get pods -A --field-selector = status.phase = Running | grep -v Complete" #(*Mandatory) - Cron job command
-shell = "bash" #(*Mandatory) - execution shell
-description = "my always active cron job" #(Optional) - Cron Job description text
+[[cron_job]]
+name = "your_job-name"
+isActive = false
+expression = "*/20 * * * * *"
+command = "kubectl get pods -A --field-selector = status.phase = Running | grep -v Complete"
+shell = "bash"
+description = "my always active cron job"
 
-[[cron-job]]
-name = "your_job-name2" #(*Mandatory Unique) - Cron job name. Should contains only letters, numbers, '_' and '-'.
-isActive = false #(*Mandatory) - If the flag is active, the job will start automatically after the application starts. Possible states: [true|false]
-expression = " * */5 * * * *" #(*Mandatory) - Cron job expression. Every 5 minutes.
-command = "kubectl get pods -A --field-selector = status.phase = Running | grep -v Complete" #(*Mandatory) - Cron job command
-shell = "bash" #(*Mandatory) - execution shell
-description = "my always inactove cron job" #(Optional) - Cron Job description text
+[[cron_job]]
+name = "your_job-name2"
+isActive = false
+expression = " * */5 * * * *"
+command = "kubectl get pods -A --field-selector = status.phase = Running | grep -v Complete"
+shell = "bash"
+description = "my always inactove cron job"

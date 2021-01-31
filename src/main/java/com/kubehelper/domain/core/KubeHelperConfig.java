@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
  */
 public class KubeHelperConfig {
     private Git git;
-    private List<CronJob> cron_job = new ArrayList<>();
+    private List<CronJob> cron_job;
 
     public KubeHelperConfig(String configString, PageModel model) {
         Toml configToml = new Toml().read(configString);
@@ -61,6 +61,7 @@ public class KubeHelperConfig {
     //get unique cron jobs, non unique jobs were ignored
     private void parseCronJobs(PageModel model, Toml configToml, List<String> notUniqueJobsCheck) {
         try {
+            cron_job = new ArrayList<>();
             for (Toml job : configToml.getTables("cron_job")) {
                 CronJob newJob = job.to(CronJob.class);
 
@@ -82,6 +83,10 @@ public class KubeHelperConfig {
         if (!notUniqueJobsCheck.isEmpty()) {
             model.addException(String.format("Some cron jobs has the same name, duplicates were ignored and removed from the config. Duplicated cron jobs: %s", notUniqueJobsCheck.toString()),
                     new RuntimeException("Non Unique Cron jobs detected."));
+        }
+        //Set the cron_job=null so that an empty list is not written to the configuration file.
+        if (cron_job.isEmpty()) {
+            cron_job = null;
         }
     }
 
@@ -107,7 +112,7 @@ public class KubeHelperConfig {
 
     private boolean isCronJobNotValid(CronJob newJob, PageModel model) {
         if (StringUtils.isAnyBlank(newJob.name, newJob.expression, newJob.command)) {
-            model.addException("Cron job %s is not valid. Name, expression and command are required fields.", new RuntimeException("Cron Job validation Exception"));
+            model.addException(String.format("Cron job %s is not valid. Name, expression and command are required fields.", newJob.name), new RuntimeException("Cron Job validation Exception"));
             return true;
         }
 
@@ -148,7 +153,9 @@ public class KubeHelperConfig {
      * @return - list with converted jobs.
      */
     public List<CronJobResult> getCronJobsResults(String cronJobsReportsPath) {
-        return cron_job.stream().map(job -> new CronJobResult()
+        return cron_job == null
+                ? new ArrayList<>()
+                : cron_job.stream().map(job -> new CronJobResult()
                 .setName(job.name)
                 .setExpression(job.expression)
                 .setCommand(job.command)
@@ -180,6 +187,10 @@ public class KubeHelperConfig {
                 cron_job.remove(next);
                 break;
             }
+        }
+        //Set the cron_job=null so that an empty list is not written to the configuration file.
+        if (cron_job.isEmpty()) {
+            cron_job = null;
         }
     }
 

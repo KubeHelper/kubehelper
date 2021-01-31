@@ -37,7 +37,7 @@
                         <textbox placeholder="Email for git push" width="100%" value="@bind(configsVM.gitEmail)"/>
                     </cell>
                     <separator width="1%" orient="vertical"></separator>
-                    <cell width="16%" valign="middle" align="right">
+                    <cell width="31%" valign="middle" align="left">
                         <button label="Clone" iconSclass="z-icon-clone" onClick="@command('cloneGitRepo')"/>
                         <separator width="1%" orient="vertical"></separator>
                         <button label="Pull" iconSclass="z-icon-cloud-download" onClick="@command('pullGitRepo')"/>
@@ -45,7 +45,7 @@
                         <button label="Push" iconSclass="z-icon-cloud-upload" onClick="@command('pushGitRepo')"/>
                     </cell>
                     <separator width="1%" orient="vertical"></separator>
-                    <cell width="25%" valign="middle" align="right">
+                    <cell width="10%" valign="middle" align="right">
                         <hbox height="100%" width="100%" align="end" pack="end">
                             <button id="saveConfigButtonId" xmlns:w="client" label="Save" iconSclass="fas fa-save" w:onClick='saveConfig();'/>
                         </hbox>

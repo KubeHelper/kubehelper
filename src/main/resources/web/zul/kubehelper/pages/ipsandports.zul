@@ -79,7 +79,7 @@
                         <column hflex="2" label="Container Ports" sort="auto(ports)"/>
                         <column hflex="2" label="Resource Name" tooltiptext="Kubernetes Resource Name: [Pod containers]" sort="auto(resourceName)"/>
                         <column hflex="1" label="Namespace" sort="auto(namespace)"/>
-                        <column hflex="min" label="Resource Type" sort="auto(resourceType)"/>
+                        <column hflex="min" label="Kind" sort="auto(resourceType)"/>
                         <column hflex="min" label="Host Info" tooltiptext="Node/Host Name: [Node IP]" sort="auto(hostInfo)"/>
                         <column hflex="1" label="Additional Info" sort="auto(additionalInfo)"/>
                         <column hflex="min" label="Creation Time" sort="auto(creationTime)"/>

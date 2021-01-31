@@ -57,6 +57,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -144,9 +145,14 @@ public class CommandsService {
                 if (filePath.endsWith(Global.CONFIG_FILENAME)) {
                     continue;
                 }
-                commands.put(Files.getNameWithoutExtension(filePath), new Toml().read(commonService.getResourceAsStringByPath(filePath)));
+                try {
+                    commands.put(Files.getNameWithoutExtension(filePath), new Toml().read(commonService.getResourceAsStringByPath(filePath)));
+                } catch (IllegalStateException e) {
+                    commandsModel.addParseException(e);
+                    logger.error(e.getMessage(), e);
+                }
             }
-        } catch (IOException | IllegalStateException e) {
+        } catch (IOException e) {
             commandsModel.addParseException(e);
             logger.error(e.getMessage(), e);
         }
@@ -202,13 +208,29 @@ public class CommandsService {
                             .setGroup(command.getString("group"))
                             .setDescription(command.getString("description"))
                             .setCommand(command.getString("command"));
-                    commandsModel.addCommandResult(cr);
+                    if (isCommandValid(cr, commandsModel)) {
+                        commandsModel.addCommandResult(cr);
+                    }
                 } catch (RuntimeException e) {
                     commandsModel.addParseException(new RuntimeException("Command parse Error. Name, Group, Description and Command itself are mandatory fields. Object: " + cr.toString()));
                     logger.error("Command parse Error. Group, Operation Description and command itself are mandatory fields. Object: " + cr.toString());
                 }
             }
         }
+    }
+
+    private boolean isCommandValid(CommandsResult cr, CommandsModel commandsModel) {
+        if (StringUtils.isAnyBlank(cr.getName(), cr.getCommand(), cr.getGroup())) {
+            commandsModel.addException(String.format("Command %s is not valid. Name, group and command are required fields. ", cr.getName()), new RuntimeException("Command validation Exception"));
+            return false;
+        }
+
+        if (!Pattern.matches("^[a-zA-Z0-9_-]*$", cr.getName())) {
+            commandsModel.addException(String.format("Command %s is not valid. The job name should contain only: letters, numbers, '-' and '_'. ", cr.getName()), new RuntimeException("Command validation Exception"));
+            return false;
+        }
+
+        return true;
     }
 
 

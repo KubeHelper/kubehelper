@@ -84,7 +84,7 @@ public class DashboardVM {
         String configString = commonService.getResourceAsStringByPath(Global.PATH_TO_CONFIG_FILE);
 
         commonService.readAndValidateConfig(model, configString);
-        if (checkExceptions())
+        if (Global.config ==null)
             return;
 
         commonService.checkAndStartJobsFromConfig(model);

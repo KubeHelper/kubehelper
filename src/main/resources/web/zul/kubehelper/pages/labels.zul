@@ -106,7 +106,7 @@
                                     <column hflex="min" label="Id" sort="auto(id)"/>
                                     <column hflex="3" label="Name" sort="auto(name)"/>
                                     <column hflex="1" label="Type" sort="auto(resourceProperty)"/>
-                                    <column hflex="1" label="Resource Type" sort="auto(resourceType)"/>
+                                    <column hflex="1" label="Kind" sort="auto(resourceType)"/>
                                     <column hflex="2" label="Resource Name" sort="auto(resourceName)"/>
                                     <column hflex="1" label="Namespace" sort="auto(namespace)"/>
                                     <column hflex="1" label="Additional Info" sort="auto(additionalInfo)"/>
@@ -224,7 +224,7 @@
                                         <columns menupopup="auto" sizable="true">
                                             <column hflex="min" label="Id" sort="auto(id)"/>
                                             <column hflex="1" label="Type" sort="auto(resourceProperty)"/>
-                                            <column hflex="1" label="Resource Type" sort="auto(resourceType)"/>
+                                            <column hflex="1" label="Kind" sort="auto(resourceType)"/>
                                             <column hflex="2" label="Resource Name" sort="auto(resourceName)"/>
                                             <column hflex="1" label="Namespace" sort="auto(namespace)"/>
                                             <column hflex="1" label="Additional Info" sort="auto(additionalInfo)"/>
