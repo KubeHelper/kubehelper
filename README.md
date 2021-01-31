@@ -20,19 +20,33 @@
 
 ## Features
 
-* [Dashboard - common cluster information.](https://github.com/KubeHelper/kubehelper/wiki/Home)
-* [Search - search, filter, view resources in a cluster.](https://github.com/KubeHelper/kubehelper/wiki/Home)
-* [Ips and Ports - search, filter, view services and pods ips, ports and detailed information.](https://github.com/KubeHelper/kubehelper/wiki/Home)
-* [Security - search, filter, view roles, rules, RBAC, pod and container security contexts, service accounts, pod security policies.](https://github.com/KubeHelper/kubehelper/wiki/Home)
-* [Labels Annotations Selectors - search, filter, view, group of labels, annotations and selectors in resources.](https://github.com/KubeHelper/kubehelper/wiki/Home)
-* [Commands - commands execution, management, creation, history.](https://github.com/KubeHelper/kubehelper/wiki/Home)
-* [Cron Jobs - creating, execution, control of cron jobs and view reports.](https://github.com/KubeHelper/kubehelper/wiki/Home)
-* [Configurations - configure KubeHelper, change config, push, pull config commands, cron jobs from repository.](https://github.com/KubeHelper/kubehelper/wiki/Home)
-* [Versions - KubeHelper utils, shells and plugins versions.](https://github.com/KubeHelper/kubehelper/wiki/Home)
+* [Dashboard - common cluster information.](https://github.com/KubeHelper/kubehelper/wiki/Home#Dashboard)
+* [Search - search, filter, view resources in a cluster.](https://github.com/KubeHelper/kubehelper/wiki/Home#Search)
+* [Ips and Ports - search, filter, view services and pods ips, ports and detailed information.](https://github.com/KubeHelper/kubehelper/wiki/Home#Ips-and-Ports)
+* [Security - search, filter, view roles, rules, RBAC, pod and container security contexts, service accounts, pod security policies.](https://github.com/KubeHelper/kubehelper/wiki/Home#Security)
+* [Labels Annotations Selectors - search, filter, view, group of labels, annotations and selectors in resources.](https://github.com/KubeHelper/kubehelper/wiki/Home#Labels-Annotations-Selectors)
+* [Commands - commands execution, management, creation, history.](https://github.com/KubeHelper/kubehelper/wiki/Home#Commands)
+* [Cron Jobs - creating, execution, control of cron jobs and view reports.](https://github.com/KubeHelper/kubehelper/wiki/Home#Cron-Jobs)
+* [Configurations - configure KubeHelper, change config, push, pull config commands, cron jobs from repository.](https://github.com/KubeHelper/kubehelper/wiki/Home#Configurations)
+* [Versions - KubeHelper utils, shells and plugins versions.](https://github.com/KubeHelper/kubehelper/wiki/UtilitiesAndPlugins)
 
 ![KubeHelper](screenshots/main.png)
 
 ## Motivation
+I think Kubernetes is a great and revolutionary product. I have been studying it and using for many years, but very often there was a need to have many different functions and commands at hand. Each time you type long commands on the command line, search in history, write aliases, and so on, of course, you can. But sometimes there is no way to login into console, or history has not been saved, or a new host. Or many other reasons.
+
+Some companies have strict rules and very often you need to forward several ssh tunnels to login into the console. Or generally very limited console access.
+
+Many desktop clients requires a certificate to connect to the server. And keeping the certificate from the cluster on the local machine is not 100% secure.
+
+And what if there is no way to install the client on the local machine for access the cluster, again you need to create aliases or copy commands from snippets. Very often I see that people are looking for certain kubectl commands, articles are published with several different commands, but there are hundreds of them, and thousands of variations. Of course, all these tasks can be automated, and surely every user / administrator of the cluster has already solved these tasks in one or another way for himself, but I am sure that there are some who have not done it yet.
+
+The same with search in Kubernetes cluster, sometimes you need to know where to look, and if there are a lot of resources, then it is not so easy to find what you need. I don't want to write a 
+huge commands, so I decided to do a "search" on many frequently used resources. As a result, KubeHelper appeared, with ideas that came during development.
+
+I also tried to look at the resources from the other side. Many GUI solutions show resources by namespace, a few more useful functions, and this is where the flexibility of graphical interfaces ends, and to do something different than just showing a list of resources in the namespace, again you have to turn to the console. For example group labels, find selector, view RBACs and so on ...
+
+Then I got the idea to help the community organize many commands in a single interface, install kubectl, plugins, utilities and make a graphical web interface for using the command line. Implemented other functions that will be useful in daily work with the Kubernetes cluster.
               
 ## Quick start
 Before installing KubeHelper in your cluster, you can configure the installation so that the KubeHelper is visible through the ``NodePort`` otherwise by default KubeHelper creates Service with 
@@ -54,15 +68,15 @@ Read more about fine-tuning and customization in the [installation section.](htt
 
 
 ## Your support
-❗&nbsp; Attention, if you have a wonderful command that will be useful to the community and you want to share it. Please write a message in the discussions, or even better, add a message with a
+❗&nbsp; If you have a wonderful command that will be useful to the community and you want to share it. Please write a message in the discussions, or even better, add a message with a
 command and description in accordance with the KubeHelper format. You can see how should command looks like [here.](https://github.com/KubeHelper/kubehelper/wiki/Installation)
 
-Which new features would you add at first? Which new feature will make your daily work easier?
+❗&nbsp; Which new features would you add at first? Which new feature will make your daily work easier?
 I composed a [list of possible new features](https://github.com/KubeHelper/kubehelper/talks), I would appreciate for your opinions and votes.
 
 It is enough to leave a comment with priority in the form of numbers or your suggestion. Here is a corresponding [Issue]((https://github.com/KubeHelper/kubehelper/issues/new?labels=kind:Feature&amp;template=FEATURE_REQUEST.md)) for a new feature request.
 
-🚀 🚀 🚀&nbsp;⭐⭐⭐ &nbsp; **Thank you in advance for your support, repost, fork, star.** &nbsp; ⭐⭐⭐&nbsp;🚀🚀🚀  
+🚀 🚀 🚀 &nbsp; ⭐⭐⭐ &nbsp; **Thank you in advance for your support, repost, fork, star.** &nbsp; ⭐⭐⭐ &nbsp; 🚀🚀🚀  
 
 🔥 🔥 🔥 &nbsp; Happy using. &nbsp;🔥🔥🔥
 
@@ -143,7 +157,6 @@ For detailed instructions on how to configure, customize, use, and more read the
 🤓 &nbsp; [Be a contributor.](https://github.com/KubeHelper/kubehelper/issues/new?labels=kind:Enhancement&amp;template=ENHANCEMENT_REQUEST.md)  
 ⭐ &nbsp; [Help the project => RATE US](https://github.com/KubeHelper/kubehelper/stargazers)  
 
----
 ## License
 Licensed GPL-3.0, see [LICENSE](https://github.com/KubeHelper/kubehelper/blob/main/LICENSE).
 
