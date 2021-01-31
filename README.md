@@ -7,7 +7,7 @@
 ---       
 ##### KubeHelper - simplifies many daily cluster tasks through a graphical web interface. Search, analysis, run commands, cron jobs, reports, filters, git config and many more.     
 
-[![LICENSE](https://img.shields.io/badge/license-GNU%20v3-green)](https://github.com/KubeHelper/kubehelper/blob/master/LICENSE)
+[![LICENSE](https://img.shields.io/badge/license-GNU%20v3-green)](https://github.com/KubeHelper/kubehelper/blob/main/LICENSE)
 ![Docker Pulls](https://img.shields.io/docker/pulls/kubehelper/kubehelper)
 ![Docker Stars](https://img.shields.io/docker/stars/kubehelper/kubehelper)
 ![Snyk Vulnerabilities for GitHub Repo](https://img.shields.io/snyk/vulnerabilities/github/KubeHelper/kubehelper)
@@ -39,21 +39,53 @@
 ## Installation 
 ### Helm
 [Configure and customize Helm installation.](https://github.com/KubeHelper/kubehelper/wiki/Installation)
+#### Installing KubeHelper with Helm.
+Replace YOUR_NAMESPACE_NAME with your namespace name.
+```shell
+KUBE_HELPER_NAMESPACE="YOUR_NAMESPACE_NAME"
+kubectl apply -f https://raw.githubusercontent.com/KubeHelper/kubehelper/main/installers/kubectl/kubehelper-deployment.yaml —n $KUBE_HELPER_NAMESPACE
+kubectl apply -f https://raw.githubusercontent.com/KubeHelper/kubehelper/develop/installers/kubectl/kubehelper-clusterrole.yaml —n $KUBE_HELPER_NAMESPACE
+kubectl create clusterrolebinding kubehelper-crb --clusterrole=kubehelper-cr --serviceaccount=$KUBE_HELPER_NAMESPACE:kubehelper-sa
+```
+#### Remove KubeHelper with kubectl.
+```shell
+kubectl delete deploy,sa,po,svc,clusterrole -l app=kubehelper -n YOUR_NAMESPACE_NAME
+kubectl delete clusterrolebinding kubehelper-crb
+```
+
 ### Terraform
 [Configure and customize Terraform installation.](https://github.com/KubeHelper/kubehelper/wiki/Installation)
-### Raw
+#### Installing KubeHelper with Terraform.
+Replace YOUR_NAMESPACE_NAME with your namespace name.
+```shell
+KUBE_HELPER_NAMESPACE="YOUR_NAMESPACE_NAME"
+kubectl apply -f https://raw.githubusercontent.com/KubeHelper/kubehelper/main/installers/kubectl/kubehelper-deployment.yaml —n $KUBE_HELPER_NAMESPACE
+kubectl apply -f https://raw.githubusercontent.com/KubeHelper/kubehelper/develop/installers/kubectl/kubehelper-clusterrole.yaml —n $KUBE_HELPER_NAMESPACE
+kubectl create clusterrolebinding kubehelper-crb --clusterrole=kubehelper-cr --serviceaccount=$KUBE_HELPER_NAMESPACE:kubehelper-sa
+```
+#### Remove KubeHelper with kubectl.
+```shell
+kubectl delete deploy,sa,po,svc,clusterrole -l app=kubehelper -n YOUR_NAMESPACE_NAME
+kubectl delete clusterrolebinding kubehelper-crb
+``` 
+
+### kubectl
 [Configure and customize kubectl installation.](https://github.com/KubeHelper/kubehelper/wiki/Installation)
-Installing KubeHelper with kubectl.
+#### Installing KubeHelper with kubectl.  
+Replace YOUR_NAMESPACE_NAME with your namespace name.
 ```shell
-kubectl apply -f kubehelper.yaml —n YOUR_NAMESPACE
-
+KUBE_HELPER_NAMESPACE="YOUR_NAMESPACE_NAME"
+kubectl apply -f https://raw.githubusercontent.com/KubeHelper/kubehelper/main/installers/kubectl/kubehelper-deployment.yaml —n $KUBE_HELPER_NAMESPACE
+kubectl apply -f https://raw.githubusercontent.com/KubeHelper/kubehelper/develop/installers/kubectl/kubehelper-clusterrole.yaml —n $KUBE_HELPER_NAMESPACE
+kubectl create clusterrolebinding kubehelper-crb --clusterrole=kubehelper-cr --serviceaccount=$KUBE_HELPER_NAMESPACE:kubehelper-sa
 ```
-Remove  KubeHelper with kubectl.
+#### Remove KubeHelper with kubectl.
 ```shell
-
+kubectl delete deploy,sa,po,svc,clusterrole -l app=kubehelper -n YOUR_NAMESPACE_NAME
+kubectl delete clusterrolebinding kubehelper-crb
 ```
 
-## Comes soon:
+## Comes soon
 KubeHelper as [Terraform Module](https://registry.terraform.io/browse/modules)  
 KubeHelper as [Helm Chart](https://artifacthub.io)
                                                                                                                        
@@ -61,14 +93,14 @@ KubeHelper as [Helm Chart](https://artifacthub.io)
 For detailed instructions on how to configure, customize, use, and more read the [KubeHelper Wiki](https://github.com/KubeHelper/kubehelper/wiki/Home).
     
 ## Support  
-💥[Enhancement Request.](https://github.com/JWebDev/kube-helper/issues/new?labels=kind:Enhancement&amp;template=ENHANCEMENT_REQUEST.md)  
-🚀[New Feature Request.](https://github.com/JWebDev/kube-helper/issues/new?labels=kind:Feature&amp;template=FEATURE_REQUEST.md)  
-🐞[Bug Report.](https://github.com/JWebDev/kube-helper/issues/new?labels=kind:Bug&amp;template=BUG_REPORT.md)  
-❓[Support Request.](https://github.com/JWebDev/kube-helper/issues/new?labels=kind:Support&amp;template=SUPPORT_REQUEST.md)  
-🤓[Be a contributor.](https://github.com/JWebDev/kube-helper/issues/new?labels=kind:Enhancement&amp;template=ENHANCEMENT_REQUEST.md)  
-⭐[Help the project => RATE US](https://github.com/JWebDev/kubehelper/stargazers)  
+💥 [Enhancement Request.](https://github.com/JWebDev/kube-helper/issues/new?labels=kind:Enhancement&amp;template=ENHANCEMENT_REQUEST.md)  
+🚀 [New Feature Request.](https://github.com/JWebDev/kube-helper/issues/new?labels=kind:Feature&amp;template=FEATURE_REQUEST.md)  
+🐞 [Bug Report.](https://github.com/JWebDev/kube-helper/issues/new?labels=kind:Bug&amp;template=BUG_REPORT.md)  
+❓ [Support Request.](https://github.com/JWebDev/kube-helper/issues/new?labels=kind:Support&amp;template=SUPPORT_REQUEST.md)  
+🤓 [Be a contributor.](https://github.com/JWebDev/kube-helper/issues/new?labels=kind:Enhancement&amp;template=ENHANCEMENT_REQUEST.md)  
+⭐ [Help the project => RATE US](https://github.com/JWebDev/kubehelper/stargazers)  
 
 ---
 ## License
-Licensed GPL-3.0, see [LICENSE](https://github.com/KubeHelper/kubehelper/blob/master/LICENSE).
+Licensed GPL-3.0, see [LICENSE](https://github.com/KubeHelper/kubehelper/blob/main/LICENSE).
 
