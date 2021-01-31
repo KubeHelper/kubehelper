@@ -1,39 +1,31 @@
-# Default values for kubehelper.
+# Default values for KubeHelper.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+#Username and password for login
+kubehelper:
+  username: "kube"
+  password: "helper"
+
+#The name of the ServiceAccount to be created.
 serviceAccount:
   name: "kubehelper-sa"
 
+#The name of the clusterRoleBinding to be created.
 clusterRoleBinding:
   name: "kubehelper-crb"
 
+#The name of the ClusterRole to be created.
+clusterRole:
+  name: "kubehelper-cr"
+
+#The name, port and type of the Service to be created.
 service:
   name: "kubehelper-svc"
   type: ClusterIP
   port: 80
 
-clusterRole:
-  name: "kubehelper-cr"
-
-rbac:
-  name: "kubehelper-cr"
-  rules:
-  - apiGroups: [ "*" ]
-    resources: [ "*" ]
-    verbs: [ "get","list" ]
-  - nonResourceURLs: [ "*" ]
-    verbs: [ "get","list" ]
-
-clusterRoleRules:
-  apiGroups:
-    verbs: ["get","list"]
-
-#clusterRoleRules:
-#  verbs: [ "get","list" ]
-#  - nonResourceURLs: [ "*" ]
-#    verbs: [ "get","list" ]
-
+#The name and other parameters of the Deployment to be created.
 deployment:
   name: "kubehelper-deployment"
 
@@ -43,17 +35,65 @@ image: "kubehelper/kubehelper"
 imageTag: "1.0.0"
 imagePullPolicy: Always
 
-podSecurityContext: {}
+podSecurityContext: { }
 
 #securityContext:
 #  runAsNonRoot: true
 #  runAsUser: 1000
 
-resources: {}
+resources: { }
 
 
-nodeSelector: {}
+nodeSelector: { }
 
-tolerations: []
+tolerations: [ ]
 
-affinity: {}
+affinity: { }
+
+#-------------------------------------
+# For your safety, KubeHelper is installed with read rights. Using the KubeHelper with default settings, you cannot modify, create, or delete resources.
+# Therefore, you can only execute commands intended for reading and viewing resources.
+# But KubeHelper is very flexible in this regard, when installing the program, you can change the ClusterRole rights up to the cluster administrator.
+# In this case, you can execute any commands and perform any actions with the cluster. Be careful with these rights!
+
+# In this case, you have 2 options.
+#-----------------
+# Option1: Add the rules that you need to the list. Here is a list of possible verbs: [create | delete | deletecollection | get | list | patch | update | watch]
+# or see what operations your cluster supports by executing this command 'kubectl api-resources -o wide'.
+#Example:
+#rbac:
+#  name: "kubehelper-cr"
+#  rules:
+#    verbs:
+#      - "get"
+#      - "list"
+#      - "create"
+#  nonResourceURLs:
+#    verbs:
+#      - 'get'
+#      - 'list'
+#      - 'delete'
+
+#-----------------
+# Option2: Be CLUSTER ADMIN! BBE CAREFUL WITH THESE RIGHTS!
+#Example:
+#rbac:
+#  name: "kubehelper-cr"
+#  rules:
+#    verbs:
+#      - "*"
+#  nonResourceURLs:
+#    verbs:
+#      - '*'
+
+rbac:
+  name: "kubehelper-cr"
+  rules:
+    verbs:
+      - "get"
+      - "list"
+  nonResourceURLs:
+    verbs:
+      - 'get'
+      - 'list'
+

@@ -1,13 +1,22 @@
 # [Kube Helper](https://github.com/KubeHelper/kubehelper)  
 
-[![LICENSE](https://img.shields.io/badge/license-GNU%20v3-green)](https://github.com/KubeHelper/kubehelper/blob/master/LICENSE)
-
 <p align="center">
   <img src="https://github.com/KubeHelper/kubehelper/blob/develop/src/main/resources/web/img/kube-helper-512.png" width="300" />
 </p>
  
 ---       
-##### KubeHelper - simplifies many daily cluster tasks through a graphical web interface. Search, analysis, run commands, cron jobs, reports, filters, git config and many more.                                     
+##### KubeHelper - simplifies many daily cluster tasks through a graphical web interface. Search, analysis, run commands, cron jobs, reports, filters, git config and many more.     
+
+[![LICENSE](https://img.shields.io/badge/license-GNU%20v3-green)](https://github.com/KubeHelper/kubehelper/blob/master/LICENSE)
+![Docker Pulls](https://img.shields.io/docker/pulls/hirotakakato/alpine-glibc)
+![Docker Stars](https://img.shields.io/docker/stars/hirotakakato/alpine-glibc)
+![Snyk Vulnerabilities for GitHub Repo](https://img.shields.io/snyk/vulnerabilities/github/JWebDev/kube-test)
+![Sonar Coverage](https://img.shields.io/sonar/coverage/kubehelper?server=https%3A%2F%2Fsonarcloud.io)
+![Sonar Quality Gate](https://img.shields.io/sonar/quality_gate/kubehelper?server=https%3A%2F%2Fsonarcloud.io)
+![Liberapay receiving](https://img.shields.io/liberapay/receives/kubehelper)
+![Open Collective backers and sponsors](https://img.shields.io/opencollective/all/kubehelper)
+![GitHub Sponsors](https://img.shields.io/github/sponsors/kubehelper?style=social)
+![GitHub Repo stars](https://img.shields.io/github/stars/KubeHelper/kubehelper?style=social)
 
 ## Features
 
@@ -36,14 +45,6 @@
                                                                                                                        
 ## Usage
 For detailed instructions on how to configure, customize, use, and more read the KubeHelper documentation.
-
-# Kube Helper
-Kubernetes helper features
-
-add VM Options to running Configuration (javax.net.ssl.SSLHandshakeException Bug: https://github.com/kubernetes-client/java/issues/893#issuecomment-617509920)
-```shell script
--Djdk.tls.client.protocols=TLSv1.2    
-```   
 
 ---
 ## License

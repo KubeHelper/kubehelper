@@ -60,20 +60,22 @@ public class Global {
     public static KubeHelperConfig config;
     public static String configString;
 
-    public static Map<String, PageModel> ACTIVE_MODELS = new HashMap<>() {
-    };
+    public static Map<String, PageModel> ACTIVE_MODELS = new HashMap<>();
+    public static Map<String, PageModel> NEW_MODELS = new HashMap<>();
 
-    public static Map<String, PageModel> NEW_MODELS = new HashMap<>() {
-        {
-            put(DASHBOARD_MODEL, new DashboardModel());
-            put(SEARCH_MODEL, new SearchModel());
-            put(SECURITY_MODEL, new SecurityModel());
-            put(LABELS_MODEL, new LabelsModel());
-            put(COMMANDS_MODEL, new CommandsModel());
-            put(IPS_AND_PORTS_MODEL, new IpsAndPortsModel());
-            put(CRON_JOBS_MODEL, new CronJobsModel());
-            put(CONFIGS_MODEL, new ConfigsModel());
-            put(VERSIONS_MODEL, new VersionsModel());
-        }
-    };
+    static {
+        initModels();
+    }
+
+    public static void initModels() {
+        NEW_MODELS.put(DASHBOARD_MODEL, new DashboardModel());
+        NEW_MODELS.put(SEARCH_MODEL, new SearchModel());
+        NEW_MODELS.put(SECURITY_MODEL, new SecurityModel());
+        NEW_MODELS.put(LABELS_MODEL, new LabelsModel());
+        NEW_MODELS.put(COMMANDS_MODEL, new CommandsModel());
+        NEW_MODELS.put(IPS_AND_PORTS_MODEL, new IpsAndPortsModel());
+        NEW_MODELS.put(CRON_JOBS_MODEL, new CronJobsModel());
+        NEW_MODELS.put(CONFIGS_MODEL, new ConfigsModel());
+        NEW_MODELS.put(VERSIONS_MODEL, new VersionsModel());
+    }
 }

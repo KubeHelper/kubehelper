@@ -3,40 +3,44 @@ kind: Deployment
 metadata:
   name: {{ .Values.deployment.name }}
   labels:
-    {{- include "kubehelper.labels" . | nindent 4 }}
+  {{- include "kubehelper.labels" . | nindent 4 }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      {{- include "kubehelper.selectorLabels" . | nindent 6 }}
+  {{- include "kubehelper.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
-        {{- include "kubehelper.selectorLabels" . | nindent 8 }}
+    {{- include "kubehelper.selectorLabels" . | nindent 8 }}
     spec:
       serviceAccountName: {{ .Values.serviceAccount.name }}
       automountServiceAccountToken: true
       securityContext:
-        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
         - name: {{ .Chart.Name }}
-          securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
+          securityContext: {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image }}:{{ .Values.imageTag }}"
           imagePullPolicy: {{ .Values.imagePullPolicy }}
+          env:
+            - name: KUBE_HELPER_UI_USERNAME
+              value: {{ .Values.kubehelper.username }}
+            - name: KUBE_HELPER_UI_PASSWORD
+              value: {{ .Values.kubehelper.password }}
           ports:
             - name: ui
               containerPort: 8080
               protocol: TCP
       {{- with .Values.nodeSelector }}
       nodeSelector:
-        {{- toYaml . | nindent 8 }}
+      {{- toYaml . | nindent 8 }}
       {{- end }}
-    {{- with .Values.affinity }}
+      {{- with .Values.affinity }}
       affinity:
-        {{- toYaml . | nindent 8 }}
-    {{- end }}
-    {{- with .Values.tolerations }}
+      {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
       tolerations:
-        {{- toYaml . | nindent 8 }}
-    {{- end }}
+  {{- toYaml . | nindent 8 }}
+  {{- end }}

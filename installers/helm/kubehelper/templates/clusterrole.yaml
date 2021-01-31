@@ -1,24 +1,12 @@
-{{/*apiVersion: v1*/}}
-{{/*kind: ClusterRole*/}}
-{{/*metadata:*/}}
-{{/*  name: {{ .Values.clusterRole.name }}*/}}
-{{/*  labels:*/}}
-{{/*  {{- include "kubehelper.labels" . | nindent 4 -}}*/}}
-{{/*rules:*/}}
-{{/*  - apiGroups: [ "*" ]*/}}
-{{/*    resources: [ "*" ]*/}}
-{{/*    verbs: [ "get","list" ]*/}}
-{{/*  - nonResourceURLs: [ "*" ]*/}}
-{{/*    verbs: [ "get","list" ]*/}}
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: {{ .Values.clusterRole.name }}
   labels:
-    {{- include "kubehelper.labels" . | nindent 4 }}
+  {{- include "kubehelper.labels" . | nindent 4 }}
 rules:
   - apiGroups: [ "*" ]
     resources: [ "*" ]
-    verbs: [ "get","list" ]
+    verbs: {{ .Values.rbac.rules.verbs | toJson | indent 4}}
   - nonResourceURLs: [ "*" ]
-    verbs: [ "get","list" ]
+    verbs: {{ .Values.rbac.nonResourceURLs.verbs | toJson | indent 4}}
