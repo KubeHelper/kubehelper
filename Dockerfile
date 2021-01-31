@@ -45,18 +45,15 @@ RUN kubectl krew install \
     view-utilization \
     who-can
 
-RUN bash -c 'mkdir -p /kubehelper/{history,git,reports}'
-#RUN groupadd kubehelper && adduser kubehelper
-#RUN addgroup -g 1000 -S kubehelper \
-#    && adduser -u 1000 -S kubehelper -G kubehelper
-#    && chown -R kubehelper:kubehelper /kubehelper \
-#    && chmod -R a+X /var/run
-
-#VOLUME /kubehelper
-#USER kubehelper
-
 #TODO ReMOVE AFTER
-COPY .kube/config /root/.kube/config
+#COPY .kube/config /root/.kube/config
+
+RUN bash -c 'mkdir -p /kubehelper/{history,git,reports}'
+RUN groupadd -g 1000 kubehelper && useradd -u 1000 -g kubehelper -s /bin/sh kubehelper
+RUN chown -R kubehelper:kubehelper /kubehelper
+
+USER kubehelper
+VOLUME /kubehelper
 
 COPY target/kubehelper.jar /kubehelper/kubehelper.jar
 ENTRYPOINT ["java","-Dspring.profiles.active=prod","--enable-preview","-jar","/kubehelper/kubehelper.jar"]

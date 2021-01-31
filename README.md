@@ -130,11 +130,12 @@ terraform destroy -auto-approve -compact-warnings -target=module.infra_kube_help
 [Configure and customize kubectl installation.](https://github.com/KubeHelper/kubehelper/wiki/Installation)
 #### Installing KubeHelper with kubectl.  
 Replace YOUR_NAMESPACE_NAME with your namespace name.
+❗&nbsp; Run order is important
 ```shell
 KUBE_HELPER_NAMESPACE="YOUR_NAMESPACE_NAME"
-kubectl apply -f https://raw.githubusercontent.com/KubeHelper/kubehelper/main/installers/kubectl/kubehelper-deployment.yaml —n $KUBE_HELPER_NAMESPACE
-kubectl apply -f https://raw.githubusercontent.com/KubeHelper/kubehelper/develop/installers/kubectl/kubehelper-clusterrole.yaml —n $KUBE_HELPER_NAMESPACE
 kubectl create clusterrolebinding kubehelper-crb --clusterrole=kubehelper-cr --serviceaccount=$KUBE_HELPER_NAMESPACE:kubehelper-sa
+kubectl apply -f https://raw.githubusercontent.com/KubeHelper/kubehelper/develop/installers/kubectl/kubehelper-clusterrole.yaml —n $KUBE_HELPER_NAMESPACE
+kubectl apply -f https://raw.githubusercontent.com/KubeHelper/kubehelper/main/installers/kubectl/kubehelper-deployment.yaml —n $KUBE_HELPER_NAMESPACE
 ```
 #### Remove KubeHelper with kubectl.
 ```shell

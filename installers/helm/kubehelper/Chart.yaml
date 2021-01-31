@@ -5,7 +5,7 @@ description: KubeHelper - simplifies many daily cluster tasks through a graphica
 type: application
 keywords:
   - kubernetes, kubehelper, search, analysis, run commands, cron jobs, reports, filters
-home: https://github.com/KubeHelper
+home: https://github.com/KubeHelper/kubehelper
 sources:
   - https://github.com/KubeHelper/kubehelper
 maintainers:

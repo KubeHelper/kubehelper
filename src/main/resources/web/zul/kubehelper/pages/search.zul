@@ -103,7 +103,7 @@
                         <column hflex="1" label="Namespace" sort="auto(namespace)"/>
                         <column hflex="1" label="Kind" sort="auto(resourceType)"/>
                         <column hflex="1" label="Creation Time" sort="auto(creationTime)"/>
-                        <column hflex="min" label="Raws"/>
+                        <column hflex="1" label="Raws"/>
                     </columns>
                     <rows>
                         <template name="model" var="item">

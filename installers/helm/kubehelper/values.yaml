@@ -37,9 +37,9 @@ imagePullPolicy: Always
 
 podSecurityContext: { }
 
-#securityContext:
-#  runAsNonRoot: true
-#  runAsUser: 1000
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
 
 resources: { }
 
