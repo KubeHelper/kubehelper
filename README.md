@@ -5,7 +5,7 @@
 </p>
  
 ---       
-##### KubeHelper - simplifies many daily cluster tasks through a graphical web interface. Search, analysis, run commands, cron jobs, reports, filters, git config and many more.     
+##### KubeHelper - simplifies many daily Kubernetes cluster tasks through a graphical web interface. Search, analysis, run commands, cron jobs, reports, filters, git synchronization and many more.     
 
 [![LICENSE](https://img.shields.io/badge/license-GNU%20v3-green)](https://github.com/KubeHelper/kubehelper/blob/main/LICENSE)
 ![Docker Pulls](https://img.shields.io/docker/pulls/kubehelper/kubehelper)
@@ -35,7 +35,7 @@
 ## Motivation
               
 ## Quick start
-Before installing KubeHelper in your cluster, you can configure the installation so that the KubeHelper is visible through the NodePort otherwise by default KubeHelper creates Service with 
+Before installing KubeHelper in your cluster, you can configure the installation so that the KubeHelper is visible through the ``NodePort`` otherwise by default KubeHelper creates Service with 
 ``ClusterIP`` and you need to specify service ``http://kubehelper-svc.YOUR-NAMESPACE/`` in your ingress or proxy.   
 
 KubeHelper has basic protection with a username and password. You can customize/replace them by replacing the environment variables in the deployment. By default, you can login with these 
@@ -49,16 +49,17 @@ command and description in accordance with the KubeHelper format. You can see ho
 
 For your safety, KubeHelper is installed with read rights. Using the KubeHelper with default settings, you cannot modify, create, or delete resources. Therefore, you can only execute commands intended for reading and viewing resources.  
 
-But KubeHelper is very flexible in this regard, when installing the program, you can change the ClusterRole rights up to the cluster administrator &nbsp; 💪. ❗&nbsp; Be careful with these rights!
+But KubeHelper is very flexible in this regard, when installing the program, you can change the ClusterRole rights up to the cluster administrator 💪. Be careful with these rights❗
 
 In this case, you can execute any commands and perform any actions with the cluster from web GUI.  
 
 Read more about fine-tuning and customization in the [installation section.](https://github.com/KubeHelper/kubehelper/wiki/Installation)
 
-🔥 🔥 🔥 &nbsp; Happy using. &nbsp; 🔥🔥🔥
+🔥 🔥 🔥 &nbsp; Happy using. &nbsp;🔥🔥🔥
 
-🚀 🚀 🚀 ⭐⭐⭐ &nbsp; **Thank you in advance for your support, repost, fork, star.** &nbsp; ⭐⭐⭐🚀🚀🚀
+🚀 🚀 🚀&nbsp;⭐⭐⭐ &nbsp; **Thank you in advance for your support, repost, fork, star.** &nbsp; ⭐⭐⭐&nbsp;🚀🚀🚀  
 
+---
 ## Installation 
 ### Helm
 [Configure and customize Helm installation.](https://github.com/KubeHelper/kubehelper/wiki/Installation)
@@ -87,8 +88,10 @@ kubectl delete clusterrolebinding kubehelper-crb
 module "infra_kube_helper" {
   source = "./namespaces/infra/kube-helper"
 }
+```
 
-#refresh terraform state
+* Refresh terraform state.
+```shell
 terraform init
 ```
 
@@ -117,7 +120,7 @@ kubectl create clusterrolebinding kubehelper-crb --clusterrole=kubehelper-cr --s
 kubectl delete deploy,sa,po,svc,clusterrole -l app=kubehelper -n YOUR_NAMESPACE_NAME
 kubectl delete clusterrolebinding kubehelper-crb
 ```
-
+---
 ## Comes soon
 KubeHelper as [Terraform Module](https://registry.terraform.io/browse/modules)  
 KubeHelper as [Helm Chart](https://artifacthub.io)
