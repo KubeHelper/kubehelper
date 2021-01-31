@@ -1,0 +1,14 @@
+#ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: kubehelper-cr
+  labels:
+    app: kubehelper
+    app.kubernetes.io/name: kubehelper
+rules:
+  - apiGroups: [ "*" ]
+    resources: [ "*" ]
+    verbs: [ "get","list" ]
+  - nonResourceURLs: [ "*" ]
+    verbs: [ "get","list" ]

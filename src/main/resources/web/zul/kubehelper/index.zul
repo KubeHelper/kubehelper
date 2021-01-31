@@ -62,29 +62,29 @@
                         </panel>
                         <panel width="100%" title="Kube Helper" collapsible="true">
                             <panelchildren style="padding:5px;">
-                                <toolbarbutton id="projectMenuBtn" hflex="1" iconSclass="z-icon-home" label="&#160;Kube Helper Project" tooltiptext="https://github.com/JWebDev/kubehelper"
-                                               href="https://github.com/JWebDev/kubehelper" target="_blank" style="text-align: left; padding-left: 2px;"/>
-                                <toolbarbutton id="wikiMenuBtn" hflex="1" iconSclass="z-icon-book" label="&#160;Wiki" tooltiptext="https://github.com/JWebDev/kubehelper"
-                                               href="https://github.com/JWebDev/kubehelper" target="_blank" style="text-align: left; padding-left: 2px;"/>
+                                <toolbarbutton id="projectMenuBtn" hflex="1" iconSclass="z-icon-home" label="&#160;Kube Helper Project" tooltiptext="https://github.com/KubeHelper/kubehelper"
+                                               href="https://github.com/KubeHelper/kubehelper" target="_blank" style="text-align: left; padding-left: 2px;"/>
+                                <toolbarbutton id="wikiMenuBtn" hflex="1" iconSclass="z-icon-book" label="&#160;Wiki" tooltiptext="https://github.com/KubeHelper/kubehelper/wiki"
+                                               href="https://github.com/KubeHelper/kubehelper" target="_blank" style="text-align: left; padding-left: 2px;"/>
                                 <toolbarbutton id="enhancementRequestMenuBtn" hflex="1" iconSclass="z-icon-level-up" label="&#160;Enhancement Request"
-                                               tooltiptext="https://github.com/JWebDev/kubehelper"
-                                               href="https://github.com/JWebDev/kube-helper/issues/new?labels=kind:Enhancement&amp;template=ENHANCEMENT_REQUEST.md" target="_blank"
+                                               tooltiptext="https://github.com/KubeHelper/kubehelper"
+                                               href="https://github.com/KubeHelper/kubehelper/issues/new?labels=kind:Enhancement&amp;template=ENHANCEMENT_REQUEST.md" target="_blank"
                                                style="text-align: left; padding-left: 2px;"/>
-                                <toolbarbutton id="newFeatureRequestMenuBtn" hflex="1" iconSclass="z-icon-plus" label="&#160;New Feature Request" tooltiptext="https://github.com/JWebDev/kubehelper"
-                                               href="https://github.com/JWebDev/kube-helper/issues/new?labels=kind:Feature&amp;template=FEATURE_REQUEST.md" target="_blank"
+                                <toolbarbutton id="newFeatureRequestMenuBtn" hflex="1" iconSclass="z-icon-plus" label="&#160;New Feature Request" tooltiptext="https://github.com/KubeHelper/kubehelper"
+                                               href="https://github.com/KubeHelper/kubehelper/issues/new?labels=kind:Feature&amp;template=FEATURE_REQUEST.md" target="_blank"
                                                style="text-align: left; padding-left: 2px;"/>
-                                <toolbarbutton id="bugReportMenuBtn" hflex="1" iconSclass="z-icon-bug" label="&#160;Bug Report" tooltiptext="https://github.com/JWebDev/kubehelper"
-                                               href="https://github.com/JWebDev/kube-helper/issues/new?labels=kind:Bug&amp;template=BUG_REPORT.md" target="_blank"
+                                <toolbarbutton id="bugReportMenuBtn" hflex="1" iconSclass="z-icon-bug" label="&#160;Bug Report" tooltiptext="https://github.com/KubeHelper/kubehelper"
+                                               href="https://github.com/KubeHelper/kubehelper/issues/new?labels=kind:Bug&amp;template=BUG_REPORT.md" target="_blank"
                                                style="text-align: left; padding-left: 2px;"/>
-                                <toolbarbutton id="supportRequestMenuBtn" hflex="1" iconSclass="z-icon-life-ring" label="&#160;Support Request" tooltiptext="https://github.com/JWebDev/kubehelper"
-                                               href="https://github.com/JWebDev/kube-helper/issues/new?labels=kind:Support&amp;template=SUPPORT_REQUEST.md" target="_blank"
+                                <toolbarbutton id="supportRequestMenuBtn" hflex="1" iconSclass="z-icon-life-ring" label="&#160;Support Request" tooltiptext="https://github.com/KubeHelper/kubehelper"
+                                               href="https://github.com/KubeHelper/kubehelper/issues/new?labels=kind:Support&amp;template=SUPPORT_REQUEST.md" target="_blank"
                                                style="text-align: left; padding-left: 2px;"/>
                                 <toolbarbutton id="beAContributorMenuBtn" hflex="1" iconSclass="z-icon-plus-square" label="&#160;Be a contributor" style="text-align: left; padding-left: 2px;"
                                                onClick="@command('contactDeveloper')"/>
                                 <toolbarbutton id="writeToTheAuthorMenuBtn" hflex="1" iconSclass="z-icon-envelope" label="&#160;Write to the author" style="text-align: left; padding-left: 2px;"
                                                onClick="@command('contactDeveloper')"/>
                                 <toolbarbutton id="helpTheProjectMenuBtn" hflex="1" iconSclass="z-icon-star" label="&#160;Help the project => RATE US" style="text-align: left; padding-left: 2px;"
-                                               tooltiptext="https://github.com/JWebDev/kubehelper/stargazers" href="https://github.com/JWebDev/kubehelper/stargazers" target="_blank"/>
+                                               tooltiptext="https://github.com/KubeHelper/kubehelper/stargazers" href="https://github.com/KubeHelper/kubehelper/stargazers" target="_blank"/>
                                 <separator orient="horizontal"/>
                                 <button iconSclass="z-icon-heartbeat" height="50px" width="100%" label="Donate" dir="reverse"
                                         style="font-size: 18px;font-weight: bold;" onClick="@command('donate')"/>
@@ -106,7 +106,7 @@
             </center>
             <south id="indexGlobalFooter" border="none">
                 <toolbar align="center" style="border-top: 1px solid lightgray">
-                    <toolbarbutton id="copyrightBtn" label="@load(indexVM.footerCopyrightText)" tooltiptext="https://github.com/JWebDev/kubehelper" href="https://github.com/JWebDev/kubehelper"
+                    <toolbarbutton id="copyrightBtn" label="@load(indexVM.footerCopyrightText)" tooltiptext="https://github.com/KubeHelper/kubehelper" href="https://github.com/KubeHelper/kubehelper"
                                    target="_blank" style="font-family: Courier, Monaco, monospace;font-size: 14px;font-weight: bold;"/>
                     <html style="vertical-align: middle">|</html>
                     <toolbarbutton id="autorBtn" label="JDev" tooltiptext="https://github.com/JWebDev" href="https://github.com/JWebDev" target="_blank"

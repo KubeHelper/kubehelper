@@ -27,37 +27,6 @@ spec:
     app.kubernetes.io/name: kubehelper
 ---
 
-#ClusterRole
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: kubehelper-cr
-  labels:
-    app: kubehelper
-    app.kubernetes.io/name: kubehelper
-rules:
-  - apiGroups: [ "*" ]
-    resources: [ "*" ]
-    verbs: [ "get","list" ]
-  - nonResourceURLs: [ "*" ]
-    verbs: [ "get","list" ]
----
-
-#ClusterRoleBinding
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: kubehelper-crb
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: kubehelper-cr
-subjects:
-  - kind: ServiceAccount
-    name: kubehelper-sa
-    namespace: default
----
-
 #Deployment
 apiVersion: apps/v1
 kind: Deployment
