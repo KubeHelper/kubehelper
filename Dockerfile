@@ -58,5 +58,5 @@ RUN bash -c 'mkdir -p /kubehelper/{history,git,reports}'
 #TODO ReMOVE AFTER
 COPY .kube/config /root/.kube/config
 
-COPY target/kube-helper.jar /kubehelper/kube-helper.jar
-ENTRYPOINT ["java","-Dspring.profiles.active=prod","--enable-preview","-jar","/kubehelper/kube-helper.jar"]
+COPY target/kubehelper.jar /kubehelper/kubehelper.jar
+ENTRYPOINT ["java","-Dspring.profiles.active=prod","--enable-preview","-jar","/kubehelper/kubehelper.jar"]

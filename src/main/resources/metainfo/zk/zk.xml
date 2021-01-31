@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <zk>
-    <config-name>kube-helper</config-name>
+    <config-name>kubehelper</config-name>
 <!--    <listener>-->
 <!--        <listener-class>com.kubehelper.controllers.KubeHelperWebAppInit</listener-class>-->
 <!--        <listener-class>com.kubehelper.controllers.KubeHelperDesktopInit</listener-class>-->

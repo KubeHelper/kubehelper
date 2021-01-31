@@ -44,9 +44,6 @@ credentials (username/password) **``kube/helper``**.
 The interface consists of two parts, the control panel on the left and content area. KubeHelper combines a lot of different functionality that is divided into sections. Everyone will find 
 something for themselves.  
 
-❗&nbsp; Attention, if you have a wonderful command that will be useful to the community and you want to share it. Please write a message in the discussions, or even better, add a message with a 
-command and description in accordance with the KubeHelper format. You can see how should command looks like [here.](https://github.com/KubeHelper/kubehelper/wiki/Installation)
-
 For your safety, KubeHelper is installed with read rights. Using the KubeHelper with default settings, you cannot modify, create, or delete resources. Therefore, you can only execute commands intended for reading and viewing resources.  
 
 But KubeHelper is very flexible in this regard, when installing the program, you can change the ClusterRole rights up to the cluster administrator 💪. Be careful with these rights❗
@@ -55,9 +52,19 @@ In this case, you can execute any commands and perform any actions with the clus
 
 Read more about fine-tuning and customization in the [installation section.](https://github.com/KubeHelper/kubehelper/wiki/Installation)
 
-🔥 🔥 🔥 &nbsp; Happy using. &nbsp;🔥🔥🔥
+
+## Your support
+❗&nbsp; Attention, if you have a wonderful command that will be useful to the community and you want to share it. Please write a message in the discussions, or even better, add a message with a
+command and description in accordance with the KubeHelper format. You can see how should command looks like [here.](https://github.com/KubeHelper/kubehelper/wiki/Installation)
+
+Which new features would you add at first? Which new feature will make your daily work easier?
+I composed a [list of possible new features](https://github.com/KubeHelper/kubehelper/talks), I would appreciate for your opinions and votes.
+
+It is enough to leave a comment with priority in the form of numbers or your suggestion. Here is a corresponding [Issue]((https://github.com/KubeHelper/kubehelper/issues/new?labels=kind:Feature&amp;template=FEATURE_REQUEST.md)) for a new feature request.
 
 🚀 🚀 🚀&nbsp;⭐⭐⭐ &nbsp; **Thank you in advance for your support, repost, fork, star.** &nbsp; ⭐⭐⭐&nbsp;🚀🚀🚀  
+
+🔥 🔥 🔥 &nbsp; Happy using. &nbsp;🔥🔥🔥
 
 ---
 ## Installation 
@@ -67,7 +74,7 @@ Read more about fine-tuning and customization in the [installation section.](htt
 //TODO.
 ```shell
 KUBE_HELPER_NAMESPACE="YOUR_NAMESPACE_NAME"
-helm repo add jdev 'https://github.com/JWebDev/helm-charts/'
+helm repo add jdev 'https://github.com/KubeHelper/helm-charts/'
 helm repo update
 helm search <your-chart-name>
 https://helm.sh/docs/topics/chart_repository/
@@ -86,7 +93,7 @@ kubectl delete clusterrolebinding kubehelper-crb
 * Add module to your main.tf. If necessary change the name and path to the module.
 ```shell
 module "infra_kube_helper" {
-  source = "./namespaces/infra/kube-helper"
+  source = "./namespaces/infra/kubehelper"
 }
 ```
 
@@ -129,12 +136,12 @@ KubeHelper as [Helm Chart](https://artifacthub.io)
 For detailed instructions on how to configure, customize, use, and more read the [KubeHelper Wiki](https://github.com/KubeHelper/kubehelper/wiki/Home).
     
 ## Support  
-💥 &nbsp; [Enhancement Request.](https://github.com/JWebDev/kube-helper/issues/new?labels=kind:Enhancement&amp;template=ENHANCEMENT_REQUEST.md)  
-🚀 &nbsp; [New Feature Request.](https://github.com/JWebDev/kube-helper/issues/new?labels=kind:Feature&amp;template=FEATURE_REQUEST.md)  
-🐞 &nbsp; [Bug Report.](https://github.com/JWebDev/kube-helper/issues/new?labels=kind:Bug&amp;template=BUG_REPORT.md)  
-❓ &nbsp; [Support Request.](https://github.com/JWebDev/kube-helper/issues/new?labels=kind:Support&amp;template=SUPPORT_REQUEST.md)  
-🤓 &nbsp; [Be a contributor.](https://github.com/JWebDev/kube-helper/issues/new?labels=kind:Enhancement&amp;template=ENHANCEMENT_REQUEST.md)  
-⭐ &nbsp; [Help the project => RATE US](https://github.com/JWebDev/kubehelper/stargazers)  
+💥 &nbsp; [Enhancement Request.](https://github.com/KubeHelper/kubehelper/issues/new?labels=kind:Enhancement&amp;template=ENHANCEMENT_REQUEST.md)  
+🚀 &nbsp; [New Feature Request.](https://github.com/KubeHelper/kubehelper/issues/new?labels=kind:Feature&amp;template=FEATURE_REQUEST.md)  
+🐞 &nbsp; [Bug Report.](https://github.com/KubeHelper/kubehelper/issues/new?labels=kind:Bug&amp;template=BUG_REPORT.md)  
+❓ &nbsp; [Support Request.](https://github.com/KubeHelper/kubehelper/issues/new?labels=kind:Support&amp;template=SUPPORT_REQUEST.md)  
+🤓 &nbsp; [Be a contributor.](https://github.com/KubeHelper/kubehelper/issues/new?labels=kind:Enhancement&amp;template=ENHANCEMENT_REQUEST.md)  
+⭐ &nbsp; [Help the project => RATE US](https://github.com/KubeHelper/kubehelper/stargazers)  
 
 ---
 ## License

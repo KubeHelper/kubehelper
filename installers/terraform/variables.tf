@@ -4,16 +4,16 @@ locals {
   kube_helper_ui_password = "helper"
 }
 
-variable "kube_helper_labels" {
+variable "kubehelper_labels" {
   default = {
-    app = "kube-helper"
+    app = "kubehelper"
     ns = "infra"
   }
 }
 
-variable "kube_helper_selector" {
+variable "kubehelper_selector" {
   default = {
-    app = "kube-helper"
+    app = "kubehelper"
     ns = "infra"
   }
 }

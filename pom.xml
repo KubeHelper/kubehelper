@@ -9,7 +9,7 @@
         <relativePath/>
     </parent>
     <groupId>com.kubehelper</groupId>
-    <artifactId>kube-helper</artifactId>
+    <artifactId>kubehelper</artifactId>
     <version>1.0-SNAPSHOT</version>
     <name>Kube Helper</name>
     <description>Kube HelperProject</description>
@@ -158,7 +158,7 @@
     </repositories>
 
     <build>
-        <finalName>kube-helper</finalName>
+        <finalName>kubehelper</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
@@ -200,7 +200,7 @@
                 <configuration>
                     <images>
                         <image>
-                            <name>kube-helper:1.0</name>
+                            <name>kubehelper:1.0</name>
                             <alias>kubehelper</alias>
                             <build>
                                 <dockerFileDir>${project.basedir}</dockerFileDir>

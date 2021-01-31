@@ -20,7 +20,7 @@
             <hlayout>
                 <image src="~./img/liberapay.png" height="50px" width="50px"/>
                 <toolbarbutton width="200px" height="50px" iconSclass="z-icon-heartbeat" label="&#160;Liberapay" dir="reverse"
-                               style="font-size: 20px;font-family: Courier, Monaco, monospace;text-align: left" href="https://liberapay.com/kube-helper/" target="_blank"/>
+                               style="font-size: 20px;font-family: Courier, Monaco, monospace;text-align: left" href="https://liberapay.com/kubehelper/" target="_blank"/>
             </hlayout>
             <hlayout>
                 <image src="~./img/github.png" height="50px" width="50px"/>
