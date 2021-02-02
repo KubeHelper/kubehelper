@@ -60,7 +60,7 @@ something for themselves.
 
 For your safety, KubeHelper is installed with read rights. Using the KubeHelper with default settings, you cannot modify, create, or delete resources. Therefore, you can only execute commands intended for reading and viewing resources.  
 
-But KubeHelper is very flexible in this regard, when installing the program, you can change the ClusterRole rights up to the cluster administrator 💪 . Be careful with these rights❗
+But KubeHelper is very flexible in this regard, you can change the ClusterRole rights up to the cluster administrator 💪 . Be careful with these rights❗
 
 In this case, you can execute any commands and perform any actions with the cluster from web GUI.  
 
