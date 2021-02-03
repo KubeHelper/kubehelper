@@ -57,6 +57,9 @@ public class CronJobsService {
     @Value("${kubehelper.user.commands.location.search.path}")
     private String userCommandsLocationSearchPath;
 
+    @Value("${kubehelper.user.commands.local.location.search.path}")
+    private String userCommandsLocalLocationSearchPath;
+
     @Value("${kubehelper.cron.jobs.reports.path}")
     private String cronJobsReportsPath;
 
@@ -158,6 +161,8 @@ public class CronJobsService {
         HashMap<String, Toml> commands = new HashMap<>();
         try {
             Set<String> userCommandFiles = commonService.getFilesPathsByDirAndExtension(userCommandsLocationSearchPath, 10, ".toml");
+            Set<String> userCommandLocalFiles = commonService.getFilesPathsByDirAndExtension(userCommandsLocalLocationSearchPath, 10, ".toml");
+            userCommandFiles.addAll(userCommandLocalFiles);
             for (String filePath : userCommandFiles) {
                 if (filePath.endsWith(Global.CONFIG_FILENAME)) {
                     continue;

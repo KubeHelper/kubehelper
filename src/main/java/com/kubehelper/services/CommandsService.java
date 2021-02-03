@@ -80,6 +80,9 @@ public class CommandsService {
     @Value("${kubehelper.user.commands.location.search.path}")
     private String userCommandsLocationSearchPath;
 
+    @Value("${kubehelper.user.commands.local.location.search.path}")
+    private String userCommandsLocalLocationSearchPath;
+
     @Value("${kubehelper.commanmds.history.path}")
     private String commandsHistoryPath;
 
@@ -141,6 +144,8 @@ public class CommandsService {
         HashMap<String, Toml> commands = new HashMap<>();
         try {
             Set<String> userCommandFiles = commonService.getFilesPathsByDirAndExtension(userCommandsLocationSearchPath, 10, ".toml");
+            Set<String> userCommandLocalFiles = commonService.getFilesPathsByDirAndExtension(userCommandsLocalLocationSearchPath, 10, ".toml");
+            userCommandFiles.addAll(userCommandLocalFiles);
             for (String filePath : userCommandFiles) {
                 if (filePath.endsWith(Global.CONFIG_FILENAME)) {
                     continue;
@@ -299,6 +304,8 @@ public class CommandsService {
         try {
             //search for user commands
             Set<String> filesPathsByDirAndExtension = commonService.getFilesPathsByDirAndExtension(userCommandsLocationSearchPath, 10, ".toml");
+            Set<String> userCommandLocalFiles = commonService.getFilesPathsByDirAndExtension(userCommandsLocalLocationSearchPath, 10, ".toml");
+            filesPathsByDirAndExtension.addAll(userCommandLocalFiles);
             commandsModel.setCommandsSources(new HashMap<>());
             for (String filePath : filesPathsByDirAndExtension) {
                 if (filePath.endsWith(Global.CONFIG_FILENAME)) {

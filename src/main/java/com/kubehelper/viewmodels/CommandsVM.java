@@ -216,10 +216,7 @@ public class CommandsVM implements EventListener<Event> {
      */
     private void redrawCommandsToolbarbuttons(String toolbarId, List<String> entries, String activeToolbarButtonId) {
         createCommandsToolbarButtons(toolbarId, entries);
-//        TODO fix nullpointer
-        if (StringUtils.isNotBlank(model.getSelectedCommandsHistoryLabel()) || StringUtils.isNotBlank(model.getSelectedCommandsSourceLabel())) {
-            enableDisableMenuItem(activeToolbarButtonId, true, "bold;");
-        }
+        enableDisableMenuItem(activeToolbarButtonId, true, "bold;");
     }
 
 
@@ -283,7 +280,7 @@ public class CommandsVM implements EventListener<Event> {
 
         BindUtils.postNotifyChange(this, "commandToExecute", "commandToExecuteEditable");
     }
-    
+
 
     /**
      * Replaces \n with spaces in commad.
@@ -563,7 +560,7 @@ public class CommandsVM implements EventListener<Event> {
 
 
     private String getCommandToolbarButtonId(String label) {
-        return label.replaceAll("[^a-zA-Z0-9]", "") + "Id";
+        return StringUtils.isBlank(label) ? "" : label.replaceAll("[^a-zA-Z0-9]", "") + "Id";
     }
 
     /**
@@ -574,9 +571,11 @@ public class CommandsVM implements EventListener<Event> {
      * @param fontWeight      - font weight bold/normal.
      */
     private void enableDisableMenuItem(String toolbarbuttonId, boolean disabled, String fontWeight) {
-        Toolbarbutton toolbarbutton = (Toolbarbutton) Path.getComponent("//indexPage/templateInclude/" + toolbarbuttonId);
-        toolbarbutton.setDisabled(disabled);
-        toolbarbutton.setStyle("text-align: left;font-weight: " + fontWeight);
+        if (StringUtils.isNotBlank(toolbarbuttonId)) {
+            Toolbarbutton toolbarbutton = (Toolbarbutton) Path.getComponent("//indexPage/templateInclude/" + toolbarbuttonId);
+            toolbarbutton.setDisabled(disabled);
+            toolbarbutton.setStyle("text-align: left;font-weight: " + fontWeight);
+        }
     }
 
     private boolean checkExceptions() {

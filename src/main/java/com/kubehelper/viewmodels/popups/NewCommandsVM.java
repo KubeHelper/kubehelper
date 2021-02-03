@@ -64,7 +64,7 @@ public class NewCommandsVM {
     @Init
     public void init() {
         Environment env = SpringUtil.getApplicationContext().getEnvironment();
-        commandsLocationPath = env.getProperty("kubehelper.user.commands.location.search.path");
+        commandsLocationPath = env.getProperty("kubehelper.user.commands.local.location.search.path");
     }
 
     /**

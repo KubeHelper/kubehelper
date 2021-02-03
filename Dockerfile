@@ -48,7 +48,7 @@ RUN kubectl krew install \
 #TODO ReMOVE AFTER
 #COPY .kube/config /root/.kube/config
 
-RUN bash -c 'mkdir -p /kubehelper/{history,git,reports}'
+RUN bash -c 'mkdir -p /kubehelper/{history,git,reports,commands}'
 RUN groupadd -g 1000 kubehelper && useradd -u 1000 -g kubehelper -s /bin/sh kubehelper
 RUN chown -R kubehelper:kubehelper /kubehelper
 
