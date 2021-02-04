@@ -10,10 +10,16 @@ ENV JAVA_OPTS='--enable-preview'
 
 RUN apt-get update && apt-get install -y --no-install-recommends unzip wget	curl net-tools nano vim procps less jq git fish zsh ksh
 
+RUN bash -c 'mkdir -p /kubehelper/{history,git,reports,commands}'
+RUN groupadd -g 1000 kubehelper && useradd -m -u 1000 -g kubehelper -s /bin/sh kubehelper && usermod -aG sudo kubehelper
+RUN chown -R kubehelper:kubehelper /kubehelper
+
 #Install latest stable kubectl
 RUN curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl" && \
     chmod +x ./kubectl && \
     mv ./kubectl /usr/local/bin/kubectl
+
+USER kubehelper
 
 #Install krew https://krew.sigs.k8s.io/docs/user-guide/setup/install/
 RUN set -x; cd "$(mktemp -d)" && \
@@ -23,7 +29,7 @@ RUN set -x; cd "$(mktemp -d)" && \
     "${KREW}" install krew
 
 #add krew to PATH
-ENV PATH="/root/.krew/bin:${PATH}"
+ENV PATH="/home/kubehelper/.krew/bin:${PATH}"
 
 #Install krew plugins
 RUN kubectl krew install \
@@ -46,13 +52,8 @@ RUN kubectl krew install \
     who-can
 
 #TODO ReMOVE AFTER
-#COPY .kube/config /root/.kube/config
+COPY .kube/config /kubehelper/.kube/config
 
-RUN bash -c 'mkdir -p /kubehelper/{history,git,reports,commands}'
-RUN groupadd -g 1000 kubehelper && useradd -u 1000 -g kubehelper -s /bin/sh kubehelper
-RUN chown -R kubehelper:kubehelper /kubehelper
-
-USER kubehelper
 VOLUME /kubehelper
 
 COPY target/kubehelper.jar /kubehelper/kubehelper.jar

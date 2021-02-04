@@ -17,7 +17,6 @@
     <properties>
         <java.version>14</java.version>
         <zkspringboot.version>2.3.1</zkspringboot.version>
-        <!--        <zk.version>9.0.0</zk.version>-->
         <zk.version>9.5.0.2</zk.version>
     </properties>
 
@@ -150,11 +149,6 @@
             <name>ZK CE Repository</name>
             <url>http://mavensync.zkoss.org/maven2</url>
         </repository>
-        <!--        <repository>-->
-        <!--            <id>Maven Central</id>-->
-        <!--            <name>Maven Central Repository</name>-->
-        <!--            <url>https://repo1.maven.org/maven2/</url>-->
-        <!--        </repository>-->
     </repositories>
 
     <build>
