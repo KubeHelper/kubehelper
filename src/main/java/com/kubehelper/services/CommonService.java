@@ -134,7 +134,7 @@ public class CommonService {
             v1NamespacesList.getItems().forEach(v1Namespace -> initNamespaces.add(v1Namespace.getMetadata().getName()));
         } catch (ApiException e) {
             Messagebox.show(e.getMessage(), "Fetch Namespaces Error", Messagebox.OK, Messagebox.ERROR);
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
         return initNamespaces;
     }

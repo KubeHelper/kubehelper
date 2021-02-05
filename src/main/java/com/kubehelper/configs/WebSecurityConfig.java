@@ -70,7 +70,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         // ZK already sends a AJAX request with a built-in CSRF token,
         // please refer to https://www.zkoss.org/wiki/ZK%20Developer's%20Reference/Security%20Tips/Cross-site%20Request%20Forgery
-        http.csrf().disable();
+//        http.csrf().disable();
         http.authorizeRequests()
                 .antMatchers(ZUL_FILES).denyAll() // block direct access to zul files
                 .antMatchers(HttpMethod.GET, ZK_RESOURCES).permitAll() // allow zk resources
