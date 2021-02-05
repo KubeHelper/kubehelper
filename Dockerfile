@@ -52,7 +52,7 @@ RUN kubectl krew install \
     who-can
 
 #TODO ReMOVE AFTER
-COPY .kube/config /kubehelper/.kube/config
+#COPY .kube/config /kubehelper/.kube/config
 
 VOLUME /kubehelper
 
