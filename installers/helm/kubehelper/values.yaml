@@ -11,7 +11,7 @@ kubehelper:
 serviceAccount:
   name: "kubehelper-sa"
 
-#The name of the clusterRoleBinding to be created.
+#The name of the ClusterRoleBinding to be created.
 clusterRoleBinding:
   name: "kubehelper-crb"
 

@@ -134,8 +134,8 @@ Replace YOUR_NAMESPACE_NAME with your namespace name.
 ```shell
 KUBE_HELPER_NAMESPACE="YOUR_NAMESPACE_NAME"
 kubectl create clusterrolebinding kubehelper-crb --clusterrole=kubehelper-cr --serviceaccount=$KUBE_HELPER_NAMESPACE:kubehelper-sa
-kubectl apply -f https://raw.githubusercontent.com/KubeHelper/kubehelper/develop/installers/kubectl/kubehelper-clusterrole.yaml —n $KUBE_HELPER_NAMESPACE
-kubectl apply -f https://raw.githubusercontent.com/KubeHelper/kubehelper/main/installers/kubectl/kubehelper-deployment.yaml —n $KUBE_HELPER_NAMESPACE
+kubectl apply -f https://raw.githubusercontent.com/KubeHelper/kubehelper/main/installers/kubectl/kubehelper-clusterrole.yaml -n $KUBE_HELPER_NAMESPACE
+kubectl apply -f https://raw.githubusercontent.com/KubeHelper/kubehelper/main/installers/kubectl/kubehelper-deployment.yaml -n $KUBE_HELPER_NAMESPACE
 ```
 #### Remove KubeHelper with kubectl.
 ```shell
