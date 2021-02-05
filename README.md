@@ -10,7 +10,6 @@
 [![LICENSE](https://img.shields.io/badge/license-GNU%20v3-green)](https://github.com/KubeHelper/kubehelper/blob/main/LICENSE)
 ![Docker Pulls](https://img.shields.io/docker/pulls/kubehelper/kubehelper)
 ![Docker Stars](https://img.shields.io/docker/stars/kubehelper/kubehelper)
-![Snyk Vulnerabilities for GitHub Repo](https://img.shields.io/snyk/vulnerabilities/github/KubeHelper/kubehelper)
 ![Sonar Coverage](https://img.shields.io/sonar/coverage/kubehelper?server=https%3A%2F%2Fsonarcloud.io)
 ![Sonar Quality Gate](https://img.shields.io/sonar/quality_gate/kubehelper?server=https%3A%2F%2Fsonarcloud.io)
 ![Liberapay receiving](https://img.shields.io/liberapay/receives/kubehelper)
