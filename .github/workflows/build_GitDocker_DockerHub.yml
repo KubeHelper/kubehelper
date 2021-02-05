@@ -19,6 +19,14 @@ jobs:
           java-version: 14
       - name: Build with Maven
         run: mvn -B package --file pom.xml
+      - name: Push to GitHub Packages
+        uses: docker/build-push-action@v1
+        with:
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: docker.pkg.github.com
+          repository: kubehelper/kubehelper
+          tags: 1.0.0
       - name: Push to Docker Hub
         uses: docker/build-push-action@v1
         with:
