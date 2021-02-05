@@ -39,13 +39,6 @@ public class KubeHelperCache {
     @Autowired
     private CacheManager cacheManager;
 
-    private List<String> hljsLanguages = Arrays.asList("livescript", "bash", "dockerfile", "apache", "xml", "markdown", "latex", "gradle", "go", "cpp",
-            "http", "json", "puppet", "awk", "ruby", "haml", "julia", "lua", "processing", "c", "typescript", "groovy", "scss", "less", "nginx", "diff",
-            "dos", "perl", "sql", "moonscript", "css", "vim", "dart", "scala", "java", "livecodeserver", "makefile", "profile", "plaintext", "rust",
-            "powershell", "python", "python-repl", "shell", "ini", "javascript", "yaml", "properties", "xquery", "kotlin");
-
-    public static Boolean COMMANDS_HOT_REPLACEMENT = false;
-
     public static String GIT_URL = "gitUrl";
     public static String GIT_BRANCH = "gitBranch";
     public static String GIT_USERNAME = "gitUser";
