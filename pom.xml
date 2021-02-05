@@ -23,8 +23,8 @@
         <sonar.projectKey>KubeHelper_kubehelper</sonar.projectKey>
         <sonar.organization>kubehelper</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
-        <sonar.sources>src/main</sonar.sources>
-        <sonar.exlusions>*.js,*.css</sonar.exlusions>
+        <sonar.sources>src/main/java/**/*,src/main/resources/web/zul/**/*</sonar.sources>
+<!--        <sonar.exlusions>*.js,*.css</sonar.exlusions>-->
     </properties>
 
     <dependencies>
