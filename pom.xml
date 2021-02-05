@@ -18,6 +18,9 @@
         <java.version>14</java.version>
         <zkspringboot.version>2.3.1</zkspringboot.version>
         <zk.version>9.5.0.2</zk.version>
+        <sonar.projectKey>KubeHelper_kubehelper</sonar.projectKey>
+        <sonar.organization>kubehelper</sonar.organization>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>
 
     <dependencies>
