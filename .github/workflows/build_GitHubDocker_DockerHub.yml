@@ -1,7 +1,7 @@
 # This workflow will build a Java project with Maven
 # For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
 
-name: Compile/build/githubDocker
+name: Build/GithubDocker/DockerHub
 
 on:
   workflow_dispatch:
@@ -21,6 +21,14 @@ jobs:
           java-version: 14
       - name: Build with Maven
         run: mvn -B package --file pom.xml
+      - name: Push to GitHub Packages
+        uses: docker/build-push-action@v1
+        with:
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: docker.pkg.github.com
+          repository: kubehelper/kubehelper
+          tags: 1.0.0
       - name: Push to Docker Hub
         uses: docker/build-push-action@v1
         with:
