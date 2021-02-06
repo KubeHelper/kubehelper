@@ -10,7 +10,6 @@
 [![LICENSE](https://img.shields.io/badge/license-GNU%20v3-green)](https://github.com/KubeHelper/kubehelper/blob/main/LICENSE)
 ![Docker Pulls](https://img.shields.io/docker/pulls/kubehelper/kubehelper)
 ![Docker Stars](https://img.shields.io/docker/stars/kubehelper/kubehelper)
-![Sonar Coverage](https://img.shields.io/sonar/coverage/KubeHelper_kubehelper?server=https://sonarcloud.io)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=KubeHelper_kubehelper&metric=alert_status)](https://sonarcloud.io/dashboard?id=KubeHelper_kubehelper)
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=KubeHelper_kubehelper&metric=security_rating)](https://sonarcloud.io/dashboard?id=KubeHelper_kubehelper)
 [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=KubeHelper_kubehelper&metric=bugs)](https://sonarcloud.io/dashboard?id=KubeHelper_kubehelper)

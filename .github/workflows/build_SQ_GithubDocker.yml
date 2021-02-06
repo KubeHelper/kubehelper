@@ -8,6 +8,11 @@ on:
     branches:
       - master
       - develop
+    inputs:
+      releaseTag:
+        description: 'Docker Release Tag'
+        required: true
+        default: '1.0.0'
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -45,4 +50,4 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
           registry: docker.pkg.github.com
           repository: kubehelper/kubehelper/kubehelper
-          tag_with_ref: true
+          tags: ${{ github.event.inputs.releaseTag }}
