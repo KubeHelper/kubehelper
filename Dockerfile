@@ -57,6 +57,6 @@ RUN kubectl krew install \
 
 VOLUME /kubehelper
 
-#COPY target/kubehelper.jar /kubehelper/kubehelper.jar
-#ENTRYPOINT ["java","-Dspring.profiles.active=prod","--enable-preview","-jar","/kubehelper/kubehelper.jar"]
-ENTRYPOINT ["tail","-f","/dev/null"]
+COPY target/kubehelper.jar /kubehelper/kubehelper.jar
+ENTRYPOINT ["java","-Dspring.profiles.active=prod","--enable-preview","-jar","/kubehelper/kubehelper.jar"]
+#ENTRYPOINT ["tail","-f","/dev/null"]
