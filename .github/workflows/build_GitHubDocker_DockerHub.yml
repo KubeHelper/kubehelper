@@ -32,7 +32,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
           registry: docker.pkg.github.com
-          repository: kubehelper/kubehelper
+          repository: kubehelper/kubehelper/kubehelper
           tags: ${{ github.event.inputs.releaseTag }}
       - name: Push to Docker Hub
         uses: docker/build-push-action@v1
