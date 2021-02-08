@@ -53,8 +53,10 @@ RUN kubectl krew install \
 
 #TODO ReMOVE AFTER
 #COPY .kube/config /kubehelper/.kube/config
+#COPY "C:\Users\ofedak\.kube" /home/kubehelper/.kube/config
 
 VOLUME /kubehelper
 
-COPY target/kubehelper.jar /kubehelper/kubehelper.jar
-ENTRYPOINT ["java","-Dspring.profiles.active=prod","--enable-preview","-jar","/kubehelper/kubehelper.jar"]
+#COPY target/kubehelper.jar /kubehelper/kubehelper.jar
+#ENTRYPOINT ["java","-Dspring.profiles.active=prod","--enable-preview","-jar","/kubehelper/kubehelper.jar"]
+ENTRYPOINT ["tail","-f","/dev/null"]

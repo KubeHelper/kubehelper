@@ -34,10 +34,10 @@
     <div id="indexWindow" viewModel="@id('indexVM') @init('com.kubehelper.viewmodels.IndexVM')" height="100%" width="100%">
         <borderlayout>
             <!-- Sidebar -->
-            <west id="mainMenuId" title="Kube Helper" size="13%" collapsible="true" autoscroll="true">
+            <west id="mainMenuId" title="Kube Helper" size="11%" collapsible="true" autoscroll="true">
                 <vbox>
                     <vbox id="mainMenuVBoxId">
-                        <image id="mainLogoId" src="~./img/kube-helper-512.png" width="@load(indexVM.logoSize)" height="@load(indexVM.logoSize)"/>
+                        <image id="mainLogoId" src="~./img/logo-hexa.png" width="@load(indexVM.logoSize)" height="@load(indexVM.logoSize)"/>
                         <panel width="100%" title="Menu" collapsible="true">
                             <panelchildren>
                                 <toolbarbutton id="dashboardMenuBtn" hflex="1" iconSclass="z-icon-dashboard" label="&#160;Dashboard" style="text-align: left; padding-left: 2px;"

@@ -1,7 +1,7 @@
 # [Kube Helper](https://github.com/KubeHelper/kubehelper)
 
 <p align="center">
-  <img src="https://github.com/KubeHelper/kubehelper/blob/develop/src/main/resources/static/img/logo-full.png" width="500" />
+  <img src="https://github.com/KubeHelper/kubehelper/blob/develop/src/main/resources/web/img/logo-full.png" width="500" />
 </p>
  
 ---       
