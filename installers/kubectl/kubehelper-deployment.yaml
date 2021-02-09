@@ -54,7 +54,7 @@ spec:
         runAsUser: 1000
       containers:
         - name: kubehelper
-          image: kubehelper/kubehelper:1.0.0
+          image: kubehelper/kubehelper:1.0.2
           imagePullPolicy: Always
           env:
             - name: KUBE_HELPER_UI_USERNAME
