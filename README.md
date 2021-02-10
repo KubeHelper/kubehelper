@@ -32,7 +32,7 @@
 * [Configurations - configure KubeHelper, change config, push, pull config commands, cron jobs from repository.](https://github.com/KubeHelper/kubehelper/wiki/Home#Configurations)
 * [Versions - KubeHelper utils, shells and plugins versions.](https://github.com/KubeHelper/kubehelper/wiki/UtilitiesAndPlugins)
 
-![KubeHelper](screenshots/main.png)
+![KubeHelper](screenshots/dashboard.png)
 
 ## Motivation
 
@@ -64,6 +64,9 @@ Before installing KubeHelper in your cluster, you can configure the installation
 
 KubeHelper has basic protection with a username and password. You can customize/replace them by replacing the environment variables in the deployment. By default, you can login with these
 credentials (username/password) **``kube/helper``**.
+
+After deployment, KubeHelper is visible in the container on port `8080`. This means that you can refer to the container by the service name. KubeHelper responds to 2 Urls `/home` and `/kubehelper`.
+If you are not logged in, you will be redirected to the login `/home` page. If you are logged in, then the KubeHelper will be available to you on `/kubehelper`.
 
 The interface consists of two parts, the control panel on the left and content area. KubeHelper combines a lot of different functionality that is divided into sections. Everyone will find something
 for themselves.
@@ -171,7 +174,7 @@ kubectl apply -f https://raw.githubusercontent.com/KubeHelper/kubehelper/main/in
 #### Remove KubeHelper with kubectl.
 
 ```shell
-kubectl delete deploy,sa,po,svc,clusterrole -l app=kubehelper -n YOUR_NAMESPACE_NAME
+kubectl delete deploy,sa,po,svc,clusterrole -l app=kubehelper -n $KUBE_HELPER_NAMESPACE
 kubectl delete clusterrolebinding kubehelper-crb
 ```
 
