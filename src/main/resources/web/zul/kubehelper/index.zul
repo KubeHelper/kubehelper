@@ -85,6 +85,8 @@
                                                onClick="@command('contactDeveloper')"/>
                                 <toolbarbutton id="helpTheProjectMenuBtn" hflex="1" iconSclass="z-icon-star" label="&#160;Help the project => RATE US" style="text-align: left; padding-left: 2px;"
                                                tooltiptext="https://github.com/KubeHelper/kubehelper/stargazers" href="https://github.com/KubeHelper/kubehelper/stargazers" target="_blank"/>
+                                <toolbarbutton id="slacktMenuBtn" hflex="1" iconSclass="fab fa-slack-hash" label="&#160;Slack" style="text-align: left; padding-left: 2px;"
+                                               tooltiptext="https://kubehelper.slack.com" href="https://kubehelper.slack.com" target="_blank"/>
                                 <separator orient="horizontal"/>
                                 <button iconSclass="z-icon-heartbeat" height="50px" width="100%" label="Donate" dir="reverse"
                                         style="font-size: 18px;font-weight: bold;" onClick="@command('donate')"/>

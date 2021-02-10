@@ -1,5 +1,3 @@
-# [Kube Helper](https://github.com/KubeHelper/kubehelper)
-
 <p align="center">
   <img src="https://github.com/KubeHelper/kubehelper/blob/develop/src/main/resources/web/img/logo-full.png" width="500" />
 </p>
@@ -37,10 +35,9 @@
 ## Motivation
 
 Kubernetes is a great and revolutionary product. I have been studying it and using for many years, but very often there was a need to have many different functions and commands at hand. Each time you
-type long commands on the command line, search in history, write aliases, and so on, of course, you can. But sometimes there is no way to login into console, or history has not been saved, or a new
-host. Or many other reasons.
+type long commands on the command line, search in history, write aliases, and so on, of course, you can. I like console and I understand that no product can replace the console. But sometimes there is no way to login into console, or history has not been saved, or you are on the new host. Or many other reasons.
 
-Some companies have strict rules and very often you need to forward several ssh tunnels to login into the console. Or generally very limited console access.
+Some companies have strict rules and very often you need to forward several ssh tunnels to login into the console. Or generally you has very limited console access.
 
 Many desktop clients requires a certificate to connect to the server. And keeping the certificate from the cluster on the local machine is not 100% secure.
 
@@ -54,8 +51,8 @@ commands, so I decided to do a "search" on many frequently used resources. As a 
 I also tried to look at the resources from the other side. Many GUI solutions show resources by namespace, a few more useful functions, and this is where the flexibility of graphical interfaces ends,
 and to do something different than just showing a list of resources in the namespace, again you have to turn to the console. For example group labels, find selector, view RBACs and so on ...
 
-Then I got the idea to help the community organize many commands in a single interface, install kubectl, plugins, utilities and make a graphical web interface for using the command line. Implemented
-other functions that will be useful in daily work with the Kubernetes cluster.
+Then I got the idea to help the community organize many commands in a single interface, install kubectl, plugins, utilities and make a graphical web interface for using the command line and also 
+implemented other functions that will be useful in daily work with the Kubernetes cluster.
 
 ## Quick start
 
@@ -83,7 +80,7 @@ Read more about fine-tuning and customization in the [installation section.](htt
 ## Your support
 
 ❗&nbsp; If you have a wonderful command that will be useful to the community and you want to share it. Please write a message in the discussions, or even better, add a message with a command and
-description in accordance with the KubeHelper format. You can see how should command looks like [here.](https://github.com/KubeHelper/kubehelper/wiki/Installation)
+description in accordance with the KubeHelper format. You can see how should command looks like [here.](https://github.com/KubeHelper/kubehelper/wiki/Home)
 
 ❗&nbsp; Which new features would you add at first? Which new feature will make your daily work easier? I composed a [list of possible new features](https://github.com/KubeHelper/kubehelper/talks), I
 would appreciate for your opinions and votes.
@@ -196,7 +193,8 @@ For detailed instructions on how to configure, customize, use, and more read the
 🐞 &nbsp; [Bug Report.](https://github.com/KubeHelper/kubehelper/issues/new?labels=kind:Bug&amp;template=BUG_REPORT.md)  
 ❓ &nbsp; [Support Request.](https://github.com/KubeHelper/kubehelper/issues/new?labels=kind:Support&amp;template=SUPPORT_REQUEST.md)  
 🤓 &nbsp; [Be a contributor.](https://github.com/KubeHelper/kubehelper/issues/new?labels=kind:Enhancement&amp;template=ENHANCEMENT_REQUEST.md)  
-⭐ &nbsp; [Help the project => RATE US](https://github.com/KubeHelper/kubehelper/stargazers)
+⭐ &nbsp; [Help the project => RATE US](https://github.com/KubeHelper/kubehelper/stargazers)  
+📢 &nbsp; [Slack.](https://kubehelper.slack.com)
 
 ## License
 
