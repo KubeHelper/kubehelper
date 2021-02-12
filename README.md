@@ -192,7 +192,7 @@ terraform destroy -auto-approve -compact-warnings -target=module.infra_kube_help
 
 #### Installing KubeHelper with kubectl.
 
-Replace YOUR_NAMESPACE_NAME with your namespace name. ❗&nbsp; Run order is important. This installation installs
+Replace YOUR_NAMESPACE_NAME with your namespace name. ❗&nbsp; Run order is important.
 
 ```shell
 KUBE_HELPER_NAMESPACE="YOUR_NAMESPACE_NAME"
