@@ -1,31 +1,36 @@
-<window id="donationsPopup" title="Many Thanks for Your Donation!" width="273px" position="center,top" closable="true" action="show: slideDown;hide: slideUp">
+<window id="donationsPopup" title="Many Thanks for Your Donation!" width="263px" position="center,top" closable="true" action="show: slideDown;hide: slideUp">
     <div>
         <vbox>
             <separator focus="true" orient="horizontal"/>
             <hlayout>
-                <image src="~./img/paypal.png" height="50px" width="50px"/>
-                <toolbarbutton width="200px" height="50px" iconSclass="z-icon-heartbeat" label="&#160;Paypal" dir="reverse"
-                               style="font-size: 20px;font-family: Courier, Monaco, monospace;text-align: left" href="https://www.paypal.me/kubehelper" target="_blank"/>
+                <image src="~./img/paypal.png" height="40px" width="40px"/>
+                <toolbarbutton width="200px" height="40px" iconSclass="z-icon-heartbeat" label="&#160;Paypal" dir="reverse"
+                               style="font-size: 16px;font-family: Courier, Monaco, monospace;text-align: left" href="https://www.paypal.me/kubehelper" target="_blank"/>
             </hlayout>
             <hlayout>
-                <image src="~./img/issue-hunt.png" height="50px" width="50px"/>
-                <toolbarbutton width="200px" height="50px" iconSclass="z-icon-heartbeat" label="&#160;IssueHunt" dir="reverse"
-                               style="font-size: 20px;font-family: Courier, Monaco, monospace;text-align: left" href="https://www.paypal.com/" target="_blank"/>
+                <image src="~./img/issue-hunt.png" height="40px" width="40px"/>
+                <toolbarbutton width="200px" height="40px" iconSclass="z-icon-heartbeat" label="&#160;IssueHunt" dir="reverse"
+                               style="font-size: 16px;font-family: Courier, Monaco, monospace;text-align: left" href="https://issuehunt.io/r/KubeHelper/kubehelper" target="_blank"/>
             </hlayout>
             <hlayout>
-                <image src="~./img/ko-fi.png" height="50px" width="50px"/>
-                <toolbarbutton width="200px" height="50px" iconSclass="z-icon-heartbeat" label="&#160;Ko-Fi" dir="reverse"
-                               style="font-size: 20px;font-family: Courier, Monaco, monospace;text-align: left" href="https://ko-fi.com/kubehelper" target="_blank"/>
+                <image src="~./img/ko-fi.png" height="40px" width="40px"/>
+                <toolbarbutton width="200px" height="40px" iconSclass="z-icon-heartbeat" label="&#160;Ko-Fi" dir="reverse"
+                               style="font-size: 16px;font-family: Courier, Monaco, monospace;text-align: left" href="https://ko-fi.com/kubehelper" target="_blank"/>
             </hlayout>
             <hlayout>
-                <image src="~./img/liberapay.png" height="50px" width="50px"/>
-                <toolbarbutton width="200px" height="50px" iconSclass="z-icon-heartbeat" label="&#160;Liberapay" dir="reverse"
-                               style="font-size: 20px;font-family: Courier, Monaco, monospace;text-align: left" href="https://liberapay.com/kubehelper/" target="_blank"/>
+                <image src="~./img/liberapay.png" height="40px" width="40px"/>
+                <toolbarbutton width="200px" height="40px" iconSclass="z-icon-heartbeat" label="&#160;Liberapay" dir="reverse"
+                               style="font-size: 16px;font-family: Courier, Monaco, monospace;text-align: left" href="https://liberapay.com/kubehelper/" target="_blank"/>
             </hlayout>
             <hlayout>
-                <image src="~./img/github.png" height="50px" width="50px"/>
-                <toolbarbutton width="200px" height="50px" iconSclass="z-icon-heartbeat" label="&#160;GitHub" dir="reverse"
-                               style="font-size: 20px;font-family: Courier, Monaco, monospace;text-align: left" href="https://github.com/JWebDev" target="_blank"/>
+                <image src="~./img/github.png" height="40px" width="40px"/>
+                <toolbarbutton width="200px" height="40px" iconSclass="z-icon-heartbeat" label="&#160;GitHub" dir="reverse"
+                               style="font-size: 16px;font-family: Courier, Monaco, monospace;text-align: left" href="https://github.com/KubeHelper/kubehelper" target="_blank"/>
+            </hlayout>
+            <hlayout>
+                <image src="~./img/opencollective.png" height="40px" width="40px"/>
+                <toolbarbutton width="200px" height="40px" iconSclass="z-icon-heartbeat" label="&#160;Open collective" dir="reverse"
+                               style="font-size: 16px;font-family: Courier, Monaco, monospace;text-align: left" href="https://opencollective.com/kubehelper" target="_blank"/>
             </hlayout>
             <separator orient="horizontal"/>
         </vbox>
