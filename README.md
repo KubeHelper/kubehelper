@@ -30,7 +30,7 @@
 * [Configurations - configure KubeHelper, change config, push, pull config commands, cron jobs from repository.](https://github.com/KubeHelper/kubehelper/wiki/Home#Configurations)
 * [Versions - KubeHelper utils, shells and plugins versions.](https://github.com/KubeHelper/kubehelper/wiki/UtilitiesAndPlugins)
 
-![KubeHelper](https://github.com/KubeHelper/kubehelper/wiki/screenshots/dashboard.png)
+![KubeHelper](https://github.com/KubeHelper/kubehelper/main/screenshots/dashboard.png)
 
 ## Motivation
 
