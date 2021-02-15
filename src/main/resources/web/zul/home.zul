@@ -18,7 +18,7 @@
                             </cell>
                             <cell width="100%" valign="middle">
                                 <label value="User :" width="40%"/>
-                                <textbox width="60%" placeholder="username" name="username" value="kube" style="float: right;"/>
+                                <textbox width="60%" placeholder="kube" name="username" style="float: right;"/>
                             </cell>
                             <cell width="100%">
                                 <html>
@@ -27,7 +27,7 @@
                             </cell>
                             <cell width="100%" valign="middle">
                                 <label value="Password :" width="40%"/>
-                                <textbox width="60%" placeholder="password" type="password" name="password" value="helper" style="float: right;"/>
+                                <textbox width="60%" placeholder="helper" type="password" name="password" style="float: right;"/>
                             </cell>
                             <cell width="100%">
                                 <html>

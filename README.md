@@ -28,27 +28,27 @@
 * [Commands - commands execution, management, creation, history.](https://github.com/KubeHelper/kubehelper/wiki/Home#Commands)
 * [Cron Jobs - creating, execution, control of cron jobs and view reports.](https://github.com/KubeHelper/kubehelper/wiki/Home#Cron-Jobs)
 * [Configurations - configure KubeHelper, change config, push, pull config commands, cron jobs from repository.](https://github.com/KubeHelper/kubehelper/wiki/Home#Configurations)
-* [Versions - KubeHelper utils, shells and plugins versions.](https://github.com/KubeHelper/kubehelper/wiki/UtilitiesAndPlugins)
+* [Versions - KubeHelper utils, shells and plugins versions.](https://github.com/KubeHelper/kubehelper/wiki/KubeHelper-utilities,-plugins-and-shells)
 
 ![KubeHelper](screenshots/dashboard.png)
 
 ## Motivation
 
-Kubernetes is a great and revolutionary product. I have been studying it and using for many years, but very often there was a need to have many different functions and commands at hand. Each time you
-type long commands on the command line, search in history, write aliases, and so on, of course, you can. I like console and I understand that no product can replace the console. But sometimes there is no way to login into console, or history has not been saved, or you are on the new host. Or many other reasons.
+Kubernetes is a great and revolutionary product. I have been studying it and using it for many years, but very often there was a need to have many different functions and commands at hand. Each time you type long commands in the command line, search in history, write aliases, and so on. Of course you can do so if you wish. I like consoles and I understand that no product can replace the console. But sometimes there is no way to login into the console, or history has not been saved, or you are under the new host. Or many other reasons.
 
-Some companies have strict rules and very often you need to forward several ssh tunnels to login into the console. Or generally you has very limited console access.
+Some companies have strict rules and very often you need to forward several ssh tunnels to login into the console. Or generally you have very limited console access.
 
 Many desktop clients requires a certificate to connect to the server. And keeping the certificate from the cluster on the local machine is not 100% secure.
 
-And what if there is no way to install the client on the local machine for access the cluster, again you need to create aliases or copy commands from snippets. Very often I see that people are looking
+And what if there is no way to install the client on the local machine for access to the cluster, again you need to create aliases or copy commands from snippets. Very often I see that people are 
+looking
 for certain kubectl commands, articles are published with several different commands, but there are hundreds of them, and thousands of variations. Of course, all these tasks can be automated, and
-surely every user / administrator of the cluster has already solved these tasks in one or another way for himself, but I am sure that there are some who have not done it yet.
+surely every user / administrator of the cluster has already solved these tasks in one or another way for himself/herself, but I am sure that there are some who have not done it yet.
 
-The same with search in Kubernetes cluster, sometimes you need to know where to look, and if there are a lot of resources, then it is not so easy to find what you need. I don't want to write a huge
-commands, so I decided to do a "search" on many frequently used resources. As a result, KubeHelper appeared, with ideas that came during development.
+The same with search in Kubernetes cluster, sometimes you need to know where to look, and if there are a lot of resources, then it is not so easy to find what you need. I don't want to write a long
+commands, so I decided to create a "search" for many frequently used resources. As a result, KubeHelper appeared, together with ideas that came during development.
 
-I also tried to look at the resources from the other side. Many GUI solutions show resources by namespace, a few more useful functions, and this is where the flexibility of graphical interfaces ends,
+I also tried to look at the resources from the other point of view. Many GUI solutions show resources by namespace, a few more useful functions, and this is where the flexibility of graphical interfaces ends,
 and to do something different than just showing a list of resources in the namespace, again you have to turn to the console. For example group labels, find selector, view RBACs and so on ...
 
 Then I got the idea to help the community organize many commands in a single interface, install kubectl, plugins, utilities and make a graphical web interface for using the command line and also 
@@ -56,19 +56,20 @@ implemented other functions that will be useful in daily work with the Kubernete
 
 ## Quick start
 
-Before installing KubeHelper in your cluster, you can configure the installation so that the KubeHelper is visible through the ``NodePort`` otherwise by default KubeHelper creates Service with
+Before installing KubeHelper in your cluster, you can configure the installation such that the KubeHelper is visible through the ``NodePort`` otherwise by default KubeHelper creates Service with
 ``ClusterIP`` and you need to specify service ``http://kubehelper-svc.YOUR-NAMESPACE/`` in your ingress or proxy.
 
 KubeHelper has basic protection with a username and password. You can customize/replace them by replacing the environment variables in the deployment. By default, you can login with these
 credentials (username/password) **``kube/helper``**.
 
-After deployment, KubeHelper is visible in the container on port `8080`. This means that you can refer to the container by the service name. KubeHelper responds to 2 Urls `/home` and `/kubehelper`.
+After deployment, KubeHelper is visible in the container at port `8080`. This means that you can refer to the container by the service name. KubeHelper responds to 2 Urls `/home` and `/kubehelper`.
 If you are not logged in, you will be redirected to the login `/home` page. If you are logged in, then the KubeHelper will be available to you on `/kubehelper`.
 
-The interface consists of two parts, the control panel on the left and content area. KubeHelper combines a lot of different functionality that is divided into sections. Everyone will find something
+The interface consists of two parts, the control panel on the left and content area. KubeHelper combines a lot of different functionality that are divided into sections. Everyone will find something
 for themselves.
 
-For your safety, KubeHelper is installed with read rights. Using the KubeHelper with default settings, you cannot modify, create, or delete resources. Therefore, you can only execute commands intended
+For your safety, KubeHelper is installed with read rights. Using the KubeHelper with default settings means you cannot modify, create, or delete resources. Therefore, you can only execute commands 
+intended
 for reading and viewing resources.
 
 But KubeHelper is very flexible in this regard, you can change the ClusterRole rights up to the cluster administrator 💪 . Be careful with these rights❗
@@ -80,12 +81,12 @@ Read more about fine-tuning and customization in the [installation section.](htt
 ## Your support
 
 ❗&nbsp; If you have a wonderful command that will be useful to the community and you want to share it. Please write a message in the discussions, or even better, add a message with a command and
-description in accordance with the KubeHelper format. You can see how should command looks like [here.](https://github.com/KubeHelper/kubehelper/wiki/Home)
+description in accordance with the KubeHelper format. You can see how the command looks like [here.](https://github.com/KubeHelper/kubehelper/wiki/Home)
 
 ❗&nbsp; Which new features would you add at first? Which new feature will make your daily work easier? I composed a [list of possible new features](https://github.com/KubeHelper/kubehelper/talks), I
 would appreciate for your opinions and votes.
 
-It is enough to leave a comment with priority in the form of numbers or your suggestion. Here is a
+It is enough to leave a comment with just a list of numbers sorted by priority, or feel free to leave your own suggestion. Here is a
 corresponding [Issue]((https://github.com/KubeHelper/kubehelper/issues/new?labels=kind:Feature&amp;template=FEATURE_REQUEST.md)) for a new feature request.
 
 🚀 🚀 🚀 &nbsp; ⭐⭐⭐ &nbsp; **Thank you in advance for your support, repost, fork, star, donation.** &nbsp; ⭐⭐⭐ &nbsp; 🚀🚀🚀
@@ -99,9 +100,9 @@ corresponding [Issue]((https://github.com/KubeHelper/kubehelper/issues/new?label
 ### Helm
 
 KubeHelper can be installed using Helm. It is highly recommended to change the default username and password.
-You can find a detailed description of all customize properties in file [values.yaml](https://github.com/KubeHelper/kubehelper/blob/main/installers/helm/kubehelper/values.yaml).
+You can find a detailed description of all customized properties in file [values.yaml](https://github.com/KubeHelper/kubehelper/blob/main/installers/helm/kubehelper/values.yaml).
 
-To install Helm Chart you have many different options. Here are some of them.
+To install a Helm Chart you have many different options. Here are some of them.
 ```shell
 #Download kubehelper.tar.gz with curl. Replace Version with last Version nummer
 curl -O https://github.com/KubeHelper/kubehelper/blob/main/installers/helm/kubehelper-VERSION.tar.gz
@@ -134,7 +135,7 @@ helm uninstall kubehelper -n YOURNAMESPACE
 ``` 
 
 #### Troubleshooting:
-Wget and Curl can download tar.gz file as html document. Then during installation you will receive the following error.
+Wget and Curl can download tar.gz files as html documents. Then during installation you will receive the following error.
 ```shell
 gzip: stdin: not in gzip format
 tar: Child returned status 1
@@ -158,7 +159,7 @@ There are 2 solutions, download the archive correctly or use the git clone and i
 The Terraform module is ready for installation. You need to connect it to your modules and specify the namespace in which the KubeHelper should be installed. Don't forget to change default username
 and password in [variables.tf](https://github.com/KubeHelper/kubehelper/blob/main/installers/terraform/variables.tf).
 
-* Add module to your main.tf. Change the name and path to the module.
+* Add a module to your main.tf. Change the name and path to the module.
 
 ```shell
 module "infra_kube_helper" {
@@ -178,7 +179,7 @@ terraform init
 terraform apply -auto-approve -compact-warnings -target=module.infra_kube_helper
 ```
 
-* Remove KubeHelper module with Terraform.
+* Remove the KubeHelper module with Terraform.
 
 ```shell
 terraform destroy -auto-approve -compact-warnings -target=module.infra_kube_helper
@@ -245,8 +246,7 @@ For detailed instructions on how to configure, customize, use, and more read the
 💥 &nbsp; [Enhancement Request](https://github.com/KubeHelper/kubehelper/issues/new?labels=kind:Enhancement&amp;template=ENHANCEMENT_REQUEST.md)  
 🚀 &nbsp; [New Feature Request](https://github.com/KubeHelper/kubehelper/issues/new?labels=kind:Feature&amp;template=FEATURE_REQUEST.md)  
 🐞 &nbsp; [Bug Report](https://github.com/KubeHelper/kubehelper/issues/new?labels=kind:Bug&amp;template=BUG_REPORT.md)  
-❓ &nbsp; [Support Request](https://github.com/KubeHelper/kubehelper/issues/new?labels=kind:Support&amp;template=SUPPORT_REQUEST.md)  
-🤓 &nbsp; [Be a contributor](https://github.com/KubeHelper/kubehelper/issues/new?labels=kind:Enhancement&amp;template=ENHANCEMENT_REQUEST.md)  
+❓ &nbsp; [Support Request](https://github.com/KubeHelper/kubehelper/issues/new?labels=kind:Support&amp;template=SUPPORT_REQUEST.md)
 ⭐ &nbsp; [Help the project => RATE US](https://github.com/KubeHelper/kubehelper/stargazers)  
 📢 &nbsp; [Slack](https://kubehelper.slack.com)
 
