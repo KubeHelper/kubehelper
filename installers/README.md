@@ -8,10 +8,10 @@ You can find a detailed description of all customized properties in file [values
 To install a Helm Chart you have many different options. Here are some of them.
 ```shell
 #Download kubehelper.tar.gz with curl. Replace Version with last Version nummer
-curl -O https://github.com/KubeHelper/kubehelper/blob/main/installers/helm/kubehelper-VERSION.tar.gz
+curl -O https://github.com/KubeHelper/kubehelper/blob/main/installers/helm/kubehelper-1.0.0.tar.gz
 
 #Download kubehelper.tar.gz with wget. Replace Version with last Version nummer
-wget https://github.com/KubeHelper/kubehelper/blob/main/installers/helm/kubehelper-VERSION.tar.gz
+wget https://github.com/KubeHelper/kubehelper/blob/main/installers/helm/kubehelper-1.0.0.tar.gz
 
 #or simply clone repo, and go to sources folder.
 cd /tmp && git clone https://github.com/KubeHelper/kubehelper.git
@@ -19,13 +19,13 @@ cd /tmp && git clone https://github.com/KubeHelper/kubehelper.git
 
 ```shell
 #Install KubeHelper with your myvals.yaml file from tar.gz
-helm install -f myvals.yaml -n YOURNAMESPACE kubehelper ./kubehelper-VERSION.tar.gz
+helm install -f myvals.yaml -n YOURNAMESPACE kubehelper ./kubehelper-1.0.0.tar.gz
 
 #Install KubeHelper with default file and change some values(username and password)
-helm install --set kubehelper.username=myusername --set kubehelper.password=mypassword -n YOURNAMESPACE kubehelper ./kubehelper-VERSION.tar.gz
+helm install --set kubehelper.username=myusername --set kubehelper.password=mypassword -n YOURNAMESPACE kubehelper ./kubehelper-1.0.0.tar.gz
 
 #Install KubeHelper with default values from tar.gz
-helm install -n YOURNAMESPACE kubehelper ./kubehelper-VERSION.tar.gz
+helm install -n YOURNAMESPACE kubehelper ./kubehelper-1.0.0.tar.gz
 
 #Install KubeHelper from cloned github repo with default values.
 helm install -n infra kubehelper /tmp/kubehelper/installers/helm/kubehelper/
@@ -38,7 +38,7 @@ helm uninstall kubehelper -n YOURNAMESPACE
 ``` 
 
 #### Troubleshooting:
-Wget and Curl can download tar.gz file as html document. Then during installation you will receive the following error.
+Wget and Curl can download tar.gz files as html documents. Then during installation you will receive the following error.
 ```shell
 gzip: stdin: not in gzip format
 tar: Child returned status 1
@@ -50,7 +50,7 @@ or something like this
 ```
 ```shell
 #You can check the file type as follows.
-file kubehelper-VERSION.tar.gz
+file kubehelper-1.0.0.tar.gz
 ```
 There are 2 solutions, download the archive correctly or use the git clone and install the helm chart from the sources.
 
