@@ -18,7 +18,7 @@
                 <caption iconSclass="z-icon-sliders"/>
                 <hbox width="100%">
                     <cell width="24%" tooltip="Git URL" valign="middle">
-                        <textbox width="100%" placeholder="https://github.com/JWebDev/kubehelper.git" value="@bind(configsVM.gitUrl)" type="url"/>
+                        <textbox width="100%" placeholder="https://github.com/KubeHelper/kubehelper.git" value="@bind(configsVM.gitUrl)" type="url"/>
                     </cell>
                     <separator width="1%" orient="vertical"></separator>
                     <cell width="9%" tooltip="Branch" valign="middle">

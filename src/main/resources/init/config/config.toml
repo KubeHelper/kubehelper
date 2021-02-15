@@ -1,9 +1,9 @@
 [git]
-url = "https://github.com/JWebDev/kubehelper.git"
-user = "kubehelper"
-password = "pass"
-branch = "default branch"
-email = "journame@yourcompany.com"
+url = ""
+user = ""
+password = ""
+branch = ""
+email = ""
 
 [[cron_job]]
 name = "your_job-name"
