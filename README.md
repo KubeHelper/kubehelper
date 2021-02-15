@@ -222,7 +222,7 @@ kubectl apply -f kubehelper-deployment.yaml  -n=$KUBE_HELPER_NAMESPACE
 #### Remove KubeHelper with kubectl.
 
 ```shell
-kubectl delete deploy,sa,po,svc,clusterrole -l app=kubehelper -n YOUR_NAMESPACE_NAME
+kubectl delete deploy,sa,po,svc,clusterrole -l app=kubehelper -n $KUBE_HELPER_NAMESPACE
 kubectl delete clusterrolebinding kubehelper-crb
 ```
 
