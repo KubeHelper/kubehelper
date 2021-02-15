@@ -1,11 +1,11 @@
-# Installation
+# Installation  
 
 ## Helm
 
 KubeHelper can be installed using Helm. It is highly recommended to change the default username and password.
-You can find a detailed description of all customize properties in file [values.yaml](https://github.com/KubeHelper/kubehelper/blob/main/installers/helm/kubehelper/values.yaml).
+You can find a detailed description of all customized properties in file [values.yaml](https://github.com/KubeHelper/kubehelper/blob/main/installers/helm/kubehelper/values.yaml).
 
-To install Helm Chart you have many different options. Here are some of them.
+To install a Helm Chart you have many different options. Here are some of them.
 ```shell
 #Download kubehelper.tar.gz with curl. Replace Version with last Version nummer
 curl -O https://github.com/KubeHelper/kubehelper/blob/main/installers/helm/kubehelper-VERSION.tar.gz
@@ -62,7 +62,7 @@ There are 2 solutions, download the archive correctly or use the git clone and i
 The Terraform module is ready for installation. You need to connect it to your modules and specify the namespace in which the KubeHelper should be installed. Don't forget to change default username
 and password in [variables.tf](https://github.com/KubeHelper/kubehelper/blob/main/installers/terraform/variables.tf).
 
-* Add module to your main.tf. Change the name and path to the module.
+* Add a module to your main.tf. Change the name and path to the module.
 
 ```shell
 module "infra_kube_helper" {
@@ -82,7 +82,7 @@ terraform init
 terraform apply -auto-approve -compact-warnings -target=module.infra_kube_helper
 ```
 
-* Remove KubeHelper module with Terraform.
+* Remove the KubeHelper module with Terraform.
 
 ```shell
 terraform destroy -auto-approve -compact-warnings -target=module.infra_kube_helper
@@ -91,10 +91,6 @@ terraform destroy -auto-approve -compact-warnings -target=module.infra_kube_help
 ---
 
 ## kubectl
-
-[Configure and customize kubectl installation.](https://github.com/KubeHelper/kubehelper/wiki/Installation)
-
-#### Installing KubeHelper with kubectl.
 
 Replace YOUR_NAMESPACE_NAME with your namespace name. ❗&nbsp; Run order is important.
 
@@ -137,7 +133,7 @@ kubectl delete clusterrolebinding kubehelper-crb
 
 ## ClusterRole Rights/Permissions
 
-For your safety, KubeHelper is installed with read rights. Using the KubeHelper with default settings, you cannot modify, create, or delete resources.  
+For your safety, KubeHelper is installed with read rights. By using the KubeHelper with default settings, means that you cannot modify, create, or delete resources.  
 Therefore, you can only execute commands intended for reading and viewing resources.  
 But KubeHelper is very flexible in this regard, you can change the ClusterRole rights up to the cluster administrator.  
 In this case, you can execute any commands and perform any actions with the cluster. Be careful with these rights❗

@@ -4,7 +4,7 @@
  
 ---       
 
-##### KubeHelper - simplifies many daily Kubernetes cluster tasks through a graphical web interface. Search, analysis, run commands, cron jobs, reports, filters, git synchronization and many more.
+##### KubeHelper - simplifies many daily Kubernetes cluster tasks through a web interface. Search, analysis, run commands, cron jobs, reports, filters, git synchronization and many more.
 
 [![LICENSE](https://img.shields.io/badge/license-GNU%20v3-green)](https://github.com/KubeHelper/kubehelper/blob/main/LICENSE)
 ![Docker Pulls](https://img.shields.io/docker/pulls/kubehelper/kubehelper)
@@ -51,7 +51,7 @@ commands, so I decided to create a "search" for many frequently used resources. 
 I also tried to look at the resources from the other point of view. Many GUI solutions show resources by namespace, a few more useful functions, and this is where the flexibility of graphical interfaces ends,
 and to do something different than just showing a list of resources in the namespace, again you have to turn to the console. For example group labels, find selector, view RBACs and so on ...
 
-Then I got the idea to help the community organize many commands in a single interface, install kubectl, plugins, utilities and make a graphical web interface for using the command line and also 
+Then I got the idea to help the community organize many commands in a single interface, install kubectl, plugins, utilities and make a web interface for using the command line and also 
 implemented other functions that will be useful in daily work with the Kubernetes cluster.
 
 ## Quick start
@@ -83,7 +83,7 @@ Read more about fine-tuning and customization in the [installation section.](htt
 ❗&nbsp; If you have a wonderful command that will be useful to the community and you want to share it. Please write a message in the discussions, or even better, add a message with a command and
 description in accordance with the KubeHelper format. You can see how the command looks like [here.](https://github.com/KubeHelper/kubehelper/wiki/Home)
 
-❗&nbsp; Which new features would you add at first? Which new feature will make your daily work easier? I composed a [list of possible new features](https://github.com/KubeHelper/kubehelper/talks), I
+❗&nbsp; Which new features would you add at first? Which new feature will make your daily work easier? I composed a [list of possible new features](https://github.com/KubeHelper/kubehelper/discussions/5), I
 would appreciate for your opinions and votes.
 
 It is enough to leave a comment with just a list of numbers sorted by priority, or feel free to leave your own suggestion. Here is a
@@ -188,10 +188,6 @@ terraform destroy -auto-approve -compact-warnings -target=module.infra_kube_help
 ---
 
 ### kubectl
-
-[Configure and customize kubectl installation.](https://github.com/KubeHelper/kubehelper/wiki/Installation)
-
-#### Installing KubeHelper with kubectl.
 
 Replace YOUR_NAMESPACE_NAME with your namespace name. ❗&nbsp; Run order is important.
 

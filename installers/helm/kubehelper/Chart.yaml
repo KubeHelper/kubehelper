@@ -1,7 +1,7 @@
 apiVersion: v2
 name: kubehelper
 version: 1.0.0
-description: KubeHelper - simplifies many daily cluster tasks through a graphical web interface. Search, analysis, run commands, cron jobs, reports, filters, git config and many more.
+description: KubeHelper - simplifies many daily cluster tasks through a web interface. Search, analysis, run commands, cron jobs, reports, filters, git synchronization and many more.
 type: application
 keywords:
   - kubernetes, kubehelper, search, analysis, run commands, cron jobs, reports, filters
